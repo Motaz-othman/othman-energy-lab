@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cooling Plant Selector · Othman Energy Lab</title>
+<meta name="description" content="Compare complete cooling plants for a data hall with liquid and air cooling, hour by hour over a full year: energy, water, peak demand and cost. By Othman Energy Lab.">
+<meta name="theme-color" content="#0e7c57">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Othman Energy Lab">
+<meta property="og:title" content="Cooling Plant Selector · Othman Energy Lab">
+<meta property="og:description" content="Compare complete cooling plants for a data hall with liquid and air cooling, hour by hour over a full year: energy, water, peak demand and cost. By Othman Energy Lab.">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+/* Shared styles for all calculators: theme tokens, layout, inputs, cards, tables, tabs */
+:root{
+  color-scheme: light;
+  --bg:#f6f6f4; --surface:#fcfcfb; --border:#e3e2de; --text:#0b0b0b; --text2:#52514e; --muted:#6f6e69;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --grey:#c9c8c3; --grey2:#9f9e99;
+  --good:#1a7f37; --warn:#b26b00; --bad:#c62828;
+  --brand:#0e7c57; --brand-ink:#0b6b4a;   /* Othman Energy Lab green: fills / text and links */
+}
+@media (prefers-color-scheme: dark){
+  :root:where(:not([data-theme="light"])){
+    color-scheme: dark;
+    --bg:#121211; --surface:#1a1a19; --border:#2e2e2c; --text:#f0efec; --text2:#c3c2b7; --muted:#8f8e88;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --grey:#4a4a47; --grey2:#6c6b67;
+    --good:#4cc26a; --warn:#e0a03a; --bad:#ef6b6b;
+    --brand:#17855e; --brand-ink:#4cc99a;
+  }
+}
+*{box-sizing:border-box}
+:root{--navh:58px;--maxw:1180px}
+html{scroll-padding-top:calc(var(--navh) + 12px)}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.pagehead{padding:20px 28px 8px}
+.pagehead h1{font-size:24px;margin:2px 0 4px;letter-spacing:-.01em}
+.crumbs{font-size:12.5px;color:var(--muted)}
+.crumbs a{color:var(--text2);text-decoration:none}
+.crumbs a:hover{color:var(--brand-ink)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chips span{font-size:11.5px;color:var(--text2);border:1px solid var(--border);border-radius:10px;padding:1px 8px;background:var(--surface)}
+h1{font-size:22px;margin:0 0 4px}
+.sub{color:var(--text2);margin:0}
+main.layout{display:grid;grid-template-columns:340px minmax(0,1fr);gap:18px;padding:12px 28px 40px;align-items:start}
+@media (max-width:900px){main.layout{grid-template-columns:minmax(0,1fr);padding:12px 16px 40px}.pagehead{padding:18px 16px 6px}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px}
+.card h2{font-size:15px;margin:0 0 10px}
+.card h3{font-size:12px;margin:14px 0 4px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em}
+label{display:block;font-size:12.5px;color:var(--text2);margin:8px 0 3px}
+input[type=number],select{width:100%;padding:7px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font:inherit}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.tabs{display:flex;gap:6px;margin-bottom:6px}
+.tabs button,.seg button{flex:1;padding:7px;border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:6px;cursor:pointer;font:inherit}
+.tabs button.on,.seg button.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.seg{display:inline-flex;gap:4px;margin-bottom:8px}.seg button{padding:4px 12px;font-size:12.5px;white-space:nowrap}
+.drop{border:1.5px dashed var(--border);border-radius:8px;padding:14px;text-align:center;color:var(--text2);cursor:pointer}
+.drop:hover{border-color:var(--brand)}
+input[type=range]{width:100%}
+.rng{display:grid;grid-template-columns:1fr 26px;align-items:center;gap:6px}
+.rng span{text-align:right;font-variant-numeric:tabular-nums}
+.note{font-size:12px;color:var(--muted);margin-top:6px}
+details summary{cursor:pointer;color:var(--text2);font-size:13px;margin-top:12px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+@media (max-width:700px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--bg);border-radius:8px;padding:10px}
+.kpi .v{font-size:19px;font-weight:650;font-variant-numeric:tabular-nums}
+.kpi .l{font-size:12px;color:var(--text2)}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--border);text-align:right;white-space:nowrap}
+th:first-child,td:first-child,td.l,th.l{text-align:left;white-space:normal}
+th{color:var(--text2);font-weight:600;font-size:12px}
+tr.best td{font-weight:650}
+.tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:600}
+.tag.ok{background:color-mix(in srgb,var(--good) 15%,transparent);color:var(--good)}
+.tag.x{background:color-mix(in srgb,var(--bad) 15%,transparent);color:var(--bad)}
+.split{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;align-items:start}
+@media (max-width:1150px){.split{grid-template-columns:1fr}}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:1100px){.grid2{grid-template-columns:1fr}}
+.chartbox{position:relative;height:250px}
+.banner{font-size:12.5px;padding:8px 10px;border-radius:6px;background:color-mix(in srgb,var(--warn) 14%,transparent);color:var(--text);margin-bottom:10px}
+.err{color:var(--bad);font-size:12.5px;margin-top:6px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--text2);margin:-2px 0 8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.method{font-size:12.5px;color:var(--text2)}
+.method li{margin:4px 0}
+.method code{font-size:12px;background:var(--bg);padding:1px 4px;border-radius:4px}
+.ctitle{font-size:13px;font-weight:600;margin:0 0 6px}
+/* results tabs */
+.rtabs{display:flex;flex-wrap:wrap;gap:4px;padding:4px;background:var(--surface);border:1px solid var(--border);border-radius:10px;position:sticky;top:calc(var(--navh) + env(safe-area-inset-top,0px));z-index:5}
+.rtabs button{flex:1 1 auto;border:0;background:none;padding:8px 14px;border-radius:7px;font:inherit;font-weight:500;color:var(--text2);cursor:pointer;white-space:nowrap}
+.rtabs button:hover{background:var(--bg);color:var(--text)}
+.rtabs button.on{background:var(--brand);color:#fff;font-weight:600}
+.rtabs button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.pane{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+.pane[hidden]{display:none}
+button.link{border:1px solid var(--brand-ink);background:none;color:var(--brand-ink);border-radius:6px;padding:6px 12px;font:inherit;font-weight:600;cursor:pointer}
+button.link:hover{background:color-mix(in srgb,var(--brand) 10%,transparent)}
+tr.click{cursor:pointer}
+tr.click:hover td{background:color-mix(in srgb,var(--text) 4%,transparent)}
+td.hi{background:color-mix(in srgb,var(--brand) 13%,transparent);font-weight:650}
+.tag:not(.ok):not(.x){background:var(--bg);color:var(--text2);border:1px solid var(--border)}
+/* site bar, footer, buttons (shared/js/site.js fills the bar and footer) */
+.sitebar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding-top:env(safe-area-inset-top,0px)}
+.sitebar-in{max-width:var(--maxw);margin:0 auto;height:var(--navh);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 28px}
+.brand{display:flex;align-items:center;gap:9px;color:var(--text);text-decoration:none;font-weight:650;font-size:15.5px;letter-spacing:-.015em;white-space:nowrap}
+.brand b{color:var(--brand-ink);font-weight:750}
+.brand svg{width:26px;height:26px;display:block}
+.sitebar nav{display:flex;gap:2px;overflow-x:auto}
+.sitebar nav a{color:var(--text2);text-decoration:none;padding:7px 11px;border-radius:7px;font-weight:500;white-space:nowrap}
+.sitebar nav a:hover{color:var(--text);background:var(--bg)}
+.sitebar nav a[aria-current]{color:var(--text);background:var(--bg);font-weight:600}
+.sitefoot{border-top:1px solid var(--border);margin-top:32px;color:var(--muted);font-size:12.5px}
+.sitefoot-in{max-width:var(--maxw);margin:0 auto;padding:28px 28px calc(28px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:16px 32px}
+.sitefoot .fb{display:flex;align-items:center;gap:8px;color:var(--text);font-weight:650;font-size:14px}
+.sitefoot .fb svg{width:22px;height:22px}
+.sitefoot .ft{margin-top:4px;color:var(--text2)}
+.sitefoot nav{display:flex;flex-wrap:wrap;gap:6px 18px}
+.sitefoot .fn{flex-basis:100%;padding-top:14px;border-top:1px solid var(--border)}
+.sitefoot a{color:var(--text2);text-decoration:none}
+.sitefoot a:hover{color:var(--brand-ink)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);text-decoration:none;font-weight:600;font-size:14px}
+.btn:hover{border-color:var(--brand)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.primary:hover{background:color-mix(in srgb,var(--brand) 88%,#000)}
+body.wide{--maxw:none}
+@media (max-width:900px){.sitebar-in,.sitefoot-in{padding-left:16px;padding-right:16px}}
+@media (max-width:560px){.brand .bn{display:none}.sitebar nav a{padding:7px 8px}}
+/* site pages (home, focus areas): sections and tool cards */
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+@media (max-width:900px){.wrap{padding:0 16px}}
+.wrap>section{padding:56px 0 8px}
+.eyebrow{font-size:12.5px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:var(--brand-ink);margin:0 0 10px}
+.shead{max-width:70ch;margin-bottom:22px}
+.shead h2{font-size:26px;letter-spacing:-.015em;margin:0 0 8px}
+.shead p{color:var(--text2);margin:0;font-size:15px}
+.shead p.eyebrow{color:var(--brand-ink);font-size:12.5px;margin-bottom:10px}
+.tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+a.tool{display:flex;flex-direction:column;gap:10px;color:inherit;text-decoration:none;padding:20px;transition:border-color .15s}
+a.tool:hover{border-color:var(--brand)}
+a.tool .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+a.tool .top .tag{margin-left:0}
+a.tool .area{font-size:12px;color:var(--muted)}
+a.tool h3{margin:0;font-size:18px;letter-spacing:-.01em;color:var(--text);text-transform:none}
+a.tool p{margin:0;color:var(--text2)}
+a.tool .chips{margin-top:auto}
+a.tool .open{color:var(--brand-ink);font-weight:600;font-size:13.5px}
+.soon{border-style:dashed;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:180px;text-align:center;padding:20px}
+.soon b{color:var(--text2)}
+/* motion: short and subtle; switched off when the visitor prefers reduced motion */
+html{scroll-behavior:smooth}
+a,button,.btn,.card,.tag,input,select{transition:background-color .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease,transform .18s ease}
+.btn:hover,button.link:hover{transform:translateY(-1px)}
+a.tool:hover,a.areac:hover,tr.click:hover{box-shadow:0 8px 22px color-mix(in srgb,var(--text) 9%,transparent)}
+a.tool:hover,a.areac:hover{transform:translateY(-2px)}
+input:focus-visible,select:focus-visible{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 22%,transparent)}
+.pane:not([hidden]){animation:fadeUp .24s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+details summary{list-style:none;display:flex;align-items:center;gap:8px;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"";flex:none;width:6px;height:6px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(-45deg);transition:transform .2s ease}
+details[open] summary::before{transform:rotate(45deg)}
+details summary:hover{color:var(--text)}
+details[open]>:not(summary){animation:fadeUp .2s ease both}
+.sitebar{transition:box-shadow .2s ease}
+.sitebar.scrolled{box-shadow:0 2px 14px color-mix(in srgb,#000 10%,transparent)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+/* company pages: vision and mission, values, approach steps, standards (home, about, contact) */
+.vm{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:900px){.vm{grid-template-columns:1fr}}
+.vmc{padding:26px;border-left:4px solid var(--brand)}
+.vml{display:block;font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--brand-ink);margin-bottom:10px}
+.vmc p{margin:0;font-size:18px;line-height:1.5;letter-spacing:-.005em;color:var(--text)}
+.values{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+@media (max-width:900px){.values{grid-template-columns:1fr}}
+.values div{display:flex;flex-direction:column;gap:4px;padding:4px 2px 4px 14px;border-left:2px solid var(--border)}
+.values b{font-size:14.5px}
+.values span{color:var(--text2)}
+/* approach */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media (max-width:1100px){.steps{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.steps{grid-template-columns:1fr}}
+.step{padding:22px}
+.step .n{display:inline-flex;width:28px;height:28px;border-radius:7px;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;background:var(--brand);margin-bottom:12px}
+.step h3{margin:0 0 6px;font-size:16px;color:var(--text);text-transform:none;letter-spacing:-.01em}
+.step p{margin:0;color:var(--text2)}
+/* standards */
+.stds{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.std{padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+.std .h{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.std b{font-size:14.5px}
+.std p{margin:0;color:var(--text2);font-size:13px}
+.std .tag{margin-left:0;white-space:nowrap}
+/* goals */
+.goals{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media (max-width:1000px){.goals{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.goals{grid-template-columns:1fr}}
+.goal{padding:22px;position:relative;overflow:hidden}
+.goal::before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:var(--brand);transform:scaleX(.18);transform-origin:left;transition:transform .3s ease}
+.goal:hover::before{transform:scaleX(1)}
+.goal .gn{display:block;font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--brand-ink);margin-bottom:10px;font-variant-numeric:tabular-nums}
+.goal h3{margin:0 0 6px;font-size:18px;letter-spacing:-.01em;color:var(--text);text-transform:none}
+.goal p{margin:0;color:var(--text2)}
+.toolsnote{margin-top:16px;padding:14px 18px;border-radius:10px;border:1px dashed color-mix(in srgb,var(--brand) 45%,var(--border));background:color-mix(in srgb,var(--brand) 6%,var(--bg));color:var(--text2)}
+.toolsnote b{color:var(--text)}
+.toolsnote a{color:var(--brand-ink);font-weight:600}
+/* top-bar tagline: quiet grey text right next to the logo (page links are in the footer) */
+.sitebar-in{justify-content:flex-start}
+.slogan{margin:0;padding-left:14px;border-left:1px solid var(--border);display:flex;flex-wrap:wrap;gap:0 6px;font-size:13.5px;font-weight:400;color:var(--muted);line-height:1.3}
+@media (max-width:700px){.slogan{font-size:12.5px;padding-left:10px}}
+@media (max-width:380px){.slogan span:last-child{display:none}}
+</style>
+<style>
+/* Cooling Plant Selector: page-specific styles (loads after shared/css/base.css) */
+#results{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;min-width:0}
+.reco{border-left:4px solid var(--brand)}
+.sbar{display:inline-block;height:8px;border-radius:0 4px 4px 0;background:var(--s1);margin-right:6px;vertical-align:0}
+/* systems */
+.sysseg{display:flex;flex-wrap:wrap;margin:0}
+.sysseg button{flex:0 1 auto;padding:7px 12px;font-size:13px}
+.sysseg .rk{display:inline-block;min-width:18px;margin-right:6px;font-weight:650;opacity:.75}
+.syshead{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.syshead h2{margin:0;font-size:18px}
+.syshead .tag{margin-left:0}
+.syshead .note{margin:0}
+.how{color:var(--text2);margin:8px 0 14px;max-width:80ch}
+.kpis.k6{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+#sysSvg{overflow-x:auto}
+.schem{display:block;width:100%;min-width:720px;max-width:1000px;height:auto;margin:4px 0 4px}
+.schem text.h{font-size:14px;font-weight:700}
+.schem .bx.tes{stroke-dasharray:5 3}
+.schem .bx.it{fill:color-mix(in srgb,var(--brand) 8%,var(--bg))}
+.schem .pump{fill:var(--surface);stroke:var(--text2);stroke-width:1.5}
+.schem .pumpv{fill:var(--text2)}
+.schem text{fill:var(--text);font-size:12.5px;font-weight:600}
+.schem text.t2{fill:var(--text2);font-size:11px;font-weight:400}
+.schem .bx{fill:var(--bg);stroke:var(--grey2);stroke-width:1.2}
+.schem .zone{fill:color-mix(in srgb,var(--s1) 5%,transparent);stroke:var(--border);stroke-dasharray:4 3}
+.schem .pipe{fill:none;stroke:var(--text2);stroke-width:2}
+.schem .heat{fill:none;stroke:var(--grey2);stroke-width:1.5;stroke-dasharray:4 3}
+.mode{display:grid;grid-template-columns:170px 1fr;gap:4px 12px;align-items:center;margin:10px 0}
+.mode .mbar{display:flex;gap:2px;height:14px}
+.mode .mbar span{min-width:2px}
+.mode .mbar span:last-child{border-radius:0 4px 4px 0}
+.mode .mv{grid-column:2;font-size:12px;color:var(--text2)}
+@media (max-width:600px){.mode{grid-template-columns:1fr}.mode .mv{grid-column:1}}
+.pros ul{margin:4px 0 0 18px;padding:0}
+.pros li{margin:3px 0}
+#tOv th:nth-child(2),#tOv td:nth-child(2){text-align:left;white-space:normal;min-width:220px}
+#tOv td:first-child{color:var(--text2)}
+/* system summary cards (top) */
+.scards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:12px}
+.scard{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.scard.rec{border:2px solid var(--brand);padding:11px}
+.scard.off{opacity:.7}
+.scard .stop{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:20px}
+.scard .stop .tag{margin-left:0}
+.scard .stop .note{margin:0}
+.scard .sname{font-weight:650;font-size:15px;line-height:1.3;min-height:2.6em}
+.scard dl{margin:0;display:grid;gap:2px}
+.scard dl div{display:flex;justify-content:space-between;gap:8px;padding:4px 6px;border-radius:4px}
+.scard dt{color:var(--text2);font-size:12.5px}
+.scard dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.scard dl div.hi{background:color-mix(in srgb,var(--brand) 13%,transparent)}
+.scard ul{margin:0 0 0 16px;padding:0;font-size:12.5px;color:var(--text2)}
+.scard .link{margin-top:auto;align-self:flex-start;padding:5px 10px;font-size:13px}
+/* extreme ambient (design condition) strip under the project line */
+.amb{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin-top:10px;padding:10px 14px;border-radius:8px;background:color-mix(in srgb,var(--warn) 10%,var(--bg));border:1px solid color-mix(in srgb,var(--warn) 35%,var(--border))}
+.amb .al{font-size:12px;font-weight:650;letter-spacing:.05em;text-transform:uppercase;color:var(--text2)}
+.amb .av{display:inline-flex;align-items:center;gap:6px;color:var(--text2)}
+.amb .av b{font-size:18px;color:var(--text);font-variant-numeric:tabular-nums}
+.amb .av i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.amb .an{font-size:12px;color:var(--text2);margin-left:auto}
+@media (max-width:600px){.amb .an{margin-left:0;flex-basis:100%}}
+.scard dt small{display:block;font-size:11px;color:var(--muted);line-height:1.2}
+.scard dl div{align-items:center}
+/* column headings: Inputs (left) and Results (right) */
+.incol{display:grid;gap:10px;min-width:0}
+.colhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;min-height:22px}
+.colhead b{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--brand-ink)}
+.colhead span{font-size:12.5px;color:var(--muted)}
+#results>.colhead{margin-bottom:-8px}
+/* CSV format help in the Weather file tab */
+.csvfmt{margin-top:12px;padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);font-size:12.5px;color:var(--text2)}
+.csvfmt p{margin:0 0 6px}
+.csvfmt code{display:block;font-size:11.5px;padding:8px;border-radius:6px;background:var(--surface);border:1px solid var(--border);color:var(--text);overflow-x:auto;white-space:nowrap;line-height:1.5}
+.csvfmt ul{margin:8px 0 10px 16px;padding:0}
+.csvfmt li{margin:3px 0}
+.csvfmt .note{display:block;margin-top:6px}
+/* climate tab: basis switch and legend on one row */
+.climbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin-bottom:10px}
+.climbar .seg,.climbar .legend{margin:0}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body class="wide" style="--navh:0px">
+<div class="pagehead">
+  <h1>Cooling Plant Selector</h1>
+  <p class="sub">Compare air-cooled chillers, free-cooling dry coolers, adiabatic coolers and cooling towers for a data hall with liquid and air cooling loops, hour by hour over a full year.</p>
+  <div class="chips"><span>ASHRAE 90.4 MLC</span><span>ASHRAE 90.1 chiller minimums</span><span>AHRI 550/590</span><span>8,760-hour simulation</span></div>
+</div>
+<main class="layout">
+<div class="incol">
+<div class="colhead"><b>Inputs</b><span>Change any value; results update instantly</span></div>
+<aside class="card" id="inputs">
+  <h2>1. Weather</h2>
+  <div class="tabs"><button id="tabCity" class="on">City</button><button id="tabFile">Weather file</button></div>
+  <div id="cityPane">
+    <label for="city">City</label>
+    <select id="city"></select>
+    <div class="note">Built-in cities use an approximate hourly year generated from 1991–2020 monthly normals. Upload an EPW file for design-grade results.</div>
+  </div>
+  <div id="filePane" hidden>
+    <div class="drop" id="drop">Drop an <b>.epw</b> file (ASHRAE IWEC / TMY) or a CSV here, or click to choose<input type="file" id="file" accept=".epw,.csv,.txt" hidden></div>
+    <div id="fileInfo" class="note"></div>
+    <div class="csvfmt">
+      <div class="ctitle">CSV format</div>
+      <p>One row per hour, 8,760 rows from 1 January 00:00, with a header row:</p>
+      <code>Month,Day,Hour,DryBulb_C,RH_pct,Pressure_Pa<br>1,1,0,17.1,64.9,101205<br>1,1,1,15.9,70.0,101205</code>
+      <ul>
+        <li><b>Required:</b> dry-bulb (°C) and one of RH (%), dew point (°C) or wet-bulb (°C).</li>
+        <li><b>Optional:</b> month (1–12); station pressure (Pa, hPa or kPa), otherwise sea level is assumed.</li>
+        <li>Comma, semicolon or tab separated. Headers are matched by name: “dry”/“DB”, “RH”/“humid”, “dew”, “wet”/“WB”, “month”, “press”.</li>
+      </ul>
+      <button type="button" class="link" id="csvSample">Download sample CSV</button>
+      <span class="note" id="csvSampleNote"></span>
+    </div>
+    <div class="note">EPW files for most locations are free at climate.onebuilding.org.</div>
+  </div>
+
+  <h2 style="margin-top:18px">2. Data hall cooling load</h2>
+  <div class="row">
+    <div><label for="it">Cooling load (MW)</label><input type="number" id="it" value="20" min="0.1" step="0.5"></div>
+    <div><label for="lf">Frequent load (%)</label><input type="number" id="lf" value="80" min="10" max="100" step="5"></div>
+  </div>
+  <h3>Liquid cooling loop</h3>
+  <div class="row3">
+    <div><label for="lcp">Share (%)</label><input type="number" id="lcp" value="80" min="0" max="100" step="5"></div>
+    <div><label for="lcs">Supply (°C)</label><input type="number" id="lcs" value="30" min="5" max="50" step="1"></div>
+    <div><label for="lcr">Return (°C)</label><input type="number" id="lcr" value="40" min="6" max="65" step="1"></div>
+  </div>
+  <h3>Air cooling loop <span id="airShare" style="text-transform:none;letter-spacing:0;font-weight:400"></span></h3>
+  <div class="row">
+    <div><label for="acs">Supply (°C)</label><input type="number" id="acs" value="20" min="5" max="40" step="1"></div>
+    <div><label for="acr">Return (°C)</label><input type="number" id="acr" value="30" min="6" max="50" step="1"></div>
+  </div>
+
+  <h2 style="margin-top:18px">3. Site</h2>
+  <label for="water">Water availability</label>
+  <select id="water">
+    <option value="plenty">Available (potable or TSE)</option>
+    <option value="limited">Limited</option>
+    <option value="none">None (zero-water design)</option>
+  </select>
+
+  <h3>Design condition (extreme)</h3>
+  <div class="row">
+    <div><label for="dbD">Design dry-bulb (°C)</label><input type="number" id="dbD" step="0.1" placeholder="auto"></div>
+    <div><label for="wbD">Design wet-bulb (°C)</label><input type="number" id="wbD" step="0.1" placeholder="auto"></div>
+  </div>
+  <div class="note">Leave blank to use the hottest dry-bulb and most humid wet-bulb hour in the weather data. For design, enter ASHRAE extreme values (e.g. 20-year return period, per ASHRAE 90.4 practice) from the ASHRAE Climatic Design Conditions.</div>
+
+
+  <details>
+    <summary>Utility tariffs (running cost)</summary>
+    <div class="row">
+      <div><label for="tE">Electricity ($/kWh)</label><input type="number" id="tE" value="0.10" step="0.01" min="0"></div>
+      <div><label for="tW">Water incl. treatment ($/m³)</label><input type="number" id="tW" value="2.5" step="0.1" min="0"></div>
+    </div>
+    <div class="row"><div><label for="tD">Demand charge ($/kW per month)</label><input type="number" id="tD" value="0" step="1" min="0"></div><div></div></div>
+    <div class="note">Running cost of cooling only (not the IT load). The demand charge is applied to the cooling electrical peak every month. Indicative defaults; enter the local tariff.</div>
+  </details>
+  <details>
+    <summary>Chillers (ASHRAE 90.1 / AHRI 550/590 basis)</summary>
+    <div class="row">
+      <div><label for="copA">Air-cooled rated COP</label><input type="number" id="copA" value="2.985" step="0.1" min="1"></div>
+      <div><label for="copW">Water-cooled rated COP</label><input type="number" id="copW" value="6.286" step="0.1" min="1"></div>
+    </div>
+    <div class="row">
+      <div><label for="nCh">Duty chillers per loop</label><input type="number" id="nCh" value="4" step="1" min="1"></div>
+      <div><label for="copMax">Max COP (low lift)</label><input type="number" id="copMax" value="14" step="1" min="4"></div>
+    </div>
+    <div class="row">
+      <div><label for="acMax">Air-cooled max ambient (°C)</label><input type="number" id="acMax" value="52" step="1"></div>
+      <div><label for="wcMax">Max entering condenser water (°C)</label><input type="number" id="wcMax" value="43" step="1"></div>
+    </div>
+    <div class="note">Defaults are ASHRAE 90.1-2019 Path A minimums (air-cooled; water-cooled ≥ 2,110 kW). Enter selected equipment values to override.</div>
+  </details>
+  <details>
+    <summary>Heat rejection and pumps</summary>
+    <div class="row">
+      <div><label for="aDC">Dry cooler approach (K)</label><input type="number" id="aDC" value="6" step="0.5"></div>
+      <div><label for="aCT">Tower approach (K)</label><input type="number" id="aCT" value="4" step="0.5"></div>
+    </div>
+    <div class="row">
+      <div><label for="aHX">Plate HX approach (K)</label><input type="number" id="aHX" value="1.5" step="0.5"></div>
+      <div><label for="eAD">Adiabatic effectiveness</label><input type="number" id="eAD" value="0.85" step="0.05" min="0" max="1"></div>
+    </div>
+    <div class="row">
+      <div><label for="swAD">Adiabatic on above (°C)</label><input type="number" id="swAD" value="24" step="1"></div>
+      <div><label for="coc">Tower cycles of conc.</label><input type="number" id="coc" value="4" step="0.5" min="1.5"></div>
+    </div>
+    <div class="row">
+      <div><label for="pump">Primary pumps, FW / CHW (% of load)</label><input type="number" id="pump" value="1.5" step="0.5" min="0"></div>
+      <div><label for="cwp">Condenser pumps (% of rejected)</label><input type="number" id="cwp" value="1.2" step="0.1" min="0"></div>
+    </div>
+  </details>
+  <details>
+    <summary>Data hall terminal units (CRAH / FWU / CDU)</summary>
+    <div class="row">
+      <div><label for="fanT">CRAH / FWU fans (% of air-loop load)</label><input type="number" id="fanT" value="3" step="0.5" min="0"></div>
+      <div><label for="cduP">CDU pumps (% of liquid-loop load)</label><input type="number" id="cduP" value="1" step="0.25" min="0"></div>
+    </div>
+    <div class="note">Electrical input including motor and drive losses. Counted as cooling energy (as in the ASHRAE 90.4 MLC), and added as heat to its loop, so the chillers and heat rejection remove it too.</div>
+  </details>
+  <details>
+    <summary>Electrical losses</summary>
+    <div class="row">
+      <div><label for="ups">UPS efficiency (%)</label><input type="number" id="ups" value="96" step="0.5" min="80" max="100"></div>
+      <div><label for="dloss">Transformer + distribution losses (%)</label><input type="number" id="dloss" value="2" step="0.5" min="0" max="10"></div>
+    </div>
+    <div class="note">UPS losses apply to the IT load; transformer and distribution losses apply to the whole facility (IT + cooling). Used for the annual PUE only; electrical peaks are the cooling plant only. Cooling for electrical rooms is not included.</div>
+  </details>
+  <details>
+    <summary>Initial cost rates ($ per kW of capacity)</summary>
+    <div id="rates"></div>
+    <div class="row"><div><label for="red">Redundancy (%)</label><input type="number" id="red" value="25" step="5" min="0"></div><div></div></div>
+    <div class="note">Indicative installed rates for screening only. Replace with local quotes.</div>
+  </details>
+</aside>
+</div>
+
+<section id="results">
+  <div class="colhead"><b>Results</b><span>Ranked systems, then details in the tabs below</span></div>
+  <div class="card reco" id="reco"></div>
+
+  <nav class="rtabs" id="rtabs" role="tablist" aria-label="Results">
+    <button role="tab" data-p="ov" class="on" aria-selected="true">Overview</button>
+    <button role="tab" data-p="sys" aria-selected="false">Systems</button>
+    <button role="tab" data-p="en" aria-selected="false">Energy &amp; water</button>
+    <button role="tab" data-p="cost" aria-selected="false">Cost</button>
+    <button role="tab" data-p="clim" aria-selected="false">Climate</button>
+    <button role="tab" data-p="meth" aria-selected="false">Method</button>
+  </nav>
+
+  <div class="pane" id="p-ov">
+    <div class="card"><h2>All options side by side</h2>
+      <div id="tOv"></div>
+      <div class="note">Highlighted cells are the best value among feasible options. Score weighs energy (4), water (3, doubled when water is limited), peak power (3) and initial cost (2). Click a row to see that system in full.</div></div>
+    <div class="card"><h2>Design-day check</h2><div id="tDes"></div><div class="note" id="desNote"></div></div>
+  </div>
+
+  <div class="pane" id="p-sys" hidden>
+    <div class="seg sysseg" id="sysSeg"></div>
+    <div class="card">
+      <div class="syshead" id="sysHead"></div>
+      <p class="how" id="sysHow"></p>
+      <div class="ctitle">How it is connected</div>
+      <div id="sysSvg"></div>
+      <div class="kpis k6" id="sysKpi"></div>
+      <div class="note" id="sysDes"></div>
+    </div>
+    <div class="card"><h2>How it runs over the year</h2>
+      <div class="legend"><span><i style="background:var(--s3)"></i>Free cooling (chiller off)</span><span><i style="background:var(--s1)"></i>Partial (pre-cooling + chiller)</span><span><i style="background:var(--s2)"></i>Chiller only</span></div>
+      <div id="sysModes"></div>
+      <div class="ctitle" id="mTitle" style="margin-top:16px">Monthly operating hours</div>
+      <div class="seg" id="loopSeg"><button data-l="0" class="on">Liquid loop</button><button data-l="1">Air loop</button></div>
+      <div class="chartbox"><canvas id="cM"></canvas></div>
+    </div>
+    <div class="card"><div class="grid2">
+      <div><h2>Equipment and cost</h2><div id="sysComp"></div><div class="note" id="compNote"></div></div>
+      <div class="pros"><h2>Strengths and watch-outs</h2><div id="sysPros"></div></div>
+    </div></div>
+  </div>
+
+  <div class="pane" id="p-en" hidden>
+    <div class="card"><h2>Energy efficiency</h2><div class="split">
+      <div><div id="tEff"></div><div class="note">MLC = annual mechanical energy ÷ annual cooling load (ASHRAE 90.4 definition, cooling load taken as IT energy). Free-cooling hours: chiller fully off.</div></div>
+      <div><div class="ctitle" id="effTitle">Annual MLC</div><div class="chartbox"><canvas id="cEff"></canvas></div></div>
+    </div></div>
+    <div class="card"><h2>Electricity and water consumption</h2><div class="split">
+      <div><div id="tCons"></div><div class="note">Annual totals at the frequent load. Peaks are at 100% load on the worst hour of the year. Electrical peak = cooling only: chillers + heat-rejection fans + pumps + CRAH / FWU fans + CDU pumps (no IT load, no electrical equipment or losses). Water peak = make-up water (evaporation, blowdown, pad water). PUE = (IT + cooling + losses) ÷ IT, annual. CRAH / fan-wall fans are not included.</div></div>
+      <div>
+        <div class="ctitle" id="elTitle">Annual electricity by component</div>
+        <div class="legend"><span><i style="background:var(--s1)"></i>Chiller compressors</span><span><i style="background:var(--s4)"></i>Heat-rejection fans</span><span><i style="background:var(--grey2)"></i>Pumps</span><span><i style="background:var(--s2)"></i>CRAH / FWU fans + CDU pumps</span></div>
+        <div class="chartbox" style="height:220px"><canvas id="cEl"></canvas></div>
+        <div class="ctitle" id="wTitle" style="margin-top:14px">Annual water</div>
+        <div class="chartbox" style="height:200px"><canvas id="cW"></canvas></div>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="pane" id="p-cost" hidden>
+    <div class="card"><h2>Running cost (cooling)</h2>
+      <div id="tRun"></div><div class="note" id="runNote"></div>
+      <div class="ctitle" id="runTitle" style="margin-top:18px">Annual running cost</div>
+      <div class="legend"><span><i style="background:var(--s1)"></i>Electricity</span><span><i style="background:var(--s3)"></i>Water</span><span><i style="background:var(--s4)"></i>Demand charge</span></div>
+      <div class="chartbox" style="height:220px"><canvas id="cRun"></canvas></div>
+    </div>
+    <div class="card"><h2>Initial cost (estimated range)</h2><div class="split">
+      <div><div id="tCap"></div><div class="note">Rate-based estimate, not a quotation: capacity × redundancy × low/high rate for each component. Excludes building works, electrical and controls.</div></div>
+      <div><div class="ctitle" id="capTitle">Estimated initial cost range</div><div class="chartbox"><canvas id="cCap"></canvas></div></div>
+    </div></div>
+  </div>
+
+  <div class="pane" id="p-clim" hidden>
+    <div class="card"><h2>Climate: free-cooling potential by month</h2>
+      <div class="kpis" id="clKpi" style="margin:0 0 14px"></div>
+      <div class="climbar">
+        <div class="seg" id="climSeg"><button data-dev="dc" class="on">Dry coolers (dry-bulb)</button><button data-dev="ct">Cooling towers (wet-bulb)</button></div>
+        <div class="legend"><span><i style="background:var(--s3)"></i>Free cooling (outdoor air alone)</span><span><i style="background:var(--s1)"></i>Partial (pre-cooling + chiller)</span><span><i style="background:var(--s2)"></i>Chiller only</span></div>
+      </div>
+      <div class="grid2">
+        <div><div class="ctitle" id="clTitle0">Liquid cooling loop (LC)</div><div class="note" id="clSub0" style="margin:0 0 6px"></div><div class="chartbox" style="height:260px"><canvas id="cCl0"></canvas></div></div>
+        <div><div class="ctitle" id="clTitle1">Air cooling loop (AC)</div><div class="note" id="clSub1" style="margin:0 0 6px"></div><div class="chartbox" style="height:260px"><canvas id="cCl1"></canvas></div></div>
+      </div>
+      <div class="note" id="clNote"></div></div>
+  </div>
+
+  <div class="pane" id="p-meth" hidden>
+  <div class="card">
+    <h2>Method and equations</h2>
+    <ul class="method">
+      <li><b>Psychrometrics</b> (ASHRAE Handbook Fundamentals, Ch. 1): saturation pressure by the Hyland–Wexler equations; humidity ratio <code>W = 0.621945·p<sub>w</sub>/(p − p<sub>w</sub>)</code>; wet-bulb solved from <code>W = [(2501 − 2.326t*)W<sub>s</sub>* − 1.006(t − t*)] / (2501 + 1.86t − 4.186t*)</code>. Station pressure from elevation.</li>
+      <li><b>Each loop, every hour</b>: return water is first cooled by the outdoor device, leaving at <code>T<sub>out</sub></code>; free-cooling fraction <code>FF = (T<sub>ret</sub> − T<sub>out</sub>)/(T<sub>ret</sub> − T<sub>sup</sub>)</code> (0–1); the chiller trims the rest.</li>
+      <li><b>Terminal units</b>: CRAH / FWU fans (air loop) and CDU pumps (liquid loop) draw a set % of their loop load. Their power is cooling energy, and the same power is added to the loop as heat: <code>Q<sub>loop</sub> = Q<sub>IT</sub> × (1 + terminal %)</code>, which the pre-cooling, chillers and heat rejection must remove. Chillers are sized for this load.</li>
+      <li><b>T<sub>out</sub></b>: dry cooler <code>T<sub>db</sub> + approach</code>; adiabatic <code>T<sub>eff</sub> + approach + HX</code> with <code>T<sub>eff</sub> = T<sub>db</sub> − ε(T<sub>db</sub> − T<sub>wb</sub>)</code> (ASHRAE Systems &amp; Equipment, evaporative cooling); tower <code>T<sub>wb</sub> + approach + HX</code>.</li>
+      <li><b>Chillers</b> (DOE-2 / EnergyPlus EIR form): <code>P = (Q<sub>cap</sub>/COP<sub>rated</sub>) × EIRFT × EIRFPLR</code>. COP<sub>rated</sub> at AHRI 550/590 conditions (defaults: ASHRAE 90.1-2019 Path A minimums). EIRFT scales with lift at constant Carnot fraction, because 20–30 °C chilled water is outside published curve ranges. EIRFPLR from EnergyPlus reference curves: water-cooled VSD centrifugal 0.0731 + 0.1514·PLR + 0.7709·PLR²; air-cooled screw = PLR. Duty chillers stage to keep PLR high.</li>
+      <li><b>Condensing temperature</b>: air-cooled <code>T<sub>db</sub> + 15 K</code>; water-cooled <code>T<sub>ECW</sub> + 7.6 K</code>, where entering condenser water = <code>T<sub>wb</sub> + tower approach</code> or <code>T<sub>eff</sub> + cooler approach</code>.</li>
+      <li><b>Water</b>: tower evaporation <code>0.8·Q<sub>rej</sub>/h<sub>fg</sub></code> plus blowdown <code>E/(CoC − 1)</code>; adiabatic water only when pads are wet (above the switch temperature).</li>
+      <li><b>Design-day check</b>: each option at 100% load at the design dry-bulb and wet-bulb (applied together, which is conservative). Fails if a chiller would exceed its condenser limit (air-cooled max ambient, max entering condenser water).</li>
+      <li><b>MLC</b> (ASHRAE 90.4): annual mechanical energy (compressors, heat-rejection fans, primary, condenser and CDU pumps, CRAH / FWU fans) ÷ annual IT energy.</li>
+      <li><b>Peaks</b>: at 100% load on the worst hour of the year. Electrical peak (cooling) = compressors + heat-rejection fans + pumps + CRAH / FWU fans + CDU pumps. It excludes the IT load and the electrical equipment and its losses. Water peak = make-up water rate in m³/h (tower evaporation and blowdown, or adiabatic pad water). Chillers are staged each hour to the number that gives the lowest power.</li>
+      <li><b>Electrical losses and PUE</b>: UPS losses on the IT load, transformer and distribution losses on the whole facility. Annual PUE <code>= (IT + cooling + losses) ÷ IT</code>. Simplified; not the full ASHRAE 90.4 ELC method. CRAH / fan-wall fans and electrical-room cooling are not included.</li>
+      <li><b>Running cost</b>: cooling only, at the frequent load: <code>electricity × tariff + water × tariff + cooling peak × demand charge × 12</code>. Simple payback against air-cooled chillers = extra initial cost (mid estimate) ÷ running cost saved, with no discounting, maintenance or tariff escalation.</li>
+      <li><b>Recommendation</b>: metrics normalised across feasible options and weighted: energy 4, water 3 (doubled when water is limited), peak power 3, initial cost 2. Options that fail the design day, or need water you don't have, are excluded. Screening-level; confirm with vendor selections and a detailed model.</li>
+    </ul>
+  </div>
+  </div>
+</section>
+</main>
+
+<script>
+// ---------- shared UI helpers for all calculators (load after Chart.js, before the calculator scripts) ----------
+const $=id=>document.getElementById(id);
+const fmt=(v,d=0)=>(+v).toLocaleString('en-US',{maximumFractionDigits:d,minimumFractionDigits:d});
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function pct(arr,q){ const s=[...arr].sort((a,b)=>a-b); return s[Math.min(s.length-1,Math.floor(q*s.length))]; }
+const kpis=k=>k.map(([v,l])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+function table(head,rows){ return `<div style="overflow-x:auto"><table><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`; }
+
+// ---------- charts (Chart.js); every chart is skipped when Chart.js is unavailable ----------
+const charts={};
+function baseOpts(){
+  const tx=css('--text2'), gr=css('--border');
+  return {responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{intersect:false}},
+    scales:{x:{grid:{display:false},ticks:{color:tx}},y:{grid:{color:gr},border:{display:false},ticks:{color:tx}}}};
+}
+function mk(id,cfg){ if(!window.Chart) return; if(charts[id]) charts[id].destroy(); charts[id]=new Chart($(id),cfg); }
+function hbar(id,labels,data,unit,d){
+  const o=baseOpts(); o.indexAxis='y';
+  o.scales.x={grid:{color:css('--border')},border:{display:false},ticks:{color:css('--text2')},title:{display:true,text:unit,color:css('--text2')},beginAtZero:true};
+  o.scales.y={grid:{display:false},ticks:{color:css('--text')}};
+  o.plugins.tooltip={callbacks:{label:c=>`${fmt(c.raw,d)} ${unit}`}};
+  mk(id,{type:'bar',data:{labels,datasets:[{data,backgroundColor:labels.map((l,i)=>i===0?css('--s1'):css('--grey')),borderRadius:4,barThickness:16}]},options:o});
+}
+// ---------- city library: 1991–2020 monthly normals (climate-zone.com: NOAA/national-met station temperatures, NASA POWER humidity) ----------
+const F=f=>Math.round((f-32)/1.8*10)/10, fa=a=>a.map(F);
+const CITIES=[
+ {g:'Middle East & Africa',id:'dubai',name:'Dubai, UAE',elev:10,sig:1.4,hi:[24.4,26.7,30.0,35.0,39.4,42.2,42.8,42.8,40.6,37.2,31.7,27.2],lo:[12.2,13.3,16.1,19.4,23.3,26.1,28.9,28.9,25.6,22.2,17.8,14.4],rh:[62,61,59,53,50,51,50,49,52,53,55,60]},
+ {g:'Middle East & Africa',id:'abudhabi',name:'Abu Dhabi, UAE',elev:27,sig:1.4,hi:fa([76,79,86,94,103,107,108,110,105,98,88,79]),lo:fa([56,59,63,69,76,80,85,86,81,74,66,60]),rh:[66,64,63,58,59,62,60,57,57,57,59,65]},
+ {g:'Middle East & Africa',id:'riyadh',name:'Riyadh, Saudi Arabia',elev:612,sig:1.6,hi:[20.0,23.9,27.8,33.9,39.4,42.8,43.3,43.9,40.6,35.0,27.8,22.2],lo:[8.9,11.1,15.0,20.6,26.1,28.3,29.4,29.4,26.1,21.1,15.6,10.6],rh:[42,34,29,25,17,11,12,14,15,21,36,44]},
+ {g:'Middle East & Africa',id:'jeddah',name:'Jeddah, Saudi Arabia',elev:15,sig:1.2,hi:fa([84,86,89,94,99,101,103,102,100,98,92,88]),lo:fa([65,66,67,72,76,78,81,83,80,76,73,68]),rh:[54,52,46,41,37,36,39,46,46,45,52,54]},
+ {g:'Middle East & Africa',id:'dammam',name:'Dammam, Saudi Arabia',elev:10,sig:1.6,hi:fa([71,74,82,92,103,110,112,110,106,98,85,75]),lo:fa([51,54,59,68,77,82,85,85,79,73,63,54]),rh:[62,61,55,49,40,37,40,46,49,53,57,63]},
+ {g:'Middle East & Africa',id:'manama',name:'Manama, Bahrain',elev:2,sig:1.3,hi:fa([69,71,78,87,97,101,103,103,100,93,82,73]),lo:fa([58,60,65,73,81,86,89,89,85,80,71,63]),rh:[69,71,72,70,66,65,67,69,66,65,64,68]},
+ {g:'Middle East & Africa',id:'cairo',name:'Cairo, Egypt',elev:75,sig:1.6,hi:fa([66,69,75,83,90,94,95,95,92,86,77,69]),lo:fa([49,51,55,60,66,72,75,75,73,68,60,52]),rh:[62,57,52,44,40,40,42,45,50,55,60,63]},
+ {g:'Americas',id:'nova',name:'Northern Virginia, USA',elev:50,sig:3.0,hi:fa([44,48,56,67,76,84,88,87,80,68,57,48]),lo:fa([27,28,35,45,55,64,69,67,61,48,39,31]),rh:[83,81,79,77,77,74,68,69,71,75,78,83]},
+ {g:'Americas',id:'dallas',name:'Dallas–Fort Worth, USA',elev:170,sig:3.0,hi:fa([54.1,58.9,67.8,76.3,82.9,91.9,96.5,96.2,87.8,78.5,66.8,57.5]),lo:fa([32.7,36.9,45.6,54.7,62.6,70.0,74.1,73.6,66.9,55.8,45.4,36.3]),rh:[58,70,69,70,72,74,69,66,68,70,69,69]},
+ {g:'Americas',id:'phoenix',name:'Phoenix, USA',elev:331,sig:2.0,hi:fa([68,71,78,86,95,104,107,105,100,89,77,66]),lo:fa([46,49,55,61,70,79,85,84,78,66,54,45]),rh:[47,45,40,31,23,16,29,35,32,30,35,45]},
+ {g:'Americas',id:'chicago',name:'Chicago, USA',elev:230,sig:3.5,hi:fa([31,35,47,60,71,81,84,82,76,63,48,36]),lo:fa([16,20,29,39,50,60,65,63,55,43,32,22]),rh:[88,85,80,76,75,74,73,73,73,76,81,87]},
+ {g:'Americas',id:'saopaulo',name:'São Paulo, Brazil',elev:760,sig:1.8,hi:fa([83,84,82,80,74,73,73,76,77,80,80,83]),lo:fa([67,67,66,64,58,56,55,56,59,62,63,66]),rh:[84,84,86,85,85,83,80,76,75,77,79,81]},
+ {g:'Europe',id:'frankfurt',name:'Frankfurt, Germany',elev:110,sig:2.8,hi:fa([41,44,52,62,69,75,79,78,69,59,48,42]),lo:fa([31,31,36,42,49,55,59,58,51,44,38,33]),rh:[93,89,83,76,73,67,62,62,70,82,91,93]},
+ {g:'Europe',id:'london',name:'London, UK',elev:40,sig:2.5,hi:fa([47,48,53,59,64,70,74,73,68,60,52,47]),lo:fa([36,36,38,41,47,52,56,55,51,46,40,36]),rh:[93,90,86,82,79,78,76,77,81,87,92,94]},
+ {g:'Europe',id:'dublin',name:'Dublin, Ireland',elev:20,sig:2.0,hi:fa([47,48,51,56,61,65,68,68,64,57,51,48]),lo:fa([36,36,38,40,44,49,53,52,49,45,40,37]),rh:[91,90,88,86,84,84,85,86,87,88,91,91]},
+ {g:'Europe',id:'madrid',name:'Madrid, Spain',elev:620,sig:2.5,hi:fa([51,55,62,67,75,86,92,91,82,70,58,52]),lo:fa([35,37,42,46,53,61,67,66,59,51,42,37]),rh:[84,78,71,67,59,47,36,36,49,66,79,84]},
+ {g:'Europe',id:'stockholm',name:'Stockholm, Sweden',elev:30,sig:2.8,hi:fa([34,34,40,51,62,69,75,72,62,50,42,36]),lo:fa([27,26,30,37,45,53,59,58,50,42,35,30]),rh:[96,95,89,82,77,75,73,77,82,89,95,97]},
+ {g:'Asia-Pacific',id:'singapore',name:'Singapore',elev:15,sig:0.8,hi:fa([87,89,90,90,90,89,89,88,89,89,88,87]),lo:fa([75,76,76,77,78,77,77,77,77,76,76,75]),rh:[88,86,84,82,83,84,85,85,84,83,85,88]},
+ {g:'Asia-Pacific',id:'mumbai',name:'Mumbai, India',elev:14,sig:1.0,hi:fa([89,89,92,92,92,91,87,87,88,93,93,91]),lo:fa([62,64,69,75,80,80,78,77,76,74,70,64]),rh:[51,45,44,53,61,79,89,90,88,78,69,59]},
+ {g:'Asia-Pacific',id:'tokyo',name:'Tokyo, Japan',elev:25,sig:2.0,hi:fa([50,52,58,67,74,79,86,88,82,72,62,54]),lo:fa([34,36,41,50,58,65,72,74,69,59,48,39]),rh:[75,74,75,77,79,82,83,81,82,82,80,77]},
+ {g:'Asia-Pacific',id:'sydney',name:'Sydney, Australia',elev:40,sig:2.0,hi:fa([81,80,78,74,70,65,64,67,71,74,76,78]),lo:fa([68,68,65,60,54,50,48,49,54,58,62,65]),rh:[75,76,75,73,72,75,73,70,69,70,73,73]},
+];
+// ---------- psychrometrics (ASHRAE Fundamentals Ch.1, Hyland–Wexler) ----------
+function pws(t){ // Pa
+  const T=t+273.15;
+  if(t>=0) return Math.exp(-5.8002206e3/T+1.3914993-4.8640239e-2*T+4.1764768e-5*T*T-1.4452093e-8*T*T*T+6.5459673*Math.log(T));
+  return Math.exp(-5.6745359e3/T+6.3925247-9.677843e-3*T+6.2215701e-7*T*T+2.0747825e-9*T*T*T-9.484024e-13*T*T*T*T+4.1635019*Math.log(T));
+}
+const Wfrom=(pw,P)=>0.621945*pw/(P-pw);
+const pAtm=z=>101325*Math.pow(1-2.25577e-5*z,5.2559);
+function dewFromRH(T,rh){ const pw=Math.max(rh,1)/100*pws(T); let lo=-60,hi=T; for(let i=0;i<40;i++){const m=(lo+hi)/2; if(pws(m)>pw) hi=m; else lo=m;} return (lo+hi)/2; }
+function wetBulb(t,td,P){
+  if(td>=t) return t;
+  const W=Wfrom(pws(td),P); let lo=td-1, hi=t;
+  for(let i=0;i<32;i++){ const m=(lo+hi)/2, Ws=Wfrom(pws(m),P);
+    const Wm=((2501-2.326*m)*Ws-1.006*(t-m))/(2501+1.86*t-4.186*m);
+    if(Wm>W) hi=m; else lo=m; }
+  return (lo+hi)/2;
+}
+// ---------- synthetic hourly year from monthly normals ----------
+function rng(seed){ let s=seed>>>0; return ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
+function gauss(r){ let u=0,v=0; while(u===0)u=r(); while(v===0)v=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+const MDAYS=[31,28,31,30,31,30,31,31,30,31,30,31];
+function interpMonthly(arr,doy){
+  let c=0; const cent=MDAYS.map(d=>{const x=c+d/2; c+=d; return x;});
+  let i=0; while(i<12 && doy>=cent[i]) i++;
+  const i1=(i-1+12)%12, i2=i%12; let x1=cent[i1], x2=cent[i2];
+  if(i===0) x1-=365; if(i===12) x2+=365;
+  return arr[i1]+(arr[i2]-arr[i1])*(doy-x1)/(x2-x1);
+}
+function synthYear(c){
+  const r=rng(12345+c.id.length*977), T=[], Td=[], mon=[];
+  const tdM=c.hi.map((h,i)=>dewFromRH((h+c.lo[i])/2,c.rh[i]));
+  let a=0,b=0;
+  for(let d=0;d<365;d++){
+    a=0.7*a+c.sig*0.714*gauss(r); b=0.6*b+0.96*gauss(r);
+    const hi=interpMonthly(c.hi,d)+a, lo=interpMonthly(c.lo,d)+a*0.8, td=interpMonthly(tdM,d)+b;
+    let m=0,acc=0; while(d>=acc+MDAYS[m]){acc+=MDAYS[m];m++;}
+    for(let h=0;h<24;h++){
+      let s; if(h>=5&&h<=15) s=-Math.cos(Math.PI*(h-5)/10); else { const x=(h<5?h+24:h)-15; s=Math.cos(Math.PI*x/14); }
+      const t=(hi+lo)/2+(hi-lo)/2*s; T.push(t); Td.push(Math.min(td,t-0.3)); mon.push(m);
+    }
+  }
+  const P=pAtm(c.elev);
+  return {name:c.name, T, Twb:T.map((t,i)=>wetBulb(t,Td[i],P)), mon, synthetic:true};
+}
+
+// ---------- weather files ----------
+function parseEPW(text){
+  const lines=text.split(/\r?\n/), loc=lines[0].split(',');
+  const name=[loc[1],loc[3]].filter(Boolean).join(', ')+(loc[5]?` (WMO ${loc[5]})`:'');
+  const elev=parseFloat(loc[9]); const T=[],Twb=[],mon=[];
+  for(let i=8;i<lines.length;i++){
+    const f=lines[i].split(','); if(f.length<10) continue;
+    const m=+f[1]-1, db=+f[6], dp=+f[7]; let P=+f[9]; if(!(P>50000&&P<120000)) P=pAtm(isNaN(elev)?0:elev);
+    if(isNaN(db)||db>70||db<-70) continue;
+    T.push(db); Twb.push(wetBulb(db,(isNaN(dp)||dp>70)?db-10:dp,P)); mon.push(m);
+  }
+  if(T.length<8000) throw new Error(`Only ${T.length} hourly rows found; expected 8,760.`);
+  return {name,T,Twb,mon,synthetic:false};
+}
+function parseCSV(text){
+  const rows=text.trim().split(/\r?\n/).map(l=>l.split(/[,;\t]/)), head=rows[0].map(h=>h.toLowerCase());
+  const find=re=>head.findIndex(h=>re.test(h));
+  let iT=find(/dry|db/); if(iT<0) iT=head.findIndex(h=>/temp/.test(h)&&!/dew|wet|wb/.test(h));
+  const iRH=find(/rh|humid/), iDP=find(/dew/), iWB=find(/wet|wb/), iM=find(/^month|^mon/), iP=find(/press/);
+  if(iT<0) throw new Error('No dry-bulb column found (header containing "dry", "db" or "temp").');
+  if(iRH<0&&iDP<0&&iWB<0) throw new Error('Need a relative humidity, dew point or wet-bulb column.');
+  // optional station pressure, in Pa, hPa/mbar or kPa; sea level when absent
+  const pres=r=>{ const v=iP>=0?+r[iP]:NaN; return !(v>0)?101325:v>20000?v:v>200?v*100:v*1000; };
+  const T=[],Twb=[],mon=[];
+  rows.slice(1).forEach((r,k)=>{ const t=+r[iT]; if(isNaN(t)) return; const P=pres(r);
+    let wb; if(iWB>=0&&!isNaN(+r[iWB])) wb=+r[iWB]; else if(iDP>=0) wb=wetBulb(t,+r[iDP],P); else wb=wetBulb(t,dewFromRH(t,+r[iRH]),P);
+    T.push(t); Twb.push(wb); mon.push(iM>=0?(+r[iM]-1):Math.min(11,Math.floor(k/730))); });
+  if(T.length<8000) throw new Error(`Only ${T.length} rows found; expected 8,760.`);
+  return {name:'Uploaded CSV',T,Twb,mon,synthetic:false};
+}
+
+// ---------- sample CSV in the upload format: one row per hour, Jan 1 00:00 to Dec 31 23:00 ----------
+function rhFromWB(t,wb,P){   // % RH from dry-bulb, wet-bulb and pressure (inverse of wetBulb)
+  const Ws=Wfrom(pws(wb),P), W=((2501-2.326*wb)*Ws-1.006*(t-wb))/(2501+1.86*t-4.186*wb), pw=W*P/(0.621945+W);
+  return Math.max(1,Math.min(100,100*pw/pws(t)));
+}
+function sampleCSV(c){
+  const y=synthYear(c), P=Math.round(pAtm(c.elev)), out=['Month,Day,Hour,DryBulb_C,RH_pct,Pressure_Pa'];
+  let d=0,m=0,acc=0;
+  y.T.forEach((t,h)=>{ const day=Math.floor(h/24); while(day>=acc+MDAYS[m]){acc+=MDAYS[m];m++;} d=day-acc+1;
+    out.push(`${m+1},${d},${h%24},${t.toFixed(1)},${rhFromWB(t,y.Twb[h],P).toFixed(1)},${P}`); });
+  return out.join('\r\n')+'\r\n';
+}
+// ---------- options, cost rates ----------
+const OPTIONS=[
+ {id:'acc',  name:'Air-cooled chillers',                     short:'Air-cooled chillers',  water:false, comp:['acch']},
+ {id:'accfc',name:'Air-cooled chillers + free-cooling dry coolers', short:'Chillers + dry coolers', water:false, comp:['acch','dc']},
+ {id:'adia', name:'Water-cooled chillers + adiabatic coolers', short:'Chillers + adiabatic', water:true, comp:['wcch','adc','hx']},
+ {id:'wcc',  name:'Water-cooled chillers + cooling towers',   short:'Chillers + towers',     water:true, comp:['wcch','ct','hx']},
+];
+const RATES=[
+ {id:'acch',l:'Air-cooled chillers',lo:180,hi:280},
+ {id:'wcch',l:'Water-cooled chillers',lo:120,hi:200},
+ {id:'dc',  l:'Dry coolers',lo:60,hi:110},
+ {id:'adc', l:'Adiabatic coolers',lo:90,hi:150},
+ {id:'ct',  l:'Cooling towers + CW pumps + treatment',lo:50,hi:90},
+ {id:'hx',  l:'Economiser plate HX',lo:15,hi:30},
+];
+// fixed weights for the recommendation score
+const WEIGHTS=[{id:'w_energy',l:'Energy',v:4},{id:'w_water',l:'Water',v:3},{id:'w_peak',l:'Peak power (grid)',v:3},{id:'w_capex',l:'Initial cost',v:2}];
+
+// ---------- chiller model ----------
+const AHRI={ac:{Te:6.7-2, Tc:35+15}, wc:{Te:6.7-2, Tc:29.4+7.6}};
+const eirPLR={ac:x=>x, wc:x=>0.07308728+0.1513521*x+0.7709311*x*x};
+function chillerPower(Qch, capEach, n, kind, Ts, Tc, p){
+  if(Qch<=0) return {P:0,cop:null};
+  const Te=Ts-2, lift=Math.max(Tc-Te,3), ref=AHRI[kind], refLift=ref.Tc-ref.Te;
+  const copRated = kind==='ac'?p.copA:p.copW;
+  let copT = copRated * ((Te+273.15)/lift) / ((ref.Te+273.15)/refLift);
+  copT=Math.min(copT,p.copMax);
+  // stage the number of duty chillers that gives the lowest power (VSD chillers are more efficient at part load)
+  const nMin=Math.min(n,Math.max(1,Math.ceil(Qch/capEach-1e-9)));
+  let P=Infinity;
+  for(let k=nMin;k<=n;k++){ const plr=Math.min(1,Qch/(k*capEach)); P=Math.min(P,k*(capEach/copT)*Math.max(eirPLR[kind](plr),0.05)); }
+  return {P, cop:Qch/P};
+}
+
+
+function hourModel(o,L,db,wb,p){
+  let Tout,Tc,kind,fanK,cwK=0,teff=db;
+  if(o.id==='acc'){Tout=Infinity;Tc=db+15;kind='ac';fanK=0;}
+  else if(o.id==='accfc'){Tout=db+p.aDC;Tc=db+15;kind='ac';fanK=0.015;}
+  else if(o.id==='adia'){teff=db>p.swAD?db-p.eAD*(db-wb):db; Tout=teff+p.aDC+p.aHX; Tc=teff+p.aDC+7.6; kind='wc'; fanK=0.018; cwK=p.cwp;}
+  else if(o.id==='wcc'){Tout=wb+p.aCT+p.aHX; Tc=wb+p.aCT+7.6; kind='wc'; fanK=0.008; cwK=p.cwp;}
+  const ff=Tout<=L.Ts?1:Math.max(0,Math.min(1,(L.Tr-Tout)/(L.Tr-L.Ts)));
+  // terminal units in the hall: CRAH / FWU fans on the air loop, CDU pumps on the liquid loop;
+  // their power is cooling energy and also ends up as heat in the loop
+  const term=L.name==='Air'?p.fanT:p.cduP;
+  const capEach=L.Qd*(1+term)/p.nCh;
+  const calc=(q)=>{
+    const Pt=term*q, qL=q+Pt;
+    const ch=chillerPower(qL*(1-ff),capEach,p.nCh,kind,L.Ts,Tc,p);
+    const Qr=qL+ch.P; let Pf=0;
+    const airFrac = ff>=1 ? Math.max(0.25,Math.min(1,(L.Tr-L.Ts)/Math.max(L.Tr-Tout,0.1))) : 1;
+    if(o.id==='accfc') Pf = ff>0 ? fanK*qL*airFrac : 0;
+    else if(o.id==='adia') Pf=fanK*Qr*airFrac;
+    else if(o.id==='wcc') Pf=fanK*Qr;
+    const Pp=p.pump*qL + cwK*Qr;
+    return {Pc:ch.P,Pf,Pp,Pt,Qr,cop:ch.cop,P:ch.P+Pf+Pp+Pt};
+  };
+  // condenser operating limit
+  let limit=null;
+  if(kind==='ac' && db>p.acMax) limit=`ambient ${db.toFixed(1)} °C > air-cooled chiller limit ${p.acMax} °C`;
+  if(kind==='wc'){ const ecw=Tc-7.6; if(ecw>p.wcMax) limit=`entering condenser water ${ecw.toFixed(1)} °C > limit ${p.wcMax} °C`; }
+  return {Tout,Tc,kind,ff,teff,calc,limit};
+}
+
+function designCheck(p,dbD,wbD){
+  const out={};
+  for(const o of OPTIONS){
+    let P=0,Qr=0,Pc=0,W=0; const issues=[];
+    p.loops.forEach(L=>{ if(L.Qd<=0) return; const hm=hourModel(o,L,dbD,wbD,p), d=hm.calc(L.Qd);
+      P+=d.P; Qr+=d.Qr; Pc+=d.Pc; W+=waterKgH(o,d.Qr,dbD,hm.teff,p)/1000;
+      if(hm.limit && hm.ff<1) issues.push(hm.limit);
+    });
+    out[o.id]={P,Qr,Pc,W,ok:issues.length===0,issues:[...new Set(issues)],ratio:P/p.Qd};
+  }
+  return out;
+}
+
+// make-up water, kg/h: tower evaporation + blowdown, or adiabatic pad water when wet
+function waterKgH(o,Qr,db,teff,p){
+  if(o.id==='wcc') return 0.8*Qr*3600/2430*(p.coc/(p.coc-1));
+  if(o.id==='adia'&&db>p.swAD) return Qr*3600*(db-teff)/(12*2430)*1.15;
+  return 0;
+}
+
+function simulate(wx,p){
+  const n=wx.T.length, hs=8760/n, loops=p.loops, out={};
+  for(const o of OPTIONS){
+    const r={o,E:0,Ec:0,Ef:0,Ep:0,Et:0,W:0,peak:0,Wpeak:0,free:[0,0],part:[0,0],mech:[0,0],
+      mFree:[new Array(12).fill(0),new Array(12).fill(0)],mPart:[new Array(12).fill(0),new Array(12).fill(0)],mMech:[new Array(12).fill(0),new Array(12).fill(0)],copSum:0,copN:0};
+    for(let h=0;h<n;h++){
+      const db=wx.T[h], wb=wx.Twb[h], m=wx.mon[h]; let Pd=0, Wd=0;
+      loops.forEach((L,li)=>{
+        if(L.Q<=0) return;
+        const hm=hourModel(o,L,db,wb,p), calc=hm.calc, ff=hm.ff, teff=hm.teff;
+        const a=calc(L.Q), d=calc(L.Qd);
+        r.E+=a.P; r.Ec+=a.Pc; r.Ef+=a.Pf; r.Ep+=a.Pp; r.Et+=a.Pt; Pd+=d.P;
+        if(a.cop){r.copSum+=a.cop; r.copN++;}
+        r.W+=waterKgH(o,a.Qr,db,teff,p); Wd+=waterKgH(o,d.Qr,db,teff,p);
+        if(ff>=1){r.free[li]++; r.mFree[li][m]++;} else if(ff>0){r.part[li]++; r.mPart[li][m]++;} else {r.mech[li]++; r.mMech[li][m]++;}
+      });
+      r.peak=Math.max(r.peak,Pd); r.Wpeak=Math.max(r.Wpeak,Wd);   // peaks at 100% load on the worst hour
+    }
+    const Qyr=loops.reduce((s,L)=>s+L.Q,0)*n;
+    ['E','Ec','Ef','Ep','Et'].forEach(k=>r[k]*=hs/1000);   // MWh
+    r.W*=hs/1000;                                     // m3
+    r.Wpeak/=1000;                                    // m3/h
+    ['free','part','mech'].forEach(k=>r[k]=r[k].map(v=>v*hs));
+    r.mlc=r.E*1000/(Qyr*hs);
+    r.cop=r.copN?r.copSum/r.copN:null;
+    r.peakRatio=r.peak/loops.reduce((s,L)=>s+L.Qd,0);
+    // electrical losses for the annual PUE only (peaks are cooling plant only): UPS on the IT load; transformers + distribution on IT + cooling
+    const fac=(it,cool)=>(it/p.ups+cool)/(1-p.dloss);
+    r.Eit=Qyr*hs/1000;                                // MWh, IT energy = cooling load
+    r.Efac=fac(r.Eit,r.E); r.Eloss=r.Efac-r.Eit-r.E;  // MWh
+    r.pue=r.Efac/r.Eit;
+    // annual running cost of cooling, $: electricity + water + demand charge (cooling peak, every month)
+    r.costE=r.E*1000*p.tE; r.costW=r.W*p.tW; r.costD=r.peak*12*p.tD;
+    r.run=r.costE+r.costW+r.costD;
+    // initial cost
+    const cap=p.Qd*(1+p.red);
+    r.capLo=0; r.capHi=0; r.capParts=[];
+    for(const c of o.comp){ const rt=p.rates[c]; r.capLo+=cap*rt.lo; r.capHi+=cap*rt.hi; r.capParts.push(c); }
+    out[o.id]=r;
+  }
+  return out;
+}
+
+function score(res,p){
+  const ids=OPTIONS.map(o=>o.id);
+  ids.forEach(id=>{ const r=res[id]; r.excluded=null;
+    if(r.o.water&&p.water==='none') r.excluded='Needs water';
+    if(!r.excluded && DES && !DES[id].ok) r.excluded='Fails design day';
+    r.capMid=(r.capLo+r.capHi)/2;
+  });
+  const ok=ids.filter(id=>!res[id].excluded);
+  const norm=(k,id)=>{ const v=ok.map(i=>res[i][k]); const mn=Math.min(...v), mx=Math.max(...v); return mx-mn<1e-9?0:(res[id][k]-mn)/(mx-mn); };
+  const wW=p.water==='limited'?p.w_water*2:p.w_water, tot=(p.w_energy+wW+p.w_peak+p.w_capex)||1;
+  ok.forEach(id=>{ res[id].score=100*(1-(p.w_energy*norm('E',id)+wW*norm('W',id)+p.w_peak*norm('peak',id)+p.w_capex*norm('capMid',id))/tot); });
+  ok.sort((a,b)=>res[b].score-res[a].score);
+  return ok;
+}
+// ---------- system descriptions: how each option works, strengths, watch-outs ----------
+const SYS={
+ acc:{how:'Separate HT and LT air-cooled chillers cool each loop every hour of the year. Each chiller rejects its heat straight to outdoor air through its own condenser fans. There is no free cooling and no water.',
+  pre:null, ch:'Air-cooled chillers', rej:[null,'Outdoor air','via condenser fans'],
+  pros:['Simplest plant: one equipment type, no condenser water loop','No water use','Packaged, widely available equipment'],
+  cons:['Highest energy: compressors run all year','Chiller capacity and efficiency drop on the hottest days','Highest peak electrical demand']},
+ accfc:{how:'Dry coolers pre-cool the return water whenever the outdoor air is cooler than the return. Air-cooled chillers then trim the water down to the supply setpoint. In cool weather the chillers switch off entirely.',
+  pre:'Free-cooling dry coolers', ch:'Air-cooled chillers', rej:['Outdoor air','Outdoor air','via condenser fans'],
+  pros:['No water use','Large free-cooling savings in cool and mild climates','Chillers stay available for the hot hours'],
+  cons:['Two sets of outdoor equipment: more yard or roof space','Free cooling is limited in hot climates','Air-cooled chillers still set the peak demand']},
+ adia:{how:'Adiabatic coolers run dry most of the year. Above the switch temperature they wet their pads, cooling the air towards the wet-bulb. Their water pre-cools the return through a plate heat exchanger and is also the condenser water for water-cooled chillers, which trim the rest.',
+  pre:'Plate heat exchanger', ch:'Water-cooled chillers', shared:'Adiabatic coolers',
+  pros:['Far less water than cooling towers (wet only in hot hours)','Efficient water-cooled chillers','Closed circuit: little water treatment'],
+  cons:['Uses some water on hot days','Larger footprint than cooling towers','Pads or sprays need maintenance and legionella control']},
+ wcc:{how:'Open cooling towers cool condenser water close to the outdoor wet-bulb by evaporation. That water pre-cools the return through a plate heat exchanger and serves the condensers of water-cooled chillers, which trim the rest.',
+  pre:'Plate heat exchanger', ch:'Water-cooled chillers', shared:'Cooling towers',
+  pros:['Lowest energy of the chiller options in most climates','Lowest condensing temperature, so the most efficient chillers','Compact heat rejection'],
+  cons:['Highest water use (evaporation plus blowdown)','Needs water treatment, legionella control and a reliable make-up supply','Visible plume and drift']},
+};
+const ROLE={
+ acch:o=>o.id==='acc'?'HT and LT chillers cool each loop; reject heat through built-in condenser fans':'HT and LT chillers trim each loop to setpoint when free cooling is not enough',
+ wcch:()=>'HT and LT chillers trim each loop to setpoint; reject heat to condenser water',
+ dc:()=>'Pre-cools the return water with outdoor air',
+ adc:()=>'Cools the condenser water; pads wetted on hot hours',
+ ct:()=>'Cools the condenser water by evaporation',
+ hx:()=>'Pre-cools the return water with condenser water (economiser)',
+};
+
+// ---------- schematic: one panel per loop (HT liquid cooling, LT air cooling), as in the energy model ----------
+// each panel: IT terminals -> return -> pre-cooling -> HT/LT chillers -> buffer/TES tank -> pumps -> supply; heat to outdoors
+function schematic(id){
+  const s=SYS[id], r=RES[id], ac=id==='acc'||id==='accfc', W=430, G=24, H=396;
+  const loops=P.loops.map((L,i)=>({L,i})).filter(x=>x.L.Q>0);
+  const hot=P.loops[0].Ts===P.loops[1].Ts?null:(P.loops[0].Ts>P.loops[1].Ts?0:1);   // warmer supply = HT loop
+  const t=(x,y,txt,c='',a='middle')=>`<text class="${c}" x="${x}" y="${y}" text-anchor="${a}">${txt}</text>`;
+  const box=(x,y,w,h,lines,c='bx')=>`<rect class="${c}" x="${x}" y="${y}" width="${w}" height="${h}" rx="6"/>`
+    +lines.map((l,k)=>t(x+w/2,y+(h-(lines.length-1)*15)/2+4+k*15,l,k?'t2':'')).join('');
+  const pipe=d=>`<path class="pipe" d="${d}" marker-end="url(#ar)"/>`;
+  const up=(x,lab)=>`<path class="heat" d="M${x} 148V116" marker-end="url(#ah)"/>${t(x+6,136,lab,'t2','start')}`;
+  const panel=({L,i},k)=>{
+    const tag=hot===null?'':(i===hot?'HT':'LT'), liquid=i===0;
+    let g=t(0,16,(tag?tag+' loop · ':'')+(liquid?'liquid cooling':'air cooling'),'h','start')
+      +t(0,34,`${fmt(L.Qd/1000,1)} MW · supply ${L.Ts} °C / return ${L.Tr} °C`,'t2','start');
+    // outdoors
+    g+=`<rect class="zone" x="0" y="46" width="${W}" height="72" rx="8"/>`+t(10,62,'Outdoors','t2','start');
+    if(s.shared){
+      g+=box(20,68,390,44,[s.shared+(loops.length>1?' (shared by both loops)':''),id==='wcc'?`approach ${P.aCT} K to wet-bulb · ${P.coc} cycles`:`wet above ${P.swAD} °C · effectiveness ${P.eAD}`]);
+      g+=up(105,'condenser water')+up(325,'condenser water');
+    } else {
+      if(s.pre){ g+=box(20,68,170,44,['Outdoor air','dry-cooler fans']); g+=up(105,'heat'); }
+      g+=box(240,68,170,44,['Outdoor air','chiller condenser fans']); g+=up(325,'heat');
+    }
+    // water loop: pre-cooling and chillers
+    if(s.pre) g+=box(20,150,170,62,[s.pre,id==='accfc'?`approach ${P.aDC} K`:`HX approach ${P.aHX} K`,`free cooling ${fmt(r.free[i])} h/yr`]);
+    g+=box(240,150,170,62,[(tag?tag+' ':'')+'chillers',`${P.nCh} × ${fmt(L.Qd/P.nCh/1000,1)} MW, ${ac?'air':'water'}-cooled`,`rated COP ${(ac?P.copA:P.copW).toFixed(2)} · on ${fmt(r.part[i]+r.mech[i])} h/yr`]);
+    g+=box(240,244,170,46,['Buffer / TES tank','ride-through; not in energy calc'],'bx tes');
+    g+=box(20,328,390,56,[liquid?'Liquid-cooled IT (CDUs)':'Air-cooled IT (CRAHs / fan walls)',`${fmt(L.Qd/1000,1)} MW at full load · ${fmt(L.Q/1000,1)} MW typical`,`${liquid?'CDU pumps':'CRAH / FWU fans'} ${fmt(L.Qd*(liquid?P.cduP:P.fanT))} kW at full load, heat added to loop`],'bx it');
+    g+=s.pre?pipe('M105 326V214')+pipe('M190 181H238'):pipe('M105 326V181H238');
+    g+=t(112,272,`Return ${L.Tr} °C`,'t2','start');
+    g+=pipe('M325 212V242')+pipe('M325 290V326');
+    g+=`<circle class="pump" cx="325" cy="308" r="8"/><path class="pumpv" d="M321 303L331 308L321 313z"/>`+t(338,312,'pumps','t2','start');
+    g+=t(310,312,`Supply ${L.Ts} °C`,'t2','end');
+    return `<g transform="translate(${k*(W+G)},0)">${g}</g>`;
+  };
+  const vw=loops.length*W+(loops.length-1)*G;
+  return `<svg class="schem" viewBox="-2 0 ${vw+4} ${H}" style="--vw:${vw}" role="img" aria-label="Schematic of ${r.o.name}, one panel per cooling loop">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:var(--text2)"/></marker>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:var(--grey2)"/></marker></defs>${loops.map(panel).join('')}</svg>
+<div class="note">Each loop has its own ${s.pre?'pre-cooling, ':''}chillers and pumps, as in the energy model.${s.shared?` The ${s.shared.toLowerCase()} are one shared plant.`:''} The buffer / TES tank is shown for chiller ride-through and is not part of the energy calculation.</div>`;
+}
+// ---------- Cooling Plant Selector: page logic ----------
+let WX=null,RES=null,DES=null,RANK=null,P=null,LOOP=0,PICK=null;
+
+const groups=[...new Set(CITIES.map(c=>c.g))];
+groups.forEach(g=>{ const og=document.createElement('optgroup'); og.label=g; CITIES.filter(c=>c.g===g).forEach(c=>{const o=document.createElement('option'); o.value=c.id; o.textContent=c.name; og.appendChild(o);}); $('city').appendChild(og); });
+RATES.forEach(r=>{ const d=document.createElement('div'); d.innerHTML=`<label>${r.l}</label><div class="row"><input type="number" id="rl_${r.id}" value="${r.lo}" step="5" min="0" aria-label="${r.l} low"><input type="number" id="rh_${r.id}" value="${r.hi}" step="5" min="0" aria-label="${r.l} high"></div>`; $('rates').appendChild(d); });
+
+function params(){
+  // blank field falls back to its default; design dry-bulb / wet-bulb default is blank = auto
+  const g=id=>{ const v=parseFloat($(id).value); return isNaN(v)?parseFloat($(id).defaultValue):v; };
+  const Qd=g('it')*1000, lf=Math.min(1,Math.max(0.1,g('lf')/100)), lcp=Math.min(100,Math.max(0,g('lcp')))/100;
+  $('airShare').textContent=`(${fmt((1-lcp)*100)}% of load)`;
+  const loops=[
+    {name:'LC',Ts:g('lcs'),Tr:Math.max(g('lcr'),g('lcs')+1),Qd:Qd*lcp,Q:Qd*lcp*lf},
+    {name:'Air',Ts:g('acs'),Tr:Math.max(g('acr'),g('acs')+1),Qd:Qd*(1-lcp),Q:Qd*(1-lcp)*lf}];
+  const rates={}; RATES.forEach(r=>rates[r.id]={lo:g('rl_'+r.id),hi:g('rh_'+r.id)});
+  return {Qd,lf,loops,water:$('water').value,copA:g('copA'),copW:g('copW'),nCh:Math.max(1,Math.round(g('nCh'))),copMax:g('copMax'),acMax:g('acMax'),wcMax:g('wcMax'),dbIn:g('dbD'),wbIn:g('wbD'),
+    aDC:g('aDC'),aCT:g('aCT'),aHX:g('aHX'),eAD:g('eAD'),swAD:g('swAD'),coc:Math.max(1.5,g('coc')),pump:g('pump')/100,cwp:g('cwp')/100,fanT:g('fanT')/100,cduP:g('cduP')/100,
+    tE:g('tE'),tW:g('tW'),tD:g('tD'),
+    red:g('red')/100,ups:Math.min(1,Math.max(0.5,g('ups')/100)),dloss:Math.min(0.3,Math.max(0,g('dloss')/100)),rates,...Object.fromEntries(WEIGHTS.map(w=>[w.id,w.v]))};
+}
+function loadCity(){ WX=synthYear(CITIES.find(c=>c.id===$('city').value)); run(); }
+
+function run(){
+  if(!WX) return;
+  P=params(); P.dbD=isNaN(P.dbIn)?Math.max(...WX.T):P.dbIn; P.wbD=isNaN(P.wbIn)?Math.max(...WX.Twb):P.wbIn; P.wbD=Math.min(P.wbD,P.dbD);
+  RES=simulate(WX,P); DES=designCheck(P,P.dbD,P.wbD); RANK=score(RES,P);
+  renderReco(); renderOverview(); renderDes(); renderSystem(); renderEff(); renderCons(); renderRun(); renderCap(); renderClimate();
+}
+const order=()=>[...RANK,...OPTIONS.map(o=>o.id).filter(id=>!RANK.includes(id))];
+const sel=()=>PICK||RANK[0]||OPTIONS[0].id;   // system shown in the Systems tab: user's pick, else the recommendation
+const tag=(id,i)=>RES[id].excluded?`<span class="tag x">${RES[id].excluded}</span>`:(i===0?'<span class="tag ok">Recommended</span>':'');
+const loopTxt=(arr)=>P.loops.map((L,i)=>L.Q>0?fmt(arr[i]):'–').join(' / ');
+// basis label for peaks (annual figures are at the frequent load, stated in the notes)
+const atPk='100% load';
+const costTxt=r=>`${fmt(r.capLo/1e6,1)}–${fmt(r.capHi/1e6,1)} M$`;
+const runTxt=r=>`${fmt(r.run/1e6,2)} M$/yr`;
+// simple payback of extra initial cost against air-cooled chillers, from the running cost saved
+function payback(r){
+  const b=RES.acc, save=b.run-r.run, extra=r.capMid-b.capMid;
+  if(r.o.id==='acc') return {txt:'baseline',save:0};
+  if(save<=0) return {txt:'no saving',save};
+  if(extra<=0) return {txt:'immediate',save};
+  return {txt:`${fmt(extra/save,1)} years`,save};
+}
+
+function renderReco(){
+  const banners=(WX.synthetic?'<div class="banner">Approximate weather generated from monthly normals. Upload an EPW file for design-grade results.</div>':'')
+    +(window.Chart?'':'<div class="banner">Charts could not load (no internet connection). Tables and results below are complete.</div>');
+  const head=`<div class="sub">For <b>${esc(WX.name)}</b>: ${fmt(P.Qd/1000,1)} MW hall, liquid loop ${P.loops[0].Ts}/${P.loops[0].Tr} °C, air loop ${P.loops[1].Ts}/${P.loops[1].Tr} °C</div>`;
+  // extreme ambient: the design condition every system is checked against
+  const src=isNaN(P.dbIn)||isNaN(P.wbIn)?'hottest hours in the weather data':'entered design values';
+  const amb=`<div class="amb"><span class="al">Extreme ambient</span>
+    <span class="av"><i style="background:var(--s1)"></i>Dry-bulb <b>${fmt(P.dbD,1)} °C</b></span>
+    <span class="av"><i style="background:var(--s2)"></i>Wet-bulb <b>${fmt(P.wbD,1)} °C</b></span>
+    <span class="an">Design condition, from ${src}</span></div>`;
+  const top=RANK.length?'':'<div class="sub" style="margin-top:4px"><b>No system meets every constraint.</b> Try allowing water, raising the loop supply temperatures, or checking the design conditions and chiller limits.</div>';
+  // one summary card per system, recommended first
+  const lines=[['Electricity',r=>r.E,r=>`${fmt(r.E/1000,1)} GWh/yr`],['Annual PUE',r=>r.pue,r=>r.pue.toFixed(3)],[`Electrical peak <small>cooling, ${atPk}</small>`,r=>r.peak,r=>`${fmt(r.peak/1000,2)} MW`],['Water',r=>r.W,r=>`${fmt(r.W)} m³/yr`],[`Water peak <small>${atPk}</small>`,r=>r.Wpeak,r=>`${fmt(r.Wpeak,1)} m³/h`],['Running cost',r=>r.run,runTxt],['Initial cost',r=>r.capMid,costTxt]];
+  const bestV=lines.map(([,v])=>RANK.length?Math.min(...RANK.map(i=>v(RES[i]))):null);
+  const cards=order().map(id=>{ const r=RES[id], k=RANK.indexOf(id);
+    const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="tag ok">Recommended</span>':`<span class="tag">#${k+1}</span>`;
+    const notes=[id==='acc'?'No free cooling':`Free cooling ${loopTxt(r.free)} h/yr (liquid / air)`];
+    if(id!=='acc') notes.push(`Saves ${fmt(Math.max(0,RES.acc.E-r.E)/1000,1)} GWh/yr vs air-cooled chillers`);
+    return `<div class="scard${k===0?' rec':''}${r.excluded?' off':''}">
+      <div class="stop">${status}${r.excluded?'':`<span class="note">score ${fmt(r.score)}</span>`}</div>
+      <div class="sname">${r.o.name}</div>
+      <dl>${lines.map(([l,v,t],j)=>`<div class="${!r.excluded&&v(r)<=bestV[j]*(1+1e-6)+1e-9?'hi':''}"><dt>${l}</dt><dd>${t(r)}</dd></div>`).join('')}</dl>
+      <ul>${notes.map(n=>`<li>${n}</li>`).join('')}</ul>
+      <button class="link" data-sys="${id}">See system →</button></div>`; });
+  $('reco').innerHTML=`${banners}${head}${amb}${top}<div class="scards">${cards.join('')}</div>`;
+}
+
+function renderOverview(){
+  const sumF=r=>r.free.reduce((a,b)=>a+b,0);
+  const cols=[
+    {h:'Electricity GWh/yr',v:r=>r.E/1000,d:1,lo:true},
+    {h:'Annual MLC',v:r=>r.mlc,d:3,lo:true},
+    {h:'Annual PUE',v:r=>r.pue,d:3,lo:true},
+    {h:`Electrical peak MW (cooling, ${atPk})`,v:r=>r.peak/1000,d:2,lo:true},
+    {h:'Water m³/yr',v:r=>r.W,d:0,lo:true},
+    {h:`Water peak m³/h (${atPk})`,v:r=>r.Wpeak,d:1,lo:true},
+    {h:'Running cost M$/yr',v:r=>r.run/1e6,d:2,lo:true},
+    {h:'Initial cost M$',v:r=>r.capMid,lo:true,txt:r=>`${fmt(r.capLo/1e6,1)}–${fmt(r.capHi/1e6,1)}`},
+    {h:'Free-cooling h (LC / air)',v:sumF,lo:false,txt:r=>loopTxt(r.free)}];
+  const bestV=cols.map(c=>RANK.length?(c.lo?Math.min:Math.max)(...RANK.map(i=>c.v(RES[i]))):null);
+  const rows=order().map(id=>{ const r=RES[id], k=RANK.indexOf(id);
+    return `<tr class="click${k===0?' best':''}" data-sys="${id}"><td>${k>=0?k+1:'–'}</td><td>${r.o.name}${tag(id,k)}</td>
+      <td>${r.excluded?'–':`<span class="sbar" style="width:${Math.max(2,r.score*0.5)}px"></span>${fmt(r.score)}`}</td>
+      ${cols.map((c,j)=>{ const v=c.v(r), hi=!r.excluded&&Math.abs(v-bestV[j])<=Math.abs(bestV[j])*1e-6+1e-9;
+        return `<td class="${hi?'hi':''}">${c.txt?c.txt(r):fmt(v,c.d)}</td>`; }).join('')}</tr>`; });
+  $('tOv').innerHTML=table(['#','Option','Score (0–100)',...cols.map(c=>c.h)],rows);
+}
+
+function renderDes(){
+  const rows=order().map(id=>{ const r=RES[id], d=DES[id];
+    return `<tr><td>${r.o.name}</td><td>${d.ok?'<span class="tag ok">Holds supply</span>':'<span class="tag x">Fails</span>'}</td><td>${fmt(d.P/1000,2)}</td><td>${d.ratio.toFixed(3)}</td><td>${fmt(d.W,1)}</td><td>${fmt(d.Qr/1000,1)}</td><td class="l">${d.issues.join('; ')||'–'}</td></tr>`; });
+  $('tDes').innerHTML=table(['Option','Result','Electrical MW','kW/kW','Water m³/h','Heat rejection MW','Notes'],rows);
+  const auto=isNaN(P.dbIn)||isNaN(P.wbIn);
+  $('desNote').textContent=`Checked at 100% load, ${fmt(P.dbD,1)} °C dry-bulb and ${fmt(P.wbD,1)} °C wet-bulb${auto?' (from the weather data; enter ASHRAE extreme values for design)':''}. Heat rejection capacity = cooling load + compressor power. Options that fail are excluded from the recommendation.`;
+}
+
+function renderSystem(){
+  const id=sel(), r=RES[id], d=DES[id], s=SYS[id], k=RANK.indexOf(id);
+  $('sysSeg').innerHTML=OPTIONS.map(o=>{ const j=RANK.indexOf(o.id);
+    return `<button data-sys="${o.id}" class="${o.id===id?'on':''}"><span class="rk">${j>=0?j+1:'✕'}</span>${o.short}</button>`; }).join('');
+  const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="tag ok">Recommended</span>':`<span class="tag">Rank ${k+1} of ${RANK.length}</span>`;
+  $('sysHead').innerHTML=`<h2>${r.o.name}</h2>${status}${r.excluded?'':`<span class="note">score ${fmt(r.score)}</span>`}`;
+  $('sysHow').textContent=s.how;
+  $('sysSvg').innerHTML=schematic(id);
+  $('sysKpi').innerHTML=kpis([[`${fmt(r.E/1000,1)} GWh`,'Cooling electricity per year'],[r.mlc.toFixed(3),'Annual MLC (kW/kW)'],[r.pue.toFixed(3),'Annual PUE (incl. losses)'],
+    [`${fmt(r.peak/1000,2)} MW`,`Electrical peak, cooling plant (${atPk})`],[`${fmt(r.Wpeak,1)} m³/h`,`Water peak, make-up (${atPk})`],
+    [`${fmt(r.W)} m³`,'Water per year'],[runTxt(r),'Running cost, cooling'],[costTxt(r),'Initial cost (estimate)'],[payback(r).txt,'Payback vs air-cooled chillers'],[`${fmt(d.Qr/1000,1)} MW`,'Heat rejection at design']]);
+  $('sysDes').innerHTML=d.ok?`Design day (${fmt(P.dbD,1)} °C db / ${fmt(P.wbD,1)} °C wb): holds supply temperature, ${fmt(d.P/1000,2)} MW mechanical power.`
+    :`<span class="tag x">Fails design day</span> ${d.issues.join('; ')}`;
+  // annual operating mode per loop
+  $('sysModes').innerHTML=P.loops.map((L,i)=>{ if(L.Q<=0) return '';
+    const seg=[['Free cooling',r.free[i],'--s3'],['Partial',r.part[i],'--s1'],['Chiller only',r.mech[i],'--s2']].filter(x=>x[1]>0);
+    return `<div class="mode"><div class="ml"><b>${i?'Air':'Liquid'} loop</b> ${L.Ts}/${L.Tr} °C</div>
+      <div class="mbar">${seg.map(([l,v,c])=>`<span style="flex:${v};background:var(${c})" title="${l}: ${fmt(v)} h/yr"></span>`).join('')}</div>
+      <div class="mv">${seg.map(([l,v])=>`${l} <b>${fmt(v)} h</b> (${fmt(v/87.6)}%)`).join(' · ')}</div></div>`; }).join('');
+  // equipment and cost
+  const cap=P.Qd*(1+P.red);
+  $('sysComp').innerHTML=table(['Component','Role','Sized MW','Cost M$'],r.o.comp.map(c=>{ const rt=P.rates[c];
+    return `<tr><td>${RATES.find(x=>x.id===c).l}</td><td class="l">${ROLE[c](r.o)}</td><td>${fmt(cap/1000,1)}</td><td>${fmt(cap*rt.lo/1e6,1)}–${fmt(cap*rt.hi/1e6,1)}</td></tr>`; }));
+  $('compNote').textContent=`Each component sized for ${fmt(P.Qd/1000,1)} MW load + ${fmt(P.red*100)}% redundancy. Pumps, CDUs, piping and controls are not included.`;
+  $('sysPros').innerHTML=`<h3>Strengths</h3><ul>${s.pros.map(x=>`<li>${x}</li>`).join('')}</ul><h3>Watch-outs</h3><ul>${s.cons.map(x=>`<li>${x}</li>`).join('')}</ul>`;
+  renderMonthly();
+}
+
+function renderEff(){
+  const rows=order().map((id,i)=>{ const r=RES[id]; return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td>${r.mlc.toFixed(3)}</td><td>${r.peakRatio.toFixed(3)}</td><td>${r.cop?r.cop.toFixed(1):'–'}</td><td>${loopTxt(r.free)}</td><td>${loopTxt(r.mech)}</td></tr>`; });
+  $('tEff').innerHTML=table(['Option','Annual MLC','Peak kW/kW','Avg chiller COP','Free-cooling h (LC / air)','Chiller-only h (LC / air)'],rows);
+  const ids=RANK;
+  $('effTitle').textContent=ids.length?`Annual MLC: ${RES[ids[0]].o.short} ${RES[ids[0]].mlc.toFixed(3)} kW/kW`:'Annual MLC';
+  hbar('cEff',ids.map(id=>RES[id].o.short),ids.map(id=>RES[id].mlc),'kW per kW of cooling',3);
+}
+
+function renderCons(){
+  const rows=order().map((id,i)=>{ const r=RES[id]; return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td>${fmt(r.E)}</td><td>${fmt(r.Ec)}</td><td>${fmt(r.Ef)}</td><td>${fmt(r.Ep)}</td><td>${fmt(r.Et)}</td><td>${fmt(r.Eloss)}</td><td>${r.pue.toFixed(3)}</td><td>${fmt(r.peak/1000,2)}</td><td>${fmt(r.W)}</td><td>${fmt(r.Wpeak,1)}</td></tr>`; });
+  $('tCons').innerHTML=table(['Option','Cooling MWh/yr','Chillers','Heat-rejection fans','Pumps','CRAH / FWU / CDU','Electrical losses MWh/yr','Annual PUE',`Electrical peak MW (cooling, ${atPk})`,'Water m³/yr',`Water peak m³/h (${atPk})`],rows);
+  const ids=RANK, labels=ids.map(id=>RES[id].o.short);
+  const o=baseOpts(); o.indexAxis='y'; o.scales.x={stacked:true,grid:{color:css('--border')},border:{display:false},ticks:{color:css('--text2')},title:{display:true,text:'MWh/yr',color:css('--text2')}};
+  o.scales.y={stacked:true,grid:{display:false},ticks:{color:css('--text')}};
+  o.plugins.tooltip={mode:'index',intersect:false,callbacks:{label:c=>`${c.dataset.label}: ${fmt(c.raw)} MWh`}};
+  const ds=(lab,k,col,last)=>({label:lab,data:ids.map(id=>RES[id][k]),backgroundColor:col,borderColor:css('--surface'),borderWidth:{right:2},barThickness:18,borderRadius:last?{topRight:4,bottomRight:4}:0});
+  mk('cEl',{type:'bar',data:{labels,datasets:[ds('Chiller compressors','Ec',css('--s1')),ds('Heat-rejection fans','Ef',css('--s4')),ds('Pumps','Ep',css('--grey2')),ds('CRAH / FWU fans + CDU pumps','Et',css('--s2'),true)]},options:o});
+  $('elTitle').textContent=ids.length?`Annual electricity: lowest ${fmt(Math.min(...ids.map(i=>RES[i].E))/1000,1)} GWh/yr`:'Annual electricity';
+  const zeroW=ids.filter(i=>RES[i].W<1).length;
+  $('wTitle').textContent=zeroW?`Annual water: ${zeroW} option${zeroW>1?'s':''} use none`:'Annual water';
+  hbar('cW',labels,ids.map(id=>RES[id].W),'m³/yr',0);
+}
+
+function renderRun(){
+  const rows=order().map((id,i)=>{ const r=RES[id], pb=payback(r);
+    return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td>${fmt(r.costE/1e3)}</td><td>${fmt(r.costW/1e3)}</td><td>${fmt(r.costD/1e3)}</td><td>${fmt(r.run/1e3)}</td><td>${id==='acc'?'–':fmt(pb.save/1e3)}</td><td>${pb.txt}</td></tr>`; });
+  $('tRun').innerHTML=table(['Option','Electricity k$/yr','Water k$/yr','Demand k$/yr','Total k$/yr','Saving vs air-cooled k$/yr','Simple payback'],rows);
+  $('runNote').textContent=`Cooling only (not IT electricity), at the frequent load. Tariffs: electricity ${P.tE} $/kWh, water ${P.tW} $/m³, demand ${P.tD} $/kW per month on the cooling peak. Simple payback = extra initial cost (mid estimate) over air-cooled chillers ÷ running cost saved; no discounting, maintenance or tariff escalation.`;
+  const ids=RANK, labels=ids.map(id=>RES[id].o.short);
+  const o=baseOpts(); o.indexAxis='y'; o.scales.x={stacked:true,grid:{color:css('--border')},border:{display:false},ticks:{color:css('--text2')},title:{display:true,text:'k$/yr',color:css('--text2')},beginAtZero:true};
+  o.scales.y={stacked:true,grid:{display:false},ticks:{color:css('--text')}};
+  o.plugins.tooltip={mode:'index',intersect:false,callbacks:{label:c=>`${c.dataset.label}: ${fmt(c.raw)} k$/yr`}};
+  const ds=(lab,k,col,last)=>({label:lab,data:ids.map(id=>RES[id][k]/1e3),backgroundColor:col,borderColor:css('--surface'),borderWidth:{right:2},barThickness:18,borderRadius:last?{topRight:4,bottomRight:4}:0});
+  mk('cRun',{type:'bar',data:{labels,datasets:[ds('Electricity','costE',css('--s1')),ds('Water','costW',css('--s3')),ds('Demand charge','costD',css('--s4'),true)]},options:o});
+  $('runTitle').textContent=ids.length?`Annual running cost: lowest ${fmt(Math.min(...ids.map(i=>RES[i].run))/1e6,2)} M$/yr`:'Annual running cost';
+}
+
+function renderCap(){
+  const rows=order().map((id,i)=>{ const r=RES[id]; return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td class="l">${r.capParts.map(c=>RATES.find(x=>x.id===c).l).join(' + ')}</td><td>${fmt(r.capLo/1e6,1)}–${fmt(r.capHi/1e6,1)}</td><td>${fmt(r.capLo/P.Qd)}–${fmt(r.capHi/P.Qd)}</td></tr>`; });
+  $('tCap').innerHTML=table(['Option','Components','Estimate M$','$ per kW of load'],rows);
+  const ids=RANK, labels=ids.map(id=>RES[id].o.short);
+  const o=baseOpts(); o.indexAxis='y';
+  o.scales.x={grid:{color:css('--border')},border:{display:false},ticks:{color:css('--text2')},title:{display:true,text:'M$ (low – high)',color:css('--text2')},beginAtZero:true};
+  o.scales.y={grid:{display:false},ticks:{color:css('--text')}};
+  o.plugins.tooltip={callbacks:{label:c=>`${fmt(c.raw[0],1)} – ${fmt(c.raw[1],1)} M$`}};
+  mk('cCap',{type:'bar',data:{labels,datasets:[{data:ids.map(id=>[RES[id].capLo/1e6,RES[id].capHi/1e6]),backgroundColor:ids.map((id,i)=>i===0?css('--s1'):css('--grey')),borderRadius:4,borderSkipped:false,barThickness:16}]},options:o});
+  $('capTitle').textContent=ids.length?`Estimated initial cost: ${costTxt(RES[ids[0]])} for the recommended option`:'Estimated initial cost range';
+}
+
+function renderMonthly(){
+  const id=sel(), r=RES[id], M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], sc=8760/WX.T.length, L=P.loops[LOOP];
+  $('mTitle').textContent=`Monthly operating hours, ${LOOP===0?'liquid':'air'} loop (${L.Ts}/${L.Tr} °C)`;
+  const o=baseOpts(); o.scales.x.stacked=true; o.scales.y.stacked=true; o.scales.y.title={display:true,text:'hours',color:css('--text2')};
+  o.plugins.tooltip={mode:'index',intersect:false,callbacks:{label:c=>`${c.dataset.label}: ${fmt(c.raw)} h`}};
+  mk('cM',{type:'bar',data:{labels:M,datasets:[
+    {label:'Free cooling',data:r.mFree[LOOP].map(v=>v*sc),backgroundColor:css('--s3'),borderColor:css('--surface'),borderWidth:{top:2}},
+    {label:'Partial',data:r.mPart[LOOP].map(v=>v*sc),backgroundColor:css('--s1'),borderColor:css('--surface'),borderWidth:{top:2}},
+    {label:'Chiller only',data:r.mMech[LOOP].map(v=>v*sc),backgroundColor:css('--s2'),borderColor:css('--surface'),borderWidth:{top:2},borderRadius:{topLeft:4,topRight:4}}]},options:o});
+}
+
+let CLDEV='dc';   // basis for the climate charts: dry coolers (dry-bulb) or cooling towers (wet-bulb)
+function renderClimate(){
+  $('clKpi').innerHTML=kpis([[`${fmt(pct(WX.T,0.996),1)} °C`,'Dry-bulb, 0.4% exceeded'],[`${fmt(P.dbD,1)} °C`,'Design dry-bulb'],[`${fmt(pct(WX.Twb,0.996),1)} °C`,'Wet-bulb, 0.4% exceeded'],[`${fmt(P.wbD,1)} °C`,'Design wet-bulb']]);
+  const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], sc=8760/WX.T.length, dc=CLDEV==='dc';
+  const appr=dc?P.aDC:P.aCT+P.aHX;                         // water leaves the outdoor device at outdoor temp + approach
+  const outT=h=>(dc?WX.T[h]:WX.Twb[h])+appr;
+  // monthly temperature summary for the tooltips
+  const ms=M.map(()=>({n:0,db:0,wb:0,dbx:-99,wbx:-99}));
+  WX.T.forEach((t,h)=>{ const m=ms[WX.mon[h]]; m.n++; m.db+=t; m.wb+=WX.Twb[h]; m.dbx=Math.max(m.dbx,t); m.wbx=Math.max(m.wbx,WX.Twb[h]); });
+  const tip=i=>{ const m=ms[i]; return m.n?[`Dry-bulb mean ${fmt(m.db/m.n,1)} °C, max ${fmt(m.dbx,1)} °C`,`Wet-bulb mean ${fmt(m.wb/m.n,1)} °C, max ${fmt(m.wbx,1)} °C`]:[]; };
+  P.loops.forEach((L,i)=>{
+    const free=Array(12).fill(0), part=Array(12).fill(0), none=Array(12).fill(0);
+    WX.T.forEach((t,h)=>{ const o=outT(h), m=WX.mon[h]; if(o<=L.Ts) free[m]+=sc; else if(o<L.Tr) part[m]+=sc; else none[m]+=sc; });
+    const tot=a=>a.reduce((x,y)=>x+y,0);
+    $('clTitle'+i).textContent=`${i?'Air cooling loop (AC)':'Liquid cooling loop (LC)'}, ${L.Ts}/${L.Tr} °C`;
+    $('clSub'+i).textContent=`Free cooling ${fmt(tot(free))} h/yr · partial ${fmt(tot(part))} h · chiller only ${fmt(tot(none))} h. Free below ${fmt(L.Ts-appr,1)} °C ${dc?'dry-bulb':'wet-bulb'}, partial below ${fmt(L.Tr-appr,1)} °C.`;
+    const o=baseOpts(); o.scales.x.stacked=true; o.scales.y.stacked=true; o.scales.y.max=750; o.scales.y.title={display:true,text:'hours',color:css('--text2')};
+    o.plugins.tooltip={mode:'index',intersect:false,callbacks:{label:c=>`${c.dataset.label}: ${fmt(c.raw)} h`,footer:c=>tip(c[0].dataIndex)}};
+    mk('cCl'+i,{type:'bar',data:{labels:M,datasets:[
+      {label:'Free cooling',data:free,backgroundColor:css('--s3'),borderColor:css('--surface'),borderWidth:{top:2}},
+      {label:'Partial',data:part,backgroundColor:css('--s1'),borderColor:css('--surface'),borderWidth:{top:2}},
+      {label:'Chiller only',data:none,backgroundColor:css('--s2'),borderColor:css('--surface'),borderWidth:{top:2},borderRadius:{topLeft:4,topRight:4}}]},options:o});
+  });
+  $('clNote').textContent=`Climate only, before choosing a system: hours each month when the outdoor ${dc?'dry-bulb':'wet-bulb'} + ${fmt(appr,1)} K approach (${dc?'dry cooler':'tower + plate HX'}) is below the loop supply temperature (free cooling) or below its return temperature (partial). Hover over a month for its temperatures. The Systems tab shows how each complete system actually runs.`;
+}
+document.querySelectorAll('#climSeg button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#climSeg button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); CLDEV=b.dataset.dev; renderClimate(); });
+
+// result tabs
+function showPane(p){
+  document.querySelectorAll('#rtabs button').forEach(b=>{ const on=b.dataset.p===p; b.classList.toggle('on',on); b.setAttribute('aria-selected',on); b.tabIndex=on?0:-1; });
+  document.querySelectorAll('.pane').forEach(el=>el.hidden=el.id!=='p-'+p);
+  Object.values(charts).forEach(c=>c.resize());
+}
+function openSystem(id){ PICK=id; renderSystem(); showPane('sys'); }
+$('rtabs').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) showPane(b.dataset.p); });
+$('rtabs').addEventListener('keydown',e=>{ if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft') return;
+  const bs=[...document.querySelectorAll('#rtabs button')], i=bs.indexOf(document.activeElement); if(i<0) return;
+  const b=bs[(i+(e.key==='ArrowRight'?1:-1)+bs.length)%bs.length]; b.focus(); showPane(b.dataset.p); });
+$('results').addEventListener('click',e=>{ const el=e.target.closest('[data-sys]'); if(el) openSystem(el.dataset.sys); });
+
+// events
+$('tabCity').onclick=()=>{ $('tabCity').classList.add('on'); $('tabFile').classList.remove('on'); $('cityPane').hidden=false; $('filePane').hidden=true; loadCity(); };
+$('tabFile').onclick=()=>{ $('tabFile').classList.add('on'); $('tabCity').classList.remove('on'); $('cityPane').hidden=true; $('filePane').hidden=false; };
+$('city').onchange=loadCity;
+$('drop').onclick=()=>$('file').click();
+['dragover','dragenter'].forEach(e=>$('drop').addEventListener(e,ev=>{ev.preventDefault();$('drop').style.borderColor=css('--brand');}));
+$('drop').addEventListener('dragleave',()=>$('drop').style.borderColor='');
+$('drop').addEventListener('drop',ev=>{ev.preventDefault();$('drop').style.borderColor=''; if(ev.dataTransfer.files[0]) readFile(ev.dataTransfer.files[0]);});
+$('file').onchange=e=>{ if(e.target.files[0]) readFile(e.target.files[0]); };
+function readFile(f){ const rd=new FileReader();
+  rd.onload=()=>{ try{ const t=rd.result, epw=/\.epw$/i.test(f.name)||/^LOCATION,/.test(t);
+    WX=epw?parseEPW(t):parseCSV(t); if(!epw) WX.name=f.name.replace(/\.[^.]+$/,'');
+    $('fileInfo').innerHTML=`Loaded <b>${esc(WX.name)}</b>: ${fmt(WX.T.length)} hours.`; run(); } catch(err){ $('fileInfo').innerHTML=`<div class="err">${esc(err.message)}</div>`; } };
+  rd.readAsText(f); }
+// sample weather CSV in the upload format, generated from the city selected in the City tab
+const sampleCity=()=>CITIES.find(c=>c.id===$('city').value);
+const showSampleNote=()=>{ $('csvSampleNote').textContent=`8,760 hours for ${sampleCity().name} (the city selected in the City tab).`; };
+$('csvSample').onclick=()=>{ const c=sampleCity(), url=URL.createObjectURL(new Blob([sampleCSV(c)],{type:'text/csv'}));
+  const a=document.createElement('a'); a.href=url; a.download=`weather-sample-${c.id}.csv`; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000); };
+$('city').addEventListener('change',showSampleNote); showSampleNote();
+document.querySelectorAll('#inputs input:not([type=file]), #inputs select:not(#city)').forEach(el=>el.addEventListener('input',run));
+document.querySelectorAll('#loopSeg button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#loopSeg button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); LOOP=+b.dataset.l; renderMonthly(); });
+if(window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',run);
+showPane('ov');
+loadCity();
+</script>
+</body>
+</html>

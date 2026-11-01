@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cooling Plant Selector · Othman Energy Lab</title>
+<meta name="description" content="Compare complete cooling plants for a data hall with liquid and air cooling, hour by hour over a full year: energy, water, peak demand and cost. By Othman Energy Lab.">
+<link rel="icon" href="../../shared/img/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../shared/img/apple-touch-icon.png">
+<meta name="theme-color" content="#0e7c57">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Othman Energy Lab">
+<meta property="og:title" content="Cooling Plant Selector · Othman Energy Lab">
+<meta property="og:description" content="Compare complete cooling plants for a data hall with liquid and air cooling, hour by hour over a full year: energy, water, peak demand and cost. By Othman Energy Lab.">
+<meta property="og:image" content="/shared/img/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../shared/css/base.css">
+<link rel="stylesheet" href="style.css">
+<!-- Chart.js: local copy in shared/lib/ (works offline); CDN fallback -->
+<script src="../../shared/lib/chart.umd.min.js"></script>
+<script>window.Chart||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"><\/script>')</script>
+</head>
+<body class="wide">
+<header class="sitebar" data-root="../../" data-page="data-centers"></header>
+<div class="pagehead">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a> / <a href="../index.html">Data Centers</a> / Cooling Plant Selector</nav>
+  <h1>Cooling Plant Selector</h1>
+  <p class="sub">Compare air-cooled chillers, free-cooling dry coolers, adiabatic coolers and cooling towers for a data hall with liquid and air cooling loops, hour by hour over a full year.</p>
+  <div class="chips"><span>ASHRAE 90.4 MLC</span><span>ASHRAE 90.1 chiller minimums</span><span>AHRI 550/590</span><span>8,760-hour simulation</span></div>
+</div>
+<main class="layout">
+<div class="incol">
+<div class="colhead"><b>Inputs</b><span>Change any value; results update instantly</span></div>
+<aside class="card" id="inputs">
+  <h2>1. Weather</h2>
+  <div class="tabs"><button id="tabCity" class="on">City</button><button id="tabFile">Weather file</button></div>
+  <div id="cityPane">
+    <label for="city">City</label>
+    <select id="city"></select>
+    <div class="note">Built-in cities use an approximate hourly year generated from 1991–2020 monthly normals. Upload an EPW file for design-grade results.</div>
+  </div>
+  <div id="filePane" hidden>
+    <div class="drop" id="drop">Drop an <b>.epw</b> file (ASHRAE IWEC / TMY) or a CSV here, or click to choose<input type="file" id="file" accept=".epw,.csv,.txt" hidden></div>
+    <div id="fileInfo" class="note"></div>
+    <div class="csvfmt">
+      <div class="ctitle">CSV format</div>
+      <p>One row per hour, 8,760 rows from 1 January 00:00, with a header row:</p>
+      <code>Month,Day,Hour,DryBulb_C,RH_pct,Pressure_Pa<br>1,1,0,17.1,64.9,101205<br>1,1,1,15.9,70.0,101205</code>
+      <ul>
+        <li><b>Required:</b> dry-bulb (°C) and one of RH (%), dew point (°C) or wet-bulb (°C).</li>
+        <li><b>Optional:</b> month (1–12); station pressure (Pa, hPa or kPa), otherwise sea level is assumed.</li>
+        <li>Comma, semicolon or tab separated. Headers are matched by name: “dry”/“DB”, “RH”/“humid”, “dew”, “wet”/“WB”, “month”, “press”.</li>
+      </ul>
+      <button type="button" class="link" id="csvSample">Download sample CSV</button>
+      <span class="note" id="csvSampleNote"></span>
+    </div>
+    <div class="note">EPW files for most locations are free at climate.onebuilding.org.</div>
+  </div>
+
+  <h2 style="margin-top:18px">2. Data hall cooling load</h2>
+  <div class="row">
+    <div><label for="it">Cooling load (MW)</label><input type="number" id="it" value="20" min="0.1" step="0.5"></div>
+    <div><label for="lf">Frequent load (%)</label><input type="number" id="lf" value="80" min="10" max="100" step="5"></div>
+  </div>
+  <h3>Liquid cooling loop</h3>
+  <div class="row3">
+    <div><label for="lcp">Share (%)</label><input type="number" id="lcp" value="80" min="0" max="100" step="5"></div>
+    <div><label for="lcs">Supply (°C)</label><input type="number" id="lcs" value="30" min="5" max="50" step="1"></div>
+    <div><label for="lcr">Return (°C)</label><input type="number" id="lcr" value="40" min="6" max="65" step="1"></div>
+  </div>
+  <h3>Air cooling loop <span id="airShare" style="text-transform:none;letter-spacing:0;font-weight:400"></span></h3>
+  <div class="row">
+    <div><label for="acs">Supply (°C)</label><input type="number" id="acs" value="20" min="5" max="40" step="1"></div>
+    <div><label for="acr">Return (°C)</label><input type="number" id="acr" value="30" min="6" max="50" step="1"></div>
+  </div>
+
+  <h2 style="margin-top:18px">3. Site</h2>
+  <label for="water">Water availability</label>
+  <select id="water">
+    <option value="plenty">Available (potable or TSE)</option>
+    <option value="limited">Limited</option>
+    <option value="none">None (zero-water design)</option>
+  </select>
+
+  <h3>Design condition (extreme)</h3>
+  <div class="row">
+    <div><label for="dbD">Design dry-bulb (°C)</label><input type="number" id="dbD" step="0.1" placeholder="auto"></div>
+    <div><label for="wbD">Design wet-bulb (°C)</label><input type="number" id="wbD" step="0.1" placeholder="auto"></div>
+  </div>
+  <div class="note">Leave blank to use the hottest dry-bulb and most humid wet-bulb hour in the weather data. For design, enter ASHRAE extreme values (e.g. 20-year return period, per ASHRAE 90.4 practice) from the ASHRAE Climatic Design Conditions.</div>
+
+
+  <details>
+    <summary>Utility tariffs (running cost)</summary>
+    <div class="row">
+      <div><label for="tE">Electricity ($/kWh)</label><input type="number" id="tE" value="0.10" step="0.01" min="0"></div>
+      <div><label for="tW">Water incl. treatment ($/m³)</label><input type="number" id="tW" value="2.5" step="0.1" min="0"></div>
+    </div>
+    <div class="row"><div><label for="tD">Demand charge ($/kW per month)</label><input type="number" id="tD" value="0" step="1" min="0"></div><div></div></div>
+    <div class="note">Running cost of cooling only (not the IT load). The demand charge is applied to the cooling electrical peak every month. Indicative defaults; enter the local tariff.</div>
+  </details>
+  <details>
+    <summary>Chillers (ASHRAE 90.1 / AHRI 550/590 basis)</summary>
+    <div class="row">
+      <div><label for="copA">Air-cooled rated COP</label><input type="number" id="copA" value="2.985" step="0.1" min="1"></div>
+      <div><label for="copW">Water-cooled rated COP</label><input type="number" id="copW" value="6.286" step="0.1" min="1"></div>
+    </div>
+    <div class="row">
+      <div><label for="nCh">Duty chillers per loop</label><input type="number" id="nCh" value="4" step="1" min="1"></div>
+      <div><label for="copMax">Max COP (low lift)</label><input type="number" id="copMax" value="14" step="1" min="4"></div>
+    </div>
+    <div class="row">
+      <div><label for="acMax">Air-cooled max ambient (°C)</label><input type="number" id="acMax" value="52" step="1"></div>
+      <div><label for="wcMax">Max entering condenser water (°C)</label><input type="number" id="wcMax" value="43" step="1"></div>
+    </div>
+    <div class="note">Defaults are ASHRAE 90.1-2019 Path A minimums (air-cooled; water-cooled ≥ 2,110 kW). Enter selected equipment values to override.</div>
+  </details>
+  <details>
+    <summary>Heat rejection and pumps</summary>
+    <div class="row">
+      <div><label for="aDC">Dry cooler approach (K)</label><input type="number" id="aDC" value="6" step="0.5"></div>
+      <div><label for="aCT">Tower approach (K)</label><input type="number" id="aCT" value="4" step="0.5"></div>
+    </div>
+    <div class="row">
+      <div><label for="aHX">Plate HX approach (K)</label><input type="number" id="aHX" value="1.5" step="0.5"></div>
+      <div><label for="eAD">Adiabatic effectiveness</label><input type="number" id="eAD" value="0.85" step="0.05" min="0" max="1"></div>
+    </div>
+    <div class="row">
+      <div><label for="swAD">Adiabatic on above (°C)</label><input type="number" id="swAD" value="24" step="1"></div>
+      <div><label for="coc">Tower cycles of conc.</label><input type="number" id="coc" value="4" step="0.5" min="1.5"></div>
+    </div>
+    <div class="row">
+      <div><label for="pump">Primary pumps, FW / CHW (% of load)</label><input type="number" id="pump" value="1.5" step="0.5" min="0"></div>
+      <div><label for="cwp">Condenser pumps (% of rejected)</label><input type="number" id="cwp" value="1.2" step="0.1" min="0"></div>
+    </div>
+  </details>
+  <details>
+    <summary>Data hall terminal units (CRAH / FWU / CDU)</summary>
+    <div class="row">
+      <div><label for="fanT">CRAH / FWU fans (% of air-loop load)</label><input type="number" id="fanT" value="3" step="0.5" min="0"></div>
+      <div><label for="cduP">CDU pumps (% of liquid-loop load)</label><input type="number" id="cduP" value="1" step="0.25" min="0"></div>
+    </div>
+    <div class="note">Electrical input including motor and drive losses. Counted as cooling energy (as in the ASHRAE 90.4 MLC), and added as heat to its loop, so the chillers and heat rejection remove it too.</div>
+  </details>
+  <details>
+    <summary>Electrical losses</summary>
+    <div class="row">
+      <div><label for="ups">UPS efficiency (%)</label><input type="number" id="ups" value="96" step="0.5" min="80" max="100"></div>
+      <div><label for="dloss">Transformer + distribution losses (%)</label><input type="number" id="dloss" value="2" step="0.5" min="0" max="10"></div>
+    </div>
+    <div class="note">UPS losses apply to the IT load; transformer and distribution losses apply to the whole facility (IT + cooling). Used for the annual PUE only; electrical peaks are the cooling plant only. Cooling for electrical rooms is not included.</div>
+  </details>
+  <details>
+    <summary>Initial cost rates ($ per kW of capacity)</summary>
+    <div id="rates"></div>
+    <div class="row"><div><label for="red">Redundancy (%)</label><input type="number" id="red" value="25" step="5" min="0"></div><div></div></div>
+    <div class="note">Indicative installed rates for screening only. Replace with local quotes.</div>
+  </details>
+</aside>
+</div>
+
+<section id="results">
+  <div class="colhead"><b>Results</b><span>Ranked systems, then details in the tabs below</span></div>
+  <div class="card reco" id="reco"></div>
+
+  <nav class="rtabs" id="rtabs" role="tablist" aria-label="Results">
+    <button role="tab" data-p="ov" class="on" aria-selected="true">Overview</button>
+    <button role="tab" data-p="sys" aria-selected="false">Systems</button>
+    <button role="tab" data-p="en" aria-selected="false">Energy &amp; water</button>
+    <button role="tab" data-p="cost" aria-selected="false">Cost</button>
+    <button role="tab" data-p="clim" aria-selected="false">Climate</button>
+    <button role="tab" data-p="meth" aria-selected="false">Method</button>
+  </nav>
+
+  <div class="pane" id="p-ov">
+    <div class="card"><h2>All options side by side</h2>
+      <div id="tOv"></div>
+      <div class="note">Highlighted cells are the best value among feasible options. Score weighs energy (4), water (3, doubled when water is limited), peak power (3) and initial cost (2). Click a row to see that system in full.</div></div>
+    <div class="card"><h2>Design-day check</h2><div id="tDes"></div><div class="note" id="desNote"></div></div>
+  </div>
+
+  <div class="pane" id="p-sys" hidden>
+    <div class="seg sysseg" id="sysSeg"></div>
+    <div class="card">
+      <div class="syshead" id="sysHead"></div>
+      <p class="how" id="sysHow"></p>
+      <div class="ctitle">How it is connected</div>
+      <div id="sysSvg"></div>
+      <div class="kpis k6" id="sysKpi"></div>
+      <div class="note" id="sysDes"></div>
+    </div>
+    <div class="card"><h2>How it runs over the year</h2>
+      <div class="legend"><span><i style="background:var(--s3)"></i>Free cooling (chiller off)</span><span><i style="background:var(--s1)"></i>Partial (pre-cooling + chiller)</span><span><i style="background:var(--s2)"></i>Chiller only</span></div>
+      <div id="sysModes"></div>
+      <div class="ctitle" id="mTitle" style="margin-top:16px">Monthly operating hours</div>
+      <div class="seg" id="loopSeg"><button data-l="0" class="on">Liquid loop</button><button data-l="1">Air loop</button></div>
+      <div class="chartbox"><canvas id="cM"></canvas></div>
+    </div>
+    <div class="card"><div class="grid2">
+      <div><h2>Equipment and cost</h2><div id="sysComp"></div><div class="note" id="compNote"></div></div>
+      <div class="pros"><h2>Strengths and watch-outs</h2><div id="sysPros"></div></div>
+    </div></div>
+  </div>
+
+  <div class="pane" id="p-en" hidden>
+    <div class="card"><h2>Energy efficiency</h2><div class="split">
+      <div><div id="tEff"></div><div class="note">MLC = annual mechanical energy ÷ annual cooling load (ASHRAE 90.4 definition, cooling load taken as IT energy). Free-cooling hours: chiller fully off.</div></div>
+      <div><div class="ctitle" id="effTitle">Annual MLC</div><div class="chartbox"><canvas id="cEff"></canvas></div></div>
+    </div></div>
+    <div class="card"><h2>Electricity and water consumption</h2><div class="split">
+      <div><div id="tCons"></div><div class="note">Annual totals at the frequent load. Peaks are at 100% load on the worst hour of the year. Electrical peak = cooling only: chillers + heat-rejection fans + pumps + CRAH / FWU fans + CDU pumps (no IT load, no electrical equipment or losses). Water peak = make-up water (evaporation, blowdown, pad water). PUE = (IT + cooling + losses) ÷ IT, annual. CRAH / fan-wall fans are not included.</div></div>
+      <div>
+        <div class="ctitle" id="elTitle">Annual electricity by component</div>
+        <div class="legend"><span><i style="background:var(--s1)"></i>Chiller compressors</span><span><i style="background:var(--s4)"></i>Heat-rejection fans</span><span><i style="background:var(--grey2)"></i>Pumps</span><span><i style="background:var(--s2)"></i>CRAH / FWU fans + CDU pumps</span></div>
+        <div class="chartbox" style="height:220px"><canvas id="cEl"></canvas></div>
+        <div class="ctitle" id="wTitle" style="margin-top:14px">Annual water</div>
+        <div class="chartbox" style="height:200px"><canvas id="cW"></canvas></div>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="pane" id="p-cost" hidden>
+    <div class="card"><h2>Running cost (cooling)</h2>
+      <div id="tRun"></div><div class="note" id="runNote"></div>
+      <div class="ctitle" id="runTitle" style="margin-top:18px">Annual running cost</div>
+      <div class="legend"><span><i style="background:var(--s1)"></i>Electricity</span><span><i style="background:var(--s3)"></i>Water</span><span><i style="background:var(--s4)"></i>Demand charge</span></div>
+      <div class="chartbox" style="height:220px"><canvas id="cRun"></canvas></div>
+    </div>
+    <div class="card"><h2>Initial cost (estimated range)</h2><div class="split">
+      <div><div id="tCap"></div><div class="note">Rate-based estimate, not a quotation: capacity × redundancy × low/high rate for each component. Excludes building works, electrical and controls.</div></div>
+      <div><div class="ctitle" id="capTitle">Estimated initial cost range</div><div class="chartbox"><canvas id="cCap"></canvas></div></div>
+    </div></div>
+  </div>
+
+  <div class="pane" id="p-clim" hidden>
+    <div class="card"><h2>Climate: free-cooling potential by month</h2>
+      <div class="kpis" id="clKpi" style="margin:0 0 14px"></div>
+      <div class="climbar">
+        <div class="seg" id="climSeg"><button data-dev="dc" class="on">Dry coolers (dry-bulb)</button><button data-dev="ct">Cooling towers (wet-bulb)</button></div>
+        <div class="legend"><span><i style="background:var(--s3)"></i>Free cooling (outdoor air alone)</span><span><i style="background:var(--s1)"></i>Partial (pre-cooling + chiller)</span><span><i style="background:var(--s2)"></i>Chiller only</span></div>
+      </div>
+      <div class="grid2">
+        <div><div class="ctitle" id="clTitle0">Liquid cooling loop (LC)</div><div class="note" id="clSub0" style="margin:0 0 6px"></div><div class="chartbox" style="height:260px"><canvas id="cCl0"></canvas></div></div>
+        <div><div class="ctitle" id="clTitle1">Air cooling loop (AC)</div><div class="note" id="clSub1" style="margin:0 0 6px"></div><div class="chartbox" style="height:260px"><canvas id="cCl1"></canvas></div></div>
+      </div>
+      <div class="note" id="clNote"></div></div>
+  </div>
+
+  <div class="pane" id="p-meth" hidden>
+  <div class="card">
+    <h2>Method and equations</h2>
+    <ul class="method">
+      <li><b>Psychrometrics</b> (ASHRAE Handbook Fundamentals, Ch. 1): saturation pressure by the Hyland–Wexler equations; humidity ratio <code>W = 0.621945·p<sub>w</sub>/(p − p<sub>w</sub>)</code>; wet-bulb solved from <code>W = [(2501 − 2.326t*)W<sub>s</sub>* − 1.006(t − t*)] / (2501 + 1.86t − 4.186t*)</code>. Station pressure from elevation.</li>
+      <li><b>Each loop, every hour</b>: return water is first cooled by the outdoor device, leaving at <code>T<sub>out</sub></code>; free-cooling fraction <code>FF = (T<sub>ret</sub> − T<sub>out</sub>)/(T<sub>ret</sub> − T<sub>sup</sub>)</code> (0–1); the chiller trims the rest.</li>
+      <li><b>Terminal units</b>: CRAH / FWU fans (air loop) and CDU pumps (liquid loop) draw a set % of their loop load. Their power is cooling energy, and the same power is added to the loop as heat: <code>Q<sub>loop</sub> = Q<sub>IT</sub> × (1 + terminal %)</code>, which the pre-cooling, chillers and heat rejection must remove. Chillers are sized for this load.</li>
+      <li><b>T<sub>out</sub></b>: dry cooler <code>T<sub>db</sub> + approach</code>; adiabatic <code>T<sub>eff</sub> + approach + HX</code> with <code>T<sub>eff</sub> = T<sub>db</sub> − ε(T<sub>db</sub> − T<sub>wb</sub>)</code> (ASHRAE Systems &amp; Equipment, evaporative cooling); tower <code>T<sub>wb</sub> + approach + HX</code>.</li>
+      <li><b>Chillers</b> (DOE-2 / EnergyPlus EIR form): <code>P = (Q<sub>cap</sub>/COP<sub>rated</sub>) × EIRFT × EIRFPLR</code>. COP<sub>rated</sub> at AHRI 550/590 conditions (defaults: ASHRAE 90.1-2019 Path A minimums). EIRFT scales with lift at constant Carnot fraction, because 20–30 °C chilled water is outside published curve ranges. EIRFPLR from EnergyPlus reference curves: water-cooled VSD centrifugal 0.0731 + 0.1514·PLR + 0.7709·PLR²; air-cooled screw = PLR. Duty chillers stage to keep PLR high.</li>
+      <li><b>Condensing temperature</b>: air-cooled <code>T<sub>db</sub> + 15 K</code>; water-cooled <code>T<sub>ECW</sub> + 7.6 K</code>, where entering condenser water = <code>T<sub>wb</sub> + tower approach</code> or <code>T<sub>eff</sub> + cooler approach</code>.</li>
+      <li><b>Water</b>: tower evaporation <code>0.8·Q<sub>rej</sub>/h<sub>fg</sub></code> plus blowdown <code>E/(CoC − 1)</code>; adiabatic water only when pads are wet (above the switch temperature).</li>
+      <li><b>Design-day check</b>: each option at 100% load at the design dry-bulb and wet-bulb (applied together, which is conservative). Fails if a chiller would exceed its condenser limit (air-cooled max ambient, max entering condenser water).</li>
+      <li><b>MLC</b> (ASHRAE 90.4): annual mechanical energy (compressors, heat-rejection fans, primary, condenser and CDU pumps, CRAH / FWU fans) ÷ annual IT energy.</li>
+      <li><b>Peaks</b>: at 100% load on the worst hour of the year. Electrical peak (cooling) = compressors + heat-rejection fans + pumps + CRAH / FWU fans + CDU pumps. It excludes the IT load and the electrical equipment and its losses. Water peak = make-up water rate in m³/h (tower evaporation and blowdown, or adiabatic pad water). Chillers are staged each hour to the number that gives the lowest power.</li>
+      <li><b>Electrical losses and PUE</b>: UPS losses on the IT load, transformer and distribution losses on the whole facility. Annual PUE <code>= (IT + cooling + losses) ÷ IT</code>. Simplified; not the full ASHRAE 90.4 ELC method. CRAH / fan-wall fans and electrical-room cooling are not included.</li>
+      <li><b>Running cost</b>: cooling only, at the frequent load: <code>electricity × tariff + water × tariff + cooling peak × demand charge × 12</code>. Simple payback against air-cooled chillers = extra initial cost (mid estimate) ÷ running cost saved, with no discounting, maintenance or tariff escalation.</li>
+      <li><b>Recommendation</b>: metrics normalised across feasible options and weighted: energy 4, water 3 (doubled when water is limited), peak power 3, initial cost 2. Options that fail the design day, or need water you don't have, are excluded. Screening-level; confirm with vendor selections and a detailed model.</li>
+    </ul>
+  </div>
+  </div>
+</section>
+</main>
+<footer class="sitefoot" data-root="../../"></footer>
+
+<script src="../../shared/js/site.js"></script>
+<script src="../../shared/js/ui.js"></script>
+<script src="../../shared/js/cities.js"></script>
+<script src="../../shared/js/psychro.js"></script>
+<script src="../../shared/js/weather.js"></script>
+<script src="js/model.js"></script>
+<script src="js/systems.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data Centers · Othman Energy Lab</title>
+<meta name="description" content="Othman Energy Lab helps engineers and clients choose the right data center cooling plant, built on ASHRAE 90.4 and aimed beyond the code minimum.">
+<link rel="icon" href="../shared/img/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../shared/img/apple-touch-icon.png">
+<meta name="theme-color" content="#0e7c57">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Othman Energy Lab">
+<meta property="og:title" content="Data Centers · Othman Energy Lab">
+<meta property="og:description" content="Othman Energy Lab helps engineers and clients choose the right data center cooling plant, built on ASHRAE 90.4 and aimed beyond the code minimum.">
+<meta property="og:image" content="/shared/img/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../shared/css/base.css">
+<style>
+.intro{display:grid;grid-template-columns:1.4fr 1fr;gap:40px;align-items:start;padding:40px 0 8px}
+@media (max-width:960px){.intro{grid-template-columns:1fr;gap:24px}}
+.intro h1{font-size:clamp(28px,3.6vw,40px);line-height:1.1;letter-spacing:-.02em;margin:6px 0 14px}
+.intro .lead{font-size:16.5px;line-height:1.55;color:var(--text2);margin:0;max-width:62ch}
+.facts{padding:20px}
+.facts h2{font-size:14px;margin:0 0 10px}
+.facts dl{margin:0;display:grid;gap:10px}
+.facts dt{font-size:12px;color:var(--muted)}
+.facts dd{margin:2px 0 0;color:var(--text)}
+</style>
+</head>
+<body>
+<header class="sitebar" data-root="../" data-page="data-centers"></header>
+
+<main class="wrap">
+  <div class="intro">
+    <div>
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Home</a> / Data Centers</nav>
+      <h1>Data Centers</h1>
+      <p class="lead">Cooling is the largest energy use in a data center after the IT load itself. We help engineers and clients choose the right cooling plant for each data hall, starting from the ASHRAE 90.4 and 90.1 requirements and showing how far a practical design can go beyond them.</p>
+    </div>
+    <aside class="card facts" aria-label="Focus area summary">
+      <h2>What we look at</h2>
+      <dl>
+        <div><dt>Governing standard</dt><dd>ASHRAE 90.4, Energy Standard for Data Centers</dd></div>
+        <div><dt>Key metric</dt><dd>Mechanical load component (MLC)</dd></div>
+        <div><dt>Systems covered</dt><dd>Liquid and air cooling loops; chillers, dry coolers, adiabatic coolers, cooling towers</dd></div>
+      </dl>
+    </aside>
+  </div>
+
+  <section id="tools">
+    <div class="shead">
+      <p class="eyebrow">Our analysis</p>
+      <h2>The analysis behind our recommendations</h2>
+      <p>We compare the real options hour by hour over a full year and show the method and assumptions, so the choice can be checked. You can explore the analysis yourself.</p>
+    </div>
+    <div class="tools">
+      <a class="card tool" href="cooling-plant/index.html">
+        <h3>Cooling Plant Selector</h3>
+        <p>Compare air-cooled chillers, free-cooling dry coolers, adiabatic coolers and cooling towers for a data hall with liquid and air cooling loops. Ranks the options on energy, water, peak power and initial cost, and shows how each system is connected and runs over the year.</p>
+        <div class="chips"><span>8,760-hour simulation</span><span>ASHRAE 90.4 MLC</span><span>ASHRAE 90.1 chiller minimums</span><span>EPW weather</span></div>
+        <span class="open">Explore the analysis →</span>
+      </a>
+      <div class="card soon"><b>More data center analysis in development</b><span>Added as the Lab grows.</span></div>
+    </div>
+  </section>
+</main>
+
+<footer class="sitefoot" data-root="../"></footer>
+<script src="../shared/js/site.js"></script>
+</body>
+</html>

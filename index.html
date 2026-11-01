@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Othman Energy Lab · Choose the right system. Save energy. Save money.</title>
+<meta name="description" content="Othman Energy Lab guides engineers and clients to the right system: the most efficient, practical design beyond conventional systems, saving energy, money and the environment.">
+<link rel="icon" href="shared/img/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="shared/img/apple-touch-icon.png">
+<meta name="theme-color" content="#0e7c57">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Othman Energy Lab">
+<meta property="og:title" content="Othman Energy Lab · Choose the right system. Save energy. Save money.">
+<meta property="og:description" content="Othman Energy Lab guides engineers and clients to the right system: the most efficient, practical design beyond conventional systems, saving energy, money and the environment.">
+<meta property="og:image" content="/shared/img/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="shared/css/base.css">
+<style>
+/* hero */
+.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:center;padding:64px 0 24px}
+@media (max-width:960px){.hero{grid-template-columns:1fr;gap:32px;padding-top:40px}}
+.hero h1{font-size:clamp(30px,4.4vw,48px);line-height:1.07;letter-spacing:-.025em;margin:0 0 16px}
+.hero h1 em{font-style:normal;color:var(--brand-ink)}
+.lead{font-size:17px;line-height:1.55;color:var(--text2);margin:0 0 24px;max-width:56ch}
+/* focus */
+#focus{padding-top:32px}
+.focus{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media (max-width:900px){.focus{grid-template-columns:1fr}}
+.fc{display:flex;flex-direction:column;gap:8px;padding:24px;border-top:3px solid var(--brand);color:inherit;text-decoration:none}
+.fc h3{margin:0;font-size:19px;letter-spacing:-.01em;color:var(--text);text-transform:none}
+.fc p{margin:0;color:var(--text2)}
+.fc .open{margin-top:auto;padding-top:6px;color:var(--brand-ink);font-weight:600;font-size:13.5px}
+a.fc:hover{transform:translateY(-2px);box-shadow:0 8px 22px color-mix(in srgb,var(--text) 9%,transparent)}
+/* hero schematic: pipes flow, fans turn, heat rises (all off with reduced motion) */
+.heroart{margin:0}
+.heroart svg{display:block;width:100%;height:auto;filter:drop-shadow(0 14px 30px color-mix(in srgb,var(--text) 10%,transparent))}
+.heroart .frame{stroke:var(--border)}
+.heroart .ground{fill:color-mix(in srgb,var(--text) 4%,var(--surface))}
+.heroart .groundline{stroke:var(--border);stroke-width:1.5}
+.heroart .sun circle{fill:color-mix(in srgb,var(--s4) 75%,var(--surface))}
+.heroart .sun path{stroke:color-mix(in srgb,var(--s4) 75%,var(--surface));stroke-width:3;stroke-linecap:round}
+.heroart .badge rect{fill:var(--surface);stroke:color-mix(in srgb,var(--brand) 40%,var(--border))}
+.heroart .badge circle{fill:var(--brand)}
+.heroart .badge text{fill:var(--brand-ink);font-size:15px;font-weight:700}
+.heroart .lbl{fill:var(--text2);font-size:14px;font-weight:600}
+.heroart .bld{stroke:var(--text2);stroke-width:1.5}
+.heroart .roof{stroke:var(--text2);stroke-width:4;stroke-linecap:round}
+.heroart .rack rect{fill:var(--bg);stroke:var(--text2);stroke-width:1.2}
+.heroart .slots path{stroke:var(--grey);stroke-width:5;stroke-linecap:round}
+.heroart .led circle{fill:var(--brand);animation:blink 1.6s ease-in-out infinite}
+.heroart .unit{fill:var(--surface);stroke:var(--text2);stroke-width:1.5}
+.heroart .comp{fill:var(--bg);stroke:var(--text2);stroke-width:1.5}
+.heroart .compi{fill:var(--text2)}
+.heroart .vent{stroke:var(--grey);stroke-width:3;stroke-linecap:round}
+.heroart .legs{stroke:var(--text2);stroke-width:3;stroke-linecap:round}
+.heroart .fanring{fill:var(--bg);stroke:var(--text2);stroke-width:1.5}
+.heroart .fan{fill:var(--text2);transform-box:fill-box;transform-origin:center;animation:spin 2.2s linear infinite}
+.heroart .heat path{fill:none;stroke:var(--s2);stroke-width:2.5;stroke-linecap:round;opacity:0;animation:rise 2.4s ease-in-out infinite}
+.heroart .pipe,.heroart .key path{fill:none;stroke-width:7;stroke-linecap:round}
+.heroart .sup{stroke:var(--s1)}
+.heroart .ret{stroke:var(--s2)}
+.heroart .pipe.flow{stroke:var(--surface);stroke-width:2.5;stroke-dasharray:6 10;opacity:.9;animation:flow 1s linear infinite}
+.heroart .key path{stroke-width:6}
+.heroart .key text{fill:var(--text2);font-size:13px}
+@media (prefers-reduced-motion:reduce){.heroart .heat path{opacity:.7}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes flow{to{stroke-dashoffset:-32}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes rise{0%{opacity:0;transform:translateY(8px)}40%{opacity:.85}100%{opacity:0;transform:translateY(-14px)}}
+/* recent tools: cards with a preview image */
+#tools{padding-top:40px}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.tcard{display:flex;flex-direction:column;padding:0;overflow:hidden;color:inherit;text-decoration:none}
+a.tcard:hover{transform:translateY(-3px);box-shadow:0 12px 28px color-mix(in srgb,var(--text) 11%,transparent);border-color:var(--brand)}
+.thumb{border-bottom:1px solid var(--border)}
+.thumb svg{display:block;width:100%;height:auto}
+.thumb .tbg{fill:color-mix(in srgb,var(--brand) 9%,var(--surface))}
+.thumb .win{fill:var(--surface);stroke:var(--border);stroke-width:1.5}
+.thumb .win.dashed{fill:none;stroke-dasharray:6 6;stroke:color-mix(in srgb,var(--brand) 40%,var(--border))}
+.thumb .dot{fill:var(--grey)}
+.thumb .sep{stroke:var(--border);stroke-width:1.2}
+.thumb .tt{fill:var(--text2);font-size:12px;font-weight:600}
+.thumb .fc{fill:var(--s3)}.thumb .pt{fill:var(--s1)}.thumb .ch{fill:var(--s2)}
+.thumb .m rect{transform-box:fill-box;transform-origin:bottom;transition:transform .35s ease}
+.thumb .lab{fill:var(--grey)}
+.thumb .bar{fill:var(--grey2)}
+.thumb .best{fill:var(--brand)}
+.thumb .ok{fill:var(--surface)}
+.thumb .rk rect{transform-box:fill-box;transform-origin:left;transition:transform .35s ease}
+a.tcard:hover .thumb .m rect{transform:scaleY(1.06)}
+a.tcard:hover .thumb .rk .best{transform:scaleX(1.04)}
+.thumb .plusc{fill:none;stroke:color-mix(in srgb,var(--brand) 45%,var(--border));stroke-width:2}
+.thumb .plus{stroke:var(--brand-ink);stroke-width:3;stroke-linecap:round}
+.tbody{display:flex;flex-direction:column;gap:8px;padding:20px 22px 22px;flex:1}
+.tmeta{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.tmeta .tag{margin-left:0}
+.tbody h3{margin:0;font-size:19px;letter-spacing:-.01em;color:var(--text);text-transform:none}
+.tbody p{margin:0;color:var(--text2)}
+.tbody .chips{margin-top:2px}
+.tbody .open{margin-top:auto;padding-top:6px;color:var(--brand-ink);font-weight:600;font-size:13.5px}
+.soon2 .tbody h3{color:var(--text2)}
+</style>
+</head>
+<body>
+<header class="sitebar" data-root="" data-page="home"></header>
+
+<main class="wrap">
+  <div class="hero">
+    <div>
+      <p class="eyebrow">Othman Energy Lab · Code-based. Beyond the minimum.</p>
+      <h1>Choose the right system.<br>Save energy. <em>Save money.</em></h1>
+      <p class="lead">We guide engineers and clients to the right system for every project: the most efficient design, built on the latest technology and a practical approach, that goes beyond conventional systems. Better for the environment, and for the client’s budget.</p>
+    </div>
+    <figure class="heroart" aria-label="Illustration: a critical building cooled by a chiller plant and a heat-rejection unit, with water flowing between them">
+      <svg viewBox="0 0 560 400" role="img">
+        <defs>
+          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:color-mix(in srgb,var(--brand) 14%,var(--surface))"/><stop offset="1" style="stop-color:var(--surface)"/></linearGradient>
+          <linearGradient id="bld" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--surface)"/><stop offset="1" style="stop-color:color-mix(in srgb,var(--text) 5%,var(--surface))"/></linearGradient>
+        </defs>
+        <clipPath id="framec"><rect x="1" y="1" width="558" height="398" rx="18"/></clipPath>
+        <rect x="1" y="1" width="558" height="398" rx="18" fill="url(#sky)"/>
+        <g clip-path="url(#framec)"><rect class="ground" x="1" y="300" width="558" height="99"/><path class="groundline" d="M1 300H559"/></g>
+        <rect class="frame" x="1" y="1" width="558" height="398" rx="18" fill="none"/>
+        <g class="sun"><circle cx="500" cy="58" r="20"/><path d="M500 26v-8M500 98v-8M468 58h-8M540 58h-8M477 35l-6-6M529 87l-6-6M523 35l6-6M471 87l6-6"/></g>
+        <g class="badge"><rect x="28" y="26" width="138" height="34" rx="17"/><circle cx="48" cy="43" r="6"/><text x="62" y="48">Save energy</text></g>
+        <g class="badge"><rect x="176" y="26" width="132" height="34" rx="17"/><circle cx="196" cy="43" r="6"/><text x="210" y="48">Save money</text></g>
+        <text class="lbl" x="125" y="100" text-anchor="middle">Critical building</text>
+        <rect class="bld" x="40" y="112" width="170" height="188" rx="6" fill="url(#bld)"/>
+        <path class="roof" d="M34 112H216"/>
+        <g class="rack"><rect x="58" y="150" width="38" height="132" rx="3"/><rect x="106" y="150" width="38" height="132" rx="3"/><rect x="154" y="150" width="38" height="132" rx="3"/></g>
+        <g class="slots"><path d="M64 166h26M64 184h26M64 202h26M64 220h26M64 238h26M64 256h26M112 166h26M112 184h26M112 202h26M112 220h26M112 238h26M112 256h26M160 166h26M160 184h26M160 202h26M160 220h26M160 238h26M160 256h26"/></g>
+        <g class="led"><circle cx="88" cy="166" r="2"/><circle cx="88" cy="202" r="2" style="animation-delay:.6s"/><circle cx="136" cy="184" r="2" style="animation-delay:.3s"/><circle cx="136" cy="238" r="2" style="animation-delay:.9s"/><circle cx="184" cy="166" r="2" style="animation-delay:.45s"/><circle cx="184" cy="220" r="2" style="animation-delay:1.1s"/></g>
+        <path class="pipe sup" d="M250 244H212"/><path class="pipe sup flow" d="M250 244H212"/>
+        <path class="pipe ret" d="M212 276H250"/><path class="pipe ret flow" d="M212 276H250"/>
+        <rect class="unit" x="250" y="226" width="120" height="66" rx="8"/>
+        <circle class="comp" cx="284" cy="259" r="17"/><circle class="compi" cx="284" cy="259" r="7"/>
+        <path class="vent" d="M318 242h36M318 252h36M318 262h36M318 272h36"/>
+        <text class="lbl" x="310" y="324" text-anchor="middle">Chiller plant</text>
+        <path class="pipe ret" d="M370 240H384V204H404"/><path class="pipe ret flow" d="M370 240H384V204H404"/>
+        <path class="pipe sup" d="M404 222H394V276H370"/><path class="pipe sup flow" d="M404 222H394V276H370"/>
+        <path class="legs" d="M414 236V300M520 236V300"/>
+        <rect class="unit" x="404" y="160" width="126" height="76" rx="8"/>
+        <circle class="fanring" cx="439" cy="198" r="24"/><circle class="fanring" cx="495" cy="198" r="24"/>
+        <g class="fan"><ellipse cx="439" cy="198" rx="5" ry="19"/><ellipse cx="439" cy="198" rx="5" ry="19" transform="rotate(60 439 198)"/><ellipse cx="439" cy="198" rx="5" ry="19" transform="rotate(120 439 198)"/></g>
+        <g class="fan" style="animation-duration:2.9s"><ellipse cx="495" cy="198" rx="5" ry="19"/><ellipse cx="495" cy="198" rx="5" ry="19" transform="rotate(60 495 198)"/><ellipse cx="495" cy="198" rx="5" ry="19" transform="rotate(120 495 198)"/></g>
+        <g class="heat"><path d="M428 150c-6-8 6-14 0-22s6-14 0-22"/><path d="M467 150c-6-8 6-14 0-22s6-14 0-22" style="animation-delay:.8s"/><path d="M506 150c-6-8 6-14 0-22s6-14 0-22" style="animation-delay:1.6s"/></g>
+        <text class="lbl" x="467" y="324" text-anchor="middle">Heat rejection</text>
+        <g class="key"><path class="sup" d="M40 366h22"/><text x="70" y="370">Chilled supply</text><path class="ret" d="M190 366h22"/><text x="220" y="370">Warm return</text></g>
+      </svg>
+    </figure>
+  </div>
+
+  <section id="tools">
+    <div class="shead">
+      <p class="eyebrow">Recent tools</p>
+      <h2>Tools that support the right choice</h2>
+      <p>The analysis we use, open for engineers and clients to explore. More tools are added as the Lab grows.</p>
+    </div>
+    <div class="tgrid">
+      <a class="card tcard" href="data-centers/cooling-plant/index.html">
+        <div class="thumb" aria-hidden="true">
+          <svg viewBox="0 0 400 210">
+            <rect class="tbg" width="400" height="210"/>
+            <rect class="win" x="18" y="16" width="364" height="178" rx="10"/>
+            <circle class="dot" cx="34" cy="31" r="3.5"/><circle class="dot" cx="46" cy="31" r="3.5"/><circle class="dot" cx="58" cy="31" r="3.5"/>
+            <path class="sep" d="M18 44H382M206 44V194"/>
+            <text class="tt" x="34" y="64">Monthly operation</text>
+            <text class="tt" x="222" y="64">Ranking</text>
+            <g class="m">
+              <rect class="fc" x="34" y="78" width="9" height="96"/><rect class="pt" x="34" y="174" width="9" height="0"/>
+              <rect class="fc" x="47" y="96" width="9" height="78"/><rect class="pt" x="47" y="78" width="9" height="18"/>
+              <rect class="fc" x="60" y="110" width="9" height="64"/><rect class="pt" x="60" y="78" width="9" height="32"/>
+              <rect class="fc" x="73" y="134" width="9" height="40"/><rect class="pt" x="73" y="96" width="9" height="38"/><rect class="ch" x="73" y="78" width="9" height="18"/>
+              <rect class="fc" x="86" y="162" width="9" height="12"/><rect class="pt" x="86" y="112" width="9" height="50"/><rect class="ch" x="86" y="78" width="9" height="34"/>
+              <rect class="pt" x="99" y="128" width="9" height="46"/><rect class="ch" x="99" y="78" width="9" height="50"/>
+              <rect class="pt" x="112" y="132" width="9" height="42"/><rect class="ch" x="112" y="78" width="9" height="54"/>
+              <rect class="pt" x="125" y="132" width="9" height="42"/><rect class="ch" x="125" y="78" width="9" height="54"/>
+              <rect class="pt" x="138" y="124" width="9" height="50"/><rect class="ch" x="138" y="78" width="9" height="46"/>
+              <rect class="fc" x="151" y="150" width="9" height="24"/><rect class="pt" x="151" y="104" width="9" height="46"/><rect class="ch" x="151" y="78" width="9" height="26"/>
+              <rect class="fc" x="164" y="118" width="9" height="56"/><rect class="pt" x="164" y="82" width="9" height="36"/>
+              <rect class="fc" x="177" y="88" width="9" height="86"/><rect class="pt" x="177" y="78" width="9" height="10"/>
+            </g>
+            <g class="rk">
+              <rect class="lab" x="222" y="80" width="40" height="9" rx="4.5"/><rect class="best" x="270" y="78" width="94" height="13" rx="4"/><circle class="ok" cx="356" cy="84.5" r="4"/>
+              <rect class="lab" x="222" y="106" width="40" height="9" rx="4.5"/><rect class="bar" x="270" y="104" width="74" height="13" rx="4"/>
+              <rect class="lab" x="222" y="132" width="40" height="9" rx="4.5"/><rect class="bar" x="270" y="130" width="54" height="13" rx="4"/>
+              <rect class="lab" x="222" y="158" width="40" height="9" rx="4.5"/><rect class="bar" x="270" y="156" width="42" height="13" rx="4"/>
+            </g>
+          </svg>
+        </div>
+        <div class="tbody">
+          <div class="tmeta"><span class="tag ok">New</span><span>Data Centers</span></div>
+          <h3>Cooling Plant Selector</h3>
+          <p>Compare complete cooling plants for a data hall with liquid and air cooling, hour by hour over a full year. See which system saves the most energy, water and money, and how it runs.</p>
+          <div class="chips"><span>8,760-hour analysis</span><span>Energy · water · cost</span><span>ASHRAE 90.4</span></div>
+          <span class="open">Open tool →</span>
+        </div>
+      </a>
+      <div class="card tcard soon2">
+        <div class="thumb" aria-hidden="true">
+          <svg viewBox="0 0 400 210">
+            <rect class="tbg" width="400" height="210"/>
+            <rect class="win dashed" x="18" y="16" width="364" height="178" rx="10"/>
+            <circle class="plusc" cx="200" cy="105" r="26"/><path class="plus" d="M200 92V118M187 105H213"/>
+          </svg>
+        </div>
+        <div class="tbody">
+          <div class="tmeta"><span>Coming soon</span></div>
+          <h3>More tools in development</h3>
+          <p>New tools for critical and high-demand buildings are added as the Lab grows.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="focus">
+    <div class="shead">
+      <p class="eyebrow">Our focus</p>
+      <h2>Where the right system matters most</h2>
+    </div>
+    <div class="focus">
+      <a class="card fc" href="data-centers/index.html">
+        <h3>Critical buildings</h3>
+        <p>Data centers and other mission-critical facilities, where cooling must never stop and runs every hour of the year.</p>
+        <span class="open">Data centers →</span>
+      </a>
+      <div class="card fc">
+        <h3>High-demand buildings</h3>
+        <p>Buildings with large cooling and energy loads, where the system choice drives the running cost for decades.</p>
+      </div>
+      <div class="card fc">
+        <h3>Energy and cost saving</h3>
+        <p>Cutting energy use and running cost with the right system, beyond conventional design.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="sitefoot" data-root=""></footer>
+<script src="shared/js/site.js"></script>
+</body>
+</html>

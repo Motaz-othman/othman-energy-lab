@@ -1,0 +1,79 @@
+/* Cooling Plant Selector: page-specific styles (loads after shared/css/base.css) */
+#results{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;min-width:0}
+.reco{border-left:4px solid var(--brand)}
+.sbar{display:inline-block;height:8px;border-radius:0 4px 4px 0;background:var(--s1);margin-right:6px;vertical-align:0}
+/* systems */
+.sysseg{display:flex;flex-wrap:wrap;margin:0}
+.sysseg button{flex:0 1 auto;padding:7px 12px;font-size:13px}
+.sysseg .rk{display:inline-block;min-width:18px;margin-right:6px;font-weight:650;opacity:.75}
+.syshead{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.syshead h2{margin:0;font-size:18px}
+.syshead .tag{margin-left:0}
+.syshead .note{margin:0}
+.how{color:var(--text2);margin:8px 0 14px;max-width:80ch}
+.kpis.k6{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+#sysSvg{overflow-x:auto}
+.schem{display:block;width:100%;min-width:720px;max-width:1000px;height:auto;margin:4px 0 4px}
+.schem text.h{font-size:14px;font-weight:700}
+.schem .bx.tes{stroke-dasharray:5 3}
+.schem .bx.it{fill:color-mix(in srgb,var(--brand) 8%,var(--bg))}
+.schem .pump{fill:var(--surface);stroke:var(--text2);stroke-width:1.5}
+.schem .pumpv{fill:var(--text2)}
+.schem text{fill:var(--text);font-size:12.5px;font-weight:600}
+.schem text.t2{fill:var(--text2);font-size:11px;font-weight:400}
+.schem .bx{fill:var(--bg);stroke:var(--grey2);stroke-width:1.2}
+.schem .zone{fill:color-mix(in srgb,var(--s1) 5%,transparent);stroke:var(--border);stroke-dasharray:4 3}
+.schem .pipe{fill:none;stroke:var(--text2);stroke-width:2}
+.schem .heat{fill:none;stroke:var(--grey2);stroke-width:1.5;stroke-dasharray:4 3}
+.mode{display:grid;grid-template-columns:170px 1fr;gap:4px 12px;align-items:center;margin:10px 0}
+.mode .mbar{display:flex;gap:2px;height:14px}
+.mode .mbar span{min-width:2px}
+.mode .mbar span:last-child{border-radius:0 4px 4px 0}
+.mode .mv{grid-column:2;font-size:12px;color:var(--text2)}
+@media (max-width:600px){.mode{grid-template-columns:1fr}.mode .mv{grid-column:1}}
+.pros ul{margin:4px 0 0 18px;padding:0}
+.pros li{margin:3px 0}
+#tOv th:nth-child(2),#tOv td:nth-child(2){text-align:left;white-space:normal;min-width:220px}
+#tOv td:first-child{color:var(--text2)}
+/* system summary cards (top) */
+.scards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:12px}
+.scard{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.scard.rec{border:2px solid var(--brand);padding:11px}
+.scard.off{opacity:.7}
+.scard .stop{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:20px}
+.scard .stop .tag{margin-left:0}
+.scard .stop .note{margin:0}
+.scard .sname{font-weight:650;font-size:15px;line-height:1.3;min-height:2.6em}
+.scard dl{margin:0;display:grid;gap:2px}
+.scard dl div{display:flex;justify-content:space-between;gap:8px;padding:4px 6px;border-radius:4px}
+.scard dt{color:var(--text2);font-size:12.5px}
+.scard dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.scard dl div.hi{background:color-mix(in srgb,var(--brand) 13%,transparent)}
+.scard ul{margin:0 0 0 16px;padding:0;font-size:12.5px;color:var(--text2)}
+.scard .link{margin-top:auto;align-self:flex-start;padding:5px 10px;font-size:13px}
+/* extreme ambient (design condition) strip under the project line */
+.amb{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin-top:10px;padding:10px 14px;border-radius:8px;background:color-mix(in srgb,var(--warn) 10%,var(--bg));border:1px solid color-mix(in srgb,var(--warn) 35%,var(--border))}
+.amb .al{font-size:12px;font-weight:650;letter-spacing:.05em;text-transform:uppercase;color:var(--text2)}
+.amb .av{display:inline-flex;align-items:center;gap:6px;color:var(--text2)}
+.amb .av b{font-size:18px;color:var(--text);font-variant-numeric:tabular-nums}
+.amb .av i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.amb .an{font-size:12px;color:var(--text2);margin-left:auto}
+@media (max-width:600px){.amb .an{margin-left:0;flex-basis:100%}}
+.scard dt small{display:block;font-size:11px;color:var(--muted);line-height:1.2}
+.scard dl div{align-items:center}
+/* column headings: Inputs (left) and Results (right) */
+.incol{display:grid;gap:10px;min-width:0}
+.colhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;min-height:22px}
+.colhead b{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--brand-ink)}
+.colhead span{font-size:12.5px;color:var(--muted)}
+#results>.colhead{margin-bottom:-8px}
+/* CSV format help in the Weather file tab */
+.csvfmt{margin-top:12px;padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);font-size:12.5px;color:var(--text2)}
+.csvfmt p{margin:0 0 6px}
+.csvfmt code{display:block;font-size:11.5px;padding:8px;border-radius:6px;background:var(--surface);border:1px solid var(--border);color:var(--text);overflow-x:auto;white-space:nowrap;line-height:1.5}
+.csvfmt ul{margin:8px 0 10px 16px;padding:0}
+.csvfmt li{margin:3px 0}
+.csvfmt .note{display:block;margin-top:6px}
+/* climate tab: basis switch and legend on one row */
+.climbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin-bottom:10px}
+.climbar .seg,.climbar .legend{margin:0}
