@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Contact · Othman Energy Lab</title>
-<meta name="description" content="Contact Othman Energy Lab about your project. We help engineers and clients choose the right system.">
+<meta name="description" content="Contact Othman Energy Lab about your project. We help engineers and clients choose the right system: less energy, lower cost, a cleaner planet.">
 <link rel="icon" href="../shared/img/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="../shared/img/apple-touch-icon.png">
 <meta name="theme-color" content="#0e7c57">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Othman Energy Lab">
 <meta property="og:title" content="Contact · Othman Energy Lab">
-<meta property="og:description" content="Contact Othman Energy Lab about your project. We help engineers and clients choose the right system.">
+<meta property="og:description" content="Contact Othman Energy Lab about your project. We help engineers and clients choose the right system: less energy, lower cost, a cleaner planet.">
 <meta property="og:image" content="/shared/img/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="../shared/css/base.css">
@@ -29,6 +29,7 @@
 .status{margin-top:14px;font-size:14px;color:var(--text2)}
 .status.ok{color:var(--brand-ink);font-weight:600}
 .status.err{color:var(--bad)}
+.status a{color:var(--brand-ink);font-weight:600}
 </style>
 </head>
 <body>
@@ -58,30 +59,32 @@
 <footer class="sitefoot" data-root="../"></footer>
 <script src="../shared/js/site.js"></script>
 <script>
-// Contact form. With SITE.formEndpoint set (e.g. a Formspree form URL) the message is sent directly;
-// otherwise the visitor's email app opens with the message addressed to SITE.email.
+// Contact form: posts the sender's email and message to SITE.formEndpoint (FormSubmit); if that fails,
+// offers an email link so the message is never lost. With no endpoint set, opens the visitor's email app.
 (function(){
   const f=document.getElementById('contactForm'), from=document.getElementById('from'), msg=document.getElementById('msg'),
         btn=document.getElementById('send'), st=document.getElementById('status');
   const say=(t,c='')=>{ st.textContent=t; st.className='status '+c; };
+  const mailto=(subject,text,email)=>`mailto:${SITE.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text+'\n\nReply to: '+email)}`;
   f.addEventListener('submit',async e=>{
     e.preventDefault();
     const email=from.value.trim(), text=msg.value.trim();
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ say('Please enter a valid email address.','err'); from.focus(); return; }
     if(!text){ say('Please write a message.','err'); msg.focus(); return; }
     const subject='Website message from '+email;
-    if(SITE.formEndpoint){
-      btn.disabled=true; say('Sending…');
-      try{
-        const r=await fetch(SITE.formEndpoint,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},
-          body:JSON.stringify({email,message:text,_subject:subject,_replyto:email})});
-        if(!r.ok) throw new Error(r.status);
-        f.reset(); say('Thank you. Your message has been sent, and we’ll reply to '+email+'.','ok');
-      }catch(err){ say('Sorry, the message could not be sent. Please try again in a moment.','err'); }
-      btn.disabled=false; return;
+    if(!SITE.formEndpoint){ location.href=mailto(subject,text,email); say('Your email app has opened with your message. Press Send there to deliver it.','ok'); return; }
+    btn.disabled=true; say('Sending…');
+    try{
+      const r=await fetch(SITE.formEndpoint,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},
+        body:JSON.stringify({email,message:text,_subject:subject,_replyto:email,_template:'table',_captcha:'false'})});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok||String(d.success)==='false') throw new Error(d.message||r.status);
+      f.reset(); say('Thank you. Your message has been sent, and we’ll reply to '+email+'.','ok');
+    }catch(err){
+      st.className='status err';
+      st.innerHTML='Sorry, the message could not be sent. <a href="'+mailto(subject,text,email).replace(/"/g,'&quot;')+'">Send it by email instead</a>.';
     }
-    location.href=`mailto:${SITE.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text+'\n\nReply to: '+email)}`;
-    say('Your email app has opened with your message. Press Send there to deliver it.','ok');
+    btn.disabled=false;
   });
 })();
 </script>

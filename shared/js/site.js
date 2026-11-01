@@ -1,9 +1,10 @@
 // ---------- site header and footer, shared by every page ----------
 // A page adds <header class="sitebar" data-root="../../" data-page="data-centers"></header>
 // and <footer class="sitefoot" data-root="../../"></footer>; data-root is the path back to the project root.
-// formEndpoint: paste a form-service URL (e.g. https://formspree.io/f/xxxxxxx) to have the contact form send directly;
-// leave empty and the form opens the visitor's email app instead.
-const SITE={name:'Othman Energy Lab', tagline:'Code-based. Beyond the minimum.', email:'Mutaz.othman@outlook.com', formEndpoint:'',
+// formEndpoint: where the contact form posts. FormSubmit (formsubmit.co) needs no account: the first message sends a
+// one-time confirmation email to SITE.email; click its link once and later messages are delivered. Empty = open the
+// visitor's email app instead.
+const SITE={name:'Othman Energy Lab', tagline:'Code-based. Beyond the minimum.', email:'Mutaz.othman@outlook.com', formEndpoint:'https://formsubmit.co/ajax/Mutaz.othman@outlook.com',
   slogan:['Less energy.','Lower cost.','A cleaner planet.']};
 const NAV=[
   {id:'about',l:'About',href:'about/index.html'},
@@ -27,5 +28,5 @@ const MARK=`<svg viewBox="0 0 26 26" aria-hidden="true"><rect width="26" height=
     foot.innerHTML=`<div class="sitefoot-in">
       <div><div class="fb">${MARK}<span>${SITE.name}</span></div><div class="ft">${SITE.tagline}</div><div class="ft"><a href="mailto:${SITE.email}">${SITE.email}</a></div></div>
       <nav aria-label="Footer">${NAV.map(n=>`<a href="${r}${n.href}">${n.l}</a>`).join('')}</nav>
-      <div class="fn">© ${new Date().getFullYear()} ${SITE.name}. Guiding engineers and clients to the right system: save energy, save money, support the environment.</div></div>`; }
+      <div class="fn">© ${new Date().getFullYear()} ${SITE.name}. Guiding engineers and clients to the right system for critical and high-demand buildings.</div></div>`; }
 })();
