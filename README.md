@@ -67,7 +67,8 @@ Code that a second tool also needs belongs in `shared/`, not copied between tool
 
 ## Publishing
 - Static hosting, e.g. Vercel: framework preset "Other", no build command, output directory = this folder. `.vercelignore` keeps `tools/`, `dist/` and the READMEs off the public site.
-- Link previews (LinkedIn, WhatsApp, X) use `og:image` = `/shared/img/og-image.png`. Several platforms need a full address, so once the domain is known, change it on every page to e.g. `https://othmanenergylab.com/shared/img/og-image.png`.
+- Live at https://othman-energy-lab1.vercel.app (Vercel, deploys automatically on every push to `main`).
+- Link previews (LinkedIn, WhatsApp, X) use full addresses in `og:image`, `og:url` and `canonical` on every page. If the site moves to its own domain, replace `https://othman-energy-lab1.vercel.app` in those tags on every page.
 - The contact form needs `SITE.formEndpoint` set (see above) so visitors without an email app can still send messages.
 
 ## Standalone files
