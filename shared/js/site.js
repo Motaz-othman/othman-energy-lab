@@ -30,3 +30,10 @@ const MARK=`<svg viewBox="0 0 26 26" aria-hidden="true"><rect width="26" height=
       <nav aria-label="Footer">${NAV.map(n=>`<a href="${r}${n.href}">${n.l}</a>`).join('')}</nav>
       <div class="fn">© ${new Date().getFullYear()} ${SITE.name}. Guiding engineers and clients to the right system for critical and high-demand buildings.</div></div>`; }
 })();
+
+// Vercel Web Analytics (visitors and page views; no cookies). Loads only on the live site, not on local files.
+(function(){
+  if(!/(^|\.)oenergylab\.com$|\.vercel\.app$/.test(location.hostname)) return;
+  window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments);};
+  const s=document.createElement('script'); s.defer=true; s.src='/_vercel/insights/script.js'; document.head.appendChild(s);
+})();
