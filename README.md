@@ -31,7 +31,9 @@ shared/                       used by every page
   js/ui.js                    $, fmt, esc, table(), kpis(), pct(), Chart.js helpers (baseOpts, mk, hbar)
   js/cities.js                built-in city climate normals (1991–2020 monthly high, low, RH)
   js/psychro.js               ASHRAE psychrometrics: saturation pressure, humidity ratio, wet-bulb
-  js/weather.js               synthetic hourly year from monthly normals; EPW and CSV parsers; sample CSV generator
+  js/weather.js               station weather loader; EPW and CSV parsers; generated-year fallback; sample CSV generator
+  data/weather/<city>.js      measured hourly year (TMYx 2011–2025) + ASHRAE 2025 design conditions per built-in city,
+                              from climate.onebuilding.org (loaded only when that city is picked)
   lib/chart.umd.min.js        Chart.js 4.4.1 (MIT licence, see lib/CHARTJS-LICENSE.md)
 <focus-area>/                 one folder per focus area, e.g. data-centers/
   index.html                  focus area page: intro and its tools
@@ -41,6 +43,7 @@ shared/                       used by every page
     js/                       the tool's model and page logic
     README.md                 method, assumptions, where to change things
 tools/build.js                builds standalone single-file pages into dist/
+tools/weather-convert.js      turns downloaded TMYx EPW + STAT files into shared/data/weather/; station list in tools/weather-sources.txt
 dist/<tool>.html              generated: one self-contained file per tool, for sharing
 ```
 Scripts share global scope. Each tool loads, in order: Chart.js, `shared/js/site.js`, `shared/js/ui.js`, any shared data and engineering modules it needs, then its own scripts.
@@ -64,6 +67,9 @@ Code that a second tool also needs belongs in `shared/`, not copied between tool
 ## Add a focus area
 1. Copy `data-centers/index.html` to `<new-area>/index.html` and change the intro, the facts panel and the tool cards.
 2. Add it to `NAV` in `shared/js/site.js` (footer links), and link it from the matching card in the Our focus section of the home page.
+
+## Weather data
+Each built-in city uses its main airport station: a measured typical year (TMYx 2011–2025) and the ASHRAE 2025 Handbook of Fundamentals design conditions, both from climate.onebuilding.org (stations listed in `tools/weather-sources.txt`). The automatic design condition is the ASHRAE extreme annual dry-bulb and wet-bulb. Hourly wet-bulb is limited to that extreme + 1 K to remove faulty humidity readings (the count per city is stored as `wbCapped`). To add a city: add it to `CITIES` in `shared/js/cities.js` (monthly normals are the fallback), download its TMYx zip, and run `node tools/weather-convert.js`. The standalone file in `dist/` cannot load these data files and uses the generated year.
 
 ## Publishing
 - Static hosting, e.g. Vercel: framework preset "Other", no build command, output directory = this folder. `.vercelignore` keeps `tools/`, `dist/` and the READMEs off the public site.

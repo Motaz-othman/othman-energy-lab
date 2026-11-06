@@ -19,11 +19,19 @@ function params(){
     tE:g('tE'),tW:g('tW'),tD:g('tD'),
     red:g('red')/100,ups:Math.min(1,Math.max(0.5,g('ups')/100)),dloss:Math.min(0.3,Math.max(0,g('dloss')/100)),rates,...Object.fromEntries(WEIGHTS.map(w=>[w.id,w.v]))};
 }
-function loadCity(){ WX=synthYear(CITIES.find(c=>c.id===$('city').value)); run(); }
+// built-in city: measured station year + ASHRAE design conditions; generated year if that cannot load
+let cityReq=0;
+function loadCity(){
+  const c=CITIES.find(x=>x.id===$('city').value), n=++cityReq;
+  stationYear(c).catch(()=>synthYear(c)).then(w=>{ if(n===cityReq){ WX=w; run(); } });
+}
+const ashrae=()=>WX&&WX.station&&WX.station.ashrae;
 
 function run(){
   if(!WX) return;
-  P=params(); P.dbD=isNaN(P.dbIn)?Math.max(...WX.T):P.dbIn; P.wbD=isNaN(P.wbIn)?Math.max(...WX.Twb):P.wbIn; P.wbD=Math.min(P.wbD,P.dbD);
+  // design condition: entered values, else the ASHRAE extreme annual values, else the hottest hours in the data
+  const A=ashrae();
+  P=params(); P.dbD=isNaN(P.dbIn)?(A?A.extDB:Math.max(...WX.T)):P.dbIn; P.wbD=isNaN(P.wbIn)?(A?A.extWB:Math.max(...WX.Twb)):P.wbIn; P.wbD=Math.min(P.wbD,P.dbD);
   RES=simulate(WX,P); DES=designCheck(P,P.dbD,P.wbD); RANK=score(RES,P);
   renderReco(); renderOverview(); renderDes(); renderSystem(); renderEff(); renderCons(); renderRun(); renderCap(); renderClimate();
 }
@@ -45,11 +53,13 @@ function payback(r){
 }
 
 function renderReco(){
-  const banners=(WX.synthetic?'<div class="banner">Approximate weather generated from monthly normals. Upload an EPW file for design-grade results.</div>':'')
+  const banners=(WX.synthetic?'<div class="banner">Approximate weather generated from monthly normals (station data could not load). Upload an EPW file for design-grade results.</div>':'')
     +(window.Chart?'':'<div class="banner">Charts could not load (no internet connection). Tables and results below are complete.</div>');
-  const head=`<div class="sub">For <b>${esc(WX.name)}</b>: ${fmt(P.Qd/1000,1)} MW hall, liquid loop ${P.loops[0].Ts}/${P.loops[0].Tr} °C, air loop ${P.loops[1].Ts}/${P.loops[1].Tr} °C</div>`;
+  const st=WX.station;
+  const head=`<div class="sub">For <b>${esc(WX.name)}</b>: ${fmt(P.Qd/1000,1)} MW hall, liquid loop ${P.loops[0].Ts}/${P.loops[0].Tr} °C, air loop ${P.loops[1].Ts}/${P.loops[1].Tr} °C</div>`
+    +(st?`<div class="wxsrc">Weather: ${esc(st.station)} (WMO ${esc(st.wmo)}), measured hourly year TMYx ${esc(st.period)} · ASHRAE climate zone ${esc(st.zone)} · climate.onebuilding.org</div>`:'');
   // extreme ambient: the design condition every system is checked against
-  const src=isNaN(P.dbIn)||isNaN(P.wbIn)?'hottest hours in the weather data':'entered design values';
+  const src=isNaN(P.dbIn)||isNaN(P.wbIn)?(ashrae()?'ASHRAE extreme annual values (2025 Fundamentals)':'hottest hours in the weather data'):'entered design values';
   const amb=`<div class="amb"><span class="al">Extreme ambient</span>
     <span class="av"><i style="background:var(--s1)"></i>Dry-bulb <b>${fmt(P.dbD,1)} °C</b></span>
     <span class="av"><i style="background:var(--s2)"></i>Wet-bulb <b>${fmt(P.wbD,1)} °C</b></span>
@@ -97,7 +107,7 @@ function renderDes(){
     return `<tr><td>${r.o.name}</td><td>${d.ok?'<span class="tag ok">Holds supply</span>':'<span class="tag x">Fails</span>'}</td><td>${fmt(d.P/1000,2)}</td><td>${d.ratio.toFixed(3)}</td><td>${fmt(d.W,1)}</td><td>${fmt(d.Qr/1000,1)}</td><td class="l">${d.issues.join('; ')||'–'}</td></tr>`; });
   $('tDes').innerHTML=table(['Option','Result','Electrical MW','kW/kW','Water m³/h','Heat rejection MW','Notes'],rows);
   const auto=isNaN(P.dbIn)||isNaN(P.wbIn);
-  $('desNote').textContent=`Checked at 100% load, ${fmt(P.dbD,1)} °C dry-bulb and ${fmt(P.wbD,1)} °C wet-bulb${auto?' (from the weather data; enter ASHRAE extreme values for design)':''}. Heat rejection capacity = cooling load + compressor power. Options that fail are excluded from the recommendation.`;
+  $('desNote').textContent=`Checked at 100% load, ${fmt(P.dbD,1)} °C dry-bulb and ${fmt(P.wbD,1)} °C wet-bulb${auto?(ashrae()?' (ASHRAE extreme annual values for this station)':' (hottest hours in the weather data; enter ASHRAE extreme values for design)'):''}. Heat rejection capacity = cooling load + compressor power. Options that fail are excluded from the recommendation.`;
 }
 
 function renderSystem(){
@@ -190,7 +200,9 @@ function renderMonthly(){
 
 let CLDEV='dc';   // basis for the climate charts: dry coolers (dry-bulb) or cooling towers (wet-bulb)
 function renderClimate(){
-  $('clKpi').innerHTML=kpis([[`${fmt(pct(WX.T,0.996),1)} °C`,'Dry-bulb, 0.4% exceeded'],[`${fmt(P.dbD,1)} °C`,'Design dry-bulb'],[`${fmt(pct(WX.Twb,0.996),1)} °C`,'Wet-bulb, 0.4% exceeded'],[`${fmt(P.wbD,1)} °C`,'Design wet-bulb']]);
+  const A=ashrae();
+  $('clKpi').innerHTML=kpis(A?[[`${fmt(A.db04,1)} °C`,'Dry-bulb, 0.4% (ASHRAE)'],[`${fmt(P.dbD,1)} °C`,'Design dry-bulb'],[`${fmt(A.wb04,1)} °C`,'Wet-bulb, 0.4% evaporation (ASHRAE)'],[`${fmt(P.wbD,1)} °C`,'Design wet-bulb']]
+    :[[`${fmt(pct(WX.T,0.996),1)} °C`,'Dry-bulb, 0.4% exceeded'],[`${fmt(P.dbD,1)} °C`,'Design dry-bulb'],[`${fmt(pct(WX.Twb,0.996),1)} °C`,'Wet-bulb, 0.4% exceeded'],[`${fmt(P.wbD,1)} °C`,'Design wet-bulb']]);
   const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], sc=8760/WX.T.length, dc=CLDEV==='dc';
   const appr=dc?P.aDC:P.aCT+P.aHX;                         // water leaves the outdoor device at outdoor temp + approach
   const outT=h=>(dc?WX.T[h]:WX.Twb[h])+appr;
@@ -245,7 +257,7 @@ function readFile(f){ const rd=new FileReader();
 // sample weather CSV in the upload format, generated from the city selected in the City tab
 const sampleCity=()=>CITIES.find(c=>c.id===$('city').value);
 const showSampleNote=()=>{ $('csvSampleNote').textContent=`8,760 hours for ${sampleCity().name} (the city selected in the City tab).`; };
-$('csvSample').onclick=()=>{ const c=sampleCity(), url=URL.createObjectURL(new Blob([sampleCSV(c)],{type:'text/csv'}));
+$('csvSample').onclick=()=>{ const c=sampleCity(), y=WX&&WX.station&&WX.name===c.name?WX:null, url=URL.createObjectURL(new Blob([sampleCSV(c,y)],{type:'text/csv'}));
   const a=document.createElement('a'); a.href=url; a.download=`weather-sample-${c.id}.csv`; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),1000); };
 $('city').addEventListener('change',showSampleNote); showSampleNote();

@@ -41,7 +41,7 @@
   <div id="cityPane">
     <label for="city">City</label>
     <select id="city"></select>
-    <div class="note">Built-in cities use an approximate hourly year generated from 1991–2020 monthly normals. Upload an EPW file for design-grade results.</div>
+    <div class="note">Built-in cities use measured hourly weather (TMYx 2011–2025, main airport station) and ASHRAE 2025 design conditions, from climate.onebuilding.org. Upload your own EPW or CSV for a specific site.</div>
   </div>
   <div id="filePane" hidden>
     <div class="drop" id="drop">Drop an <b>.epw</b> file (ASHRAE IWEC / TMY) or a CSV here, or click to choose<input type="file" id="file" accept=".epw,.csv,.txt" hidden></div>
@@ -91,7 +91,7 @@
     <div><label for="dbD">Design dry-bulb (°C)</label><input type="number" id="dbD" step="0.1" placeholder="auto"></div>
     <div><label for="wbD">Design wet-bulb (°C)</label><input type="number" id="wbD" step="0.1" placeholder="auto"></div>
   </div>
-  <div class="note">Leave blank to use the hottest dry-bulb and most humid wet-bulb hour in the weather data. For design, enter ASHRAE extreme values (e.g. 20-year return period, per ASHRAE 90.4 practice) from the ASHRAE Climatic Design Conditions.</div>
+  <div class="note">Leave blank to use the ASHRAE extreme annual dry-bulb and wet-bulb for the selected city (for an uploaded file: its hottest hours). To design to a stricter condition, e.g. a 20-year return period, enter it here.</div>
 
 
   <details>
@@ -254,6 +254,7 @@
   <div class="card">
     <h2>Method and equations</h2>
     <ul class="method">
+      <li><b>Weather</b>: built-in cities use a measured typical year (TMYx 2011–2025, ISD/ERA5 records) from the main airport station, and ASHRAE 2025 Handbook of Fundamentals design conditions, both from climate.onebuilding.org. Hourly wet-bulb is limited to the ASHRAE extreme annual wet-bulb + 1 K to remove faulty humidity readings. The automatic design condition is the ASHRAE extreme annual dry-bulb and wet-bulb.</li>
       <li><b>Psychrometrics</b> (ASHRAE Handbook Fundamentals, Ch. 1): saturation pressure by the Hyland–Wexler equations; humidity ratio <code>W = 0.621945·p<sub>w</sub>/(p − p<sub>w</sub>)</code>; wet-bulb solved from <code>W = [(2501 − 2.326t*)W<sub>s</sub>* − 1.006(t − t*)] / (2501 + 1.86t − 4.186t*)</code>. Station pressure from elevation.</li>
       <li><b>Each loop, every hour</b>: return water is first cooled by the outdoor device, leaving at <code>T<sub>out</sub></code>; free-cooling fraction <code>FF = (T<sub>ret</sub> − T<sub>out</sub>)/(T<sub>ret</sub> − T<sub>sup</sub>)</code> (0–1); the chiller trims the rest.</li>
       <li><b>Terminal units</b>: CRAH / FWU fans (air loop) and CDU pumps (liquid loop) draw a set % of their loop load. Their power is cooling energy, and the same power is added to the loop as heat: <code>Q<sub>loop</sub> = Q<sub>IT</sub> × (1 + terminal %)</code>, which the pre-cooling, chillers and heat rejection must remove. Chillers are sized for this load.</li>

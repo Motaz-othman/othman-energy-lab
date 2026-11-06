@@ -62,10 +62,34 @@ function rhFromWB(t,wb,P){   // % RH from dry-bulb, wet-bulb and pressure (inver
   const Ws=Wfrom(pws(wb),P), W=((2501-2.326*wb)*Ws-1.006*(t-wb))/(2501+1.86*t-4.186*wb), pw=W*P/(0.621945+W);
   return Math.max(1,Math.min(100,100*pw/pws(t)));
 }
-function sampleCSV(c){
-  const y=synthYear(c), P=Math.round(pAtm(c.elev)), out=['Month,Day,Hour,DryBulb_C,RH_pct,Pressure_Pa'];
+// y: a loaded weather year for city c (station data when available); defaults to the generated year
+function sampleCSV(c,y){
+  y=y||synthYear(c);
+  const P=Math.round(pAtm(y.station&&y.station.elev!=null?y.station.elev:c.elev)), out=['Month,Day,Hour,DryBulb_C,RH_pct,Pressure_Pa'];
   let d=0,m=0,acc=0;
   y.T.forEach((t,h)=>{ const day=Math.floor(h/24); while(day>=acc+MDAYS[m]){acc+=MDAYS[m];m++;} d=day-acc+1;
     out.push(`${m+1},${d},${h%24},${t.toFixed(1)},${rhFromWB(t,y.Twb[h],P).toFixed(1)},${P}`); });
   return out.join('\r\n')+'\r\n';
+}
+
+// ---------- station weather for built-in cities: measured hourly year + ASHRAE design conditions ----------
+// Each city has shared/data/weather/<id>.js (TMYx hourly dry-bulb / wet-bulb and ASHRAE 2025 Fundamentals values,
+// from climate.onebuilding.org). It is loaded only when the city is picked; if it cannot load (e.g. in a
+// standalone file), the caller falls back to synthYear().
+const WX_BASE=(typeof document!=='undefined'&&document.currentScript&&/shared\/js\/weather\.js/.test(document.currentScript.src))
+  ? document.currentScript.src.replace(/js\/weather\.js.*$/,'data/weather/') : null;
+function decodeWx(s){ const b=atob(s), u=new Uint8Array(b.length); for(let i=0;i<b.length;i++) u[i]=b.charCodeAt(i); return Array.from(new Int16Array(u.buffer),v=>v/10); }
+function stationYear(c){
+  return new Promise((ok,fail)=>{
+    const take=()=>{ const r=(window.WX_DATA||{})[c.id]; if(!r) return false;
+      const T=decodeWx(r.db), Twb=decodeWx(r.wb), mon=[]; let m=0,acc=0;
+      for(let h=0;h<T.length;h++){ const d=Math.floor(h/24); while(d>=acc+MDAYS[m]){acc+=MDAYS[m];m++;} mon.push(m); }
+      ok({name:c.name,T,Twb,mon,synthetic:false,station:r}); return true; };
+    if(take()) return;
+    if(!WX_BASE) return fail(new Error('station data not available'));
+    const s=document.createElement('script'); s.src=WX_BASE+c.id+'.js';
+    s.onload=()=>{ if(!take()) fail(new Error('no station data for '+c.id)); };
+    s.onerror=()=>fail(new Error('station data failed to load'));
+    document.head.appendChild(s);
+  });
 }
