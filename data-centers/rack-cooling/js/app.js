@@ -10,12 +10,12 @@ let SCEN='jump', R=null;
 const plat=()=>PLATFORMS.find(p=>p.id===$('rP').value);
 
 // platform defaults go into the fields; the user can still change them
-function loadPlatform(){ const p=plat(); $('rTs').value=p.TsMax; $('rIdle').value=Math.round(p.idle*100); $('rVrack').value=p.Vrack;
+function loadPlatform(){ const p=plat(); $('rTs').value=Math.min(40,p.TsMax); $('rIdle').value=Math.round(p.idle*100); $('rVrack').value=p.Vrack;
   $('rPnote').textContent=`${fmt(p.P)} kW per rack${p.Ppeak>p.P?` (short peaks to ${fmt(p.Ppeak)} kW)`:''} · ${fmt(p.liq*100)}% to liquid · ASHRAE ${p.cls}`; }
 
 function run(){
   const p=plat();
-    const i={fluid:$('rFluid').value,Ts:lim(num('rTs',p.TsMax),5,p.TrMax-2),margin:lim(num('rMargin',20),0,100)/100,idle:lim(num('rIdle',30),5,100)/100,
+    const i={fluid:$('rFluid').value,Ts:lim(num('rTs',Math.min(40,p.TsMax)),5,p.TrMax-2),margin:lim(num('rMargin',20),0,100)/100,idle:lim(num('rIdle',30),5,100)/100,
     tDet:Math.max(0,num('rDet',5)),tRamp:Math.max(0,num('rRamp',15)),tMCV:Math.max(0,num('rMCV',60)),
     Vrack:Math.max(1,num('rVrack',p.Vrack)),Vcdu:Math.max(0,num('rVcdu',40)),Vbuf:Math.max(0,num('rVbuf',100)),
     tcsL:Math.max(1,num('rTcsL',20)),tcsV:lim(num('rTcsV',0.8),0.3,3),sensAt:$('rSens').value,dTair:lim(num('rAir',12),5,25)};
@@ -26,7 +26,7 @@ function run(){
   const riseV=(s,lab)=>`<div><span class="v${s.ok?'':' bad'}">+${fmt(s.rise,1)} <small>K</small></span><span class="l">${lab}</span></div>`;
   const pair=(fn)=>withTank?fn(a,'no tank')+fn(b,`with ${tk}`):fn(a,'no tank');
   const maker=p.group==='CPU / HPC'?p.name.split(' ')[0]:p.group, over=r.Ts>p.TsMax+1e-9;
-  $('rTsNote').innerHTML=over?`<span style="color:var(--bad)"><b>Above the ${fmt(p.TsMax)} °C platform maximum:</b> risky unless confirmed by ${esc(maker)}.</span>`:'Starts at the platform maximum, which saves the most on the facility water. The flow follows the platform rule at the supply chosen.';
+  $('rTsNote').innerHTML=over?`<span style="color:var(--bad)"><b>Above the ${fmt(p.TsMax)} °C platform maximum:</b> risky unless confirmed by ${esc(maker)}.</span>`:`Default 40 °C. Up to the ${fmt(p.TsMax)} °C platform maximum saves more on the facility water. The flow follows the platform rule at the supply chosen.`;
   $('rStatus').textContent=`Per rack · ${p.name}`;
   $('rRes').innerHTML=`
     <div class="big4">
