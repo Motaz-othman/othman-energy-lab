@@ -45,7 +45,7 @@
     <div class="note" id="gFileInfo">Same formats as the Cooling Plant Selector.</div>
   </div>
   <h2 style="margin-top:18px">Load and plant</h2>
-  <label for="gQ">Cooling load at full IT (kW)</label><input type="number" id="gQ" value="20000" min="1" step="500">
+  <label for="gQ">Cooling load / chiller capacity at full IT (kW)</label><input type="number" id="gQ" value="20000" min="1" step="500">
   <label for="gNight">Average IT load over the 12-hour night (%)</label><input type="number" id="gNight" value="80" min="10" max="100" step="5">
   <div class="note">The tank recharges at night, 19:00 to 07:00, with the chiller capacity the IT load leaves free. The lower the night load, the faster it recharges. By day the IT load is taken at 100%.</div>
   <label for="gSys">Cooling system</label><select id="gSys"></select>
@@ -55,14 +55,15 @@
     <div><label for="gTr">Return (°C)</label><input type="number" id="gTr" value="40" step="1"></div>
   </div>
   <h2 style="margin-top:18px">Design temperature</h2>
-  <label for="gTd">Size the plant for</label><select id="gTd"><option value="">Recommended (safe)</option></select>
+  <label for="gTd">Size the plant for (°C)</label><input type="number" id="gTd" step="0.5">
+  <div class="note" id="gTdNote">The recommended temperature is filled in. Type your own to test it.</div>
   <details>
     <summary>Safety margins</summary>
     <div class="row">
       <div><label for="gSafe">Design temperature margin (K)</label><input type="number" id="gSafe" value="2" min="0" step="0.5"></div>
-      <div><label for="gRechMax">Full again within (h of night)</label><input type="number" id="gRechMax" value="10" min="2" max="12" step="1"></div>
+      <div><label for="gRechMax">Safe recharge time (h)</label><input type="number" id="gRechMax" value="4" min="1" max="12" step="0.5"></div>
     </div>
-    <div class="note">The recommendation takes the lowest design temperature that still recharges in time, adds this margin, and never goes below the ASHRAE 0.4% dry-bulb.</div>
+    <div class="note">The recommendation takes the lowest design temperature whose tank recharges within the safe time, adds this margin, and never goes below the ASHRAE 0.4% dry-bulb.</div>
     <div class="row">
       <div><label for="gReserve">Reserve kept full (%)</label><input type="number" id="gReserve" value="20" min="0" max="80" step="5"></div>
       <div><label for="gMar">Tank sizing margin (%)</label><input type="number" id="gMar" value="20" min="0" step="5"></div>

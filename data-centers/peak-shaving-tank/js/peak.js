@@ -56,8 +56,8 @@ function runPlant(o,L,hours,capRated,k,Etank,loadAt,pCap){
 }
 
 // size the tank for one design temperature Td: a heatwave of N hottest days, full IT load by day,
-// the night IT load for the 12-hour night; the tank must be full again within the recharge limit each night
-function studyCase(o,L,i,wx,base,DR,Td,k,yr){
+// the night IT load for the 12-hour night; the tank must be full again before the next morning
+function studyCase(o,L,i,base,DR,Td,k,yr){
   const TdWb=base.extDB>base.db04 ? base.extWB-(base.extDB-Td)*(base.extWB-base.wb04)/(base.extDB-base.db04) : base.extWB;
   const cap0=capRatedFor(o,L,i.Q,base.extDB,base.extWB,k);           // plant sized for the extreme (no tank)
   const capT=capRatedFor(o,L,i.Q,Td,Math.min(TdWb,Td),k);              // plant sized for the design temperature
@@ -66,38 +66,33 @@ function studyCase(o,L,i,wx,base,DR,Td,k,yr){
   const load=h=>{ const t=h%24; return t>=DAY0&&t<NIGHT0?i.Q:i.Q*i.night; };
   const E=runPlant(o,L,hw,capT,k,1e12,load,pCap).drawMax;              // energy the tank must hold
   const r=runPlant(o,L,hw,capT,k,E,load,pCap);
-  // recharge: hours from the end of each afternoon's discharge until the tank is full again
+  // recharge: hours from the end of each afternoon's discharge until the tank is full again (must be before 07:00)
   let rechH=0, ok=true;
   for(let d=0;d<i.days;d++){
     const lastDis=r.prof.slice(d*24,(d+1)*24).reduce((m,x,j)=>x.dis>1e-6?d*24+j:m,-1); if(lastDis<0) continue;
     let full=-1; for(let h=lastDis+1;h<r.prof.length;h++){ if(r.prof[h].soc>=E-1e-3){full=h;break;} }
-    if(full<0||full>d*24+NIGHT0+i.rechMax){ ok=false; rechH=Infinity; } else rechH=Math.max(rechH,full-lastDis);
+    if(full<0||full>d*24+24+DAY0){ ok=false; rechH=Infinity; } else rechH=Math.max(rechH,full-lastDis);
   }
+  const safe=ok&&rechH<=i.rechMax;                                     // recharges within the safe time
   const V=E>0?tankVolume(E,i.Tr-i.Ts,i.eff)*(1+i.margin)/(1-i.reserve):0;
   const orig=runPlant(o,L,hw,cap0,k,0,load);                           // original plant on the same days, for the graph
   // hours a year the plant would exceed its new limit at full IT load (when the tank would work)
   let above=0; for(let h=0;h<yr.length;h++){ const pl=plantAt(o,L,yr[h].db,yr[h].wb,capT,k); if(i.Q*(1-pl.ff)>pl.cap||pl.power(i.Q)>pCap*1.0005) above++; }
   const Prated0=orig.peak, Prated=Math.max(r.peak,pCap);
-  return {Td,TdWb,E,V,...tankShape(Math.max(V,1),i.Hmax),cap0,capT,Prated0,Prated,cut:Math.max(0,Prated0-Prated),above,rechH,ok,
+  return {Td,TdWb,E,V,...tankShape(Math.max(V,1),i.Hmax),cap0,capT,Prated0,Prated,cut:Math.max(0,Prated0-Prated),above,rechH,ok,safe,
     graph:{orig:orig.prof.slice(6,30),tank:r.prof.slice(6,30),E}};
 }
 
-// study every design temperature from the extreme down to 3 K below the ASHRAE 0.4% level
+// study every design temperature from the extreme down to 3 K below the ASHRAE 0.4% level, then recommend:
+// the lowest design temperature that still recharges within the safe time, raised by the safety margin,
+// and never below the ASHRAE 0.4% design dry-bulb
 function peakStudy(i,wx,k){
   const o=OPTIONS.find(x=>x.id===i.sys), L={name:'CHW',Ts:i.Ts,Tr:i.Tr}, base=designBasis(wx), DR=hotDayRange(wx);
   const lo=Math.max(base.db04-3,base.extDB-8), cases=[], yr=wx.T.map((t,h)=>({db:t,wb:wx.Twb[h]}));
-  for(let Td=Math.round((base.extDB-0.5)*2)/2; Td>=lo-1e-9; Td-=0.5) cases.push(studyCase(o,L,i,wx,base,DR,Td,k,yr));
-  return {base,DR,cases,sys:o};
-}
-
-// the case to show: a chosen design temperature, or the safe recommendation =
-// the lowest design temperature that still recharges in time, raised by the safety margin,
-// and never below the ASHRAE 0.4% design dry-bulb
-function pickCase(st,Td,safety){
-  const {cases,base}=st, near=t=>cases.reduce((a,c)=>Math.abs(c.Td-t)<Math.abs(a.Td-t)?c:a,cases[0]);
-  if(Td!=null) return {rec:near(Td),why:'chosen'};
-  let low=null; for(const c of cases){ if(c.ok&&c.E>0) low=c; else if(low) break; }   // cases run from hot to cool
-  if(!low) return {rec:cases[0],why:'norecharge'};
-  const target=Math.max(low.Td+safety,base.db04), up=cases.filter(c=>c.Td>=target-1e-9&&c.E>0);
-  return {rec:up.length?up[up.length-1]:cases[0],why:'safe',low};
+  for(let Td=Math.round((base.extDB-0.5)*2)/2; Td>=lo-1e-9; Td-=0.5) cases.push(studyCase(o,L,i,base,DR,Td,k,yr));
+  let low=null; for(const c of cases){ if(c.safe&&c.E>0) low=c; else if(low) break; }   // cases run from hot to cool
+  const recTd=low?Math.min(cases[0].Td,Math.ceil(Math.max(low.Td+i.safety,base.db04)*2)/2):cases[0].Td;
+  const st={base,DR,cases,sys:o,low,recTd};
+  st.at=Td=>cases.find(c=>Math.abs(c.Td-Td)<1e-9)||studyCase(o,L,i,base,DR,Td,k,yr);   // any design temperature the user enters
+  return st;
 }

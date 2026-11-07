@@ -23,40 +23,44 @@ $('gFile').onchange=e=>{ const f=e.target.files[0]; if(!f) return; const rd=new 
 // ---------- study ----------
 function inputs(){
   return {Q:num('gQ',20000),night:Math.min(1,num('gNight',80)/100),sys:$('gSys').value,Ts:num('gTs',30),Tr:Math.max(num('gTr',40),num('gTs',30)+1),
-    reserve:Math.min(.8,num('gReserve',20)/100),margin:num('gMar',20)/100,days:Math.round(num('gDays',3)),rechMax:Math.min(12,num('gRechMax',10)),
+    reserve:Math.min(.8,num('gReserve',20)/100),margin:num('gMar',20)/100,days:Math.round(num('gDays',3)),rechMax:Math.min(12,num('gRechMax',4)),
     eff:num('gEff',85)/100,Hmax:num('gH',15),safety:num('gSafe',2)};
 }
 // the study takes a moment: run it shortly after the last change
 function schedule(ms){ clearTimeout(timer); $('gStatus').textContent='Calculating…'; timer=setTimeout(run,ms??400); }
+let userTd=null;   // design temperature typed by the user; null = use the recommendation
 function run(){
   if(!WX) return;
   I=inputs(); ST=peakStudy(I,WX,{a:num('gKa',1.2)/100,w:num('gKw',.7)/100});
-  const keep=$('gTd').value;
-  $('gTd').innerHTML='<option value="">Recommended (safe)</option>'+ST.cases.map(c=>`<option value="${c.Td}">${fmt(c.Td,1)} °C</option>`).join('');
-  $('gTd').value=ST.cases.some(c=>String(c.Td)===keep)?keep:'';
   render();
 }
 
 // ---------- results ----------
 function render(){
   if(!ST) return;
-  const td=$('gTd').value===''?null:parseFloat($('gTd').value), {rec:c,why,low}=pickCase(ST,td,I.safety), b=ST.base;
+  const b=ST.base, rec=ST.recTd, lo=ST.cases[ST.cases.length-1].Td, hi=ST.cases[0].Td;
+  const Td=userTd==null?rec:Math.min(hi,Math.max(lo-5,userTd)), c=ST.at(Td);
+  if(userTd==null) $('gTd').value=rec;
+  $('gTdNote').innerHTML=userTd==null
+    ? `Recommended: <b>${fmt(rec,1)} °C</b>. Type your own temperature to test it.`
+    : `Recommended: <b>${fmt(rec,1)} °C</b> · <a href="#" id="gTdReset">use it</a>`;
+  if($('gTdReset')) $('gTdReset').onclick=e=>{ e.preventDefault(); userTd=null; render(); };
   $('gStatus').textContent=`${WX.name} · ${ST.sys.name}`;
-  const chCut=Math.max(0,c.cap0-c.capT), night=`${fmt(I.night*100)}% IT load`;
-  const rech=isFinite(c.rechH)?{v:`${fmt(c.rechH)} <small>h</small>`,l:`to recharge at ${night} over the 12-hour night`}:{v:'No',l:`full recharge within ${fmt(I.rechMax)} h at ${night}`};
-  const msg={
-    safe:`Rate the cooling plant for <b>${fmt(c.Td,1)} °C</b> instead of the extreme <b>${fmt(b.extDB,1)} °C</b>. On the hottest afternoons the tank covers the peak, and at ${night} it is full again ${fmt(c.rechH)} h after the peak. This saves <b>${MW(c.cut)} MW</b> of electrical supply (transformer, generator, grid connection) and <b>${MW(chCut)} MW</b> of chiller capacity.`,
-    chosen:`Rating the cooling plant for <b>${fmt(c.Td,1)} °C</b> instead of <b>${fmt(b.extDB,1)} °C</b> saves <b>${MW(c.cut)} MW</b> of electrical supply and <b>${MW(chCut)} MW</b> of chiller capacity.${c.ok?'':` <b>But at ${night} the tank does not recharge in time</b> during a heatwave: choose a higher temperature or the recommendation.`}`,
-    norecharge:`At ${night} over the night, no design temperature lets the tank recharge in time during a ${I.days}-day heatwave. Lower the night IT load or allow more recharge hours.`}[why];
-  const safeNote=why==='safe'?`<div class="note">Safe choice: the lowest temperature that still recharges in time is ${fmt(low.Td,1)} °C; the recommendation adds a ${fmt(I.safety,1)} K margin and stays at or above the ASHRAE 0.4% level of ${fmt(b.db04,1)} °C.</div>`:'';
+  const chCut=Math.max(0,c.cap0-c.capT), night=`${fmt(I.night*100)}% IT load`, lim=`${fmt(I.rechMax,1)} h`;
+  const rech=isFinite(c.rechH)?{v:`${fmt(c.rechH)} <small>h</small>`,l:`to recharge at ${night} over the 12-hour night`}:{v:'No',l:`full recharge before morning at ${night}`};
+  const save=`This saves <b>${MW(c.cut)} MW</b> of electrical supply (transformer, generator, grid connection) and <b>${MW(chCut)} MW</b> of chiller capacity.`;
+  const msg=c.safe
+    ? `Rate the cooling plant for <b>${fmt(c.Td,1)} °C</b> instead of the extreme <b>${fmt(b.extDB,1)} °C</b>. On the hottest afternoons the tank covers the peak, and at ${night} over the night it is full again ${fmt(c.rechH)} h after the peak. ${save}`
+    : `<b>Recharging may not be safe during a heatwave.</b> At ${fmt(c.Td,1)} °C the tank ${isFinite(c.rechH)?`needs ${fmt(c.rechH)} h to recharge at ${night}, more than the safe ${lim}`:`does not refill before morning at ${night}`}. Either raise the design temperature toward the extreme (a smaller cut${ST.low?`, e.g. the recommended ${fmt(rec,1)} °C`:''}), or include a <b>standby chiller</b> to cover the shortage on those days.`;
+  const safeNote=c.safe&&userTd==null&&ST.low?`<div class="note">Safe choice: the lowest temperature that recharges within ${lim} is ${fmt(ST.low.Td,1)} °C; the recommendation adds a ${fmt(I.safety,1)} K margin and stays at or above the ASHRAE 0.4% level of ${fmt(b.db04,1)} °C.</div>`:'';
   $('gRes').innerHTML=`
     <div class="big4">
       <div class="bn"><div class="v good">−${MW(c.cut)} <small>MW</small></div><div class="l">Rated power ${MW(c.Prated0)} → ${MW(c.Prated)} MW (−${fmt(100*c.cut/c.Prated0,1)}%)</div></div>
       <div class="bn"><div class="v">${fmt(c.V)} <small>m³</small></div><div class="l">Tank · Ø ${fmt(c.D,1)} × ${fmt(c.H,1)} m high</div></div>
-      <div class="bn"><div class="v">${rech.v}</div><div class="l">${rech.l}</div></div>
+      <div class="bn"><div class="v${c.safe?'':' bad'}">${rech.v}</div><div class="l">${rech.l}</div></div>
       <div class="bn"><div class="v">~${fmt(c.above)} <small>h/yr</small></div><div class="l">Hours the tank works (above ${fmt(c.Td,1)} °C at full IT load)</div></div>
     </div>
-    <div class="verdict${why==='norecharge'||!c.ok?' warn':''}">${msg}</div>${safeNote}`;
+    <div class="verdict${c.safe?'':' warn'}">${msg}</div>${safeNote}`;
   charts_(c);
   details(c,b);
 }
@@ -79,7 +83,7 @@ function charts_(c){
 function details(c,b){
   const st=WX.station;
   const rows=ST.cases.map(x=>`<tr class="${x===c?'rec':''}"><td>${fmt(x.Td,1)} °C</td><td>${MW(x.Prated)}</td><td>−${fmt(x.cut)}</td><td>${fmt(x.capT/1000,1)}</td><td>${fmt(x.V)}</td><td>${fmt(x.above)}</td>
-    <td>${x.ok?`<span class="ok">${fmt(x.rechH)} h</span>`:'<span class="no">Not in time</span>'}</td></tr>`);
+    <td>${!x.ok?'<span class="no">Not before morning</span>':`<span class="${x.safe?'ok':'no'}">${fmt(x.rechH)} h</span>`}</td></tr>`);
   $('gDet').innerHTML=`<h3>Every design temperature studied</h3>
     ${table(['Design temp','Rated MW','Cut kW','Chillers MW','Tank m³','Hours/yr','Recharge'],rows)}
     <h3>Basis</h3>
@@ -87,11 +91,11 @@ function details(c,b){
       <li><b>Weather:</b> ${st?`${esc(st.station)} (WMO ${esc(st.wmo)}), measured hourly year TMYx ${esc(st.period)}; ASHRAE 2025 extreme ${fmt(b.extDB,1)} °C dry-bulb / ${fmt(b.extWB,1)} °C wet-bulb, 0.4% ${fmt(b.db04,1)} °C.`:`uploaded file; extreme and 0.4% values taken from its hours.`} Hot-day temperature range ${fmt(ST.DR,1)} K.</li>
       <li><b>Without a tank</b> the plant is rated for full IT load at ${fmt(b.extDB,1)} °C: chillers ${fmt(c.cap0/1000,1)} MW of cooling, ${MW(c.Prated0)} MW electrical.</li>
       <li><b>With the tank</b> the plant is rated for full IT load at ${fmt(c.Td,1)} °C: chillers ${fmt(c.capT/1000,1)} MW, and its power never exceeds ${MW(c.Prated)} MW. Above that, the tank covers the difference.</li>
-      <li><b>Heatwave:</b> ${I.days} hottest days in a row; IT at 100% from 07:00 to 19:00 and ${fmt(I.night*100)}% over the 12-hour night. Each night the tank must be full again within ${fmt(I.rechMax)} h of 19:00, using only the chiller capacity the IT load leaves free and without passing the new rated power.</li>
+      <li><b>Heatwave:</b> ${I.days} hottest days in a row; IT at 100% from 07:00 to 19:00 and ${fmt(I.night*100)}% over the 12-hour night. Each night the tank recharges; it is safe when full again within ${fmt(I.rechMax,1)} h of the peak, and must be full before 07:00, using only the chiller capacity the IT load leaves free and without passing the new rated power.</li>
       <li><b>Tank:</b> ${fmt(c.E)} kWh usable at ΔT ${fmt(I.Tr-I.Ts)} K and ${fmt(I.eff*100)}% efficiency, + ${fmt(I.margin*100)}% sizing margin, + ${fmt(I.reserve*100)}% reserve kept full.</li>
       <li><b>Chiller capacity</b> falls ${fmt(num('gKa',1.2),1)}%/K above 35 °C ambient (air-cooled) or ${fmt(num('gKw',.7),1)}%/K above 29.4 °C condenser water (water-cooled). Screening estimate: confirm with chiller selections and a detailed design.</li>
     </ul>`;
 }
-document.querySelectorAll('#inGrid input:not([type=file]), #inGrid select:not(#gCity):not(#gTd)').forEach(el=>el.addEventListener('input',()=>schedule()));
-$('gTd').onchange=render;
+document.querySelectorAll('#inGrid input:not([type=file]):not(#gTd), #inGrid select:not(#gCity):not(#gTd)').forEach(el=>el.addEventListener('input',()=>schedule()));
+$('gTd').addEventListener('change',()=>{ const v=parseFloat($('gTd').value); userTd=isNaN(v)?null:v; render(); });
 loadCity();
