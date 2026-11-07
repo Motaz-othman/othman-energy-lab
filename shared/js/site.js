@@ -37,3 +37,14 @@ const MARK=`<svg viewBox="0 0 26 26" aria-hidden="true"><rect width="26" height=
   window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments);};
   const s=document.createElement('script'); s.defer=true; s.src='/_vercel/insights/script.js'; document.head.appendChild(s);
 })();
+
+// tool pages on phones and tablets: one button jumps between the inputs and the results of the visible tool
+(function(){
+  const layouts=[...document.querySelectorAll('main.layout')]; if(!layouts.length) return;
+  const b=document.createElement('button'); b.className='fab'; b.type='button'; document.body.appendChild(b);
+  const cur=()=>layouts.find(l=>!l.hidden)||layouts[0], res=()=>cur().querySelector('.results'), inp=()=>cur().querySelector('.incol')||cur();
+  const inView=el=>{ const r=el.getBoundingClientRect(); return r.top<innerHeight*0.6&&r.bottom>innerHeight*0.2; };
+  const label=()=>{ const r=res(); b.textContent=r&&(inView(r)||r.getBoundingClientRect().top<0)?'Inputs ↑':'Results ↓'; };
+  b.onclick=()=>{ const r=res(); const toRes=b.textContent.startsWith('Results'); (toRes?r:inp()).scrollIntoView({behavior:'smooth',block:'start'}); };
+  addEventListener('scroll',label,{passive:true}); addEventListener('resize',label); label();
+})();

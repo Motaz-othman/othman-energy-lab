@@ -46,3 +46,5 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
 .bn .pair .v{display:block;font-size:24px}
 .bn .pair .v.bad{color:var(--bad)}
 .bn .pair .l{display:block;margin-top:2px}
+/* phones: two result cards per row; a card with two values takes the full row */
+@media (max-width:560px){.big4{grid-template-columns:1fr 1fr;gap:10px}.big4 .bn:has(.pair){grid-column:1/-1}.bn{padding:12px}.bn .v{font-size:24px}.bn .v small{font-size:13px}.verdict{font-size:15px}.tankrow{justify-items:center}}
