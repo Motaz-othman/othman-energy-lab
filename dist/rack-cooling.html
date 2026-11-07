@@ -475,7 +475,7 @@ function run(){
   R=rackStudy(p,i); R.i=i;
   const r=R, a=r.noTank, b=r.tank, tk=`${fmt(i.Vbuf)} L/rack tank`, withTank=i.Vbuf>0;
   // one value of a pair: safe minimum flow, or TCS supply rise
-  const flowV=(s,lab)=>`<div><span class="v${s.ok?'':' bad'}">${s.ok?`${fmt(s.F)} <small>L/min</small>`:'none'}</span><span class="l">${s.ok?`${fmt(s.fSafe*100)}% · `:''}${lab}</span></div>`;
+  const flowV=(s,lab)=>`<div><span class="v${s.ok?'':' bad'}">${fmt(s.ok?s.F:r.Fop)} <small>L/min</small></span><span class="l">${s.ok?`${fmt(s.fSafe*100)}% · `:'100% · no turndown · '}${lab}</span></div>`;
   const riseV=(s,lab)=>`<div><span class="v${s.ok?'':' bad'}">+${fmt(s.rise,1)} <small>K</small></span><span class="l">${lab}</span></div>`;
   const pair=(fn)=>withTank?fn(a,'no tank')+fn(b,`with ${tk}`):fn(a,'no tank');
   const maker=p.group==='CPU / HPC'?p.name.split(' ')[0]:p.group, over=r.Ts>p.TsMax+1e-9;
@@ -535,7 +535,7 @@ function chart(){
 
 function details(){
   const r=R, p=r.p, i=r.i, a=r.noTank, b=r.tank, q=k=>`<span class="tag${p.q[k]==='vendor'?' ok':''}">${QUAL[p.q[k]]}</span>`;
-  const fl=s=>s.ok?`${fmt(s.F)} L/min (${fmt(s.fSafe*100)}%)`:'no safe turndown';
+  const fl=s=>s.ok?`${fmt(s.F)} L/min (${fmt(s.fSafe*100)}%)`:`${fmt(r.Fop)} L/min (100%, no turndown)`;
   $('rDet').innerHTML=`<h3>Platform data</h3>
     ${table(['Item','Value','Basis'],[
       `<tr><td>Rack power</td><td>${fmt(p.P)} kW${p.Ppeak>p.P?` (short peaks to ${fmt(p.Ppeak)} kW)`:''}</td><td>${q('P')}</td></tr>`,
