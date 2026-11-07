@@ -3,12 +3,16 @@ const RHO_CP=4180;   // water, kJ per m³ per K
 
 // m³ of chilled water to store E kWh of cooling at a supply/return difference dT, with stratification efficiency eff
 const tankVolume=(E,dT,eff)=>E*3600/(RHO_CP*dT*eff);
-// vertical stratified tank: height up to Hmax, keeping height / diameter between 1 and 4
+// vertical stratified tanks: height up to Hmax, keeping height / diameter between 1 and 4;
+// when one tank at the height limit would be wider than tall, the volume is split into n equal tanks
 function tankShape(V,Hmax){
-  let D=Math.pow(V/Math.PI,1/3), H=4*D;                 // tallest useful shape (H = 4 D)
-  if(H>Hmax){ H=Hmax; D=Math.sqrt(4*V/(Math.PI*H)); }    // limited by the allowed height
-  return {D,H,area:Math.PI*D*D/4};
+  let n=0, D, H;
+  do{ n++; const v=V/n; D=Math.pow(v/Math.PI,1/3); H=4*D;   // tallest useful shape (H = 4 D)
+      if(H>Hmax){ H=Hmax; D=Math.sqrt(4*v/(Math.PI*H)); }    // limited by the allowed height
+  }while(H<D-1e-9&&n<20);
+  return {n,D,H,area:n*Math.PI*D*D/4};
 }
+const tankText=t=>`${t.n>1?t.n+' tanks, each ':''}Ø ${fmt(t.D,1)} × ${fmt(t.H,1)} m`;
 
 // drawing of the stratified tank with its diameter and height
 function tankSvg(D,H){

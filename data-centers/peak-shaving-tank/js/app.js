@@ -22,9 +22,10 @@ $('gFile').onchange=e=>{ const f=e.target.files[0]; if(!f) return; const rd=new 
 
 // ---------- study ----------
 function inputs(){
-  return {Q:num('gQ',20000),night:Math.min(1,num('gNight',80)/100),sys:$('gSys').value,Ts:num('gTs',30),Tr:Math.max(num('gTr',40),num('gTs',30)+1),
-    reserve:Math.min(.8,num('gReserve',20)/100),margin:num('gMar',20)/100,days:Math.round(num('gDays',3)),rechMax:Math.min(12,num('gRechMax',4)),
-    eff:num('gEff',85)/100,Hmax:num('gH',15),safety:num('gSafe',0)};
+  const lim=(v,a,b)=>Math.min(b,Math.max(a,v));   // typed values are not held to the min / max of the fields
+  return {Q:Math.max(1,num('gQ',20000)),night:lim(num('gNight',80),10,100)/100,sys:$('gSys').value,Ts:num('gTs',30),Tr:Math.max(num('gTr',40),num('gTs',30)+1),
+    reserve:lim(num('gReserve',20),0,80)/100,margin:Math.max(0,num('gMar',20))/100,days:lim(Math.round(num('gDays',3)),1,7),rechMax:lim(num('gRechMax',4),1,12),
+    eff:lim(num('gEff',85),50,100)/100,Hmax:Math.max(3,num('gH',15)),safety:Math.max(0,num('gSafe',0))};
 }
 // the study takes a moment: run it shortly after the last change
 function schedule(ms){ clearTimeout(timer); $('gStatus').textContent='Calculating…'; timer=setTimeout(run,ms??400); }
@@ -39,7 +40,8 @@ function run(){
 function render(){
   if(!ST) return;
   const b=ST.base, rec=ST.recTd, lo=ST.cases[ST.cases.length-1].Td, hi=ST.cases[0].Td;
-  const Td=userTd==null?rec:Math.min(hi,Math.max(lo-5,userTd)), c=ST.at(Td);
+  const Td=userTd==null?rec:Math.round(Math.min(hi,Math.max(lo-5,userTd))*2)/2, c=ST.at(Td);
+  if(userTd!=null&&Td!==userTd) $('gTd').value=Td;   // show the value actually studied (0.5 K steps, within the range)
   if(userTd==null) $('gTd').value=rec;
   $('gTdNote').innerHTML=userTd==null
     ? `Recommended: <b>${fmt(rec,1)} °C</b>. Type your own temperature to test it.`
@@ -50,7 +52,7 @@ function render(){
   const rech=isFinite(c.rechH)?{v:`${fmt(c.rechH)} <small>h</small>`,l:`to recharge at ${night} over the 12-hour night`}:{v:'No',l:`full recharge before morning at ${night}`};
   const save=`This saves <b>${MW(c.cut)} MW</b> of electrical supply (transformer, generator, grid connection) and <b>${MW(chCut)} MW</b> of chiller capacity.`;
   // the reserve kept full (net of the sizing margin) also covers a power changeover at full load
-  const rideMin=c.V*I.reserve/(1+I.margin)*RHO_CP*(I.Tr-I.Ts)*I.eff/3600/I.Q*60;
+  const rideMin=c.V*I.reserve*RHO_CP*(I.Tr-I.Ts)*I.eff/3600/I.Q*60;
   const uses=c.cut>0?`<div class="uses">
       <div><b>${fmt(I.reserve*100)}% reserve kept full · ${fmt(c.V*I.reserve)} m³</b><span>Never used for peak shaving. It supports a changeover to generator at the peak (about ${fmt(rideMin)} min at full load), and covers what the design does not count: weather hotter than the ASHRAE extreme, chiller fouling and ageing, or a chiller out of service. For a dedicated ride-through design, use the Ride-Through Tank.</span></div>
     </div>`:'';
@@ -61,11 +63,11 @@ function render(){
   $('gRes').innerHTML=`
     <div class="big4">
       <div class="bn"><div class="v good">−${MW(c.cut)} <small>MW</small></div><div class="l">Rated power ${MW(c.Prated0)} → ${MW(c.Prated)} MW (−${fmt(100*c.cut/c.Prated0,1)}%)</div></div>
-      <div class="bn"><div class="v">${fmt(c.V)} <small>m³</small></div><div class="l">Tank · Ø ${fmt(c.D,1)} × ${fmt(c.H,1)} m high</div></div>
+      <div class="bn"><div class="v">${fmt(c.V)} <small>m³</small></div><div class="l">Tank · ${tankText(c)} high</div></div>
       <div class="bn"><div class="v${c.safe?'':' bad'}">${rech.v}</div><div class="l">${rech.l}</div></div>
       <div class="bn"><div class="v">~${fmt(c.above)} <small>h/yr</small></div><div class="l">Hours the tank works (above ${fmt(c.Td,1)} °C at full IT load)</div></div>
     </div>
-    <div class="verdict${c.safe?'':' warn'}">${msg}</div>${uses}${safeNote}`;
+    <div class="verdict${c.safe?'':' warn'}">${msg}${c.cut<0.03*c.Prated0?` <span class="note">The cut is small: with this system and water temperature the plant draws little extra power in the hottest hours, so a tank adds little here.</span>`:''}</div>${uses}${safeNote}`;
   charts_(c);
   details(c,b);
 }

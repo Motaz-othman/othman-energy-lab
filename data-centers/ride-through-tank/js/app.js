@@ -9,12 +9,13 @@ function rideThroughTank(i){
 }
 
 function run(){
-  const i={Q:num('eQ',20000),min:num('eMin',10),Ts:num('eTs',30),Tr:num('eTr',40),eff:num('eEff',85)/100,margin:num('eMar',20)/100,Hmax:num('eH',15),costV:num('eCost',500)};
+  const lim=(v,a,b)=>Math.min(b,Math.max(a,v));   // typed values are not held to the min / max of the fields
+  const i={Q:Math.max(1,num('eQ',20000)),min:Math.max(0.5,num('eMin',10)),Ts:num('eTs',30),Tr:num('eTr',40),eff:lim(num('eEff',85),50,100)/100,margin:Math.max(0,num('eMar',20))/100,Hmax:Math.max(3,num('eH',15)),costV:Math.max(0,num('eCost',500))};
   const r=rideThroughTank(i);
   $('eRes').innerHTML=`
     <div class="big4">
       <div class="bn"><div class="v good">${fmt(r.V)} <small>m³</small></div><div class="l">Tank volume, with ${fmt(i.margin*100)}% margin</div></div>
-      <div class="bn"><div class="v">Ø ${fmt(r.D,1)} × ${fmt(r.H,1)} <small>m</small></div><div class="l">Diameter × height · ${fmt(r.area)} m² footprint</div></div>
+      <div class="bn"><div class="v">${r.n>1?r.n+' × ':''}Ø ${fmt(r.D,1)} × ${fmt(r.H,1)} <small>m</small></div><div class="l">${r.n>1?r.n+' tanks: diameter':'Diameter'} × height · ${fmt(r.area)} m² footprint</div></div>
       <div class="bn"><div class="v">${fmt(i.min,1)} <small>min</small></div><div class="l">Full cooling at ${fmt(i.Q/1000,1)} MW without chillers</div></div>
       <div class="bn"><div class="v">${money(r.cost)}</div><div class="l">Indicative tank cost</div></div>
     </div>
@@ -27,7 +28,7 @@ function run(){
       `<tr><td>Volume with ${fmt(i.margin*100)}% margin</td><td>${fmt(r.V)} m³</td></tr>`,
       `<tr><td>Water mass</td><td>${fmt(r.V)} t</td></tr>`])}
     <ul class="method"><li>Volume = load × time ÷ (4,180 kJ/m³K × ΔT × tank efficiency), plus the safety margin.</li>
-    <li>The tank pumps and controls must run on UPS power during the gap. The tank is shaped up to the height limit, with height between 1 and 4 times the diameter for good stratification.</li></ul>
+    <li>The tank pumps and controls must run on UPS power during the gap. The tank is shaped up to the height limit, with height between 1 and 4 times the diameter for good stratification; a larger volume is split into equal tanks.</li></ul>
     <h3>Ride-through time: assumptions</h3>
     ${table(['Step','Typical time'],[
       `<tr><td>Generator start and transfer (NFPA 110 Level 1: power within 10 s)</td><td>10–30 s</td></tr>`,
