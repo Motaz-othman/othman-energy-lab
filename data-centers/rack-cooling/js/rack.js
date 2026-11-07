@@ -46,6 +46,8 @@ function rackStudy(p,i){
   const tReset=i.resetMin*60, tSafeReset=head/rise;
   const bufL=tSafeReset>=tReset?0:Math.max(0,Ql*tReset/(cp*head)-Mloop)/f.rho*1000;   // extra water per rack
   const TsRide=Tr-(Ql/(mOp*cp))-Ql*tReset/(Mloop*cp);               // supply that rides through without a buffer (same flow)
+  // with a small buffer tank on the TCS loop (litres per rack), mixed into the loop water
+  const Mbuf=Mloop+i.Vbuf*f.rho/1000, tSafeBuf=head*Mbuf*cp/Ql, TsRideBuf=Tr-(Ql/(mOp*cp))-Ql*tReset/(Mbuf*cp);
   const resetTrace=[]; for(let k=0;k<=40;k++){ const t=k*Math.max(tReset,tSafeReset)*1.2/40; resetTrace.push({t:t/60,T:TrOp+rise*Math.min(t,tReset)}); }
 
   // 3. CDU pump trip at rated power: no flow; the cold-plate coolant and metal absorb the heat
@@ -56,5 +58,5 @@ function rackStudy(p,i){
   const chain=[{k:'Rack',d:'cold-plate coolant and metal, at the operating flow',t:Mr/mOp},{k:'CDU',d:`sensing and control ${fmt(i.tDet)} s + pump ramp ${fmt(i.tRamp)} s`,t:tResp},
     {k:'Pipes',d:'round trip plant ⇄ CDU',t:tRT},{k:'Plant',d:'chiller reset',t:tReset}];
   return {p,f,Ql,Qa,QlJ,Ts,Tr,Freq,Fop,TrOp,air,tResp,fSafe,FSafe:fSafe*Fop,peakOK,fFollow,jumpFollow,jumpSafe,tNoResp,
-    tRT,Mloop,rise,head,tReset,tSafeReset,bufL,TsRide,resetTrace,tPump,pumpTrace,chain};
+    tRT,Mloop,rise,head,tReset,tSafeReset,bufL,TsRide,tSafeBuf,TsRideBuf,resetTrace,tPump,pumpTrace,chain};
 }

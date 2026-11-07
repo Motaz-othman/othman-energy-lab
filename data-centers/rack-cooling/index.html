@@ -53,7 +53,10 @@
       <div><label for="rDet">CDU sensing + control (s)</label><input type="number" id="rDet" value="3" min="0" step="1"></div>
       <div><label for="rRamp">CDU pump ramp (s)</label><input type="number" id="rRamp" value="7" min="0" step="1"></div>
     </div>
-    <label for="rResetMin">Plant reset (min)</label><input type="number" id="rResetMin" min="0.5" step="0.5">
+    <div class="row">
+      <div><label for="rResetMin">Plant reset (min)</label><input type="number" id="rResetMin" min="0.5" step="0.5"></div>
+      <div><label for="rVbuf">TCS buffer tank per rack (L)</label><input type="number" id="rVbuf" value="100" min="0" step="50"></div>
+    </div>
     <div class="row">
       <div><label for="rPipe">Pipe run plant → CDU (m)</label><input type="number" id="rPipe" value="150" min="5" step="10"></div>
       <div><label for="rVel">Water velocity (m/s)</label><input type="number" id="rVel" value="2" min="0.5" max="4" step="0.1"></div>
