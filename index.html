@@ -103,6 +103,14 @@ a.tcard:hover .thumb .rk .best{transform:scaleX(1.04)}
 .tbody .chips{margin-top:2px}
 .tbody .open{margin-top:auto;padding-top:6px;color:var(--brand-ink);font-weight:600;font-size:13.5px}
 .soon2 .tbody h3{color:var(--text2)}
+.thumb .orig{fill:none;stroke:var(--grey2);stroke-width:2.5;stroke-dasharray:5 4}
+.thumb .cut{fill:none;stroke:var(--brand);stroke-width:3}
+.thumb .cap{stroke:var(--brand);stroke-width:1;stroke-dasharray:4 4;opacity:.6}
+.thumb .shave{fill:color-mix(in srgb,var(--s2) 35%,transparent)}
+.thumb .rech{fill:color-mix(in srgb,var(--s1) 30%,transparent)}
+.thumb .tk rect{fill:var(--surface);stroke:var(--text2);stroke-width:1.5}
+.thumb .tk .lvl{fill:color-mix(in srgb,var(--s1) 45%,transparent);stroke:none;transform-box:fill-box;transform-origin:bottom;transition:transform .35s ease}
+a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
 </style>
 </head>
 <body>
@@ -161,6 +169,30 @@ a.tcard:hover .thumb .rk .best{transform:scaleX(1.04)}
       <p>The analysis we use, open for engineers and clients to explore. More tools are added as the Lab grows.</p>
     </div>
     <div class="tgrid">
+      <a class="card tcard" href="data-centers/thermal-storage/index.html">
+        <div class="thumb" aria-hidden="true">
+          <svg viewBox="0 0 400 210">
+            <rect class="tbg" width="400" height="210"/>
+            <rect class="win" x="18" y="16" width="364" height="178" rx="10"/>
+            <circle class="dot" cx="34" cy="31" r="3.5"/><circle class="dot" cx="46" cy="31" r="3.5"/><circle class="dot" cx="58" cy="31" r="3.5"/>
+            <path class="sep" d="M18 44H382"/>
+            <text class="tt" x="34" y="64">Hottest day: plant power</text>
+            <path class="shave" d="M120 106C150 62 210 58 240 106Z"/>
+            <path class="rech" d="M240 106C252 106 262 150 278 158C268 158 258 150 246 148Z"/>
+            <path class="orig" d="M34 172C70 150 100 120 120 106C150 62 210 58 240 106C246 120 252 148 262 152C300 160 340 166 366 170"/>
+            <path class="cut" d="M34 172C70 150 100 120 120 106H240C252 106 262 150 278 158C310 162 340 166 366 170"/>
+            <path class="cap" d="M34 106H366"/>
+            <g class="tk"><rect x="318" y="58" width="34" height="40" rx="5"/><rect class="lvl" x="318" y="76" width="34" height="22" rx="5"/></g>
+          </svg>
+        </div>
+        <div class="tbody">
+          <div class="tmeta"><span class="tag ok">New</span><span>Data Centers</span></div>
+          <h3>Thermal Storage Tank</h3>
+          <p>Size a chilled-water tank to ride through a power changeover, or to shave the rare extreme-hour peak so the cooling plant needs less rated power. See the cut, the tank size and the payback.</p>
+          <div class="chips"><span>Ride-through</span><span>Peak shaving</span><span>Measured weather</span></div>
+          <span class="open">Open tool →</span>
+        </div>
+      </a>
       <a class="card tcard" href="data-centers/cooling-plant/index.html">
         <div class="thumb" aria-hidden="true">
           <svg viewBox="0 0 400 210">
@@ -193,7 +225,7 @@ a.tcard:hover .thumb .rk .best{transform:scaleX(1.04)}
           </svg>
         </div>
         <div class="tbody">
-          <div class="tmeta"><span class="tag ok">New</span><span>Data Centers</span></div>
+          <div class="tmeta"><span>Data Centers</span></div>
           <h3>Cooling Plant Selector</h3>
           <p>Compare complete cooling plants for a data hall with liquid and air cooling, hour by hour over a full year. See which system saves the most energy, water and money, and how it runs.</p>
           <div class="chips"><span>8,760-hour analysis</span><span>Energy · water · cost</span><span>ASHRAE 90.4</span></div>

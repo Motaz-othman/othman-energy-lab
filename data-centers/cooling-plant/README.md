@@ -10,7 +10,7 @@ Open `index.html` here, or the standalone build `dist/cooling-plant.html`.
 |---|---|
 | `index.html` | Page layout, inputs, result tabs (Overview, Systems, Energy & water, Initial cost, Climate, Method) |
 | `style.css` | Page-specific styles: summary cards, system view, schematic, operating-mode bars |
-| `js/model.js` | Options, cost rates, chiller model, hourly simulation, design-day check, scoring |
+| `../../shared/js/cooling-model.js` | Options, cost rates, chiller model, hourly simulation, design-day check, scoring |
 | `js/systems.js` | Per-system description, strengths and watch-outs, equipment roles, and the connection schematic |
 | `js/app.js` | Inputs, rendering of the results, events |
 
@@ -18,9 +18,9 @@ Part of Othman Energy Lab, Data Centers focus area. Shared modules it uses (in `
 
 ## Where to change things
 - **Add a city:** append an entry to `CITIES` in `shared/js/cities.js` (`hi`, `lo` in °C, `rh` in %, `elev` in m, `sig` = day-to-day temperature variability in K). Every calculator that uses the city list gets it.
-- **Add a cooling option:** add it to `OPTIONS` in `js/model.js`, then add its branch in `hourModel()` (leaving water temperature, condensing temperature, chiller type, fan power), and its description and schematic layout to `SYS` in `js/systems.js`.
-- **Chiller performance:** `chillerPower()` and `eirPLR` in `js/model.js`. Rated COP defaults are ASHRAE 90.1-2019 Path A minimums; part-load curves are from the EnergyPlus reference datasets.
-- **Cost rates:** `RATES` in `js/model.js` (indicative placeholders; replace with project rates).
+- **Add a cooling option:** add it to `OPTIONS` in `shared/js/cooling-model.js`, then add its branch in `hourModel()` (leaving water temperature, condensing temperature, chiller type, fan power), and its description and schematic layout to `SYS` in `js/systems.js`.
+- **Chiller performance:** `chillerPower()` and `eirPLR` in `shared/js/cooling-model.js`. Rated COP defaults are ASHRAE 90.1-2019 Path A minimums; part-load curves are from the EnergyPlus reference datasets.
+- **Cost rates:** `RATES` in `shared/js/cooling-model.js` (indicative placeholders; replace with project rates).
 
 ## Method summary
 - Each hour, each loop: return water is pre-cooled by the outdoor device; free-cooling fraction FF = (T_ret − T_out)/(T_ret − T_sup); the chiller trims the remainder.

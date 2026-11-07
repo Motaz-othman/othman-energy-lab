@@ -16,6 +16,7 @@ npx http-server -p 8000 -c-1      # then open http://localhost:8000
 | Focus area | Tool | Folder | What it does |
 |---|---|---|---|
 | Data Centers | Cooling Plant Selector | `data-centers/cooling-plant/` | Hourly (8,760 h) comparison of air-cooled chillers, free-cooling dry coolers, adiabatic coolers and cooling towers for a data hall with liquid and air cooling loops. See its [README](data-centers/cooling-plant/README.md). |
+| Data Centers | Thermal Storage Tank | `data-centers/thermal-storage/` | Chilled-water tank sizing in two cards: emergency ride-through for the changeover to generator power, and grid power saving, which shaves the extreme-hour peak so the cooling plant is rated for a lower design temperature (heatwave and night-recharge checks, payback on utility costs or including infrastructure). |
 
 ## Project layout
 ```
@@ -31,6 +32,7 @@ shared/                       used by every page
   js/ui.js                    $, fmt, esc, table(), kpis(), pct(), Chart.js helpers (baseOpts, mk, hbar)
   js/cities.js                built-in city climate normals (1991–2020 monthly high, low, RH)
   js/psychro.js               ASHRAE psychrometrics: saturation pressure, humidity ratio, wet-bulb
+  js/cooling-model.js         shared cooling plant model: system options, hourly plant power, cost rates (Cooling Plant Selector, Thermal Storage Tank)
   js/weather.js               station weather loader; EPW and CSV parsers; generated-year fallback; sample CSV generator
   data/weather/<city>.js      measured hourly year (TMYx 2011–2025) + ASHRAE 2025 design conditions per built-in city,
                               from climate.onebuilding.org (loaded only when that city is picked)
@@ -57,7 +59,7 @@ The form asks only for the sender's email and a message. With `SITE.formEndpoint
 
 ## Add a tool
 1. Copy `data-centers/cooling-plant/` into the focus area folder (e.g. `data-centers/<new-tool>/`) and remove what you don't need. Tool folder names must be unique across focus areas.
-2. Keep the shared parts in its `index.html`: the `sitebar` header and `sitefoot` footer (with `data-root="../../"`), the breadcrumb (Home / area / tool), and the links to `../../shared/css/base.css`, `../../shared/lib/chart.umd.min.js`, `../../shared/js/site.js` and `../../shared/js/ui.js`, plus any shared modules it uses (`psychro.js`, `cities.js`, `weather.js`).
+2. Keep the shared parts in its `index.html`: the `sitebar` header and `sitefoot` footer (with `data-root="../../"`), the breadcrumb (Home / area / tool), and the links to `../../shared/css/base.css`, `../../shared/lib/chart.umd.min.js`, `../../shared/js/site.js` and `../../shared/js/ui.js`, plus any shared modules it uses (`psychro.js`, `cities.js`, `weather.js`, `cooling-model.js`).
 3. Add a card for it on its focus area page and in the Recent tools section of the home page (move the "New" tag to it), and update the Standards section on the About page if it uses new standards.
    Give its page a `<meta name="description">` and the icon and sharing tags, copied from an existing page.
 4. Build its standalone file: `node tools/build.js <new-tool>`.

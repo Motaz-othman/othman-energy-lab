@@ -1,4 +1,4 @@
-// ---------- options, cost rates ----------
+// ---------- shared cooling plant model (Cooling Plant Selector, Thermal Storage Tank): options, cost rates ----------
 const OPTIONS=[
  {id:'acc',  name:'Air-cooled chillers',                     short:'Air-cooled chillers',  water:false, comp:['acch']},
  {id:'accfc',name:'Air-cooled chillers + free-cooling dry coolers', short:'Chillers + dry coolers', water:false, comp:['acch','dc']},
