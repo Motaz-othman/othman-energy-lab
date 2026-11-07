@@ -18,7 +18,7 @@ function loadReset(){ $('rResetMin').value=RESETS.find(x=>x.id===$('rReset').val
 function run(){
   const p=plat();
   const i={fluid:$('rFluid').value,Ts:lim(num('rTs',p.TsMax),5,p.TsMax),margin:lim(num('rMargin',20),0,100)/100,idle:lim(num('rIdle',30),5,100)/100,
-    tCDU:Math.max(0,num('rCDU',10)),pipeL:Math.max(5,num('rPipe',150)),vel:lim(num('rVel',2),0.5,4),Vrack:Math.max(5,num('rVrack',p.Vrack)),
+    tDet:Math.max(0,num('rDet',3)),tRamp:Math.max(0,num('rRamp',7)),pipeL:Math.max(5,num('rPipe',150)),vel:lim(num('rVel',2),0.5,4),Vrack:Math.max(1,num('rVrack',p.Vrack)),
     Vcdu:Math.max(0,num('rVcdu',40)),dTair:lim(num('rAir',12),5,25),resetMin:Math.max(0.5,num('rResetMin',3))};
   if(num('rTs',p.TsMax)>p.TsMax) $('rTs').value=p.TsMax;
   R=rackStudy(p,i); R.i=i;
@@ -28,11 +28,11 @@ function run(){
     <div class="big4">
       <div class="bn"><div class="v good">${fmt(p.TsMax)} <small>°C</small></div><div class="l">Max coolant supply (ASHRAE ${p.cls}) · return limit ${fmt(r.Tr)} °C</div></div>
       <div class="bn"><div class="v">${fmt(r.Fop)} <small>L/min</small></div><div class="l">${fmt(r.Ql,1)} kW to liquid at ${fmt(r.Ts)} °C supply${r.Qa>0.05?` · ${fmt(r.Qa,1)} kW to air, ${fmt(r.air)} m³/h`:''}</div></div>
-      <div class="bn"><div class="v">${fmt(r.fSafe*100)}<small>%</small></div><div class="l">Safe minimum flow, ${fmt(r.FSafe)} L/min: survives a jump from idle to full load</div></div>
+      <div class="bn"><div class="v">${fmt(r.fSafe*100)}<small>%</small></div><div class="l">${r.peakOK?`Safe minimum flow (of operating), ${fmt(r.FSafe)} L/min: survives a jump from idle to peak load`:`No turndown: even full flow does not hold a jump to the ${fmt(r.p.Ppeak)} kW peak`}</div></div>
       <div class="bn"><div class="v${okReset?' good':' bad'}">${secs(r.tSafeReset)}</div><div class="l">Safe with no plant cooling (plant reset ${fmt(i.resetMin,1)} min)</div></div>
     </div>
     <div class="verdict${okReset?'':' warn'}">
-      <b>Variable flow</b> can go down to ${fmt(r.fSafe*100)}% (${fmt(r.FSafe)} L/min per rack). Below that, a jump to full load heats the coolant past ${fmt(r.Tr)} °C before the CDU catches up in ${fmt(i.tCDU)} s.<br>
+      ${r.peakOK?`<b>Variable flow</b> can go down to ${fmt(r.fSafe*100)}% of the operating flow (${fmt(r.FSafe)} L/min per rack). Below that, a jump from idle to the ${fmt(r.p.Ppeak)} kW peak heats the coolant past ${fmt(r.Tr)} °C before the CDU responds (${fmt(r.tResp)} s).`:`<b>Variable flow:</b> no turndown. A jump to the ${fmt(r.p.Ppeak)} kW peak passes ${fmt(r.Tr)} °C even at full flow: raise the flow margin or lower the supply temperature.`}<br>
       ${okReset?`<b>Plant reset:</b> the loop water alone covers a ${fmt(i.resetMin,1)}-min reset.`
         :`<b>Plant reset:</b> the loop water lasts only ${secs(r.tSafeReset)}, short of the ${fmt(i.resetMin,1)}-min reset. Add about <b>${fmt(r.bufL/1000,2)} m³ of buffer per rack</b> on the CDU loop${r.TsRide>15?`, or run the supply at <b>${fmt(r.TsRide,1)} °C</b> or lower`:''}.`}<br>
       <b>Pump trip:</b> the rack reaches its limit in about ${secs(r.tPump)}. Run the standby CDU pump in parallel (hot standby) with automatic changeover.
@@ -53,8 +53,8 @@ function chart(){
     ds=[line('Return at idle-following flow',T(r.jumpFollow.tr),css('--grey2')),line('Return at the safe minimum flow',T(r.jumpSafe.tr),css('--brand'),{borderWidth:2.5}),
       line('Flow (safe minimum case)',r.jumpSafe.tr.map(x=>({x:x.t,y:x.f*100})),css('--s1'),{borderDash:[5,4],borderWidth:1.5,yAxisID:'y1'}),
       line('Return limit',[{x:0,y:r.Tr},{x:r.jumpSafe.tr.at(-1).t,y:r.Tr}],limC,{borderDash:[6,4],borderWidth:1})];
-    title=`Idle (${fmt(i.idle*100)}%) → full load at once; the CDU ramps the flow back in ${fmt(i.tCDU)} s`;
-    note=`If the flow simply followed the idle heat (${fmt(r.fFollow*100)}%), the coolant would pass ${fmt(r.Tr)} °C ${secs(r.tNoResp)} after the jump${r.jumpFollow.peak>r.Tr+1e-3?`, before the CDU responds (peak ${fmt(r.jumpFollow.peak,1)} °C)`:''}.`;
+    title=`Idle (${fmt(i.idle*100)}%) → ${fmt(r.p.Ppeak)} kW peak at once; the CDU responds in ${fmt(i.tDet)} s and ramps the flow over ${fmt(i.tRamp)} s`;
+    note=isFinite(r.tNoResp)?`If the flow simply followed the idle heat (${fmt(r.fFollow*100)}%) and never rose, the coolant would pass ${fmt(r.Tr)} °C ${secs(r.tNoResp)} after the jump. The CDU needs ${fmt(r.tResp)} s to bring the flow back.`:`Even if the flow stayed at the idle-following value (${fmt(r.fFollow*100)}%), the coolant would stay below ${fmt(r.Tr)} °C.`;
   }else if(SCEN==='reset'){
     o.scales.x.title.text='Minutes with no plant cooling';
     ds=[line('Return temperature',r.resetTrace.map(x=>({x:x.t,y:x.T})),css('--brand'),{borderWidth:2.5}),
@@ -67,7 +67,7 @@ function chart(){
     ds=[line('Return temperature',r.pumpTrace.map(x=>({x:x.t,y:x.T})),css('--brand'),{borderWidth:2.5}),
       line('Return limit',[{x:0,y:r.Tr},{x:r.pumpTrace.at(-1).t,y:r.Tr}],limC,{borderDash:[6,4],borderWidth:1})];
     title='CDU pump trips at full load: no flow until the standby pump takes over';
-    note=`Only the ${fmt(i.Vrack)} L of coolant in the rack absorbs the heat, starting ${fmt(r.head,1)} K below the limit.`;
+    note=`Only the buffer at the chips (${fmt(i.Vrack)} L water-equivalent: cold-plate coolant and metal) absorbs the heat, starting ${fmt(r.head,1)} K below the limit. In practice the GPUs throttle soon after.`;
   }
   $('rChartTitle').textContent=title; $('rChartNote').textContent=note;
   $('rLegend').innerHTML=ds.map(d=>`<span><i style="background:${d.borderColor}"></i>${d.label}</span>`).join('');
@@ -83,7 +83,7 @@ function details(){
       `<tr><td>Max coolant supply</td><td>${fmt(p.TsMax)} °C (ASHRAE ${p.cls})</td><td>${q('TsMax')}</td></tr>`,
       `<tr><td>Max coolant return</td><td>${fmt(p.TrMax)} °C</td><td>${q('TrMax')}</td></tr>`,
       `<tr><td>Idle heat</td><td>${fmt(p.idle*100)}% of rack power</td><td>${q('idle')}</td></tr>`,
-      `<tr><td>Coolant in the rack</td><td>${fmt(p.Vrack)} L</td><td>${q('Vrack')}</td></tr>`,
+      `<tr><td>Buffer at the chips (cold-plate coolant + metal)</td><td>${fmt(p.Vrack)} L water-eq.</td><td>${q('Vrack')}</td></tr>`,
       p.minLpm?`<tr><td>Vendor minimum flow</td><td>${fmt(p.minLpm)} L/min per rack</td><td><span class="tag ok">Published</span></td></tr>`:''])}
     <p class="note">${esc(p.note)} Sources: ${p.src.map(s=>`<a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])}</a>`).join(', ')}.</p>
     <h3>Flow per rack</h3>
@@ -95,9 +95,10 @@ function details(){
     ${table(['Stage','What sets it','Time'],r.chain.map(c=>`<tr><td>${c.k}</td><td>${c.d}</td><td>${secs(c.t)}</td></tr>`))}
     <ul class="method">
       <li><b>Flow:</b> liquid heat ÷ (ρ·cp·(return limit − supply)), with ${esc(r.f.name)} (ρ ${fmt(r.f.rho)} kg/m³, cp ${fmt(r.f.cp,2)} kJ/kg·K). This reproduces the Lenovo GB300 table (59 L/min at 25 °C … 177 L/min at 45 °C).</li>
-      <li><b>Load jump:</b> the rack coolant is one well-mixed volume; the rack goes from idle to full heat at once and the CDU ramps the flow linearly back to the operating flow over the response time. The safe minimum is the lowest idle flow whose peak return stays at or below the limit${p.minLpm?', and not below the vendor minimum':''}. The chips' own thermal mass is ignored (on the safe side).</li>
+      <li><b>Load jump:</b> the rack goes from idle to its ${fmt(p.Ppeak)} kW peak at once. The buffer at the chips (cold-plate coolant and metal) is one well-mixed volume; the manifolds do not count. The CDU holds the flow while it senses and reacts, then ramps it linearly to the operating flow. The safe minimum is the lowest idle flow whose peak return stays at or below the limit${p.minLpm?', and not below the vendor minimum':''}.</li>
       <li><b>Plant reset:</b> no cooling at all for the whole reset; the flow stays at the operating value and the water in the facility pipes (operating flow × round trip), the CDU and the rack absorbs the heat. Rapid-restart chillers restart in about 26–43 s and reach about 80% capacity 75–120 s later (about 2–2.5 min in total); the 3-min default adds a margin. Standard chillers take 10–15 min. Sources: ${RESET_SRC.map(s=>`<a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])}</a>`).join(', ')}.</li>
-      <li><b>Pump trip:</b> no flow; only the coolant in the rack absorbs the heat, from the operating return up to the limit.</li>
+      <li><b>Pump trip:</b> no flow at rated power; only the buffer at the chips absorbs the heat, from the operating return up to the limit.</li>
+      <li><b>Return limit as the safety line:</b> it is the platform design rating; the chips throttle at their own junction limit, somewhat later. The CDU is assumed to raise the flow when the return temperature rises (temperature or ΔT control); with fixed differential-pressure control the rack flow does not follow the load at all.</li>
       <li><b>Air:</b> the air share at a ${fmt(i.dTair)} K air temperature rise.</li>
       <li>Screening estimate: confirm with the platform vendor's site planning guide and the CDU data.</li>
     </ul>`;

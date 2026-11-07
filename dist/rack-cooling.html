@@ -288,19 +288,20 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
       <div><label for="rIdle">Idle heat (%)</label><input type="number" id="rIdle" min="5" max="100" step="5"></div>
     </div>
     <div class="row">
-      <div><label for="rCDU">CDU response (s)</label><input type="number" id="rCDU" value="10" min="0" step="1"></div>
-      <div><label for="rResetMin">Plant reset (min)</label><input type="number" id="rResetMin" min="0.5" step="0.5"></div>
+      <div><label for="rDet">CDU sensing + control (s)</label><input type="number" id="rDet" value="3" min="0" step="1"></div>
+      <div><label for="rRamp">CDU pump ramp (s)</label><input type="number" id="rRamp" value="7" min="0" step="1"></div>
     </div>
+    <label for="rResetMin">Plant reset (min)</label><input type="number" id="rResetMin" min="0.5" step="0.5">
     <div class="row">
       <div><label for="rPipe">Pipe run plant → CDU (m)</label><input type="number" id="rPipe" value="150" min="5" step="10"></div>
       <div><label for="rVel">Water velocity (m/s)</label><input type="number" id="rVel" value="2" min="0.5" max="4" step="0.1"></div>
     </div>
     <div class="row">
-      <div><label for="rVrack">Coolant in rack (L)</label><input type="number" id="rVrack" min="5" step="5"></div>
+      <div><label for="rVrack">Buffer at the chips (L)</label><input type="number" id="rVrack" min="1" step="1"></div>
       <div><label for="rVcdu">Coolant in CDU per rack (L)</label><input type="number" id="rVcdu" value="40" min="0" step="5"></div>
     </div>
     <label for="rAir">Air temperature rise (K)</label><input type="number" id="rAir" value="12" min="5" max="25" step="1">
-    <div class="note">Flow margin: operating flow above the minimum the platform needs. Coolant volumes are estimates; take them from the rack and CDU data when known.</div>
+    <div class="note">Flow margin: operating flow above the minimum the platform needs. Buffer at the chips: coolant in the cold plates plus the cold-plate metal, as litres of water (the manifolds do not count). Volumes are estimates; use the rack and CDU data when known.</div>
   </details>
 </aside>
 </div>
@@ -344,35 +345,35 @@ function hbar(id,labels,data,unit,d){
 }
 // ---------- Liquid Rack Cooling: platform data (per rack) ----------
 // P: rack design power kW · liq: share of heat to liquid · TsMax: max coolant supply °C · TrMax: max coolant return °C
-// idle: idle heat as a share of P · Vrack: coolant held in the rack (cold plates + manifolds), L · minLpm: vendor minimum flow per rack
+// idle: idle heat as a share of P · Vrack: thermal buffer at the chips, L of water-equivalent (cold-plate coolant + cold-plate metal; manifolds excluded) · minLpm: vendor minimum flow per rack
 // q: data quality per value ('vendor' published by the maker or an OEM, 'reported' secondary sources, 'est' engineering estimate)
 const PLATFORMS=[
- {id:'gb300',group:'NVIDIA',name:'NVIDIA GB300 NVL72',P:135,Ppeak:155,liq:.90,TsMax:45,TrMax:55,cls:'W45',idle:.30,Vrack:30,minLpm:null,
+ {id:'gb300',group:'NVIDIA',name:'NVIDIA GB300 NVL72',P:135,Ppeak:155,liq:.90,TsMax:45,TrMax:55,cls:'W45',idle:.30,Vrack:10,minLpm:null,
   q:{P:'vendor',liq:'vendor',TsMax:'vendor',TrMax:'vendor',idle:'est',Vrack:'est'},
   note:'135 kW TDP, up to 155 kW peak. About 90% of the heat to liquid. Supply 25–45 °C; the required rack flow (59 L/min at 25 °C … 177 L/min at 45 °C) holds the return at about 55 °C.',
   src:[['Lenovo GB300 NVL72 product guide','https://lenovopress.lenovo.com/lp2357-lenovo-nvidia-gb300-nvl72-rack-scale-ai']]},
- {id:'gb200',group:'NVIDIA',name:'NVIDIA GB200 NVL72',P:132,Ppeak:132,liq:.87,TsMax:45,TrMax:55,cls:'W45',idle:.30,Vrack:30,minLpm:null,
+ {id:'gb200',group:'NVIDIA',name:'NVIDIA GB200 NVL72',P:132,Ppeak:132,liq:.87,TsMax:45,TrMax:55,cls:'W45',idle:.30,Vrack:10,minLpm:null,
   q:{P:'reported',liq:'reported',TsMax:'vendor',TrMax:'est',idle:'est',Vrack:'est'},
   note:'About 120 kW nominal, up to 132 kW measured; about 115 kW to liquid and 17 kW to air. Max inlet 45 °C (QCT lists 65 °C as the absolute return maximum); the design return is taken at 55 °C like the GB300 rack.',
   src:[['QCT Qoolrack GB200 NVL72 paper','https://blog.qct.io/wp-content/uploads/2025/04/QCT-Qoolrack-Stand-Alone_Advanced-Liquid-Cooling-for-NVIDIA-GB200-NVL72-Systems.pdf'],
        ['Introl GB200 NVL72 deployment','https://introl.com/blog/gb200-nvl72-deployment-72-gpu-liquid-cooled']]},
- {id:'vr200',group:'NVIDIA',name:'NVIDIA Vera Rubin NVL144 (preliminary)',P:230,Ppeak:230,liq:1,TsMax:45,TrMax:65,cls:'W45',idle:.30,Vrack:40,minLpm:null,
+ {id:'vr200',group:'NVIDIA',name:'NVIDIA Vera Rubin NVL144 (preliminary)',P:230,Ppeak:230,liq:1,TsMax:45,TrMax:65,cls:'W45',idle:.30,Vrack:14,minLpm:null,
   q:{P:'reported',liq:'reported',TsMax:'reported',TrMax:'reported',idle:'est',Vrack:'est'},
   note:'Preliminary: NVIDIA has not published full cooling specifications. Reported about 190 kW (Max-Q) to 230 kW (Max-P); fanless, fully liquid-cooled; 45 °C supply with a return of about 65 °C.',
   src:[['DCD: NVIDIA prepares for 1 MW racks','https://www.datacenterdynamics.com/en/news/nvidia-prepares-data-center-industry-for-1mw-racks-and-800-volt-dc-power-architectures/'],
        ['SemiAnalysis: Vera Rubin','https://newsletter.semianalysis.com/p/vera-rubin-extreme-co-design-an-evolution'],
        ['Baike: VR200 NVL144 rack','https://baike.baidu.com/en/item/VR200%20NVL144%20rack/5431697']]},
- {id:'b200',group:'NVIDIA',name:'NVIDIA HGX B200, 8 × 4U liquid-cooled servers',P:115,Ppeak:115,liq:.92,TsMax:45,TrMax:55,cls:'W45',idle:.30,Vrack:25,minLpm:null,
+ {id:'b200',group:'NVIDIA',name:'NVIDIA HGX B200, 8 × 4U liquid-cooled servers',P:115,Ppeak:115,liq:.92,TsMax:45,TrMax:55,cls:'W45',idle:.30,Vrack:8,minLpm:null,
   q:{P:'est',liq:'vendor',TsMax:'vendor',TrMax:'est',idle:'est',Vrack:'est'},
   note:'Rack of eight 4U direct-liquid-cooled HGX B200 servers (about 14.3 kW each). Inlet up to 45 °C; up to 92% of the heat to liquid.',
   src:[['Supermicro DLC-2 press release','https://www.supermicro.com/en/pressreleases/supermicro-expands-its-nvidia-blackwell-system-portfolio-new-direct-liquid-cooled-dlc'],
        ['Supermicro B200 Front I/O datasheet','https://www.supermicro.com/datasheet/datasheet_SuperCluster_B200_Front_IO.pdf']]},
- {id:'mi355x',group:'AMD',name:'AMD Instinct MI355X, 64-GPU liquid-cooled rack',P:120,Ppeak:120,liq:.85,TsMax:40,TrMax:55,cls:'W40',idle:.30,Vrack:25,minLpm:null,
+ {id:'mi355x',group:'AMD',name:'AMD Instinct MI355X, 64-GPU liquid-cooled rack',P:120,Ppeak:120,liq:.85,TsMax:40,TrMax:55,cls:'W40',idle:.30,Vrack:8,minLpm:null,
   q:{P:'vendor',liq:'est',TsMax:'est',TrMax:'est',idle:'est',Vrack:'est'},
   note:'GIGABYTE rack: 64 MI355X GPUs (1.4 kW each), up to 120 kW, with an in-rack 100 kW liquid-to-liquid CDU. Coolant temperatures are not published: W40 assumed.',
   src:[['GIGABYTE MI355X DLC rack','https://www.gigabyte.com/Enterprise/GIGAPOD-Rack-Scale/AI-DLC-Rack_AMD-Instinct-MI355X'],
        ['The Register: MI355X','https://www.theregister.com/2025/06/12/amd_mi355x/']]},
- {id:'sd650v3',group:'CPU / HPC',name:'Lenovo ThinkSystem SD650 V3 (Neptune), CPU',P:80,Ppeak:80,liq:.90,TsMax:45,TrMax:60,cls:'W45',idle:.35,Vrack:20,minLpm:36,
+ {id:'sd650v3',group:'CPU / HPC',name:'Lenovo ThinkSystem SD650 V3 (Neptune), CPU',P:80,Ppeak:80,liq:.90,TsMax:45,TrMax:60,cls:'W45',idle:.35,Vrack:7,minLpm:36,
   q:{P:'est',liq:'vendor',TsMax:'vendor',TrMax:'est',idle:'est',Vrack:'est'},
   note:'Rack of six 6U enclosures (36 trays, 72 dual-socket nodes). Inlet up to 45 °C; over 90% of the heat to water at 45 °C. Lenovo minimum flow 1.0 L/min per tray (36 L/min per rack).',
   src:[['Lenovo SD650 V3 environmental specifications','https://pubs.lenovo.com/sd650-v3/sd650v3_server_specifications_environmental'],
@@ -388,39 +389,42 @@ const RESET_SRC=[['Daikin RapidRestore','https://www.daikinapplied.com/news/blog
 // ---------- Liquid Rack Cooling: model (one rack) ----------
 // Flow rule (as in the Lenovo GB300 table): required flow holds the coolant return at the platform maximum,
 //   flow = liquid heat ÷ (ρ·cp·(TrMax − supply)).
-// Transients treat the coolant held in the rack (and, for a plant reset, in the whole loop) as one well-mixed mass.
+// Load jump and pump trip: only the coolant in the cold plates and the cold-plate metal (water-equivalent volume Vrack)
+// buffer the chips; the manifolds are upstream or downstream and do not. Plant reset: the water in the whole loop
+// (facility pipes, CDU, rack) is taken as one well-mixed mass, which is on the safe side of plug flow.
 
 const lpm=(kgs,f)=>kgs/f.rho*1000*60;          // kg/s → L/min
-const kgs=(Lpm,f)=>Lpm/60/1000*f.rho;          // L/min → kg/s
 
-// load jump: the rack runs at idle on flow fmin (share of the operating flow), then jumps to full heat;
-// the CDU brings the flow back to the operating flow, linearly over tR seconds. Returns the return temperature trace.
-function loadJump(r,fmin,tR,tEnd){
-  const {Ql,cp,mOp,Mr,Ts,idle}=r, m0=fmin*mOp, dt=0.05; let T=Ts+Ql*idle/(m0*cp), peak=T; const tr=[];
-  for(let t=0;t<=tEnd+1e-9;t+=dt){
-    const m=tR>0&&t<tR?m0+(mOp-m0)*t/tR:mOp;
-    if(Math.abs(t/0.5-Math.round(t/0.5))<1e-6) tr.push({t,T,f:m/mOp});
-    T+=(Ql-m*cp*(T-Ts))/(Mr*cp)*dt; peak=Math.max(peak,T);
+// load jump: idle heat on flow fmin (share of the operating flow), then the heat jumps to the peak at t = 0;
+// the CDU holds the flow for tD seconds (sensing and control), then ramps it linearly to the operating flow over tR seconds
+function loadJump(r,fmin,tD,tR,tEnd){
+  const {QlIdle,QlJ,cp,mOp,Mr,Ts}=r, m0=fmin*mOp, dt=0.02; let T=Ts+QlIdle/(m0*cp), peak=T, k=0; const tr=[];
+  for(let t=0;t<=tEnd+1e-9;t=(++k)*dt){
+    const m=t<=tD?m0:tR>0&&t<tD+tR?m0+(mOp-m0)*(t-tD)/tR:mOp;
+    if(k%25===0) tr.push({t,T,f:m/mOp});
+    T+=(QlJ-m*cp*(T-Ts))/(Mr*cp)*dt; peak=Math.max(peak,T);
   }
   return {peak,tr};
 }
 
 function rackStudy(p,i){
-  const f=FLUIDS[i.fluid], Q=p.P, Ql=Q*p.liq, Qa=Q-Ql, Ts=Math.min(i.Ts,p.TsMax), Tr=p.TrMax, cp=f.cp;
-  const mReq=Ql/(cp*(Tr-Ts)), Freq=lpm(mReq,f);                   // flow that holds the return at the limit
+  const f=FLUIDS[i.fluid], Ql=p.P*p.liq, Qa=p.P-Ql, QlJ=p.Ppeak*p.liq, QlIdle=Ql*i.idle, Ts=Math.min(i.Ts,p.TsMax), Tr=p.TrMax, cp=f.cp;
+  const mReq=Ql/(cp*(Tr-Ts)), Freq=lpm(mReq,f);                   // flow that holds the return at the limit (rated power)
   const mOp=mReq*(1+i.margin), Fop=lpm(mOp,f), TrOp=Ts+Ql/(mOp*cp);  // operating flow with the margin
-  const Mr=i.Vrack*f.rho/1000, idle=i.idle, r={Ql,cp,mOp,Mr,Ts,idle};
+  const Mr=i.Vrack*f.rho/1000, r={QlIdle,QlJ,cp,mOp,Mr,Ts};
   const air=Qa/(1.2*1.006*i.dTair)*3600;                            // m³/h of air for the air share
+  const tResp=i.tDet+i.tRamp;
 
   // 1. load jump: lowest idle flow that keeps the return at or below the limit while the CDU responds
-  const tEnd=Math.max(60,3*i.tCDU), ok=fm=>loadJump(r,fm,i.tCDU,tEnd).peak<=Tr+1e-3;
-  const lo=Math.max(idle*mReq/mOp*(1+1e-6), p.minLpm?p.minLpm/Fop:0, 0.05);   // idle heat (and the vendor minimum) need this
-  let fSafe; if(ok(lo)) fSafe=lo; else { let a=lo,b=1; for(let n=0;n<30;n++){ const c=(a+b)/2; if(ok(c)) b=c; else a=c; } fSafe=b; }
-  const fFollow=Math.max(lo,idle);                                   // flow that simply follows the idle heat
-  const jumpFollow=loadJump(r,fFollow,i.tCDU,tEnd), jumpSafe=loadJump(r,fSafe,i.tCDU,tEnd);
+  const tEnd=Math.max(60,3*tResp), ok=fm=>loadJump(r,fm,i.tDet,i.tRamp,tEnd).peak<=Tr+1e-3;
+  const lo=Math.max(QlIdle/(cp*(Tr-Ts))/mOp*(1+1e-6), p.minLpm?p.minLpm/Fop:0, 0.05);   // idle heat (and the vendor minimum) need this
+  const peakOK=ok(1);                                                // even full flow may not hold a jump to the peak
+  let fSafe=1; if(peakOK){ if(ok(lo)) fSafe=lo; else { let a=lo,b=1; for(let n=0;n<30;n++){ const c=(a+b)/2; if(ok(c)) b=c; else a=c; } fSafe=b; } }
+  const fFollow=Math.max(lo,i.idle);                                 // flow that simply follows the idle heat
+  const jumpFollow=loadJump(r,fFollow,i.tDet,i.tRamp,tEnd), jumpSafe=loadJump(r,fSafe,i.tDet,i.tRamp,tEnd);
   // time the chips run safely after the jump if the flow stayed at the idle-following value
-  const m0=fFollow*mOp, Tss=Ts+Ql/(m0*cp), T0=Ts+Ql*idle/(m0*cp), tau=Mr/m0;
-  const tNoResp=Tss<=Tr?Infinity:-tau*Math.log((Tss-Tr)/(Tss-T0));
+  const m0=fFollow*mOp, Tss=Ts+QlJ/(m0*cp), T0=Ts+QlIdle/(m0*cp), tau=Mr/m0;
+  const tNoResp=Tss<=Tr?Infinity:T0>=Tr?0:-tau*Math.log((Tss-Tr)/(Tss-T0));
 
   // 2. plant reset: no cooling for the reset time; the loop water (pipes plant ⇄ CDU, CDU, rack) absorbs the heat
   const tRT=2*i.pipeL/i.vel;                                         // round trip in the facility pipes, s
@@ -429,17 +433,17 @@ function rackStudy(p,i){
   const head=Tr-TrOp;                                                // return headroom at the operating flow
   const tReset=i.resetMin*60, tSafeReset=head/rise;
   const bufL=tSafeReset>=tReset?0:Math.max(0,Ql*tReset/(cp*head)-Mloop)/f.rho*1000;   // extra water per rack
-  const TsRide=Tr-(Ql/(mOp*cp))-Ql*tReset/(Mloop*cp);               // supply that rides through without a buffer
+  const TsRide=Tr-(Ql/(mOp*cp))-Ql*tReset/(Mloop*cp);               // supply that rides through without a buffer (same flow)
   const resetTrace=[]; for(let k=0;k<=40;k++){ const t=k*Math.max(tReset,tSafeReset)*1.2/40; resetTrace.push({t:t/60,T:TrOp+rise*Math.min(t,tReset)}); }
 
-  // 3. CDU pump trip: no flow; the rack coolant absorbs the heat
+  // 3. CDU pump trip at rated power: no flow; the cold-plate coolant and metal absorb the heat
   const tPump=head*Mr*cp/Ql;
-  const pumpTrace=[]; for(let k=0;k<=40;k++){ const t=k*Math.max(4*tPump,10)/40; pumpTrace.push({t,T:TrOp+Ql*t/(Mr*cp)}); }
+  const pumpTrace=[]; for(let k=0;k<=40;k++){ const t=k*Math.max(4*tPump,5)/40; pumpTrace.push({t,T:TrOp+Ql*t/(Mr*cp)}); }
 
   // response chain
-  const chain=[{k:'Rack',d:'coolant in the cold plates and manifolds',t:Mr/mOp},{k:'CDU',d:'sensing, control and pump ramp',t:i.tCDU},
+  const chain=[{k:'Rack',d:'cold-plate coolant and metal, at the operating flow',t:Mr/mOp},{k:'CDU',d:`sensing and control ${fmt(i.tDet)} s + pump ramp ${fmt(i.tRamp)} s`,t:tResp},
     {k:'Pipes',d:'round trip plant ⇄ CDU',t:tRT},{k:'Plant',d:'chiller reset',t:tReset}];
-  return {p,f,Q,Ql,Qa,Ts,Tr,Freq,Fop,TrOp,air,fSafe,FSafe:fSafe*Fop,fFollow,jumpFollow,jumpSafe,tNoResp,
+  return {p,f,Ql,Qa,QlJ,Ts,Tr,Freq,Fop,TrOp,air,tResp,fSafe,FSafe:fSafe*Fop,peakOK,fFollow,jumpFollow,jumpSafe,tNoResp,
     tRT,Mloop,rise,head,tReset,tSafeReset,bufL,TsRide,resetTrace,tPump,pumpTrace,chain};
 }
 // ---------- Liquid Rack Cooling: page logic ----------
@@ -462,7 +466,7 @@ function loadReset(){ $('rResetMin').value=RESETS.find(x=>x.id===$('rReset').val
 function run(){
   const p=plat();
   const i={fluid:$('rFluid').value,Ts:lim(num('rTs',p.TsMax),5,p.TsMax),margin:lim(num('rMargin',20),0,100)/100,idle:lim(num('rIdle',30),5,100)/100,
-    tCDU:Math.max(0,num('rCDU',10)),pipeL:Math.max(5,num('rPipe',150)),vel:lim(num('rVel',2),0.5,4),Vrack:Math.max(5,num('rVrack',p.Vrack)),
+    tDet:Math.max(0,num('rDet',3)),tRamp:Math.max(0,num('rRamp',7)),pipeL:Math.max(5,num('rPipe',150)),vel:lim(num('rVel',2),0.5,4),Vrack:Math.max(1,num('rVrack',p.Vrack)),
     Vcdu:Math.max(0,num('rVcdu',40)),dTair:lim(num('rAir',12),5,25),resetMin:Math.max(0.5,num('rResetMin',3))};
   if(num('rTs',p.TsMax)>p.TsMax) $('rTs').value=p.TsMax;
   R=rackStudy(p,i); R.i=i;
@@ -472,11 +476,11 @@ function run(){
     <div class="big4">
       <div class="bn"><div class="v good">${fmt(p.TsMax)} <small>°C</small></div><div class="l">Max coolant supply (ASHRAE ${p.cls}) · return limit ${fmt(r.Tr)} °C</div></div>
       <div class="bn"><div class="v">${fmt(r.Fop)} <small>L/min</small></div><div class="l">${fmt(r.Ql,1)} kW to liquid at ${fmt(r.Ts)} °C supply${r.Qa>0.05?` · ${fmt(r.Qa,1)} kW to air, ${fmt(r.air)} m³/h`:''}</div></div>
-      <div class="bn"><div class="v">${fmt(r.fSafe*100)}<small>%</small></div><div class="l">Safe minimum flow, ${fmt(r.FSafe)} L/min: survives a jump from idle to full load</div></div>
+      <div class="bn"><div class="v">${fmt(r.fSafe*100)}<small>%</small></div><div class="l">${r.peakOK?`Safe minimum flow (of operating), ${fmt(r.FSafe)} L/min: survives a jump from idle to peak load`:`No turndown: even full flow does not hold a jump to the ${fmt(r.p.Ppeak)} kW peak`}</div></div>
       <div class="bn"><div class="v${okReset?' good':' bad'}">${secs(r.tSafeReset)}</div><div class="l">Safe with no plant cooling (plant reset ${fmt(i.resetMin,1)} min)</div></div>
     </div>
     <div class="verdict${okReset?'':' warn'}">
-      <b>Variable flow</b> can go down to ${fmt(r.fSafe*100)}% (${fmt(r.FSafe)} L/min per rack). Below that, a jump to full load heats the coolant past ${fmt(r.Tr)} °C before the CDU catches up in ${fmt(i.tCDU)} s.<br>
+      ${r.peakOK?`<b>Variable flow</b> can go down to ${fmt(r.fSafe*100)}% of the operating flow (${fmt(r.FSafe)} L/min per rack). Below that, a jump from idle to the ${fmt(r.p.Ppeak)} kW peak heats the coolant past ${fmt(r.Tr)} °C before the CDU responds (${fmt(r.tResp)} s).`:`<b>Variable flow:</b> no turndown. A jump to the ${fmt(r.p.Ppeak)} kW peak passes ${fmt(r.Tr)} °C even at full flow: raise the flow margin or lower the supply temperature.`}<br>
       ${okReset?`<b>Plant reset:</b> the loop water alone covers a ${fmt(i.resetMin,1)}-min reset.`
         :`<b>Plant reset:</b> the loop water lasts only ${secs(r.tSafeReset)}, short of the ${fmt(i.resetMin,1)}-min reset. Add about <b>${fmt(r.bufL/1000,2)} m³ of buffer per rack</b> on the CDU loop${r.TsRide>15?`, or run the supply at <b>${fmt(r.TsRide,1)} °C</b> or lower`:''}.`}<br>
       <b>Pump trip:</b> the rack reaches its limit in about ${secs(r.tPump)}. Run the standby CDU pump in parallel (hot standby) with automatic changeover.
@@ -497,8 +501,8 @@ function chart(){
     ds=[line('Return at idle-following flow',T(r.jumpFollow.tr),css('--grey2')),line('Return at the safe minimum flow',T(r.jumpSafe.tr),css('--brand'),{borderWidth:2.5}),
       line('Flow (safe minimum case)',r.jumpSafe.tr.map(x=>({x:x.t,y:x.f*100})),css('--s1'),{borderDash:[5,4],borderWidth:1.5,yAxisID:'y1'}),
       line('Return limit',[{x:0,y:r.Tr},{x:r.jumpSafe.tr.at(-1).t,y:r.Tr}],limC,{borderDash:[6,4],borderWidth:1})];
-    title=`Idle (${fmt(i.idle*100)}%) → full load at once; the CDU ramps the flow back in ${fmt(i.tCDU)} s`;
-    note=`If the flow simply followed the idle heat (${fmt(r.fFollow*100)}%), the coolant would pass ${fmt(r.Tr)} °C ${secs(r.tNoResp)} after the jump${r.jumpFollow.peak>r.Tr+1e-3?`, before the CDU responds (peak ${fmt(r.jumpFollow.peak,1)} °C)`:''}.`;
+    title=`Idle (${fmt(i.idle*100)}%) → ${fmt(r.p.Ppeak)} kW peak at once; the CDU responds in ${fmt(i.tDet)} s and ramps the flow over ${fmt(i.tRamp)} s`;
+    note=isFinite(r.tNoResp)?`If the flow simply followed the idle heat (${fmt(r.fFollow*100)}%) and never rose, the coolant would pass ${fmt(r.Tr)} °C ${secs(r.tNoResp)} after the jump. The CDU needs ${fmt(r.tResp)} s to bring the flow back.`:`Even if the flow stayed at the idle-following value (${fmt(r.fFollow*100)}%), the coolant would stay below ${fmt(r.Tr)} °C.`;
   }else if(SCEN==='reset'){
     o.scales.x.title.text='Minutes with no plant cooling';
     ds=[line('Return temperature',r.resetTrace.map(x=>({x:x.t,y:x.T})),css('--brand'),{borderWidth:2.5}),
@@ -511,7 +515,7 @@ function chart(){
     ds=[line('Return temperature',r.pumpTrace.map(x=>({x:x.t,y:x.T})),css('--brand'),{borderWidth:2.5}),
       line('Return limit',[{x:0,y:r.Tr},{x:r.pumpTrace.at(-1).t,y:r.Tr}],limC,{borderDash:[6,4],borderWidth:1})];
     title='CDU pump trips at full load: no flow until the standby pump takes over';
-    note=`Only the ${fmt(i.Vrack)} L of coolant in the rack absorbs the heat, starting ${fmt(r.head,1)} K below the limit.`;
+    note=`Only the buffer at the chips (${fmt(i.Vrack)} L water-equivalent: cold-plate coolant and metal) absorbs the heat, starting ${fmt(r.head,1)} K below the limit. In practice the GPUs throttle soon after.`;
   }
   $('rChartTitle').textContent=title; $('rChartNote').textContent=note;
   $('rLegend').innerHTML=ds.map(d=>`<span><i style="background:${d.borderColor}"></i>${d.label}</span>`).join('');
@@ -527,7 +531,7 @@ function details(){
       `<tr><td>Max coolant supply</td><td>${fmt(p.TsMax)} °C (ASHRAE ${p.cls})</td><td>${q('TsMax')}</td></tr>`,
       `<tr><td>Max coolant return</td><td>${fmt(p.TrMax)} °C</td><td>${q('TrMax')}</td></tr>`,
       `<tr><td>Idle heat</td><td>${fmt(p.idle*100)}% of rack power</td><td>${q('idle')}</td></tr>`,
-      `<tr><td>Coolant in the rack</td><td>${fmt(p.Vrack)} L</td><td>${q('Vrack')}</td></tr>`,
+      `<tr><td>Buffer at the chips (cold-plate coolant + metal)</td><td>${fmt(p.Vrack)} L water-eq.</td><td>${q('Vrack')}</td></tr>`,
       p.minLpm?`<tr><td>Vendor minimum flow</td><td>${fmt(p.minLpm)} L/min per rack</td><td><span class="tag ok">Published</span></td></tr>`:''])}
     <p class="note">${esc(p.note)} Sources: ${p.src.map(s=>`<a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])}</a>`).join(', ')}.</p>
     <h3>Flow per rack</h3>
@@ -539,9 +543,10 @@ function details(){
     ${table(['Stage','What sets it','Time'],r.chain.map(c=>`<tr><td>${c.k}</td><td>${c.d}</td><td>${secs(c.t)}</td></tr>`))}
     <ul class="method">
       <li><b>Flow:</b> liquid heat ÷ (ρ·cp·(return limit − supply)), with ${esc(r.f.name)} (ρ ${fmt(r.f.rho)} kg/m³, cp ${fmt(r.f.cp,2)} kJ/kg·K). This reproduces the Lenovo GB300 table (59 L/min at 25 °C … 177 L/min at 45 °C).</li>
-      <li><b>Load jump:</b> the rack coolant is one well-mixed volume; the rack goes from idle to full heat at once and the CDU ramps the flow linearly back to the operating flow over the response time. The safe minimum is the lowest idle flow whose peak return stays at or below the limit${p.minLpm?', and not below the vendor minimum':''}. The chips' own thermal mass is ignored (on the safe side).</li>
+      <li><b>Load jump:</b> the rack goes from idle to its ${fmt(p.Ppeak)} kW peak at once. The buffer at the chips (cold-plate coolant and metal) is one well-mixed volume; the manifolds do not count. The CDU holds the flow while it senses and reacts, then ramps it linearly to the operating flow. The safe minimum is the lowest idle flow whose peak return stays at or below the limit${p.minLpm?', and not below the vendor minimum':''}.</li>
       <li><b>Plant reset:</b> no cooling at all for the whole reset; the flow stays at the operating value and the water in the facility pipes (operating flow × round trip), the CDU and the rack absorbs the heat. Rapid-restart chillers restart in about 26–43 s and reach about 80% capacity 75–120 s later (about 2–2.5 min in total); the 3-min default adds a margin. Standard chillers take 10–15 min. Sources: ${RESET_SRC.map(s=>`<a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])}</a>`).join(', ')}.</li>
-      <li><b>Pump trip:</b> no flow; only the coolant in the rack absorbs the heat, from the operating return up to the limit.</li>
+      <li><b>Pump trip:</b> no flow at rated power; only the buffer at the chips absorbs the heat, from the operating return up to the limit.</li>
+      <li><b>Return limit as the safety line:</b> it is the platform design rating; the chips throttle at their own junction limit, somewhat later. The CDU is assumed to raise the flow when the return temperature rises (temperature or ΔT control); with fixed differential-pressure control the rack flow does not follow the load at all.</li>
       <li><b>Air:</b> the air share at a ${fmt(i.dTair)} K air temperature rise.</li>
       <li>Screening estimate: confirm with the platform vendor's site planning guide and the CDU data.</li>
     </ul>`;
