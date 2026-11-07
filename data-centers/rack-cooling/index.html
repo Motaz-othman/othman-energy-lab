@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Liquid Rack Cooling · Othman Energy Lab</title>
+<meta name="description" content="Choose a liquid-cooled GPU or CPU platform: maximum supply temperature, cooling and flow per rack, the safe minimum flow for variable-flow control, and how long the racks stay safe when the plant resets or a pump trips. By Othman Energy Lab.">
+<link rel="icon" href="../../shared/img/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../shared/img/apple-touch-icon.png">
+<meta name="theme-color" content="#0e7c57">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Othman Energy Lab">
+<meta property="og:title" content="Liquid Rack Cooling · Othman Energy Lab">
+<meta property="og:description" content="Choose a liquid-cooled GPU or CPU platform: maximum supply temperature, cooling and flow per rack, the safe minimum flow for variable-flow control, and how long the racks stay safe when the plant resets or a pump trips. By Othman Energy Lab.">
+<meta property="og:url" content="https://www.oenergylab.com/data-centers/rack-cooling/">
+<meta property="og:image" content="https://www.oenergylab.com/shared/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="canonical" href="https://www.oenergylab.com/data-centers/rack-cooling/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../shared/css/base.css">
+<link rel="stylesheet" href="../../shared/css/results.css">
+<!-- Chart.js: local copy in shared/lib/ (works offline); CDN fallback -->
+<script src="../../shared/lib/chart.umd.min.js"></script>
+<script>window.Chart||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"><\/script>')</script>
+</head>
+<body class="wide">
+<header class="sitebar" data-root="../../" data-page="data-centers"></header>
+<div class="pagehead">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a> / <a href="../index.html">Data Centers</a> / Liquid Rack Cooling</nav>
+  <h1>Liquid Rack Cooling</h1>
+  <p class="sub">Choose the GPU or CPU platform. See the maximum supply temperature, the cooling and flow each rack needs, the safe minimum flow for variable-flow control, and how long the racks stay safe when the plant resets or a pump trips.</p>
+</div>
+
+<main class="layout">
+<div class="incol">
+<div class="colhead"><b>Inputs</b><span>Results update instantly</span></div>
+<aside class="card inputs" id="inRack">
+  <h2>Platform</h2>
+  <label for="rP">Liquid-cooled rack</label><select id="rP"></select>
+  <div class="note" id="rPnote"></div>
+  <label for="rTs" style="margin-top:12px">Coolant supply to the rack (°C)</label><input type="number" id="rTs" step="1">
+  <div class="note" id="rTsNote">Set to the platform maximum. Lower it to see the flow drop and the safety margins grow.</div>
+  <label for="rReset" style="margin-top:12px">Chiller plant</label><select id="rReset"></select>
+  <details>
+    <summary>Customize</summary>
+    <label for="rFluid">Coolant</label><select id="rFluid"><option value="water">Water</option><option value="pg25">PG25 (25% propylene glycol)</option></select>
+    <div class="row">
+      <div><label for="rMargin">Flow margin (%)</label><input type="number" id="rMargin" value="20" min="0" max="100" step="5"></div>
+      <div><label for="rIdle">Idle heat (%)</label><input type="number" id="rIdle" min="5" max="100" step="5"></div>
+    </div>
+    <div class="row">
+      <div><label for="rCDU">CDU response (s)</label><input type="number" id="rCDU" value="10" min="0" step="1"></div>
+      <div><label for="rResetMin">Plant reset (min)</label><input type="number" id="rResetMin" min="0.5" step="0.5"></div>
+    </div>
+    <div class="row">
+      <div><label for="rPipe">Pipe run plant → CDU (m)</label><input type="number" id="rPipe" value="150" min="5" step="10"></div>
+      <div><label for="rVel">Water velocity (m/s)</label><input type="number" id="rVel" value="2" min="0.5" max="4" step="0.1"></div>
+    </div>
+    <div class="row">
+      <div><label for="rVrack">Coolant in rack (L)</label><input type="number" id="rVrack" min="5" step="5"></div>
+      <div><label for="rVcdu">Coolant in CDU per rack (L)</label><input type="number" id="rVcdu" value="40" min="0" step="5"></div>
+    </div>
+    <label for="rAir">Air temperature rise (K)</label><input type="number" id="rAir" value="12" min="5" max="25" step="1">
+    <div class="note">Flow margin: operating flow above the minimum the platform needs. Coolant volumes are estimates; take them from the rack and CDU data when known.</div>
+  </details>
+</aside>
+</div>
+<section class="results">
+  <div class="colhead"><b>Results</b><span id="rStatus">Per rack</span></div>
+  <div class="card hero" id="rRes"></div>
+  <div class="card">
+    <div class="seg" id="rScen"><button data-s="jump" class="on">Load jump</button><button data-s="reset">Plant reset</button><button data-s="pump">Pump trip</button></div>
+    <div class="ctitle" id="rChartTitle"></div>
+    <div class="legend" id="rLegend"></div>
+    <div class="chartbox" style="height:300px"><canvas id="rChart"></canvas></div>
+    <div class="note" id="rChartNote" style="margin-top:8px"></div>
+  </div>
+  <details class="card more"><summary>Show details</summary><div id="rDet"></div></details>
+</section>
+</main>
+
+<footer class="sitefoot" data-root="../../"></footer>
+<script src="../../shared/js/site.js"></script>
+<script src="../../shared/js/ui.js"></script>
+<script src="js/platforms.js"></script>
+<script src="js/rack.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

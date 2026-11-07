@@ -169,6 +169,28 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
       <p>The analysis we use, open for engineers and clients to explore. More tools are added as the Lab grows.</p>
     </div>
     <div class="tgrid">
+      <a class="card tcard" href="data-centers/rack-cooling/index.html">
+        <div class="thumb" aria-hidden="true">
+          <svg viewBox="0 0 400 210">
+            <rect class="tbg" width="400" height="210"/>
+            <rect class="win" x="18" y="16" width="364" height="178" rx="10"/>
+            <circle class="dot" cx="34" cy="31" r="3.5"/><circle class="dot" cx="46" cy="31" r="3.5"/><circle class="dot" cx="58" cy="31" r="3.5"/>
+            <path class="sep" d="M18 44H382"/>
+            <text class="tt" x="34" y="64">Load jump: coolant return</text>
+            <g class="tk"><rect x="34" y="78" width="46" height="96" rx="4"/><rect class="lvl" x="40" y="86" width="34" height="10" rx="2"/><rect class="lvl" x="40" y="102" width="34" height="10" rx="2"/><rect class="lvl" x="40" y="118" width="34" height="10" rx="2"/><rect class="lvl" x="40" y="134" width="34" height="10" rx="2"/><rect class="lvl" x="40" y="150" width="34" height="10" rx="2"/></g>
+            <path class="cap" d="M100 96H366" style="stroke:var(--bad)"/>
+            <path class="orig" d="M100 150C130 150 140 80 170 84S210 130 260 138 340 140 366 140"/>
+            <path class="cut" d="M100 156C130 156 145 98 175 100S215 134 260 140 340 142 366 142"/>
+          </svg>
+        </div>
+        <div class="tbody">
+          <div class="tmeta"><span class="tag ok">New</span><span>Data Centers</span></div>
+          <h3>Liquid Rack Cooling</h3>
+          <p>Choose the GPU or CPU platform (GB300, GB200, Vera Rubin, HGX B200, MI355X, CPU) and see the maximum supply temperature, the flow per rack, the safe minimum for variable flow, and how long racks stay safe through a plant reset or pump trip.</p>
+          <div class="chips"><span>Vendor data</span><span>Safe minimum flow</span><span>Response times</span></div>
+          <span class="open">Open tool →</span>
+        </div>
+      </a>
       <a class="card tcard" href="data-centers/peak-shaving-tank/index.html">
         <div class="thumb" aria-hidden="true">
           <svg viewBox="0 0 400 210">
@@ -186,7 +208,7 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
           </svg>
         </div>
         <div class="tbody">
-          <div class="tmeta"><span class="tag ok">New</span><span>Data Centers</span></div>
+          <div class="tmeta"><span>Data Centers</span></div>
           <h3>Peak Shaving Tank</h3>
           <p>Shave the rare extreme-hour peak with a chilled-water tank that recharges at night, so the cooling plant and its electrical supply can be rated lower. See the power cut, the tank size and the recharge time.</p>
           <div class="chips"><span>Hourly weather</span><span>Heatwave check</span><span>Night recharge</span></div>
@@ -208,7 +230,7 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
           </svg>
         </div>
         <div class="tbody">
-          <div class="tmeta"><span class="tag ok">New</span><span>Data Centers</span></div>
+          <div class="tmeta"><span>Data Centers</span></div>
           <h3>Ride-Through Tank</h3>
           <p>Size the chilled-water tank that keeps the data center cooled through the changeover from grid power to generator, until the chillers are running again.</p>
           <div class="chips"><span>Tank volume</span><span>Diameter × height</span><span>Indicative cost</span></div>
