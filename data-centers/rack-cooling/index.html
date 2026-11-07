@@ -39,7 +39,8 @@
   <h2>Platform</h2>
   <label for="rP">Liquid-cooled rack</label><select id="rP"></select>
   <div class="note" id="rPnote"></div>
-  <div class="note">The coolant supply is kept at the platform maximum, which saves the most on the facility water.</div>
+  <label for="rTs" style="margin-top:12px">Coolant supply to the rack (°C)</label><input type="number" id="rTs" step="1">
+  <div class="note" id="rTsNote">Starts at the platform maximum, which saves the most on the facility water. The flow follows the platform rule at the supply chosen.</div>
   <label for="rVbuf" style="margin-top:12px">Buffer tank on the TCS loop (L per rack)</label><input type="number" id="rVbuf" value="100" min="0" step="50">
   <div class="note">Buffers the TCS supply while the CDU control valve opens after a load jump.</div>
   <h2 style="margin-top:18px">CDU response</h2>

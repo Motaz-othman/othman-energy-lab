@@ -10,12 +10,13 @@ let SCEN='jump', R=null;
 const plat=()=>PLATFORMS.find(p=>p.id===$('rP').value);
 
 // platform defaults go into the fields; the user can still change them
-function loadPlatform(){ const p=plat(); $('rIdle').value=Math.round(p.idle*100); $('rVrack').value=p.Vrack;
+function loadPlatform(){ const p=plat(); $('rTs').value=p.TsMax; $('rIdle').value=Math.round(p.idle*100); $('rVrack').value=p.Vrack;
   $('rPnote').textContent=`${fmt(p.P)} kW per rack${p.Ppeak>p.P?` (short peaks to ${fmt(p.Ppeak)} kW)`:''} · ${fmt(p.liq*100)}% to liquid · ASHRAE ${p.cls}`; }
 
 function run(){
   const p=plat();
-  const i={fluid:$('rFluid').value,margin:lim(num('rMargin',20),0,100)/100,idle:lim(num('rIdle',30),5,100)/100,
+  if(num('rTs',p.TsMax)>p.TsMax) $('rTs').value=p.TsMax;
+  const i={fluid:$('rFluid').value,Ts:lim(num('rTs',p.TsMax),5,p.TsMax),margin:lim(num('rMargin',20),0,100)/100,idle:lim(num('rIdle',30),5,100)/100,
     tDet:Math.max(0,num('rDet',5)),tRamp:Math.max(0,num('rRamp',15)),tMCV:Math.max(0,num('rMCV',60)),
     Vrack:Math.max(1,num('rVrack',p.Vrack)),Vcdu:Math.max(0,num('rVcdu',40)),Vbuf:Math.max(0,num('rVbuf',100)),
     tcsL:Math.max(1,num('rTcsL',20)),tcsV:lim(num('rTcsV',0.8),0.3,3),sensAt:$('rSens').value,dTair:lim(num('rAir',12),5,25)};
@@ -29,7 +30,7 @@ function run(){
   $('rRes').innerHTML=`
     <div class="big4">
       <div class="bn"><div class="v good">${fmt(p.TsMax)} <small>°C</small></div><div class="l">Max coolant supply (ASHRAE ${p.cls}) · return limit ${fmt(r.Tr)} °C</div></div>
-      <div class="bn"><div class="v">${fmt(r.Fop)} <small>L/min</small></div><div class="l">Operating flow · ${fmt(r.Ql,1)} kW to liquid, return ${fmt(r.TrOp,1)} °C${r.Qa>0.05?` · ${fmt(r.Qa,1)} kW to air, ${fmt(r.air)} m³/h`:''}</div></div>
+      <div class="bn"><div class="v">${fmt(r.Fop)} <small>L/min</small></div><div class="l">Operating flow · ${fmt(r.Ql,1)} kW to liquid, return ${fmt(r.TrOp,1)} °C at ${fmt(r.Ts,r.Ts%1?1:0)} °C supply${r.Qa>0.05?` · ${fmt(r.Qa,1)} kW to air, ${fmt(r.air)} m³/h`:''}</div></div>
       <div class="bn"><div class="l">Safe minimum flow at idle</div><div class="pair">${pair(flowV)}</div></div>
       <div class="bn"><div class="l">TCS supply rise while the MCV opens</div><div class="pair">${pair(riseV)}</div></div>
     </div>
@@ -99,7 +100,7 @@ function details(){
     <h3>Response chain</h3>
     ${table(['Stage','What sets it','Time'],r.chain.map(c=>`<tr><td>${c.k}</td><td>${c.d}</td><td>${secs(c.t)}</td></tr>`))}
     <ul class="method">
-      <li><b>Flow:</b> liquid heat ÷ (ρ·cp·(return limit − supply)), with ${esc(r.f.name)} (ρ ${fmt(r.f.rho)} kg/m³, cp ${fmt(r.f.cp,2)} kJ/kg·K). This reproduces the Lenovo GB300 table (59 L/min at 25 °C … 177 L/min at 45 °C). The supply is kept at the platform maximum.</li>
+      <li><b>Flow:</b> liquid heat ÷ (ρ·cp·(return limit − supply)), with ${esc(r.f.name)} (ρ ${fmt(r.f.rho)} kg/m³, cp ${fmt(r.f.cp,2)} kJ/kg·K). This reproduces the Lenovo GB300 table (59 L/min at 25 °C … 177 L/min at 45 °C). The supply is the value entered, at most the platform maximum.</li>
       <li><b>Load jump:</b> the rack goes from idle to its ${fmt(p.P)} kW rated load at once. Short electrical peaks${p.Ppeak>p.P?` (to ${fmt(p.Ppeak)} kW)`:''} last milliseconds to seconds and are smoothed by the thermal mass. Two water masses: the buffer at the chips, and the TCS loop (CDU, TCS pipes${i.Vbuf>0?', buffer tank':''}) at the supply temperature. The CDU reacts after the sensing time; then the VFD pump ramps the rack flow to the operating flow and the MCV opens the facility water to the heat exchanger (taken with the same ${fmt(i.margin*100)}% margin). The safe minimum is the lowest idle flow whose return stays at or below the limit${p.minLpm?', and not below the vendor minimum':''}.</li>
       <li><b>Load drop:</b> going from full load to idle is not a thermal risk for the chips; the flow and the valve follow at their own pace, and the ΔT is low for a short time.</li>
       <li><b>Pump trip:</b> no flow at rated load; only the buffer at the chips absorbs the heat, from the operating return up to the limit.</li>
