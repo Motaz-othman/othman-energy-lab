@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ride-Through Tank · Othman Energy Lab</title>
+<meta name="description" content="Size a chilled-water tank that keeps a data center cooled through the changeover from grid power to generator. By Othman Energy Lab.">
+<meta name="theme-color" content="#0e7c57">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Othman Energy Lab">
+<meta property="og:title" content="Ride-Through Tank · Othman Energy Lab">
+<meta property="og:description" content="Size a chilled-water tank that keeps a data center cooled through the changeover from grid power to generator. By Othman Energy Lab.">
+<meta property="og:url" content="https://www.oenergylab.com/data-centers/ride-through-tank/">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="canonical" href="https://www.oenergylab.com/data-centers/ride-through-tank/">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+/* Shared styles for all calculators: theme tokens, layout, inputs, cards, tables, tabs */
+:root{
+  color-scheme: light;
+  --bg:#f6f6f4; --surface:#fcfcfb; --border:#e3e2de; --text:#0b0b0b; --text2:#52514e; --muted:#6f6e69;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --grey:#c9c8c3; --grey2:#9f9e99;
+  --good:#1a7f37; --warn:#b26b00; --bad:#c62828;
+  --brand:#0e7c57; --brand-ink:#0b6b4a;   /* Othman Energy Lab green: fills / text and links */
+}
+@media (prefers-color-scheme: dark){
+  :root:where(:not([data-theme="light"])){
+    color-scheme: dark;
+    --bg:#121211; --surface:#1a1a19; --border:#2e2e2c; --text:#f0efec; --text2:#c3c2b7; --muted:#8f8e88;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --grey:#4a4a47; --grey2:#6c6b67;
+    --good:#4cc26a; --warn:#e0a03a; --bad:#ef6b6b;
+    --brand:#17855e; --brand-ink:#4cc99a;
+  }
+}
+*{box-sizing:border-box}
+:root{--navh:58px;--maxw:1180px}
+html{scroll-padding-top:calc(var(--navh) + 12px)}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.pagehead{padding:20px 28px 8px}
+.pagehead h1{font-size:24px;margin:2px 0 4px;letter-spacing:-.01em}
+.crumbs{font-size:12.5px;color:var(--muted)}
+.crumbs a{color:var(--text2);text-decoration:none}
+.crumbs a:hover{color:var(--brand-ink)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chips span{font-size:11.5px;color:var(--text2);border:1px solid var(--border);border-radius:10px;padding:1px 8px;background:var(--surface)}
+h1{font-size:22px;margin:0 0 4px}
+.sub{color:var(--text2);margin:0}
+main.layout{display:grid;grid-template-columns:340px minmax(0,1fr);gap:18px;padding:12px 28px 40px;align-items:start}
+@media (max-width:900px){main.layout{grid-template-columns:minmax(0,1fr);padding:12px 16px 40px}.pagehead{padding:18px 16px 6px}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px}
+.card h2{font-size:15px;margin:0 0 10px}
+.card h3{font-size:12px;margin:14px 0 4px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em}
+label{display:block;font-size:12.5px;color:var(--text2);margin:8px 0 3px}
+input[type=number],select{width:100%;padding:7px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font:inherit}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.tabs{display:flex;gap:6px;margin-bottom:6px}
+.tabs button,.seg button{flex:1;padding:7px;border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:6px;cursor:pointer;font:inherit}
+.tabs button.on,.seg button.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.seg{display:inline-flex;gap:4px;margin-bottom:8px}.seg button{padding:4px 12px;font-size:12.5px;white-space:nowrap}
+.drop{border:1.5px dashed var(--border);border-radius:8px;padding:14px;text-align:center;color:var(--text2);cursor:pointer}
+.drop:hover{border-color:var(--brand)}
+input[type=range]{width:100%}
+.rng{display:grid;grid-template-columns:1fr 26px;align-items:center;gap:6px}
+.rng span{text-align:right;font-variant-numeric:tabular-nums}
+.note{font-size:12px;color:var(--muted);margin-top:6px}
+details summary{cursor:pointer;color:var(--text2);font-size:13px;margin-top:12px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+@media (max-width:700px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--bg);border-radius:8px;padding:10px}
+.kpi .v{font-size:19px;font-weight:650;font-variant-numeric:tabular-nums}
+.kpi .l{font-size:12px;color:var(--text2)}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--border);text-align:right;white-space:nowrap}
+th:first-child,td:first-child,td.l,th.l{text-align:left;white-space:normal}
+th{color:var(--text2);font-weight:600;font-size:12px}
+tr.best td{font-weight:650}
+.tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:600}
+.tag.ok{background:color-mix(in srgb,var(--good) 15%,transparent);color:var(--good)}
+.tag.x{background:color-mix(in srgb,var(--bad) 15%,transparent);color:var(--bad)}
+.split{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;align-items:start}
+@media (max-width:1150px){.split{grid-template-columns:1fr}}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:1100px){.grid2{grid-template-columns:1fr}}
+.chartbox{position:relative;height:250px}
+.banner{font-size:12.5px;padding:8px 10px;border-radius:6px;background:color-mix(in srgb,var(--warn) 14%,transparent);color:var(--text);margin-bottom:10px}
+.err{color:var(--bad);font-size:12.5px;margin-top:6px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--text2);margin:-2px 0 8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.method{font-size:12.5px;color:var(--text2)}
+.method li{margin:4px 0}
+.method code{font-size:12px;background:var(--bg);padding:1px 4px;border-radius:4px}
+.ctitle{font-size:13px;font-weight:600;margin:0 0 6px}
+/* results tabs */
+.rtabs{display:flex;flex-wrap:wrap;gap:4px;padding:4px;background:var(--surface);border:1px solid var(--border);border-radius:10px;position:sticky;top:calc(var(--navh) + env(safe-area-inset-top,0px));z-index:5}
+.rtabs button{flex:1 1 auto;border:0;background:none;padding:8px 14px;border-radius:7px;font:inherit;font-weight:500;color:var(--text2);cursor:pointer;white-space:nowrap}
+.rtabs button:hover{background:var(--bg);color:var(--text)}
+.rtabs button.on{background:var(--brand);color:#fff;font-weight:600}
+.rtabs button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.pane{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+.pane[hidden]{display:none}
+button.link{border:1px solid var(--brand-ink);background:none;color:var(--brand-ink);border-radius:6px;padding:6px 12px;font:inherit;font-weight:600;cursor:pointer}
+button.link:hover{background:color-mix(in srgb,var(--brand) 10%,transparent)}
+tr.click{cursor:pointer}
+tr.click:hover td{background:color-mix(in srgb,var(--text) 4%,transparent)}
+td.hi{background:color-mix(in srgb,var(--brand) 13%,transparent);font-weight:650}
+.tag:not(.ok):not(.x){background:var(--bg);color:var(--text2);border:1px solid var(--border)}
+/* site bar, footer, buttons (shared/js/site.js fills the bar and footer) */
+.sitebar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding-top:env(safe-area-inset-top,0px)}
+.sitebar-in{max-width:var(--maxw);margin:0 auto;height:var(--navh);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 28px}
+.brand{display:flex;align-items:center;gap:9px;color:var(--text);text-decoration:none;font-weight:650;font-size:15.5px;letter-spacing:-.015em;white-space:nowrap}
+.brand b{color:var(--brand-ink);font-weight:750}
+.brand svg{width:26px;height:26px;display:block}
+.sitebar nav{display:flex;gap:2px;overflow-x:auto}
+.sitebar nav a{color:var(--text2);text-decoration:none;padding:7px 11px;border-radius:7px;font-weight:500;white-space:nowrap}
+.sitebar nav a:hover{color:var(--text);background:var(--bg)}
+.sitebar nav a[aria-current]{color:var(--text);background:var(--bg);font-weight:600}
+.sitefoot{border-top:1px solid var(--border);margin-top:32px;color:var(--muted);font-size:12.5px}
+.sitefoot-in{max-width:var(--maxw);margin:0 auto;padding:28px 28px calc(28px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:16px 32px}
+.sitefoot .fb{display:flex;align-items:center;gap:8px;color:var(--text);font-weight:650;font-size:14px}
+.sitefoot .fb svg{width:22px;height:22px}
+.sitefoot .ft{margin-top:4px;color:var(--text2)}
+.sitefoot nav{display:flex;flex-wrap:wrap;gap:6px 18px}
+.sitefoot .fn{flex-basis:100%;padding-top:14px;border-top:1px solid var(--border)}
+.sitefoot a{color:var(--text2);text-decoration:none}
+.sitefoot a:hover{color:var(--brand-ink)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);text-decoration:none;font-weight:600;font-size:14px}
+.btn:hover{border-color:var(--brand)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.primary:hover{background:color-mix(in srgb,var(--brand) 88%,#000)}
+body.wide{--maxw:none}
+@media (max-width:900px){.sitebar-in,.sitefoot-in{padding-left:16px;padding-right:16px}}
+@media (max-width:560px){.brand .bn{display:none}.sitebar nav a{padding:7px 8px}}
+/* site pages (home, focus areas): sections and tool cards */
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+@media (max-width:900px){.wrap{padding:0 16px}}
+.wrap>section{padding:56px 0 8px}
+.eyebrow{font-size:12.5px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:var(--brand-ink);margin:0 0 10px}
+.shead{max-width:70ch;margin-bottom:22px}
+.shead h2{font-size:26px;letter-spacing:-.015em;margin:0 0 8px}
+.shead p{color:var(--text2);margin:0;font-size:15px}
+.shead p.eyebrow{color:var(--brand-ink);font-size:12.5px;margin-bottom:10px}
+.tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+a.tool{display:flex;flex-direction:column;gap:10px;color:inherit;text-decoration:none;padding:20px;transition:border-color .15s}
+a.tool:hover{border-color:var(--brand)}
+a.tool .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+a.tool .top .tag{margin-left:0}
+a.tool .area{font-size:12px;color:var(--muted)}
+a.tool h3{margin:0;font-size:18px;letter-spacing:-.01em;color:var(--text);text-transform:none}
+a.tool p{margin:0;color:var(--text2)}
+a.tool .chips{margin-top:auto}
+a.tool .open{color:var(--brand-ink);font-weight:600;font-size:13.5px}
+.soon{border-style:dashed;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:180px;text-align:center;padding:20px}
+.soon b{color:var(--text2)}
+/* motion: short and subtle; switched off when the visitor prefers reduced motion */
+html{scroll-behavior:smooth}
+a,button,.btn,.card,.tag,input,select{transition:background-color .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease,transform .18s ease}
+.btn:hover,button.link:hover{transform:translateY(-1px)}
+a.tool:hover,a.areac:hover,tr.click:hover{box-shadow:0 8px 22px color-mix(in srgb,var(--text) 9%,transparent)}
+a.tool:hover,a.areac:hover{transform:translateY(-2px)}
+input:focus-visible,select:focus-visible{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 22%,transparent)}
+.pane:not([hidden]){animation:fadeUp .24s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+details summary{list-style:none;display:flex;align-items:center;gap:8px;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"";flex:none;width:6px;height:6px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(-45deg);transition:transform .2s ease}
+details[open] summary::before{transform:rotate(45deg)}
+details summary:hover{color:var(--text)}
+details[open]>:not(summary){animation:fadeUp .2s ease both}
+.sitebar{transition:box-shadow .2s ease}
+.sitebar.scrolled{box-shadow:0 2px 14px color-mix(in srgb,#000 10%,transparent)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+/* company pages: vision and mission, values, approach steps, standards (home, about, contact) */
+.vm{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:900px){.vm{grid-template-columns:1fr}}
+.vmc{padding:26px;border-left:4px solid var(--brand)}
+.vml{display:block;font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--brand-ink);margin-bottom:10px}
+.vmc p{margin:0;font-size:18px;line-height:1.5;letter-spacing:-.005em;color:var(--text)}
+.values{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+@media (max-width:900px){.values{grid-template-columns:1fr}}
+.values div{display:flex;flex-direction:column;gap:4px;padding:4px 2px 4px 14px;border-left:2px solid var(--border)}
+.values b{font-size:14.5px}
+.values span{color:var(--text2)}
+/* approach */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media (max-width:1100px){.steps{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.steps{grid-template-columns:1fr}}
+.step{padding:22px}
+.step .n{display:inline-flex;width:28px;height:28px;border-radius:7px;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;background:var(--brand);margin-bottom:12px}
+.step h3{margin:0 0 6px;font-size:16px;color:var(--text);text-transform:none;letter-spacing:-.01em}
+.step p{margin:0;color:var(--text2)}
+/* standards */
+.stds{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.std{padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+.std .h{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.std b{font-size:14.5px}
+.std p{margin:0;color:var(--text2);font-size:13px}
+.std .tag{margin-left:0;white-space:nowrap}
+/* goals */
+.goals{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media (max-width:1000px){.goals{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.goals{grid-template-columns:1fr}}
+.goal{padding:22px;position:relative;overflow:hidden}
+.goal::before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:var(--brand);transform:scaleX(.18);transform-origin:left;transition:transform .3s ease}
+.goal:hover::before{transform:scaleX(1)}
+.goal .gn{display:block;font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--brand-ink);margin-bottom:10px;font-variant-numeric:tabular-nums}
+.goal h3{margin:0 0 6px;font-size:18px;letter-spacing:-.01em;color:var(--text);text-transform:none}
+.goal p{margin:0;color:var(--text2)}
+.toolsnote{margin-top:16px;padding:14px 18px;border-radius:10px;border:1px dashed color-mix(in srgb,var(--brand) 45%,var(--border));background:color-mix(in srgb,var(--brand) 6%,var(--bg));color:var(--text2)}
+.toolsnote b{color:var(--text)}
+.toolsnote a{color:var(--brand-ink);font-weight:600}
+/* top-bar tagline: quiet grey text right next to the logo (page links are in the footer) */
+.sitebar-in{justify-content:flex-start}
+.slogan{margin:0;padding-left:14px;border-left:1px solid var(--border);display:flex;flex-wrap:wrap;gap:0 6px;font-size:13.5px;font-weight:400;color:var(--muted);line-height:1.3}
+@media (max-width:700px){.slogan{font-size:12.5px;padding-left:10px}}
+@media (max-width:380px){.slogan span:last-child{display:none}}
+</style>
+<style>
+/* Tank tools (Ride-Through Tank, Peak Shaving Tank): shared result styles (load after base.css) */
+/* layout */
+.layout[hidden]{display:none}
+.incol{display:grid;gap:10px;min-width:0}
+.colhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;min-height:22px}
+.colhead b{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--brand-ink)}
+.colhead span{font-size:12.5px;color:var(--muted)}
+.results{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;min-width:0;align-content:start}
+.results>.colhead{margin-bottom:-6px}
+/* the important results */
+.hero{display:grid;gap:16px;border-left:4px solid var(--brand)}
+.hero .for{font-size:13.5px;color:var(--text2)}
+.big4{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.bn{padding:14px 16px;border-radius:12px;background:var(--bg);border:1px solid var(--border)}
+.bn .v{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
+.bn .v.good{color:var(--brand-ink)}
+.bn .v small{font-size:15px;font-weight:600;color:var(--text2);letter-spacing:0}
+.bn .l{font-size:13px;color:var(--text2);margin-top:4px}
+.verdict{font-size:16px;line-height:1.5;padding:12px 16px;border-radius:10px;background:color-mix(in srgb,var(--brand) 9%,var(--surface))}
+.verdict.warn{background:color-mix(in srgb,var(--warn) 12%,var(--surface))}
+.tankrow{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+@media (max-width:560px){.tankrow{grid-template-columns:1fr}}
+.tanksvg{width:150px;height:auto}
+.tanksvg .shell{fill:var(--surface);stroke:var(--text2);stroke-width:1.5}
+.tanksvg .dim{stroke:var(--muted);stroke-width:1}
+.tanksvg text{fill:var(--text2);font-size:11px}
+/* curves */
+.legend .sw{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.legend .sw.shave{background:color-mix(in srgb,var(--s2) 35%,transparent);border:1px solid var(--s2)}
+.legend .sw.rech{background:color-mix(in srgb,var(--s1) 25%,transparent);border:1px solid var(--s1)}
+/* details */
+.more summary{margin:0;font-weight:600;color:var(--text)}
+.more[open] summary{margin-bottom:12px}
+.more h3{font-size:12px;margin:16px 0 6px}
+.more td.l{white-space:normal}
+tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transparent)}
+.ok{color:var(--brand-ink);font-weight:600}
+.no{color:var(--bad);font-weight:600}
+.method{font-size:12.5px;color:var(--text2);padding-left:18px}
+.method li{margin:4px 0}
+</style>
+</head>
+<body class="wide" style="--navh:0px">
+<div class="pagehead">
+  <h1>Ride-Through Tank</h1>
+  <p class="sub">Size a chilled-water tank that keeps the data center cooled through the changeover from grid power to generator, until the chillers are running again.</p>
+</div>
+
+<main class="layout">
+<div class="incol">
+<div class="colhead"><b>Inputs</b><span>Results update instantly</span></div>
+<aside class="card inputs" id="inEmg">
+  <h2>Load and time</h2>
+  <label for="eQ">Cooling load (kW)</label><input type="number" id="eQ" value="20000" min="1" step="500">
+  <label for="eMin">Ride-through time (minutes)</label><input type="number" id="eMin" value="10" min="0.5" step="0.5">
+  <div class="note">Time from the power cut until the chillers are cooling again on generator power: generator start, changeover and chiller restart. Typically 5–15 minutes.</div>
+  <h2 style="margin-top:18px">Chilled water</h2>
+  <div class="row">
+    <div><label for="eTs">Supply (°C)</label><input type="number" id="eTs" value="30" step="1"></div>
+    <div><label for="eTr">Return (°C)</label><input type="number" id="eTr" value="40" step="1"></div>
+  </div>
+  <details>
+    <summary>Tank and cost</summary>
+    <div class="row">
+      <div><label for="eEff">Tank efficiency (%)</label><input type="number" id="eEff" value="85" min="50" max="100" step="1"></div>
+      <div><label for="eMar">Safety margin (%)</label><input type="number" id="eMar" value="20" min="0" step="5"></div>
+    </div>
+    <div class="row">
+      <div><label for="eH">Max tank height (m)</label><input type="number" id="eH" value="15" min="3" step="1"></div>
+      <div><label for="eCost">Tank cost ($/m³)</label><input type="number" id="eCost" value="500" min="0" step="50"></div>
+    </div>
+    <div class="note">Tank efficiency: share of the stored cooling that is usable in a stratified tank. Cost is indicative; use local quotes.</div>
+  </details>
+</aside>
+</div>
+<section class="results">
+  <div class="colhead"><b>Results</b><span>Ride-through tank</span></div>
+  <div class="card hero" id="eRes"></div>
+  <details class="card more"><summary>Show details</summary><div id="eDet"></div></details>
+</section>
+</main>
+<script>
+// ---------- shared UI helpers for all calculators (load after Chart.js, before the calculator scripts) ----------
+const $=id=>document.getElementById(id);
+const fmt=(v,d=0)=>(+v).toLocaleString('en-US',{maximumFractionDigits:d,minimumFractionDigits:d});
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function pct(arr,q){ const s=[...arr].sort((a,b)=>a-b); return s[Math.min(s.length-1,Math.floor(q*s.length))]; }
+const kpis=k=>k.map(([v,l])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+function table(head,rows){ return `<div style="overflow-x:auto"><table><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`; }
+
+// ---------- charts (Chart.js); every chart is skipped when Chart.js is unavailable ----------
+const charts={};
+function baseOpts(){
+  const tx=css('--text2'), gr=css('--border');
+  return {responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{intersect:false}},
+    scales:{x:{grid:{display:false},ticks:{color:tx}},y:{grid:{color:gr},border:{display:false},ticks:{color:tx}}}};
+}
+function mk(id,cfg){ if(!window.Chart) return; if(charts[id]) charts[id].destroy(); charts[id]=new Chart($(id),cfg); }
+function hbar(id,labels,data,unit,d){
+  const o=baseOpts(); o.indexAxis='y';
+  o.scales.x={grid:{color:css('--border')},border:{display:false},ticks:{color:css('--text2')},title:{display:true,text:unit,color:css('--text2')},beginAtZero:true};
+  o.scales.y={grid:{display:false},ticks:{color:css('--text')}};
+  o.plugins.tooltip={callbacks:{label:c=>`${fmt(c.raw,d)} ${unit}`}};
+  mk(id,{type:'bar',data:{labels,datasets:[{data,backgroundColor:labels.map((l,i)=>i===0?css('--s1'):css('--grey')),borderRadius:4,barThickness:16}]},options:o});
+}
+// ---------- shared chilled-water tank sizing (Ride-Through Tank, Peak Shaving Tank); load after ui.js ----------
+const RHO_CP=4180;   // water, kJ per m³ per K
+
+// m³ of chilled water to store E kWh of cooling at a supply/return difference dT, with stratification efficiency eff
+const tankVolume=(E,dT,eff)=>E*3600/(RHO_CP*dT*eff);
+// vertical stratified tank: height up to Hmax, keeping height / diameter between 1 and 4
+function tankShape(V,Hmax){
+  let D=Math.pow(V/Math.PI,1/3), H=4*D;                 // tallest useful shape (H = 4 D)
+  if(H>Hmax){ H=Hmax; D=Math.sqrt(4*V/(Math.PI*H)); }    // limited by the allowed height
+  return {D,H,area:Math.PI*D*D/4};
+}
+
+// drawing of the stratified tank with its diameter and height
+function tankSvg(D,H){
+  const rgba=(hex,a)=>{ const h=hex.replace('#',''), n=parseInt(h.length===3?h.split('').map(c=>c+c).join(''):h,16); return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`; };
+  const s=Math.min(110/Math.max(D,1),150/Math.max(H,1)), w=Math.max(30,D*s), h=Math.max(24,H*s), x=(150-w)/2, y=12, ry=Math.max(5,w*0.12);
+  return `<svg class="tanksvg" viewBox="0 0 170 ${y+h+ry+34}" role="img" aria-label="Tank ${fmt(D,1)} m diameter by ${fmt(H,1)} m high">
+  <defs><linearGradient id="strat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:${rgba(css('--s2'),.55)}"/><stop offset=".48" style="stop-color:${rgba(css('--s2'),.25)}"/><stop offset=".52" style="stop-color:${rgba(css('--s1'),.25)}"/><stop offset="1" style="stop-color:${rgba(css('--s1'),.6)}"/></linearGradient></defs>
+  <path class="shell" d="M${x} ${y} V${y+h} A${w/2} ${ry} 0 0 0 ${x+w} ${y+h} V${y} Z" style="fill:url(#strat)"/>
+  <ellipse class="shell" cx="${x+w/2}" cy="${y}" rx="${w/2}" ry="${ry}"/>
+  <path class="dim" d="M${x} ${y+h+ry+12}H${x+w}M${x} ${y+h+ry+8}v8M${x+w} ${y+h+ry+8}v8"/>
+  <text x="${x+w/2}" y="${y+h+ry+28}" text-anchor="middle">Ø ${fmt(D,1)} m</text>
+  <path class="dim" d="M${x+w+10} ${y}V${y+h}M${x+w+6} ${y}h8M${x+w+6} ${y+h}h8"/>
+  <text x="${x+w+16}" y="${y+h/2+4}">${fmt(H,1)} m</text></svg>`;
+}
+// ---------- Ride-Through Tank: sizing and page logic ----------
+const num=(id,d)=>{ const v=parseFloat($(id).value); return isNaN(v)?d:v; };
+const money=v=>Math.abs(v)>=1e6?`$${fmt(v/1e6,2)}M`:`$${fmt(v/1e3)}k`;
+
+// cooling energy for the ride-through time, stored at the supply/return difference, plus the safety margin
+function rideThroughTank(i){
+  const dT=Math.max(1,i.Tr-i.Ts), E=i.Q*i.min/60, Vnet=tankVolume(E,dT,i.eff), V=Vnet*(1+i.margin);
+  return {dT,E,Vnet,V,...tankShape(V,i.Hmax),cost:V*i.costV};
+}
+
+function run(){
+  const i={Q:num('eQ',20000),min:num('eMin',10),Ts:num('eTs',30),Tr:num('eTr',40),eff:num('eEff',85)/100,margin:num('eMar',20)/100,Hmax:num('eH',15),costV:num('eCost',500)};
+  const r=rideThroughTank(i);
+  $('eRes').innerHTML=`
+    <div class="big4">
+      <div class="bn"><div class="v good">${fmt(r.V)} <small>m³</small></div><div class="l">Tank volume, with ${fmt(i.margin*100)}% margin</div></div>
+      <div class="bn"><div class="v">Ø ${fmt(r.D,1)} × ${fmt(r.H,1)} <small>m</small></div><div class="l">Diameter × height · ${fmt(r.area)} m² footprint</div></div>
+      <div class="bn"><div class="v">${fmt(i.min,1)} <small>min</small></div><div class="l">Full cooling at ${fmt(i.Q/1000,1)} MW without chillers</div></div>
+      <div class="bn"><div class="v">${money(r.cost)}</div><div class="l">Indicative tank cost</div></div>
+    </div>
+    <div class="tankrow">${tankSvg(r.D,r.H)}
+      <div class="verdict">A <b>${fmt(r.V)} m³</b> chilled-water tank keeps <b>${fmt(i.Q/1000,1)} MW</b> of cooling running for <b>${fmt(i.min,1)} minutes</b> while the generators start and the chillers restart. At 75% load the same tank lasts about <b>${fmt(i.min/0.75,1)} minutes</b>.</div></div>`;
+  $('eDet').innerHTML=`${table(['Item','Value'],[
+      `<tr><td>Cooling to store</td><td>${fmt(r.E)} kWh</td></tr>`,
+      `<tr><td>Supply / return difference</td><td>${fmt(r.dT)} K</td></tr>`,
+      `<tr><td>Net volume (before margin)</td><td>${fmt(r.Vnet)} m³</td></tr>`,
+      `<tr><td>Volume with ${fmt(i.margin*100)}% margin</td><td>${fmt(r.V)} m³</td></tr>`,
+      `<tr><td>Water mass</td><td>${fmt(r.V)} t</td></tr>`])}
+    <ul class="method"><li>Volume = load × time ÷ (4,180 kJ/m³K × ΔT × tank efficiency), plus the safety margin.</li>
+    <li>The tank pumps and controls must run on UPS power during the gap. The tank is shaped up to the height limit, with height between 1 and 4 times the diameter for good stratification.</li></ul>`;
+}
+document.querySelectorAll('#inEmg input').forEach(el=>el.addEventListener('input',run));
+run();
+</script>
+</body>
+</html>

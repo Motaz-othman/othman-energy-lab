@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Thermal Storage Tank · Othman Energy Lab</title>
-<meta name="description" content="Size a chilled-water thermal storage tank for a data center: ride-through for the changeover to generator power, or peak shaving to cut the rated power of the cooling plant. By Othman Energy Lab.">
+<title>Peak Shaving Tank · Othman Energy Lab</title>
+<meta name="description" content="Size a chilled-water tank that shaves the rare extreme-hour peak of a data center cooling plant, so the plant and its electrical supply need less rated power. By Othman Energy Lab.">
 <meta name="theme-color" content="#0e7c57">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Othman Energy Lab">
-<meta property="og:title" content="Thermal Storage Tank · Othman Energy Lab">
-<meta property="og:description" content="Size a chilled-water thermal storage tank for a data center: ride-through for the changeover to generator power, or peak shaving to cut the rated power of the cooling plant. By Othman Energy Lab.">
-<meta property="og:url" content="https://www.oenergylab.com/data-centers/thermal-storage/">
+<meta property="og:title" content="Peak Shaving Tank · Othman Energy Lab">
+<meta property="og:description" content="Size a chilled-water tank that shaves the rare extreme-hour peak of a data center cooling plant, so the plant and its electrical supply need less rated power. By Othman Energy Lab.">
+<meta property="og:url" content="https://www.oenergylab.com/data-centers/peak-shaving-tank/">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<link rel="canonical" href="https://www.oenergylab.com/data-centers/thermal-storage/">
+<link rel="canonical" href="https://www.oenergylab.com/data-centers/peak-shaving-tank/">
 <meta name="twitter:card" content="summary_large_image">
 <style>
 /* Shared styles for all calculators: theme tokens, layout, inputs, cards, tables, tabs */
@@ -217,19 +217,7 @@ details[open]>:not(summary){animation:fadeUp .2s ease both}
 @media (max-width:380px){.slogan span:last-child{display:none}}
 </style>
 <style>
-/* Thermal Storage Tank: page-specific styles (loads after shared/css/base.css) */
-/* purpose cards */
-.modes{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:6px 28px 4px}
-@media (max-width:900px){.modes{grid-template-columns:1fr;padding:6px 16px 4px}}
-.mode{display:flex;gap:14px;align-items:flex-start;text-align:left;padding:16px 18px;border:1.5px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text);font:inherit;cursor:pointer}
-.mode:hover{border-color:var(--brand)}
-.mode.on{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 8%,var(--surface));box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 18%,transparent)}
-.mode b{display:block;font-size:17px;letter-spacing:-.01em}
-.mode small{display:block;font-size:13px;color:var(--text2);margin-top:3px;line-height:1.4}
-.mi{flex:none;width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:var(--bg);border:1px solid var(--border)}
-.mi svg{width:22px;height:22px;fill:var(--brand-ink);stroke:var(--brand-ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.mode.on .mi{background:var(--brand);border-color:var(--brand)}
-.mode.on .mi svg{fill:#fff;stroke:#fff}
+/* Tank tools (Ride-Through Tank, Peak Shaving Tank): shared result styles (load after base.css) */
 /* layout */
 .layout[hidden]{display:none}
 .incol{display:grid;gap:10px;min-width:0}
@@ -249,8 +237,6 @@ details[open]>:not(summary){animation:fadeUp .2s ease both}
 .bn .l{font-size:13px;color:var(--text2);margin-top:4px}
 .verdict{font-size:16px;line-height:1.5;padding:12px 16px;border-radius:10px;background:color-mix(in srgb,var(--brand) 9%,var(--surface))}
 .verdict.warn{background:color-mix(in srgb,var(--warn) 12%,var(--surface))}
-.payrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:13.5px;color:var(--text2)}
-.payrow .seg{margin:0}
 .tankrow{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
 @media (max-width:560px){.tankrow{grid-template-columns:1fr}}
 .tanksvg{width:150px;height:auto}
@@ -276,58 +262,11 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
 </head>
 <body class="wide" style="--navh:0px">
 <div class="pagehead">
-  <h1>Thermal Storage Tank</h1>
-  <p class="sub">Size a chilled-water storage tank for a data center: to ride through a power changeover, or to cut the rated power of the cooling plant.</p>
+  <h1>Peak Shaving Tank</h1>
+  <p class="sub">A cooling plant is rated for the extreme hottest hour at full IT load, a condition that rarely happens. A chilled-water tank covers those few hours, so the chillers and their electrical supply can be rated lower. The tank recharges during the 12-hour night.</p>
 </div>
 
-<div class="modes" role="tablist" aria-label="Purpose of the tank">
-  <button class="mode on" id="mEmg" role="tab" aria-selected="true" data-m="emg">
-    <span class="mi" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span>
-    <span><b>Emergency ride-through</b><small>Keep cooling running through the changeover from grid power to generator.</small></span>
-  </button>
-  <button class="mode" id="mGrid" role="tab" aria-selected="false" data-m="grid">
-    <span class="mi" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 17c3-1 4-9 7-9s3 6 6 6 3-3 5-3" fill="none"/><path d="M3 12h18" fill="none" stroke-dasharray="2 2"/></svg></span>
-    <span><b>Grid power saving</b><small>Shave the rare extreme-hour peak, so the plant needs less rated power.</small></span>
-  </button>
-</div>
-
-<!-- ===================== Emergency ride-through ===================== -->
-<main class="layout" id="pEmg">
-<div class="incol">
-<div class="colhead"><b>Inputs</b><span>Results update instantly</span></div>
-<aside class="card inputs" id="inEmg">
-  <h2>Load and time</h2>
-  <label for="eQ">Cooling load (kW)</label><input type="number" id="eQ" value="20000" min="1" step="500">
-  <label for="eMin">Ride-through time (minutes)</label><input type="number" id="eMin" value="10" min="0.5" step="0.5">
-  <div class="note">Time from the power cut until the chillers are cooling again on generator power: generator start, changeover and chiller restart. Typically 5–15 minutes.</div>
-  <h2 style="margin-top:18px">Chilled water</h2>
-  <div class="row">
-    <div><label for="eTs">Supply (°C)</label><input type="number" id="eTs" value="20" step="1"></div>
-    <div><label for="eTr">Return (°C)</label><input type="number" id="eTr" value="30" step="1"></div>
-  </div>
-  <details>
-    <summary>Tank and cost</summary>
-    <div class="row">
-      <div><label for="eEff">Tank efficiency (%)</label><input type="number" id="eEff" value="85" min="50" max="100" step="1"></div>
-      <div><label for="eMar">Safety margin (%)</label><input type="number" id="eMar" value="20" min="0" step="5"></div>
-    </div>
-    <div class="row">
-      <div><label for="eH">Max tank height (m)</label><input type="number" id="eH" value="15" min="3" step="1"></div>
-      <div><label for="eCost">Tank cost ($/m³)</label><input type="number" id="eCost" value="500" min="0" step="50"></div>
-    </div>
-    <div class="note">Tank efficiency: share of the stored cooling that is usable in a stratified tank. Cost is indicative; use local quotes.</div>
-  </details>
-</aside>
-</div>
-<section class="results">
-  <div class="colhead"><b>Results</b><span>Emergency ride-through</span></div>
-  <div class="card hero" id="eRes"></div>
-  <details class="card more"><summary>Show details</summary><div id="eDet"></div></details>
-</section>
-</main>
-
-<!-- ===================== Grid power saving ===================== -->
-<main class="layout" id="pGrid" hidden>
+<main class="layout">
 <div class="incol">
 <div class="colhead"><b>Inputs</b><span>Results update a moment after you change a value</span></div>
 <aside class="card inputs" id="inGrid">
@@ -341,61 +280,41 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
   </div>
   <h2 style="margin-top:18px">Load and plant</h2>
   <label for="gQ">Cooling load at full IT (kW)</label><input type="number" id="gQ" value="20000" min="1" step="500">
-  <div class="row">
-    <div><label for="gLf">Average IT load (%)</label><input type="number" id="gLf" value="80" min="10" max="100" step="5"></div>
-    <div><label for="gNight">IT load at night (%)</label><input type="number" id="gNight" value="80" min="10" max="100" step="5"></div>
-  </div>
+  <label for="gNight">Average IT load over the 12-hour night (%)</label><input type="number" id="gNight" value="80" min="10" max="100" step="5">
+  <div class="note">The tank recharges at night, 19:00 to 07:00, with the chiller capacity the IT load leaves free. The lower the night load, the faster it recharges. By day the IT load is taken at 100%.</div>
   <label for="gSys">Cooling system</label><select id="gSys"></select>
   <div class="note">Air-cooled chillers are the usual case: their power peaks hardest in the extreme hours.</div>
   <div class="row">
-    <div><label for="gTs">Supply (°C)</label><input type="number" id="gTs" value="20" step="1"></div>
-    <div><label for="gTr">Return (°C)</label><input type="number" id="gTr" value="30" step="1"></div>
+    <div><label for="gTs">Supply (°C)</label><input type="number" id="gTs" value="30" step="1"></div>
+    <div><label for="gTr">Return (°C)</label><input type="number" id="gTr" value="40" step="1"></div>
   </div>
-  <h2 style="margin-top:18px">Utility costs</h2>
-  <label for="gPb">Electricity ($/kWh)</label><input type="number" id="gPb" value="0.10" min="0" step="0.01">
-  <div class="row">
-    <div><label for="gPp">Peak-hour price ($/kWh)</label><input type="number" id="gPp" step="0.01" min="0" placeholder="same"></div>
-    <div><label for="gDc">Demand charge ($/kW·month)</label><input type="number" id="gDc" value="0" min="0" step="1"></div>
-  </div>
-  <div class="row">
-    <div><label for="gPk0">Peak from (hour)</label><input type="number" id="gPk0" value="12" min="0" max="23" step="1"></div>
-    <div><label for="gPk1">to (hour)</label><input type="number" id="gPk1" value="18" min="0" max="24" step="1"></div>
-  </div>
-  <div class="note">A flat price alone gives little saving: the energy is the same, only moved in time. A peak-hour price or a demand charge is what pays for the tank.</div>
   <h2 style="margin-top:18px">Design temperature</h2>
-  <label for="gTd">Size the plant for</label><select id="gTd"><option value="">Recommended (balanced)</option></select>
+  <label for="gTd">Size the plant for</label><select id="gTd"><option value="">Recommended (safe)</option></select>
   <details>
-    <summary>Costs and safety margins</summary>
+    <summary>Safety margins</summary>
     <div class="row">
-      <div><label for="gCost">Tank cost ($/m³)</label><input type="number" id="gCost" value="500" min="0" step="50"></div>
-      <div><label for="gLife">Plant life (years)</label><input type="number" id="gLife" value="20" min="1" step="1"></div>
+      <div><label for="gSafe">Design temperature margin (K)</label><input type="number" id="gSafe" value="2" min="0" step="0.5"></div>
+      <div><label for="gRechMax">Full again within (h of night)</label><input type="number" id="gRechMax" value="10" min="2" max="12" step="1"></div>
     </div>
-    <div class="row">
-      <div><label for="gInfra">Electrical infrastructure ($/kW)</label><input type="number" id="gInfra" value="700" min="0" step="50"></div>
-      <div><label for="gChk">Chiller ($/kW cooling)</label><input type="number" id="gChk" value="230" min="0" step="10"></div>
-    </div>
-    <div class="note">Infrastructure: transformer, switchgear, generator and grid connection, per kW of rated power. Used only when payback includes infrastructure.</div>
+    <div class="note">The recommendation takes the lowest design temperature that still recharges in time, adds this margin, and never goes below the ASHRAE 0.4% dry-bulb.</div>
     <div class="row">
       <div><label for="gReserve">Reserve kept full (%)</label><input type="number" id="gReserve" value="20" min="0" max="80" step="5"></div>
-      <div><label for="gMar">Sizing margin (%)</label><input type="number" id="gMar" value="20" min="0" step="5"></div>
+      <div><label for="gMar">Tank sizing margin (%)</label><input type="number" id="gMar" value="20" min="0" step="5"></div>
     </div>
     <div class="row">
       <div><label for="gDays">Heatwave (days in a row)</label><input type="number" id="gDays" value="3" min="1" max="7" step="1"></div>
-      <div><label for="gWin">Recharge within (% of night)</label><input type="number" id="gWin" value="80" min="30" max="100" step="5"></div>
+      <div><label for="gH">Max tank height (m)</label><input type="number" id="gH" value="15" min="3" step="1"></div>
     </div>
     <div class="row">
       <div><label for="gKa">Capacity loss, air-cooled (%/K)</label><input type="number" id="gKa" value="1.2" min="0" step="0.1"></div>
       <div><label for="gKw">Capacity loss, water-cooled (%/K)</label><input type="number" id="gKw" value="0.7" min="0" step="0.1"></div>
     </div>
-    <div class="row">
-      <div><label for="gEff">Tank efficiency (%)</label><input type="number" id="gEff" value="85" min="50" max="100" step="1"></div>
-      <div><label for="gH">Max tank height (m)</label><input type="number" id="gH" value="15" min="3" step="1"></div>
-    </div>
+    <label for="gEff">Tank efficiency (%)</label><input type="number" id="gEff" value="85" min="50" max="100" step="1">
   </details>
 </aside>
 </div>
 <section class="results">
-  <div class="colhead"><b>Results</b><span id="gStatus">Grid power saving</span></div>
+  <div class="colhead"><b>Results</b><span id="gStatus">Peak shaving</span></div>
   <div class="card hero" id="gRes"><div class="note">Calculating…</div></div>
   <div class="card" id="gCurves">
     <div class="ctitle" id="gChartTitle">Hottest day: cooling plant power</div>
@@ -710,8 +629,7 @@ function score(res,p){
   ok.sort((a,b)=>res[b].score-res[a].score);
   return ok;
 }
-// ---------- Thermal Storage Tank: sizing models ----------
-// Uses the shared hourly plant model (shared/js/cooling-model.js: OPTIONS, hourModel) and the station weather.
+// ---------- shared chilled-water tank sizing (Ride-Through Tank, Peak Shaving Tank); load after ui.js ----------
 const RHO_CP=4180;   // water, kJ per m³ per K
 
 // m³ of chilled water to store E kWh of cooling at a supply/return difference dT, with stratification efficiency eff
@@ -723,26 +641,34 @@ function tankShape(V,Hmax){
   return {D,H,area:Math.PI*D*D/4};
 }
 
-// ---------- card 1: emergency ride-through ----------
-function emergencyTank(i){
-  const dT=Math.max(1,i.Tr-i.Ts), E=i.Q*i.min/60, Vnet=tankVolume(E,dT,i.eff), V=Vnet*(1+i.margin);
-  return {dT,E,Vnet,V,...tankShape(V,i.Hmax),cost:V*i.costV};
+// drawing of the stratified tank with its diameter and height
+function tankSvg(D,H){
+  const rgba=(hex,a)=>{ const h=hex.replace('#',''), n=parseInt(h.length===3?h.split('').map(c=>c+c).join(''):h,16); return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`; };
+  const s=Math.min(110/Math.max(D,1),150/Math.max(H,1)), w=Math.max(30,D*s), h=Math.max(24,H*s), x=(150-w)/2, y=12, ry=Math.max(5,w*0.12);
+  return `<svg class="tanksvg" viewBox="0 0 170 ${y+h+ry+34}" role="img" aria-label="Tank ${fmt(D,1)} m diameter by ${fmt(H,1)} m high">
+  <defs><linearGradient id="strat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:${rgba(css('--s2'),.55)}"/><stop offset=".48" style="stop-color:${rgba(css('--s2'),.25)}"/><stop offset=".52" style="stop-color:${rgba(css('--s1'),.25)}"/><stop offset="1" style="stop-color:${rgba(css('--s1'),.6)}"/></linearGradient></defs>
+  <path class="shell" d="M${x} ${y} V${y+h} A${w/2} ${ry} 0 0 0 ${x+w} ${y+h} V${y} Z" style="fill:url(#strat)"/>
+  <ellipse class="shell" cx="${x+w/2}" cy="${y}" rx="${w/2}" ry="${ry}"/>
+  <path class="dim" d="M${x} ${y+h+ry+12}H${x+w}M${x} ${y+h+ry+8}v8M${x+w} ${y+h+ry+8}v8"/>
+  <text x="${x+w/2}" y="${y+h+ry+28}" text-anchor="middle">Ø ${fmt(D,1)} m</text>
+  <path class="dim" d="M${x+w+10} ${y}V${y+h}M${x+w+6} ${y}h8M${x+w+6} ${y+h}h8"/>
+  <text x="${x+w+16}" y="${y+h/2+4}">${fmt(H,1)} m</text></svg>`;
 }
-
-// ---------- card 2: grid power saving (peak shaving) ----------
+// ---------- Peak Shaving Tank: sizing model ----------
+// Uses the shared hourly plant model (shared/js/cooling-model.js: OPTIONS, hourModel), shared/js/tank.js and the station weather.
 const TES_P={nCh:4,copA:2.985,copW:6.286,copMax:14,acMax:60,wcMax:50,aDC:6,aCT:4,aHX:1.5,eAD:.85,swAD:24,coc:4,pump:.015,cwp:.012,fanT:0,cduP:0};
+const DAY0=7, NIGHT0=19;   // full IT load 07:00–19:00; the 12-hour night 19:00–07:00 runs at the night IT load
 
 // chiller capacity factor vs its rating point: air-cooled falls with ambient dry-bulb (rated at 35 °C),
 // water-cooled with entering condenser water (rated at 29.4 °C); k = fraction lost per K
 function capFactor(hm,db,k){ return Math.max(0.3, hm.kind==='wc' ? 1-k.w*((hm.Tc-7.6)-29.4) : 1-k.a*(db-35)); }
 
-// one hour of the plant: chiller capacity available, chiller cooling needed, and the electrical power
+// one hour of the plant: chiller capacity available, and the electrical power for a cooling load
 function plantAt(o,L,db,wb,capRated,k){
   const hm0=hourModel(o,{...L,Qd:1},db,wb,TES_P), cap=capRated*capFactor(hm0,db,k);
   const hm=hourModel(o,{...L,Qd:cap},db,wb,TES_P);
   return {hm,cap,ff:hm.ff,power:q=>hm.calc(Math.max(0,q)).P};
 }
-
 // rated chiller capacity needed to carry the full load q at design condition (db, wb)
 function capRatedFor(o,L,q,db,wb,k){ const hm=hourModel(o,{...L,Qd:1},db,wb,TES_P); return q*(1-hm.ff)/capFactor(hm,db,k); }
 
@@ -766,203 +692,137 @@ function designBasis(wx){
   return {extDB:Math.max(...wx.T),extWB:Math.max(...wx.Twb),db04:pct(wx.T,.996),wb04:pct(wx.Twb,.996),src:'weather file'};
 }
 
-// is the hour inside the electricity peak period?
-const inPeak=(h,i)=>{ const t=h%24; return i.pk0<=i.pk1 ? t>=i.pk0&&t<i.pk1 : t>=i.pk0||t<i.pk1; };
-
-// run hours through a plant with an optional tank. loadAt(h) = cooling load kW; returns profile and totals
+// run hours through a plant with an optional tank of Etank kWh. loadAt(h) = cooling load kW
 // pCap (kW, optional): the plant never draws more electrical power than this; the tank covers the rest
-function runPlant(o,L,hours,capRated,k,Etank,i,loadAt,chargeOK,pCap){
-  let soc=Etank, minSoc=Etank, drawMax=0, dischargeH=0, cost=0, energy=0; const prof=[];
+function runPlant(o,L,hours,capRated,k,Etank,loadAt,pCap){
+  let soc=Etank, drawMax=0; const prof=[];
   hours.forEach((w,h)=>{
     const q=loadAt(h), pl=plantAt(o,L,w.db,w.wb,capRated,k), need=q*(1-pl.ff);
     let qPlant=q, dis=0, chg=0;
     if(need>pl.cap+1e-6){ dis=need-pl.cap; qPlant=q-dis; }
     if(pCap){ for(let n=0;n<4&&pl.power(qPlant)>pCap*1.0005;n++) qPlant*=pCap/pl.power(qPlant); dis=q-qPlant; }   // hold the power cap
-    if(dis>1e-6){ soc-=dis; dischargeH++; }
-    else if(Etank>0&&soc<Etank&&chargeOK){ const room=pl.ff>=1?pl.cap:pl.cap/(1-pl.ff)-q; chg=Math.max(0,Math.min(Etank-soc,room));
+    if(dis>1e-6) soc-=dis;
+    else if(Etank>0&&soc<Etank){ const room=pl.ff>=1?pl.cap:pl.cap/(1-pl.ff)-q; chg=Math.max(0,Math.min(Etank-soc,room));
       if(pCap){ for(let n=0;n<4&&chg>0&&pl.power(q+chg)>pCap*1.0005;n++) chg=Math.max(0,(q+chg)*pCap/pl.power(q+chg)-q); }
       qPlant=q+chg; soc+=chg; }
-    const P=pl.power(qPlant), price=i.pPeak!=null&&inPeak(h,i)?i.pPeak:i.pBase;
-    cost+=P*price; energy+=P; minSoc=Math.min(minSoc,soc); drawMax=Math.max(drawMax,Etank-soc);
-    prof.push({P,dis,chg,soc,need,cap:pl.cap,db:w.db});
+    drawMax=Math.max(drawMax,Etank-soc);
+    prof.push({P:pl.power(qPlant),dis,chg,soc});
   });
-  return {prof,minSoc,drawMax,dischargeH,cost,energy,peak:Math.max(...prof.map(x=>x.P))};
+  return {prof,drawMax,peak:Math.max(...prof.map(x=>x.P))};
 }
 
-// size the tank for one design temperature: heatwave of N hot days at full load by day, night load for recharge
-function studyCase(o,L,i,wx,base,DR,Td,k,yr,yrOrig){
+// size the tank for one design temperature Td: a heatwave of N hottest days, full IT load by day,
+// the night IT load for the 12-hour night; the tank must be full again within the recharge limit each night
+function studyCase(o,L,i,wx,base,DR,Td,k,yr){
   const TdWb=base.extDB>base.db04 ? base.extWB-(base.extDB-Td)*(base.extWB-base.wb04)/(base.extDB-base.db04) : base.extWB;
   const cap0=capRatedFor(o,L,i.Q,base.extDB,base.extWB,k);           // plant sized for the extreme (no tank)
   const capT=capRatedFor(o,L,i.Q,Td,Math.min(TdWb,Td),k);              // plant sized for the design temperature
   const pCap=plantAt(o,L,Td,Math.min(TdWb,Td),capT,k).power(i.Q);       // electrical limit = full load at the design temperature
-  const day=hotDay(base,DR), hw=[]; for(let d=0;d<i.days;d++) hw.push(...day);
-  const dayLoad=(f)=>h=>{ const t=h%24; return t>=7&&t<19?i.Q:i.Q*f; };
-  // drawdown with an unlimited tank tells the energy the tank must hold
-  const probe=runPlant(o,L,hw,capT,k,1e12,i,dayLoad(i.night),true,pCap);
-  const E=probe.drawMax;
-  // recharge: back to full before each next hot afternoon, within the allowed share of the night
-  const rech=f=>{ const r=runPlant(o,L,hw,capT,k,E,i,dayLoad(f),true,pCap); let ok=true;
-    for(let d=0;d<i.days;d++){ const startNext=d*24+7+24, lastDis=r.prof.slice(d*24,(d+1)*24).reduce((m,x,j)=>x.dis>0?d*24+j:m,-1);
-      if(lastDis<0) continue; let full=-1; for(let h=lastDis+1;h<Math.min(r.prof.length,startNext);h++){ if(r.prof[h].soc>=E-1e-3){full=h;break;} }
-      if(full<0 || (d<i.days-1&&(full-lastDis)>(startNext-lastDis)*i.window)) ok=false; }
-    return {ok,r}; };
-  const normal=rech(i.night), worst=rech(1);
+  const day=hotDay(base,DR), hw=[]; for(let d=0;d<i.days;d++) hw.push(...day); hw.push(...day.slice(0,DAY0));   // + the last night
+  const load=h=>{ const t=h%24; return t>=DAY0&&t<NIGHT0?i.Q:i.Q*i.night; };
+  const E=runPlant(o,L,hw,capT,k,1e12,load,pCap).drawMax;              // energy the tank must hold
+  const r=runPlant(o,L,hw,capT,k,E,load,pCap);
+  // recharge: hours from the end of each afternoon's discharge until the tank is full again
+  let rechH=0, ok=true;
+  for(let d=0;d<i.days;d++){
+    const lastDis=r.prof.slice(d*24,(d+1)*24).reduce((m,x,j)=>x.dis>1e-6?d*24+j:m,-1); if(lastDis<0) continue;
+    let full=-1; for(let h=lastDis+1;h<r.prof.length;h++){ if(r.prof[h].soc>=E-1e-3){full=h;break;} }
+    if(full<0||full>d*24+NIGHT0+i.rechMax){ ok=false; rechH=Infinity; } else rechH=Math.max(rechH,full-lastDis);
+  }
   const V=E>0?tankVolume(E,i.Tr-i.Ts,i.eff)*(1+i.margin)/(1-i.reserve):0;
-  // original plant on the same hot days (no tank), for the cutting graph and the rated power
-  const orig=runPlant(o,L,hw,cap0,k,0,i,dayLoad(i.night),false);
-  // a typical year at the average load: energy cost with and without the tank, and how often the tank works
-  const yrTank=runPlant(o,L,yr,capT,k,E,i,()=>i.Q*i.lf,true,pCap);
+  const orig=runPlant(o,L,hw,cap0,k,0,load);                           // original plant on the same days, for the graph
   // hours a year the plant would exceed its new limit at full IT load (when the tank would work)
   let above=0; for(let h=0;h<yr.length;h++){ const pl=plantAt(o,L,yr[h].db,yr[h].wb,capT,k); if(i.Q*(1-pl.ff)>pl.cap||pl.power(i.Q)>pCap*1.0005) above++; }
-  const Prated0=Math.max(orig.peak,yrOrig.peak), Prated=Math.max(normal.r.peak,yrTank.peak,pCap);
-  const cut=Math.max(0,Prated0-Prated), tankCost=V*i.costV;
-  const annual=cut*i.tD*12+(yrOrig.cost-yrTank.cost);
-  const infra=cut*i.infraKW+Math.max(0,cap0-capT)*i.chKW;
-  const pay=(net)=>net<=0?0:(annual>0?net/annual:Infinity);
-  return {Td,TdWb,E,V,...tankShape(Math.max(V,1),i.Hmax),cap0,capT,Prated0,Prated,cut,above,
-    normalOK:normal.ok,worstOK:worst.ok,tankCost,annual,infra,demand:cut*i.tD*12,energySave:yrOrig.cost-yrTank.cost,
-    payU:pay(tankCost),payI:pay(tankCost-infra),upfront:infra-tankCost,
-    netU:annual*i.life-tankCost, netI:annual*i.life+infra-tankCost,   // net saving over the plant life (no discounting)
-    graph:{orig:orig.prof.slice(6,30),tank:normal.r.prof.slice(6,30),E}};
+  const Prated0=orig.peak, Prated=Math.max(r.peak,pCap);
+  return {Td,TdWb,E,V,...tankShape(Math.max(V,1),i.Hmax),cap0,capT,Prated0,Prated,cut:Math.max(0,Prated0-Prated),above,rechH,ok,
+    graph:{orig:orig.prof.slice(6,30),tank:r.prof.slice(6,30),E}};
 }
 
-// study every design temperature from the extreme down; recommend the best case that passes the checks
+// study every design temperature from the extreme down to 3 K below the ASHRAE 0.4% level
 function peakStudy(i,wx,k){
   const o=OPTIONS.find(x=>x.id===i.sys), L={name:'CHW',Ts:i.Ts,Tr:i.Tr}, base=designBasis(wx), DR=hotDayRange(wx);
-  const lo=Math.max(base.db04-3,base.extDB-8), cases=[];
-  // a typical year at the average load without a tank: the baseline for energy cost (same for every case)
-  const cap0=capRatedFor(o,L,i.Q,base.extDB,base.extWB,k), yr=wx.T.map((t,h)=>({db:t,wb:wx.Twb[h]}));
-  const yrOrig=runPlant(o,L,yr,cap0,k,0,i,()=>i.Q*i.lf,false);
-  for(let Td=Math.round((base.extDB-0.5)*2)/2; Td>=lo-1e-9; Td-=0.5) cases.push(studyCase(o,L,i,wx,base,DR,Td,k,yr,yrOrig));
+  const lo=Math.max(base.db04-3,base.extDB-8), cases=[], yr=wx.T.map((t,h)=>({db:t,wb:wx.Twb[h]}));
+  for(let Td=Math.round((base.extDB-0.5)*2)/2; Td>=lo-1e-9; Td-=0.5) cases.push(studyCase(o,L,i,wx,base,DR,Td,k,yr));
   return {base,DR,cases,sys:o};
 }
 
-// pick the case to show: a chosen design temperature, else the balanced size = the case that passes the
-// recharge check with the best net saving over the plant life (mode "utility" or "infra")
-function pickCase(st,mode,Td){
-  const {cases,base}=st, pass=cases.filter(c=>c.normalOK&&c.E>0), net=c=>mode==='infra'?c.netI:c.netU;
-  if(Td!=null) return {rec:cases.reduce((a,c)=>Math.abs(c.Td-Td)<Math.abs(a.Td-Td)?c:a,cases[0]),why:'chosen'};
-  if(pass.some(c=>net(c)>0)) return {rec:pass.filter(c=>net(c)>0).reduce((a,c)=>net(c)>net(a)?c:a),why:'best'};
-  if(pass.length) return {rec:pass.reduce((a,c)=>Math.abs(c.Td-base.db04)<Math.abs(a.Td-base.db04)?c:a),why:'nopay'};
-  return {rec:cases[0],why:'norecharge'};
+// the case to show: a chosen design temperature, or the safe recommendation =
+// the lowest design temperature that still recharges in time, raised by the safety margin,
+// and never below the ASHRAE 0.4% design dry-bulb
+function pickCase(st,Td,safety){
+  const {cases,base}=st, near=t=>cases.reduce((a,c)=>Math.abs(c.Td-t)<Math.abs(a.Td-t)?c:a,cases[0]);
+  if(Td!=null) return {rec:near(Td),why:'chosen'};
+  let low=null; for(const c of cases){ if(c.ok&&c.E>0) low=c; else if(low) break; }   // cases run from hot to cool
+  if(!low) return {rec:cases[0],why:'norecharge'};
+  const target=Math.max(low.Td+safety,base.db04), up=cases.filter(c=>c.Td>=target-1e-9&&c.E>0);
+  return {rec:up.length?up[up.length-1]:cases[0],why:'safe',low};
 }
-// ---------- Thermal Storage Tank: page logic ----------
+// ---------- Peak Shaving Tank: page logic ----------
 const num=(id,d)=>{ const v=parseFloat($(id).value); return isNaN(v)?d:v; };
-const money=v=>Math.abs(v)>=1e6?`$${fmt(v/1e6,2)}M`:`$${fmt(v/1e3)}k`;
 const rgba=(hex,a)=>{ const h=hex.replace('#',''), n=parseInt(h.length===3?h.split('').map(c=>c+c).join(''):h,16); return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`; };
+const MW=kw=>fmt(kw/1000,2);
 
-// stratified tank drawing with its diameter and height
-function tankSvg(D,H){
-  const s=Math.min(110/Math.max(D,1),150/Math.max(H,1)), w=Math.max(30,D*s), h=Math.max(24,H*s), x=(150-w)/2, y=24, ry=Math.max(5,w*0.12);
-  return `<svg class="tanksvg" viewBox="0 0 170 ${y+h+ry+34}" role="img" aria-label="Tank ${fmt(D,1)} m diameter by ${fmt(H,1)} m high">
-  <defs><linearGradient id="strat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:${rgba(css('--s2'),.55)}"/><stop offset=".48" style="stop-color:${rgba(css('--s2'),.25)}"/><stop offset=".52" style="stop-color:${rgba(css('--s1'),.25)}"/><stop offset="1" style="stop-color:${rgba(css('--s1'),.6)}"/></linearGradient></defs>
-  <path class="shell" d="M${x} ${y} V${y+h} A${w/2} ${ry} 0 0 0 ${x+w} ${y+h} V${y} Z" style="fill:url(#strat)"/>
-  <ellipse class="shell" cx="${x+w/2}" cy="${y}" rx="${w/2}" ry="${ry}"/>
-  <path class="dim" d="M${x} ${y+h+ry+12}H${x+w}M${x} ${y+h+ry+8}v8M${x+w} ${y+h+ry+8}v8"/>
-  <text x="${x+w/2}" y="${y+h+ry+28}" text-anchor="middle">Ø ${fmt(D,1)} m</text>
-  <path class="dim" d="M${x+w+10} ${y}V${y+h}M${x+w+6} ${y}h8M${x+w+6} ${y+h}h8"/>
-  <text x="${x+w+16}" y="${y+h/2+4}">${fmt(H,1)} m</text></svg>`;
-}
-
-// ---------- purpose cards ----------
-function setMode(m){
-  document.querySelectorAll('.mode').forEach(b=>{ const on=b.dataset.m===m; b.classList.toggle('on',on); b.setAttribute('aria-selected',on); });
-  $('pEmg').hidden=m!=='emg'; $('pGrid').hidden=m!=='grid';
-  history.replaceState(null,'',m==='grid'?'#grid':'#emergency');
-  if(m==='grid'){ if(!GWX) gLoadCity(); else Object.values(charts).forEach(c=>c.resize()); }
-}
-document.querySelectorAll('.mode').forEach(b=>b.onclick=()=>setMode(b.dataset.m));
-
-// ---------- card 1: emergency ride-through ----------
-function runEmg(){
-  const i={Q:num('eQ',20000),min:num('eMin',10),Ts:num('eTs',20),Tr:num('eTr',30),eff:num('eEff',85)/100,margin:num('eMar',20)/100,Hmax:num('eH',15),costV:num('eCost',500)};
-  const r=emergencyTank(i);
-  $('eRes').innerHTML=`
-    <div class="big4">
-      <div class="bn"><div class="v good">${fmt(r.V)} <small>m³</small></div><div class="l">Tank volume, with ${fmt(i.margin*100)}% margin</div></div>
-      <div class="bn"><div class="v">Ø ${fmt(r.D,1)} × ${fmt(r.H,1)} <small>m</small></div><div class="l">Diameter × height · ${fmt(r.area)} m² footprint</div></div>
-      <div class="bn"><div class="v">${fmt(i.min,1)} <small>min</small></div><div class="l">Full cooling at ${fmt(i.Q/1000,1)} MW without chillers</div></div>
-      <div class="bn"><div class="v">${money(r.cost)}</div><div class="l">Indicative tank cost</div></div>
-    </div>
-    <div class="tankrow">${tankSvg(r.D,r.H)}
-      <div class="verdict">A <b>${fmt(r.V)} m³</b> chilled-water tank keeps <b>${fmt(i.Q/1000,1)} MW</b> of cooling running for <b>${fmt(i.min,1)} minutes</b> while the generators start and the chillers restart. At 75% load the same tank lasts about <b>${fmt(i.min/0.75,1)} minutes</b>.</div></div>`;
-  $('eDet').innerHTML=`${table(['Item','Value'],[
-      `<tr><td>Cooling to store</td><td>${fmt(r.E)} kWh</td></tr>`,
-      `<tr><td>Supply / return difference</td><td>${fmt(r.dT)} K</td></tr>`,
-      `<tr><td>Net volume (before margin)</td><td>${fmt(r.Vnet)} m³</td></tr>`,
-      `<tr><td>Volume with ${fmt(i.margin*100)}% margin</td><td>${fmt(r.V)} m³</td></tr>`,
-      `<tr><td>Water mass</td><td>${fmt(r.V)} t</td></tr>`])}
-    <ul class="method"><li>Volume = load × time ÷ (4,180 kJ/m³K × ΔT × tank efficiency), plus the safety margin.</li>
-    <li>The tank pumps and controls must run on UPS power during the gap. The tank is shaped up to the height limit, with height between 1 and 4 times the diameter for good stratification.</li></ul>`;
-}
-document.querySelectorAll('#inEmg input').forEach(el=>el.addEventListener('input',runEmg));
-
-// ---------- card 2: grid power saving ----------
-let GWX=null, GST=null, GI=null, PAYMODE='utility', gTimer=null, gReq=0;
+let WX=null, ST=null, I=null, timer=null, req=0;
 [...new Set(CITIES.map(c=>c.g))].forEach(g=>{ const og=document.createElement('optgroup'); og.label=g;
   CITIES.filter(c=>c.g===g).forEach(c=>{ const o=document.createElement('option'); o.value=c.id; o.textContent=c.name; og.appendChild(o); }); $('gCity').appendChild(og); });
 OPTIONS.forEach(o=>{ const e=document.createElement('option'); e.value=o.id; e.textContent=o.name; $('gSys').appendChild(e); });
-function gLoadCity(){ const c=CITIES.find(x=>x.id===$('gCity').value), n=++gReq; $('gStatus').textContent='Loading weather…';
-  stationYear(c).catch(()=>synthYear(c)).then(w=>{ if(n===gReq){ GWX=w; gSchedule(0); } }); }
-$('gCity').onchange=gLoadCity;
-$('gTabCity').onclick=()=>{ $('gTabCity').classList.add('on'); $('gTabFile').classList.remove('on'); $('gCityPane').hidden=false; $('gFilePane').hidden=true; gLoadCity(); };
+
+// ---------- weather ----------
+function loadCity(){ const c=CITIES.find(x=>x.id===$('gCity').value), n=++req; $('gStatus').textContent='Loading weather…';
+  stationYear(c).catch(()=>synthYear(c)).then(w=>{ if(n===req){ WX=w; schedule(0); } }); }
+$('gCity').onchange=loadCity;
+$('gTabCity').onclick=()=>{ $('gTabCity').classList.add('on'); $('gTabFile').classList.remove('on'); $('gCityPane').hidden=false; $('gFilePane').hidden=true; loadCity(); };
 $('gTabFile').onclick=()=>{ $('gTabFile').classList.add('on'); $('gTabCity').classList.remove('on'); $('gCityPane').hidden=true; $('gFilePane').hidden=false; };
 $('gFile').onchange=e=>{ const f=e.target.files[0]; if(!f) return; const rd=new FileReader();
-  rd.onload=()=>{ try{ const t=rd.result, epw=/\.epw$/i.test(f.name)||/^LOCATION,/.test(t); GWX=epw?parseEPW(t):parseCSV(t); if(!epw) GWX.name=f.name.replace(/\.[^.]+$/,'');
-    $('gFileInfo').innerHTML=`Loaded <b>${esc(GWX.name)}</b>: ${fmt(GWX.T.length)} hours.`; gSchedule(0); }
+  rd.onload=()=>{ try{ const t=rd.result, epw=/\.epw$/i.test(f.name)||/^LOCATION,/.test(t); WX=epw?parseEPW(t):parseCSV(t); if(!epw) WX.name=f.name.replace(/\.[^.]+$/,'');
+    $('gFileInfo').innerHTML=`Loaded <b>${esc(WX.name)}</b>: ${fmt(WX.T.length)} hours.`; schedule(0); }
     catch(err){ $('gFileInfo').innerHTML=`<div class="err">${esc(err.message)}</div>`; } };
   rd.readAsText(f); };
 
-function gInputs(){
-  const pp=parseFloat($('gPp').value);
-  return {Q:num('gQ',20000),lf:num('gLf',80)/100,night:num('gNight',80)/100,sys:$('gSys').value,Ts:num('gTs',20),Tr:Math.max(num('gTr',30),num('gTs',20)+1),
-    pBase:num('gPb',.1),pPeak:isNaN(pp)?null:pp,pk0:num('gPk0',12),pk1:num('gPk1',18),tD:num('gDc',0),
-    costV:num('gCost',500),life:num('gLife',20),infraKW:num('gInfra',700),chKW:num('gChk',230),
-    reserve:Math.min(.8,num('gReserve',20)/100),margin:num('gMar',20)/100,days:Math.round(num('gDays',3)),window:num('gWin',80)/100,
-    eff:num('gEff',85)/100,Hmax:num('gH',15),mode:PAYMODE};
+// ---------- study ----------
+function inputs(){
+  return {Q:num('gQ',20000),night:Math.min(1,num('gNight',80)/100),sys:$('gSys').value,Ts:num('gTs',30),Tr:Math.max(num('gTr',40),num('gTs',30)+1),
+    reserve:Math.min(.8,num('gReserve',20)/100),margin:num('gMar',20)/100,days:Math.round(num('gDays',3)),rechMax:Math.min(12,num('gRechMax',10)),
+    eff:num('gEff',85)/100,Hmax:num('gH',15),safety:num('gSafe',2)};
 }
 // the study takes a moment: run it shortly after the last change
-function gSchedule(ms){ clearTimeout(gTimer); $('gStatus').textContent='Calculating…'; gTimer=setTimeout(gRun,ms??400); }
-function gRun(){
-  if(!GWX) return;
-  GI=gInputs(); GST=peakStudy(GI,GWX,{a:num('gKa',1.2)/100,w:num('gKw',.7)/100});
+function schedule(ms){ clearTimeout(timer); $('gStatus').textContent='Calculating…'; timer=setTimeout(run,ms??400); }
+function run(){
+  if(!WX) return;
+  I=inputs(); ST=peakStudy(I,WX,{a:num('gKa',1.2)/100,w:num('gKw',.7)/100});
   const keep=$('gTd').value;
-  $('gTd').innerHTML='<option value="">Recommended (balanced)</option>'+GST.cases.map(c=>`<option value="${c.Td}">${fmt(c.Td,1)} °C</option>`).join('');
-  $('gTd').value=GST.cases.some(c=>String(c.Td)===keep)?keep:'';
-  gRender();
+  $('gTd').innerHTML='<option value="">Recommended (safe)</option>'+ST.cases.map(c=>`<option value="${c.Td}">${fmt(c.Td,1)} °C</option>`).join('');
+  $('gTd').value=ST.cases.some(c=>String(c.Td)===keep)?keep:'';
+  render();
 }
-function gRender(){
-  if(!GST) return;
-  const td=$('gTd').value===''?null:parseFloat($('gTd').value), {rec:c,why}=pickCase(GST,PAYMODE,td), b=GST.base;
-  const st=GWX.station;
-  $('gStatus').textContent=`${GWX.name} · ${GST.sys.name}`;
-  const pay= PAYMODE==='infra'
-    ? (c.payI===0?{v:'Immediate',l:`saves ${money(c.upfront)} upfront vs a plant sized for ${fmt(b.extDB,1)} °C`}:isFinite(c.payI)?{v:`${fmt(c.payI,1)} <small>yrs</small>`,l:'payback incl. infrastructure saving'}:{v:'No payback',l:'on these costs'})
-    : (isFinite(c.payU)?{v:`${fmt(c.payU,1)} <small>yrs</small>`,l:'payback from utility costs'}:{v:'No payback',l:'from utility costs alone'});
+
+// ---------- results ----------
+function render(){
+  if(!ST) return;
+  const td=$('gTd').value===''?null:parseFloat($('gTd').value), {rec:c,why,low}=pickCase(ST,td,I.safety), b=ST.base;
+  $('gStatus').textContent=`${WX.name} · ${ST.sys.name}`;
+  const chCut=Math.max(0,c.cap0-c.capT), night=`${fmt(I.night*100)}% IT load`;
+  const rech=isFinite(c.rechH)?{v:`${fmt(c.rechH)} <small>h</small>`,l:`to recharge at ${night} over the 12-hour night`}:{v:'No',l:`full recharge within ${fmt(I.rechMax)} h at ${night}`};
   const msg={
-    best:`Size the cooling plant for <b>${fmt(c.Td,1)} °C</b> instead of <b>${fmt(b.extDB,1)} °C</b>. The tank covers the hottest hours, with ${fmt(GI.reserve*100)}% kept in reserve and a ${fmt(GI.margin*100)}% sizing margin.`,
-    chosen:`Sizing the cooling plant for <b>${fmt(c.Td,1)} °C</b> instead of <b>${fmt(b.extDB,1)} °C</b>${c.normalOK?'':', but the tank <b>does not recharge</b> in time during a heatwave at this setting'}.`,
-    nopay:`With these utility costs the tank doesn’t pay back: the energy is the same, only moved in time. A <b>peak-hour price</b> or <b>demand charge</b> makes it pay, or switch to <b>Including infrastructure</b>. Shown: the plant sized for the ASHRAE 0.4% level, <b>${fmt(c.Td,1)} °C</b>.`,
-    norecharge:`No tank size recharges in time during a ${GI.days}-day heatwave with these inputs. Try a lower night IT load or fewer heatwave days.`}[why];
-  const flag=c.normalOK&&!c.worstOK?` <span class="note">Recharge relies on IT at ${fmt(GI.night*100)}% at night; at full IT load all night, the tank would not refill during a heatwave.</span>`:'';
+    safe:`Rate the cooling plant for <b>${fmt(c.Td,1)} °C</b> instead of the extreme <b>${fmt(b.extDB,1)} °C</b>. On the hottest afternoons the tank covers the peak, and at ${night} it is full again ${fmt(c.rechH)} h after the peak. This saves <b>${MW(c.cut)} MW</b> of electrical supply (transformer, generator, grid connection) and <b>${MW(chCut)} MW</b> of chiller capacity.`,
+    chosen:`Rating the cooling plant for <b>${fmt(c.Td,1)} °C</b> instead of <b>${fmt(b.extDB,1)} °C</b> saves <b>${MW(c.cut)} MW</b> of electrical supply and <b>${MW(chCut)} MW</b> of chiller capacity.${c.ok?'':` <b>But at ${night} the tank does not recharge in time</b> during a heatwave: choose a higher temperature or the recommendation.`}`,
+    norecharge:`At ${night} over the night, no design temperature lets the tank recharge in time during a ${I.days}-day heatwave. Lower the night IT load or allow more recharge hours.`}[why];
+  const safeNote=why==='safe'?`<div class="note">Safe choice: the lowest temperature that still recharges in time is ${fmt(low.Td,1)} °C; the recommendation adds a ${fmt(I.safety,1)} K margin and stays at or above the ASHRAE 0.4% level of ${fmt(b.db04,1)} °C.</div>`:'';
   $('gRes').innerHTML=`
     <div class="big4">
-      <div class="bn"><div class="v good">−${fmt(c.cut/1000,2)} <small>MW</small></div><div class="l">Rated cooling power ${fmt(c.Prated0/1000,1)} → ${fmt(c.Prated/1000,1)} MW (−${fmt(100*c.cut/c.Prated0,1)}%)</div></div>
+      <div class="bn"><div class="v good">−${MW(c.cut)} <small>MW</small></div><div class="l">Rated power ${MW(c.Prated0)} → ${MW(c.Prated)} MW (−${fmt(100*c.cut/c.Prated0,1)}%)</div></div>
       <div class="bn"><div class="v">${fmt(c.V)} <small>m³</small></div><div class="l">Tank · Ø ${fmt(c.D,1)} × ${fmt(c.H,1)} m high</div></div>
+      <div class="bn"><div class="v">${rech.v}</div><div class="l">${rech.l}</div></div>
       <div class="bn"><div class="v">~${fmt(c.above)} <small>h/yr</small></div><div class="l">Hours the tank works (above ${fmt(c.Td,1)} °C at full IT load)</div></div>
-      <div class="bn"><div class="v${isFinite(PAYMODE==='infra'?c.payI:c.payU)?' good':''}">${pay.v}</div><div class="l">${pay.l}</div></div>
     </div>
-    <div class="verdict${why==='nopay'||why==='norecharge'||(why==='chosen'&&!c.normalOK)?' warn':''}">${msg}${flag}</div>
-    <div class="payrow">Payback based on
-      <div class="seg" id="paySeg"><button data-p="utility" class="${PAYMODE==='utility'?'on':''}">Utility costs only</button><button data-p="infra" class="${PAYMODE==='infra'?'on':''}">Including infrastructure</button></div></div>`;
-  document.querySelectorAll('#paySeg button').forEach(x=>x.onclick=()=>{ PAYMODE=x.dataset.p; gRender(); });
-  gCharts(c);
-  gDetails(c,b,st);
+    <div class="verdict${why==='norecharge'||!c.ok?' warn':''}">${msg}</div>${safeNote}`;
+  charts_(c);
+  details(c,b);
 }
-function gCharts(c){
+function charts_(c){
   const lab=Array.from({length:24},(_,j)=>`${String((6+j)%24).padStart(2,'0')}:00`);
   const orig=c.graph.orig.map(x=>x.P/1000), tank=c.graph.tank.map(x=>x.P/1000), cap=Array(24).fill(c.Prated/1000);
-  $('gChartTitle').textContent=`Hottest day at full IT load (ASHRAE extreme ${fmt(GST.base.extDB,1)} °C): cooling plant power, MW`;
+  $('gChartTitle').textContent=`Hottest day (ASHRAE extreme ${fmt(ST.base.extDB,1)} °C), full IT load by day: cooling plant power, MW`;
   const o=baseOpts(); o.scales.y.title={display:true,text:'MW',color:css('--text2')};
   o.plugins.tooltip={mode:'index',intersect:false,callbacks:{label:x=>`${x.dataset.label}: ${fmt(x.raw,2)} MW`}};
   mk('gChart',{type:'line',data:{labels:lab,datasets:[
@@ -975,29 +835,25 @@ function gCharts(c){
   const E=c.graph.E||1;
   mk('gSoc',{type:'line',data:{labels:lab,datasets:[{label:'Tank level',data:c.graph.tank.map(x=>Math.max(0,Math.min(100,100*x.soc/E))),borderColor:css('--s1'),backgroundColor:rgba(css('--s1'),.15),fill:true,borderWidth:2,pointRadius:0,tension:.3}]},options:so});
 }
-function gDetails(c,b,st){
-  const payTxt=x=>PAYMODE==='infra'?(x.payI===0?'immediate':isFinite(x.payI)?fmt(x.payI,1)+' yrs':'–'):(isFinite(x.payU)?fmt(x.payU,1)+' yrs':'–');
-  const rows=GST.cases.map(x=>`<tr class="${x===c?'rec':''}"><td>${fmt(x.Td,1)} °C</td><td>${fmt(x.Prated/1000,2)}</td><td>−${fmt(x.cut)}</td><td>${fmt(x.capT/1000,1)}</td><td>${fmt(x.V)}</td><td>${fmt(x.above)}</td>
-    <td>${x.normalOK?'<span class="ok">OK</span>':'<span class="no">No</span>'} / ${x.worstOK?'<span class="ok">OK</span>':'<span class="no">No</span>'}</td><td>${payTxt(x)}</td></tr>`);
+function details(c,b){
+  const st=WX.station;
+  const rows=ST.cases.map(x=>`<tr class="${x===c?'rec':''}"><td>${fmt(x.Td,1)} °C</td><td>${MW(x.Prated)}</td><td>−${fmt(x.cut)}</td><td>${fmt(x.capT/1000,1)}</td><td>${fmt(x.V)}</td><td>${fmt(x.above)}</td>
+    <td>${x.ok?`<span class="ok">${fmt(x.rechH)} h</span>`:'<span class="no">Not in time</span>'}</td></tr>`);
   $('gDet').innerHTML=`<h3>Every design temperature studied</h3>
-    ${table(['Design temp','Rated MW','Cut kW','Chillers MW','Tank m³','Hours/yr','Recharge (night IT / full IT)','Payback'],rows)}
+    ${table(['Design temp','Rated MW','Cut kW','Chillers MW','Tank m³','Hours/yr','Recharge'],rows)}
     <h3>Basis</h3>
     <ul class="method">
-      <li><b>Weather:</b> ${st?`${esc(st.station)} (WMO ${esc(st.wmo)}), measured hourly year TMYx ${esc(st.period)}; ASHRAE 2025 extreme ${fmt(b.extDB,1)} °C dry-bulb / ${fmt(b.extWB,1)} °C wet-bulb, 0.4% ${fmt(b.db04,1)} °C.`:`uploaded file; extreme and 0.4% values taken from its hours.`} Hot-day temperature range ${fmt(GST.DR,1)} K.</li>
-      <li><b>Without a tank</b> the plant is sized for full IT load at ${fmt(b.extDB,1)} °C: chillers ${fmt(c.cap0/1000,1)} MW of cooling, ${fmt(c.Prated0/1000,2)} MW electrical.</li>
-      <li><b>With the tank</b> the plant is sized for full IT load at ${fmt(c.Td,1)} °C: chillers ${fmt(c.capT/1000,1)} MW, and its power never exceeds ${fmt(c.Prated/1000,2)} MW. Above that, the tank covers the difference.</li>
-      <li><b>Heatwave check:</b> ${GI.days} hottest days in a row at full IT load by day; the tank must refill overnight within ${fmt(GI.window*100)}% of the night, with IT at ${fmt(GI.night*100)}% (and flagged at full IT load).</li>
-      <li><b>Tank:</b> ${fmt(c.E)} kWh usable at ΔT ${fmt(GI.Tr-GI.Ts)} K and ${fmt(GI.eff*100)}% efficiency, + ${fmt(GI.margin*100)}% margin, + ${fmt(GI.reserve*100)}% reserve kept full.</li>
-      <li><b>Savings:</b> demand charge ${money(c.demand)}/yr, energy cost ${money(c.energySave)}/yr${PAYMODE==='infra'?`; infrastructure ${money(c.infra)} (electrical ${fmt(c.cut)} kW × $${fmt(GI.infraKW)}/kW, chillers ${fmt(Math.max(0,c.cap0-c.capT))} kW × $${fmt(GI.chKW)}/kW) against tank ${money(c.tankCost)}`:`; tank ${money(c.tankCost)}`}. Recommended = best net saving over ${fmt(GI.life)} years among cases that recharge in time.</li>
+      <li><b>Weather:</b> ${st?`${esc(st.station)} (WMO ${esc(st.wmo)}), measured hourly year TMYx ${esc(st.period)}; ASHRAE 2025 extreme ${fmt(b.extDB,1)} °C dry-bulb / ${fmt(b.extWB,1)} °C wet-bulb, 0.4% ${fmt(b.db04,1)} °C.`:`uploaded file; extreme and 0.4% values taken from its hours.`} Hot-day temperature range ${fmt(ST.DR,1)} K.</li>
+      <li><b>Without a tank</b> the plant is rated for full IT load at ${fmt(b.extDB,1)} °C: chillers ${fmt(c.cap0/1000,1)} MW of cooling, ${MW(c.Prated0)} MW electrical.</li>
+      <li><b>With the tank</b> the plant is rated for full IT load at ${fmt(c.Td,1)} °C: chillers ${fmt(c.capT/1000,1)} MW, and its power never exceeds ${MW(c.Prated)} MW. Above that, the tank covers the difference.</li>
+      <li><b>Heatwave:</b> ${I.days} hottest days in a row; IT at 100% from 07:00 to 19:00 and ${fmt(I.night*100)}% over the 12-hour night. Each night the tank must be full again within ${fmt(I.rechMax)} h of 19:00, using only the chiller capacity the IT load leaves free and without passing the new rated power.</li>
+      <li><b>Tank:</b> ${fmt(c.E)} kWh usable at ΔT ${fmt(I.Tr-I.Ts)} K and ${fmt(I.eff*100)}% efficiency, + ${fmt(I.margin*100)}% sizing margin, + ${fmt(I.reserve*100)}% reserve kept full.</li>
       <li><b>Chiller capacity</b> falls ${fmt(num('gKa',1.2),1)}%/K above 35 °C ambient (air-cooled) or ${fmt(num('gKw',.7),1)}%/K above 29.4 °C condenser water (water-cooled). Screening estimate: confirm with chiller selections and a detailed design.</li>
     </ul>`;
 }
-document.querySelectorAll('#inGrid input:not([type=file]), #inGrid select:not(#gCity):not(#gTd)').forEach(el=>el.addEventListener('input',()=>gSchedule()));
-$('gTd').onchange=gRender;
-
-// start: emergency card, or grid from the link
-runEmg();
-setMode(location.hash==='#grid'?'grid':'emg');
+document.querySelectorAll('#inGrid input:not([type=file]), #inGrid select:not(#gCity):not(#gTd)').forEach(el=>el.addEventListener('input',()=>schedule()));
+$('gTd').onchange=render;
+loadCity();
 </script>
 </body>
 </html>

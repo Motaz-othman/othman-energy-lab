@@ -16,7 +16,8 @@ npx http-server -p 8000 -c-1      # then open http://localhost:8000
 | Focus area | Tool | Folder | What it does |
 |---|---|---|---|
 | Data Centers | Cooling Plant Selector | `data-centers/cooling-plant/` | Hourly (8,760 h) comparison of air-cooled chillers, free-cooling dry coolers, adiabatic coolers and cooling towers for a data hall with liquid and air cooling loops. See its [README](data-centers/cooling-plant/README.md). |
-| Data Centers | Thermal Storage Tank | `data-centers/thermal-storage/` | Chilled-water tank sizing in two cards: emergency ride-through for the changeover to generator power, and grid power saving, which shaves the extreme-hour peak so the cooling plant is rated for a lower design temperature (heatwave and night-recharge checks, payback on utility costs or including infrastructure). |
+| Data Centers | Peak Shaving Tank | `data-centers/peak-shaving-tank/` | Chilled-water tank that shaves the extreme-hour peak so the cooling plant and its electrical supply are rated for a lower design temperature. Checks each design temperature against a heatwave and the 12-hour night recharge; the recommendation adds a safety margin and stays at or above the ASHRAE 0.4% level. |
+| Data Centers | Ride-Through Tank | `data-centers/ride-through-tank/` | Chilled-water tank that keeps cooling running through the changeover from grid power to generator: volume, shape and indicative cost. |
 
 ## Project layout
 ```
@@ -32,7 +33,9 @@ shared/                       used by every page
   js/ui.js                    $, fmt, esc, table(), kpis(), pct(), Chart.js helpers (baseOpts, mk, hbar)
   js/cities.js                built-in city climate normals (1991–2020 monthly high, low, RH)
   js/psychro.js               ASHRAE psychrometrics: saturation pressure, humidity ratio, wet-bulb
-  js/cooling-model.js         shared cooling plant model: system options, hourly plant power, cost rates (Cooling Plant Selector, Thermal Storage Tank)
+  js/cooling-model.js         shared cooling plant model: system options, hourly plant power, cost rates (Cooling Plant Selector, Peak Shaving Tank)
+  js/tank.js                  chilled-water tank volume, shape and drawing (Ride-Through Tank, Peak Shaving Tank)
+  css/tank.css                shared result styles for the tank tools
   js/weather.js               station weather loader; EPW and CSV parsers; generated-year fallback; sample CSV generator
   data/weather/<city>.js      measured hourly year (TMYx 2011–2025) + ASHRAE 2025 design conditions per built-in city,
                               from climate.onebuilding.org (loaded only when that city is picked)

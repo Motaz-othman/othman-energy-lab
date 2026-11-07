@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ride-Through Tank · Othman Energy Lab</title>
+<meta name="description" content="Size a chilled-water tank that keeps a data center cooled through the changeover from grid power to generator. By Othman Energy Lab.">
+<link rel="icon" href="../../shared/img/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../shared/img/apple-touch-icon.png">
+<meta name="theme-color" content="#0e7c57">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Othman Energy Lab">
+<meta property="og:title" content="Ride-Through Tank · Othman Energy Lab">
+<meta property="og:description" content="Size a chilled-water tank that keeps a data center cooled through the changeover from grid power to generator. By Othman Energy Lab.">
+<meta property="og:url" content="https://www.oenergylab.com/data-centers/ride-through-tank/">
+<meta property="og:image" content="https://www.oenergylab.com/shared/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="canonical" href="https://www.oenergylab.com/data-centers/ride-through-tank/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../shared/css/base.css">
+<link rel="stylesheet" href="../../shared/css/tank.css">
+</head>
+<body class="wide">
+<header class="sitebar" data-root="../../" data-page="data-centers"></header>
+<div class="pagehead">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a> / <a href="../index.html">Data Centers</a> / Ride-Through Tank</nav>
+  <h1>Ride-Through Tank</h1>
+  <p class="sub">Size a chilled-water tank that keeps the data center cooled through the changeover from grid power to generator, until the chillers are running again.</p>
+</div>
+
+<main class="layout">
+<div class="incol">
+<div class="colhead"><b>Inputs</b><span>Results update instantly</span></div>
+<aside class="card inputs" id="inEmg">
+  <h2>Load and time</h2>
+  <label for="eQ">Cooling load (kW)</label><input type="number" id="eQ" value="20000" min="1" step="500">
+  <label for="eMin">Ride-through time (minutes)</label><input type="number" id="eMin" value="10" min="0.5" step="0.5">
+  <div class="note">Time from the power cut until the chillers are cooling again on generator power: generator start, changeover and chiller restart. Typically 5–15 minutes.</div>
+  <h2 style="margin-top:18px">Chilled water</h2>
+  <div class="row">
+    <div><label for="eTs">Supply (°C)</label><input type="number" id="eTs" value="30" step="1"></div>
+    <div><label for="eTr">Return (°C)</label><input type="number" id="eTr" value="40" step="1"></div>
+  </div>
+  <details>
+    <summary>Tank and cost</summary>
+    <div class="row">
+      <div><label for="eEff">Tank efficiency (%)</label><input type="number" id="eEff" value="85" min="50" max="100" step="1"></div>
+      <div><label for="eMar">Safety margin (%)</label><input type="number" id="eMar" value="20" min="0" step="5"></div>
+    </div>
+    <div class="row">
+      <div><label for="eH">Max tank height (m)</label><input type="number" id="eH" value="15" min="3" step="1"></div>
+      <div><label for="eCost">Tank cost ($/m³)</label><input type="number" id="eCost" value="500" min="0" step="50"></div>
+    </div>
+    <div class="note">Tank efficiency: share of the stored cooling that is usable in a stratified tank. Cost is indicative; use local quotes.</div>
+  </details>
+</aside>
+</div>
+<section class="results">
+  <div class="colhead"><b>Results</b><span>Ride-through tank</span></div>
+  <div class="card hero" id="eRes"></div>
+  <details class="card more"><summary>Show details</summary><div id="eDet"></div></details>
+</section>
+</main>
+
+<footer class="sitefoot" data-root="../../"></footer>
+<script src="../../shared/js/site.js"></script>
+<script src="../../shared/js/ui.js"></script>
+<script src="../../shared/js/tank.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

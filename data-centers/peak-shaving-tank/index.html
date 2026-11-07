@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peak Shaving Tank · Othman Energy Lab</title>
+<meta name="description" content="Size a chilled-water tank that shaves the rare extreme-hour peak of a data center cooling plant, so the plant and its electrical supply need less rated power. By Othman Energy Lab.">
+<link rel="icon" href="../../shared/img/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../shared/img/apple-touch-icon.png">
+<meta name="theme-color" content="#0e7c57">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Othman Energy Lab">
+<meta property="og:title" content="Peak Shaving Tank · Othman Energy Lab">
+<meta property="og:description" content="Size a chilled-water tank that shaves the rare extreme-hour peak of a data center cooling plant, so the plant and its electrical supply need less rated power. By Othman Energy Lab.">
+<meta property="og:url" content="https://www.oenergylab.com/data-centers/peak-shaving-tank/">
+<meta property="og:image" content="https://www.oenergylab.com/shared/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="canonical" href="https://www.oenergylab.com/data-centers/peak-shaving-tank/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../shared/css/base.css">
+<link rel="stylesheet" href="../../shared/css/tank.css">
+<!-- Chart.js: local copy in shared/lib/ (works offline); CDN fallback -->
+<script src="../../shared/lib/chart.umd.min.js"></script>
+<script>window.Chart||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"><\/script>')</script>
+</head>
+<body class="wide">
+<header class="sitebar" data-root="../../" data-page="data-centers"></header>
+<div class="pagehead">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a> / <a href="../index.html">Data Centers</a> / Peak Shaving Tank</nav>
+  <h1>Peak Shaving Tank</h1>
+  <p class="sub">A cooling plant is rated for the extreme hottest hour at full IT load, a condition that rarely happens. A chilled-water tank covers those few hours, so the chillers and their electrical supply can be rated lower. The tank recharges during the 12-hour night.</p>
+</div>
+
+<main class="layout">
+<div class="incol">
+<div class="colhead"><b>Inputs</b><span>Results update a moment after you change a value</span></div>
+<aside class="card inputs" id="inGrid">
+  <h2>Weather</h2>
+  <div class="tabs"><button id="gTabCity" class="on">City</button><button id="gTabFile">Weather file</button></div>
+  <div id="gCityPane"><label for="gCity">City</label><select id="gCity"></select>
+    <div class="note">Measured hourly weather and ASHRAE 2025 design conditions for the main airport station.</div></div>
+  <div id="gFilePane" hidden>
+    <label for="gFile">EPW or CSV weather file (8,760 hours)</label><input type="file" id="gFile" accept=".epw,.csv,.txt">
+    <div class="note" id="gFileInfo">Same formats as the Cooling Plant Selector.</div>
+  </div>
+  <h2 style="margin-top:18px">Load and plant</h2>
+  <label for="gQ">Cooling load at full IT (kW)</label><input type="number" id="gQ" value="20000" min="1" step="500">
+  <label for="gNight">Average IT load over the 12-hour night (%)</label><input type="number" id="gNight" value="80" min="10" max="100" step="5">
+  <div class="note">The tank recharges at night, 19:00 to 07:00, with the chiller capacity the IT load leaves free. The lower the night load, the faster it recharges. By day the IT load is taken at 100%.</div>
+  <label for="gSys">Cooling system</label><select id="gSys"></select>
+  <div class="note">Air-cooled chillers are the usual case: their power peaks hardest in the extreme hours.</div>
+  <div class="row">
+    <div><label for="gTs">Supply (°C)</label><input type="number" id="gTs" value="30" step="1"></div>
+    <div><label for="gTr">Return (°C)</label><input type="number" id="gTr" value="40" step="1"></div>
+  </div>
+  <h2 style="margin-top:18px">Design temperature</h2>
+  <label for="gTd">Size the plant for</label><select id="gTd"><option value="">Recommended (safe)</option></select>
+  <details>
+    <summary>Safety margins</summary>
+    <div class="row">
+      <div><label for="gSafe">Design temperature margin (K)</label><input type="number" id="gSafe" value="2" min="0" step="0.5"></div>
+      <div><label for="gRechMax">Full again within (h of night)</label><input type="number" id="gRechMax" value="10" min="2" max="12" step="1"></div>
+    </div>
+    <div class="note">The recommendation takes the lowest design temperature that still recharges in time, adds this margin, and never goes below the ASHRAE 0.4% dry-bulb.</div>
+    <div class="row">
+      <div><label for="gReserve">Reserve kept full (%)</label><input type="number" id="gReserve" value="20" min="0" max="80" step="5"></div>
+      <div><label for="gMar">Tank sizing margin (%)</label><input type="number" id="gMar" value="20" min="0" step="5"></div>
+    </div>
+    <div class="row">
+      <div><label for="gDays">Heatwave (days in a row)</label><input type="number" id="gDays" value="3" min="1" max="7" step="1"></div>
+      <div><label for="gH">Max tank height (m)</label><input type="number" id="gH" value="15" min="3" step="1"></div>
+    </div>
+    <div class="row">
+      <div><label for="gKa">Capacity loss, air-cooled (%/K)</label><input type="number" id="gKa" value="1.2" min="0" step="0.1"></div>
+      <div><label for="gKw">Capacity loss, water-cooled (%/K)</label><input type="number" id="gKw" value="0.7" min="0" step="0.1"></div>
+    </div>
+    <label for="gEff">Tank efficiency (%)</label><input type="number" id="gEff" value="85" min="50" max="100" step="1">
+  </details>
+</aside>
+</div>
+<section class="results">
+  <div class="colhead"><b>Results</b><span id="gStatus">Peak shaving</span></div>
+  <div class="card hero" id="gRes"><div class="note">Calculating…</div></div>
+  <div class="card" id="gCurves">
+    <div class="ctitle" id="gChartTitle">Hottest day: cooling plant power</div>
+    <div class="legend"><span><i style="background:var(--grey2)"></i>Without tank</span><span><i style="background:var(--brand)"></i>With tank</span><span><i class="sw shave"></i>Covered by the tank</span><span><i class="sw rech"></i>Night recharge</span></div>
+    <div class="chartbox" style="height:300px"><canvas id="gChart"></canvas></div>
+    <div class="ctitle" style="margin-top:14px">Tank level</div>
+    <div class="chartbox" style="height:140px"><canvas id="gSoc"></canvas></div>
+  </div>
+  <details class="card more"><summary>Show details</summary><div id="gDet"></div></details>
+</section>
+</main>
+
+<footer class="sitefoot" data-root="../../"></footer>
+<script src="../../shared/js/site.js"></script>
+<script src="../../shared/js/ui.js"></script>
+<script src="../../shared/js/cities.js"></script>
+<script src="../../shared/js/psychro.js"></script>
+<script src="../../shared/js/weather.js"></script>
+<script src="../../shared/js/cooling-model.js"></script>
+<script src="../../shared/js/tank.js"></script>
+<script src="js/peak.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
