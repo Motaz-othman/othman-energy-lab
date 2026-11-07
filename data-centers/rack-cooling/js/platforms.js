@@ -35,9 +35,3 @@ const PLATFORMS=[
        ['Intel / Lenovo Neptune deck','https://www.intel.com.tw/content/dam/www/central-libraries/us/en/documents/2023-03/05-lenovo-neptune-e2c-ai.pdf']]}
 ];
 const FLUIDS={water:{name:'Water',rho:990,cp:4.18},pg25:{name:'PG25 (25% propylene glycol)',rho:1015,cp:3.90}};
-// plant reset window: rapid-restart chillers restart in about 26–43 s and reach ~80% capacity 75–120 s later
-// (about 2–2.5 min in total); 3 min adds a margin and is taken with no cooling at all. Standard chillers: 10–15 min.
-const RESETS=[{id:'rapid',name:'Rapid-restart chillers',min:3},{id:'std',name:'Standard chillers',min:15}];
-const RESET_SRC=[['Daikin RapidRestore','https://www.daikinapplied.com/news/blogs/RapidRestore'],
-  ['York YZ Quick Start','https://www.york.com/-/media/project/jci-global/york-sites/united-states-york/commercial/files/chi_ds_yz_quick_start.pdf'],
-  ['Schneider: cooling in a power outage','https://datacentre.solutions/news/26717/ensuring-data-centre-cooling-in-a-power-outage']];

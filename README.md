@@ -18,7 +18,7 @@ npx http-server -p 8000 -c-1      # then open http://localhost:8000
 | Data Centers | Cooling Plant Selector | `data-centers/cooling-plant/` | Hourly (8,760 h) comparison of air-cooled chillers, free-cooling dry coolers, adiabatic coolers and cooling towers for a data hall with liquid and air cooling loops. See its [README](data-centers/cooling-plant/README.md). |
 | Data Centers | Peak Shaving Tank | `data-centers/peak-shaving-tank/` | Chilled-water tank that shaves the extreme-hour peak so the cooling plant and its electrical supply are rated for a lower design temperature. Checks each design temperature against a heatwave and the 12-hour night recharge; the recommendation adds a safety margin and stays at or above the ASHRAE 0.4% level. |
 | Data Centers | Ride-Through Tank | `data-centers/ride-through-tank/` | Chilled-water tank that keeps cooling running through the changeover from grid power to generator: volume, shape and indicative cost. |
-| Data Centers | Liquid Rack Cooling | `data-centers/rack-cooling/` | Per-rack cooling for liquid-cooled GPU and CPU platforms (published vendor data, marked by source): max supply temperature, liquid and air load, flow, the safe minimum flow for variable flow (idle → full load jump vs CDU response), and safe time through a plant reset or CDU pump trip. |
+| Data Centers | Liquid Rack Cooling | `data-centers/rack-cooling/` | Per-rack cooling for liquid-cooled GPU and CPU platforms (published vendor data, marked by source): max supply temperature, liquid and air load, flow, the safe minimum flow for variable flow (idle → full load jump vs CDU response), and the CDU response (VFD pump, MCV, optional TCS buffer tank) to a load jump or pump trip. |
 
 ## Project layout
 ```
