@@ -32,6 +32,7 @@ function run(){
     <div class="big4">
       <div class="bn"><div class="v">${fmt(r.Fop)} <small>L/min</small></div><div class="l">Operating flow · ${fmt(r.Ql,1)} kW to liquid, return ${fmt(r.TrOp,1)} °C (limit ${fmt(r.Tr)} °C) at ${fmt(r.Ts,r.Ts%1?1:0)} °C supply${r.Qa>0.05?` · ${fmt(r.Qa,1)} kW to air, ${fmt(r.air)} m³/h`:''}</div></div>
       <div class="bn"><div class="l">Safe minimum flow at idle</div><div class="pair">${pair(flowV)}</div></div>
+      <div class="bn"><div class="v${isFinite(r.Vmin)?' good':' bad'}">${isFinite(r.Vmin)?`${fmt(r.Vmin)} <small>L/rack</small>`:'Not enough'}</div><div class="l">${!isFinite(r.Vmin)?`Minimum TCS tank: no tank up to 5,000 L/rack covers the response. Use a faster MCV or pump`:r.Vmin===0?'Minimum TCS tank: none needed, the loop water covers the response':`Minimum TCS tank: covers the response gap (MCV ${fmt(i.tMCV)} s). More only lowers the supply rise`}</div></div>
       <div class="bn"><div class="l">TCS supply rise while the MCV opens</div><div class="pair">${pair(riseV)}</div></div>
     </div>
     <div class="verdict${(a.ok||b.ok&&withTank)&&!over?'':' warn'}">
@@ -39,6 +40,7 @@ function run(){
       ${a.ok?`<b>Variable flow</b> can go down to ${fmt(a.F)} L/min per rack at idle (${fmt(a.fSafe*100)}% of the operating flow)${withTank&&b.ok?`, or ${fmt(b.F)} L/min with the ${tk}`:''}. Below that, a jump from idle to the ${fmt(r.P)} kW rated load heats the coolant past ${fmt(r.Tr)} °C before the VFD pump ramps up (${fmt(r.tSense)} s to react + ${fmt(i.tRamp)} s ramp).`
         :withTank&&b.ok?`<b>Without a tank</b> the coolant passes ${fmt(r.Tr)} °C after a load jump even at full flow: the MCV (${fmt(i.tMCV)} s) is too slow for the loop water alone. With the ${tk}, variable flow can go down to ${fmt(b.F)} L/min per rack at idle (${fmt(b.fSafe*100)}%).`
         :`<b>No safe turndown:</b> after a load jump the coolant passes ${fmt(r.Tr)} °C even at full flow. Use a faster MCV or pump${withTank?', or a larger TCS tank':', or add a TCS buffer tank'}${i.sensAt==='cdu'?', or sense the return at the rack manifold':''}.`}<br>
+      <b>Minimum TCS tank:</b> ${!isFinite(r.Vmin)?`no practical tank covers the response; use a faster MCV or VFD pump`:r.Vmin===0?'none needed; the water in the CDU and the TCS pipes covers the response':`${fmt(r.Vmin)} L per rack covers the response gap. Extra volume only lowers the supply rise; a faster VFD pump, not a bigger tank, lowers the minimum flow further`}.<br>
       <b>Control valve:</b> while the MCV opens (${fmt(i.tMCV)} s) the TCS supply rises by up to ${fmt(a.rise,1)} K${withTank?` (${fmt(b.rise,1)} K with the ${tk})`:''}.<br>
       <b>Pump trip:</b> the rack reaches its limit in about ${secs(r.tPump)}. Run the standby CDU pump in parallel (hot standby) with automatic changeover.<br>
       <span class="note">Chiller plant resets are handled on the facility water side, for example with a tank on the facility loop: see the <a href="../ride-through-tank/index.html">Ride-Through Tank</a>.</span>
