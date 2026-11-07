@@ -84,14 +84,14 @@ function studyCase(o,L,i,base,DR,Td,k,yr){
 }
 
 // study every design temperature from the extreme down to 3 K below the ASHRAE 0.4% level, then recommend:
-// the lowest design temperature that still recharges within the safe time, raised by the safety margin,
-// and never below the ASHRAE 0.4% design dry-bulb
+// the lowest design temperature whose tank recharges within the safe time (default 4 h),
+// plus an optional extra margin (default 0 K)
 function peakStudy(i,wx,k){
   const o=OPTIONS.find(x=>x.id===i.sys), L={name:'CHW',Ts:i.Ts,Tr:i.Tr}, base=designBasis(wx), DR=hotDayRange(wx);
   const lo=Math.max(base.db04-3,base.extDB-8), cases=[], yr=wx.T.map((t,h)=>({db:t,wb:wx.Twb[h]}));
   for(let Td=Math.round((base.extDB-0.5)*2)/2; Td>=lo-1e-9; Td-=0.5) cases.push(studyCase(o,L,i,base,DR,Td,k,yr));
   let low=null; for(const c of cases){ if(c.safe&&c.E>0) low=c; else if(low) break; }   // cases run from hot to cool
-  const recTd=low?Math.min(cases[0].Td,Math.ceil(Math.max(low.Td+i.safety,base.db04)*2)/2):cases[0].Td;
+  const recTd=low?Math.min(cases[0].Td,Math.ceil((low.Td+i.safety)*2)/2):cases[0].Td;
   const st={base,DR,cases,sys:o,low,recTd};
   st.at=Td=>cases.find(c=>Math.abs(c.Td-Td)<1e-9)||studyCase(o,L,i,base,DR,Td,k,yr);   // any design temperature the user enters
   return st;

@@ -24,7 +24,7 @@ $('gFile').onchange=e=>{ const f=e.target.files[0]; if(!f) return; const rd=new 
 function inputs(){
   return {Q:num('gQ',20000),night:Math.min(1,num('gNight',80)/100),sys:$('gSys').value,Ts:num('gTs',30),Tr:Math.max(num('gTr',40),num('gTs',30)+1),
     reserve:Math.min(.8,num('gReserve',20)/100),margin:num('gMar',20)/100,days:Math.round(num('gDays',3)),rechMax:Math.min(12,num('gRechMax',4)),
-    eff:num('gEff',85)/100,Hmax:num('gH',15),safety:num('gSafe',2)};
+    eff:num('gEff',85)/100,Hmax:num('gH',15),safety:num('gSafe',0)};
 }
 // the study takes a moment: run it shortly after the last change
 function schedule(ms){ clearTimeout(timer); $('gStatus').textContent='Calculating…'; timer=setTimeout(run,ms??400); }
@@ -52,7 +52,7 @@ function render(){
   const msg=c.safe
     ? `Rate the cooling plant for <b>${fmt(c.Td,1)} °C</b> instead of the extreme <b>${fmt(b.extDB,1)} °C</b>. On the hottest afternoons the tank covers the peak, and at ${night} over the night it is full again ${fmt(c.rechH)} h after the peak. ${save}`
     : `<b>Recharging may not be safe during a heatwave.</b> At ${fmt(c.Td,1)} °C the tank ${isFinite(c.rechH)?`needs ${fmt(c.rechH)} h to recharge at ${night}, more than the safe ${lim}`:`does not refill before morning at ${night}`}. Either raise the design temperature toward the extreme (a smaller cut${ST.low?`, e.g. the recommended ${fmt(rec,1)} °C`:''}), or include a <b>standby chiller</b> to cover the shortage on those days.`;
-  const safeNote=c.safe&&userTd==null&&ST.low?`<div class="note">Safe choice: the lowest temperature that recharges within ${lim} is ${fmt(ST.low.Td,1)} °C; the recommendation adds a ${fmt(I.safety,1)} K margin and stays at or above the ASHRAE 0.4% level of ${fmt(b.db04,1)} °C.</div>`:'';
+  const safeNote=c.safe&&userTd==null&&ST.low?`<div class="note">Recommended: the lowest design temperature whose tank recharges within ${lim} at ${night}${I.safety>0?`, plus a ${fmt(I.safety,1)} K extra margin`:''}. ASHRAE 0.4% level for reference: ${fmt(b.db04,1)} °C.</div>`:'';
   $('gRes').innerHTML=`
     <div class="big4">
       <div class="bn"><div class="v good">−${MW(c.cut)} <small>MW</small></div><div class="l">Rated power ${MW(c.Prated0)} → ${MW(c.Prated)} MW (−${fmt(100*c.cut/c.Prated0,1)}%)</div></div>
