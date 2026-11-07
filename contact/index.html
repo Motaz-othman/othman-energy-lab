@@ -34,6 +34,10 @@
 .status.ok{color:var(--brand-ink);font-weight:600}
 .status.err{color:var(--bad)}
 .status a{color:var(--brand-ink);font-weight:600}
+.mailc .ml{display:block;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.mailc .addr{display:inline-block;margin:6px 0 10px;font-size:clamp(20px,2.6vw,26px);font-weight:700;color:var(--brand-ink);text-decoration:none;word-break:break-all}
+.mailc .addr:hover{text-decoration:underline}
+.mailc p{margin:0;color:var(--text2)}
 </style>
 </head>
 <body>
@@ -46,7 +50,14 @@
     <p class="lead">Tell us about your project, and we’ll help you choose the right system.</p>
   </div>
 
-  <form class="card formc" id="contactForm" novalidate>
+  <div class="card formc mailc">
+    <span class="ml">Email us</span>
+    <a class="addr" href="mailto:Mutaz.othman@outlook.com">Mutaz.othman@outlook.com</a>
+    <p>Tell us about your project: the building, the location and the load. We’ll reply by email.</p>
+  </div>
+
+  <!-- contact form: hidden until a reliable form service is set up (SITE.formEndpoint) -->
+  <form class="card formc" id="contactForm" novalidate hidden>
     <div class="field">
       <label for="from">Your email</label>
       <input type="email" id="from" name="email" autocomplete="email" required placeholder="name@company.com">
