@@ -575,7 +575,7 @@ function details(){
     </ul>`;
 }
 
-$('rP').onchange=()=>{ loadPlatform(); run(); };
+$('rP').onchange=()=>{ userTank=false; loadPlatform(); run(); };   // a new platform starts from its own minimum tank
 $('rVbuf').addEventListener('blur',()=>{ if($('rVbuf').value===''){ userTank=false; run(); } });   // left empty: back to the minimum
 document.querySelectorAll('#inRack input, #rFluid, #rSens').forEach(el=>el.addEventListener('input',()=>{ if(el.id==='rVbuf') userTank=$('rVbuf').value!==''; run(); }));
 document.querySelectorAll('#rScen button').forEach(b=>b.onclick=()=>{ SCEN=b.dataset.s; document.querySelectorAll('#rScen button').forEach(x=>x.classList.toggle('on',x===b)); chart(); });
