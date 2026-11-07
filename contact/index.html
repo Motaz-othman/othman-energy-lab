@@ -78,8 +78,9 @@
     const subject='Website message from '+email;
     if(!SITE.formEndpoint){ location.href=mailto(subject,text,email); say('Your email app has opened with your message. Press Send there to deliver it.','ok'); return; }
     btn.disabled=true; say('Sending…');
+    const ac=new AbortController(), t=setTimeout(()=>ac.abort(),12000);   // don't wait forever if the form service is down
     try{
-      const r=await fetch(SITE.formEndpoint,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},
+      const r=await fetch(SITE.formEndpoint,{method:'POST',signal:ac.signal,headers:{'Content-Type':'application/json','Accept':'application/json'},
         body:JSON.stringify({email,message:text,_subject:subject,_replyto:email,_template:'table',_captcha:'false'})});
       const d=await r.json().catch(()=>({}));
       if(!r.ok||String(d.success)==='false') throw new Error(d.message||r.status);
@@ -88,7 +89,7 @@
       st.className='status err';
       st.innerHTML='Sorry, the message could not be sent. <a href="'+mailto(subject,text,email).replace(/"/g,'&quot;')+'">Send it by email instead</a>.';
     }
-    btn.disabled=false;
+    clearTimeout(t); btn.disabled=false;
   });
 })();
 </script>
