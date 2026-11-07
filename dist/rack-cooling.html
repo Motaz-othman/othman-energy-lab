@@ -286,10 +286,10 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
   <div class="note">Buffers the TCS supply while the CDU control valve opens after a load jump.</div>
   <h2 style="margin-top:18px">CDU response</h2>
   <div class="row">
-    <div><label for="rRamp">VFD pump ramp (s)</label><input type="number" id="rRamp" value="7" min="0" step="1"></div>
-    <div><label for="rMCV">MCV stroke (s)</label><input type="number" id="rMCV" value="15" min="0" step="5"></div>
+    <div><label for="rRamp">VFD pump ramp (s)</label><input type="number" id="rRamp" value="15" min="0" step="1"></div>
+    <div><label for="rMCV">MCV stroke (s)</label><input type="number" id="rMCV" value="60" min="0" step="5"></div>
   </div>
-  <div class="note">The MCV is the CDU control valve on the facility water side of its heat exchanger.</div>
+  <div class="note">The MCV is the CDU control valve on the facility water side of its heat exchanger. Defaults are on the safe side (standard actuator and pump ramp); enter the vendor values when known.</div>
   <details>
     <summary>Customize</summary>
     <label for="rFluid">Coolant</label><select id="rFluid"><option value="water">Water</option><option value="pg25">PG25 (25% propylene glycol)</option></select>
@@ -298,7 +298,7 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
       <div><label for="rIdle">Idle heat (%)</label><input type="number" id="rIdle" min="5" max="100" step="5"></div>
     </div>
     <div class="row">
-      <div><label for="rDet">CDU sensing + control (s)</label><input type="number" id="rDet" value="3" min="0" step="1"></div>
+      <div><label for="rDet">CDU sensing + control (s)</label><input type="number" id="rDet" value="5" min="0" step="1"></div>
       <div><label for="rSens">CDU senses the return at</label><select id="rSens"><option value="rack">Rack manifold</option><option value="cdu">CDU (adds the pipe transit)</option></select></div>
     </div>
     <div class="row">
@@ -468,7 +468,7 @@ function loadPlatform(){ const p=plat(); $('rIdle').value=Math.round(p.idle*100)
 function run(){
   const p=plat();
   const i={fluid:$('rFluid').value,margin:lim(num('rMargin',20),0,100)/100,idle:lim(num('rIdle',30),5,100)/100,
-    tDet:Math.max(0,num('rDet',3)),tRamp:Math.max(0,num('rRamp',7)),tMCV:Math.max(0,num('rMCV',15)),
+    tDet:Math.max(0,num('rDet',5)),tRamp:Math.max(0,num('rRamp',15)),tMCV:Math.max(0,num('rMCV',60)),
     Vrack:Math.max(1,num('rVrack',p.Vrack)),Vcdu:Math.max(0,num('rVcdu',40)),Vbuf:Math.max(0,num('rVbuf',100)),
     tcsL:Math.max(1,num('rTcsL',20)),tcsV:lim(num('rTcsV',0.8),0.3,3),sensAt:$('rSens').value,dTair:lim(num('rAir',12),5,25)};
   R=rackStudy(p,i); R.i=i;

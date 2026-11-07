@@ -16,7 +16,7 @@ function loadPlatform(){ const p=plat(); $('rIdle').value=Math.round(p.idle*100)
 function run(){
   const p=plat();
   const i={fluid:$('rFluid').value,margin:lim(num('rMargin',20),0,100)/100,idle:lim(num('rIdle',30),5,100)/100,
-    tDet:Math.max(0,num('rDet',3)),tRamp:Math.max(0,num('rRamp',7)),tMCV:Math.max(0,num('rMCV',15)),
+    tDet:Math.max(0,num('rDet',5)),tRamp:Math.max(0,num('rRamp',15)),tMCV:Math.max(0,num('rMCV',60)),
     Vrack:Math.max(1,num('rVrack',p.Vrack)),Vcdu:Math.max(0,num('rVcdu',40)),Vbuf:Math.max(0,num('rVbuf',100)),
     tcsL:Math.max(1,num('rTcsL',20)),tcsV:lim(num('rTcsV',0.8),0.3,3),sensAt:$('rSens').value,dTair:lim(num('rAir',12),5,25)};
   R=rackStudy(p,i); R.i=i;
