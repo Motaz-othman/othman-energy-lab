@@ -19,24 +19,24 @@ function run(){
   const p=plat();
   const i={fluid:$('rFluid').value,Ts:lim(num('rTs',p.TsMax),5,p.TsMax),margin:lim(num('rMargin',20),0,100)/100,idle:lim(num('rIdle',30),5,100)/100,
     tDet:Math.max(0,num('rDet',3)),tRamp:Math.max(0,num('rRamp',7)),pipeL:Math.max(5,num('rPipe',150)),vel:lim(num('rVel',2),0.5,4),Vrack:Math.max(1,num('rVrack',p.Vrack)),
-    Vcdu:Math.max(0,num('rVcdu',40)),dTair:lim(num('rAir',12),5,25),Vbuf:Math.max(0,num('rVbuf',100)),resetMin:Math.max(0.5,num('rResetMin',3))};
+    Vcdu:Math.max(0,num('rVcdu',40)),dTair:lim(num('rAir',12),5,25),Vbuf:Math.max(0,num('rVbuf',100)),tcsL:Math.max(1,num('rTcsL',20)),tcsV:lim(num('rTcsV',0.8),0.3,3),sensAt:$('rSens').value,resetMin:Math.max(0.5,num('rResetMin',3))};
   if(num('rTs',p.TsMax)>p.TsMax) $('rTs').value=p.TsMax;
   R=rackStudy(p,i); R.i=i;
   const r=R, okReset=r.tSafeReset>=r.tReset, okBuf=r.tSafeBuf>=r.tReset;
   // a supply limit for the plant reset: the chosen supply already rides through, a lower one, or none practical
-  const ride=(T,lab)=>`<div><span class="v${T>=r.Ts-1e-6?' good':T<15?' bad':''}">${T>=r.Ts-1e-6?`${fmt(r.Ts)} °C ✓`:T<15?'none':`${fmt(T,1)} <small>°C</small>`}</span><span class="l">${lab}</span></div>`;
+  const ride=(T,lab)=>`<div><span class="v${T>=r.Ts-1e-6?' good':T<15?' bad':''}">${T<15?'none':`${fmt(T,1)} <small>°C</small>${T>=r.Ts-1e-6?' ✓':''}`}</span><span class="l">${lab}</span></div>`;
   $('rStatus').textContent=`Per rack · ${p.name}`;
   $('rRes').innerHTML=`
     <div class="big4">
       <div class="bn"><div class="v good">${fmt(p.TsMax)} <small>°C</small></div><div class="l">Max coolant supply (ASHRAE ${p.cls}) · return limit ${fmt(r.Tr)} °C</div></div>
-      <div class="bn"><div class="v">${fmt(r.Fop)} <small>L/min</small></div><div class="l">${fmt(r.Ql,1)} kW to liquid at ${fmt(r.Ts)} °C supply${r.Qa>0.05?` · ${fmt(r.Qa,1)} kW to air, ${fmt(r.air)} m³/h`:''}</div></div>
+      <div class="bn"><div class="v">${fmt(r.Fop)} <small>L/min</small></div><div class="l">${fmt(r.Ql,1)} kW to liquid · return ${fmt(r.TrOp,1)} °C at ${fmt(r.Ts,r.Ts%1?1:0)} °C supply${r.Qa>0.05?` · ${fmt(r.Qa,1)} kW to air, ${fmt(r.air)} m³/h`:''}</div></div>
       <div class="bn"><div class="v">${fmt(r.FSafe)} <small>L/min</small></div><div class="l">${r.peakOK?`Safe minimum flow · ${fmt(r.fSafe*100)}% of operating. Survives a jump from idle to peak load`:`No turndown: even full flow does not hold a jump to the ${fmt(r.p.Ppeak)} kW peak`}</div></div>
       <div class="bn"><div class="l">Max supply to ride through a ${fmt(i.resetMin,1)}-min plant reset</div><div class="pair">${ride(r.TsRide,'no tank')}${ride(r.TsRideBuf,`${fmt(i.Vbuf)} L/rack TCS tank`)}</div></div>
     </div>
     <div class="verdict${okReset?'':' warn'}">
       ${r.peakOK?`<b>Variable flow</b> can go down to ${fmt(r.fSafe*100)}% of the operating flow (${fmt(r.FSafe)} L/min per rack). Below that, a jump from idle to the ${fmt(r.p.Ppeak)} kW peak heats the coolant past ${fmt(r.Tr)} °C before the CDU responds (${fmt(r.tResp)} s).`:`<b>Variable flow:</b> no turndown. A jump to the ${fmt(r.p.Ppeak)} kW peak passes ${fmt(r.Tr)} °C even at full flow: raise the flow margin or lower the supply temperature.`}<br>
       ${okReset?`<b>Plant reset:</b> the loop water alone covers a ${fmt(i.resetMin,1)}-min reset.`
-        :`<b>Plant reset:</b> at ${fmt(r.Ts)} °C supply the loop water lasts only ${secs(r.tSafeReset)}${i.Vbuf>0?` (${secs(r.tSafeBuf)} with the ${fmt(i.Vbuf)} L/rack tank)`:''}, short of the ${fmt(i.resetMin,1)}-min reset. ${okBuf?`The ${fmt(i.Vbuf)} L/rack TCS tank covers it.`:`To ride it through, run the supply at <b>${fmt(r.TsRide,1)} °C</b> or lower${i.Vbuf>0?`, or <b>${fmt(r.TsRideBuf,1)} °C</b> with a ${fmt(i.Vbuf)} L/rack buffer tank on the TCS loop`:''}.`}`}<br>
+        :`<b>Plant reset:</b> at ${fmt(r.Ts,r.Ts%1?1:0)} °C supply the loop water lasts only ${secs(r.tSafeReset)}${i.Vbuf>0?` (${secs(r.tSafeBuf)} with the ${fmt(i.Vbuf)} L/rack tank)`:''}, short of the ${fmt(i.resetMin,1)}-min reset. ${okBuf?`The ${fmt(i.Vbuf)} L/rack TCS tank covers it.`:`To ride it through, run the supply at <b>${fmt(r.TsRide,1)} °C</b> or lower${i.Vbuf>0?`, or <b>${fmt(r.TsRideBuf,1)} °C</b> with a ${fmt(i.Vbuf)} L/rack buffer tank on the TCS loop`:''}.`}`}<br>
       <b>Pump trip:</b> the rack reaches its limit in about ${secs(r.tPump)}. Run the standby CDU pump in parallel (hot standby) with automatic changeover.
     </div>`;
   chart(); details();
@@ -55,7 +55,7 @@ function chart(){
     ds=[line('Return at idle-following flow',T(r.jumpFollow.tr),css('--grey2')),line('Return at the safe minimum flow',T(r.jumpSafe.tr),css('--brand'),{borderWidth:2.5}),
       line('Flow (safe minimum case)',r.jumpSafe.tr.map(x=>({x:x.t,y:x.f*100})),css('--s1'),{borderDash:[5,4],borderWidth:1.5,yAxisID:'y1'}),
       line('Return limit',[{x:0,y:r.Tr},{x:r.jumpSafe.tr.at(-1).t,y:r.Tr}],limC,{borderDash:[6,4],borderWidth:1})];
-    title=`Idle (${fmt(i.idle*100)}%) → ${fmt(r.p.Ppeak)} kW peak at once; the CDU responds in ${fmt(i.tDet)} s and ramps the flow over ${fmt(i.tRamp)} s`;
+    title=`Idle (${fmt(i.idle*100)}%) → ${fmt(r.p.Ppeak)} kW peak at once; the CDU responds in ${fmt(r.tSense)} s and ramps the flow over ${fmt(i.tRamp)} s`;
     note=isFinite(r.tNoResp)?`If the flow simply followed the idle heat (${fmt(r.fFollow*100)}%) and never rose, the coolant would pass ${fmt(r.Tr)} °C ${secs(r.tNoResp)} after the jump. The CDU needs ${fmt(r.tResp)} s to bring the flow back.`:`Even if the flow stayed at the idle-following value (${fmt(r.fFollow*100)}%), the coolant would stay below ${fmt(r.Tr)} °C.`;
   }else if(SCEN==='reset'){
     o.scales.x.title.text='Minutes with no plant cooling';
@@ -63,7 +63,7 @@ function chart(){
       line('Return limit',[{x:0,y:r.Tr},{x:r.resetTrace.at(-1).t,y:r.Tr}],limC,{borderDash:[6,4],borderWidth:1}),
       line('End of plant reset',[{x:i.resetMin,y:r.TrOp},{x:i.resetMin,y:r.resetTrace.at(-1).T}],css('--grey2'),{borderDash:[2,3],borderWidth:1})];
     title=`Chiller plant resets: no cooling for ${fmt(i.resetMin,1)} min, flow kept at ${fmt(r.Fop)} L/min`;
-    note=`The water in the pipes (${fmt(i.pipeL)} m each way, round trip ${secs(r.tRT)}), the CDU and the rack absorbs the heat: about ${fmt(r.Mloop/r.f.rho,2)} m³ per rack, rising ${fmt(r.rise*60,1)} K per minute.`;
+    note=`The water in the facility pipes (${fmt(i.pipeL)} m each way, round trip ${secs(r.tRT)}), the TCS pipes (${fmt(i.tcsL)} m at ${fmt(i.tcsV,1)} m/s), the CDU and the rack absorbs the heat: about ${fmt(r.Mloop/r.f.rho,2)} m³ per rack, rising ${fmt(r.rise*60,1)} K per minute.`;
   }else{
     o.scales.x.title.text='Seconds after the CDU pump trips';
     ds=[line('Return temperature',r.pumpTrace.map(x=>({x:x.t,y:x.T})),css('--brand'),{borderWidth:2.5}),
@@ -90,8 +90,8 @@ function details(){
     <p class="note">${esc(p.note)} Sources: ${p.src.map(s=>`<a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])}</a>`).join(', ')}.</p>
     <h3>Flow per rack</h3>
     ${table(['Flow','L/min','Note'],[
-      `<tr><td>Minimum to hold the return at ${fmt(r.Tr)} °C</td><td>${fmt(r.Freq)}</td><td>at ${fmt(r.Ts)} °C supply, full load</td></tr>`,
-      `<tr><td>Operating flow (+${fmt(i.margin*100)}%)</td><td>${fmt(r.Fop)}</td><td>return ${fmt(r.TrOp,1)} °C, ${fmt(r.head,1)} K below the limit</td></tr>`,
+      `<tr><td>Minimum to hold the return at ${fmt(r.Tr)} °C</td><td>${fmt(r.Freq)}</td><td>at ${fmt(r.Ts,r.Ts%1?1:0)} °C supply, full load</td></tr>`,
+      `<tr><td>Operating flow (sized at ${fmt(p.TsMax)} °C, +${fmt(i.margin*100)}%)</td><td>${fmt(r.Fop)}</td><td>return ${fmt(r.TrOp,1)} °C, ${fmt(r.head,1)} K below the limit</td></tr>`,
       `<tr><td>Safe minimum (variable flow)</td><td>${fmt(r.FSafe)}</td><td>${fmt(r.fSafe*100)}% of the operating flow</td></tr>`])}
     <h3>Plant reset (${fmt(i.resetMin,1)} min, no cooling)</h3>
     ${table(['Case','Safe at '+fmt(r.Ts)+' °C','Max supply to ride through'],[
@@ -113,6 +113,6 @@ function details(){
 
 $('rP').onchange=()=>{ loadPlatform(); run(); };
 $('rReset').onchange=()=>{ loadReset(); run(); };
-document.querySelectorAll('#inRack input, #rFluid').forEach(el=>el.addEventListener('input',run));
+document.querySelectorAll('#inRack input, #rFluid, #rSens').forEach(el=>el.addEventListener('input',run));
 document.querySelectorAll('#rScen button').forEach(b=>b.onclick=()=>{ SCEN=b.dataset.s; document.querySelectorAll('#rScen button').forEach(x=>x.classList.toggle('on',x===b)); chart(); });
 loadPlatform(); loadReset(); run();
