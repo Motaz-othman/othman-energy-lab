@@ -238,6 +238,9 @@ details[open]>:not(summary){animation:fadeUp .2s ease both}
 .bn .l{font-size:13px;color:var(--text2);margin-top:4px}
 .verdict{font-size:16px;line-height:1.5;padding:12px 16px;border-radius:10px;background:color-mix(in srgb,var(--brand) 9%,var(--surface))}
 .verdict.warn{background:color-mix(in srgb,var(--warn) 12%,var(--surface))}
+.uses{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.uses>div{padding:12px 14px;border-radius:10px;border:1px dashed color-mix(in srgb,var(--brand) 45%,var(--border));font-size:13px;color:var(--text2);line-height:1.45}
+.uses b{display:block;font-size:17px;color:var(--brand-ink);margin-bottom:2px}
 .tankrow{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
 @media (max-width:560px){.tankrow{grid-template-columns:1fr}}
 .tanksvg{width:150px;height:auto}

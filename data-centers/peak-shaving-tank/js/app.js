@@ -49,6 +49,14 @@ function render(){
   const chCut=Math.max(0,c.cap0-c.capT), night=`${fmt(I.night*100)}% IT load`, lim=`${fmt(I.rechMax,1)} h`;
   const rech=isFinite(c.rechH)?{v:`${fmt(c.rechH)} <small>h</small>`,l:`to recharge at ${night} over the 12-hour night`}:{v:'No',l:`full recharge before morning at ${night}`};
   const save=`This saves <b>${MW(c.cut)} MW</b> of electrical supply (transformer, generator, grid connection) and <b>${MW(chCut)} MW</b> of chiller capacity.`;
+  // the freed supply can carry more IT: each extra IT kW also needs its cooling power (at the new rated ratio)
+  const itMore=c.cut/(1+c.Prated/I.Q);
+  // the reserve kept full (net of the sizing margin) also covers a power changeover at full load
+  const rideMin=c.V*I.reserve/(1+I.margin)*RHO_CP*(I.Tr-I.Ts)*I.eff/3600/I.Q*60;
+  const uses=c.cut>0?`<div class="uses">
+      <div><b>+${MW(itMore)} MW of IT</b><span>with its cooling, on the same transformers, generators and grid connection. Useful where the grid connection is the limit.</span></div>
+      <div><b>~${fmt(rideMin)} min ride-through</b><span>from the ${fmt(I.reserve*100)}% reserve kept full (${fmt(c.V*I.reserve)} m³): the same tank can also cover the changeover to generator, so no separate ride-through tank.</span></div>
+    </div>`:'';
   const msg=c.safe
     ? `Rate the cooling plant for <b>${fmt(c.Td,1)} °C</b> instead of the extreme <b>${fmt(b.extDB,1)} °C</b>. On the hottest afternoons the tank covers the peak, and at ${night} over the night it is full again ${fmt(c.rechH)} h after the peak. ${save}`
     : `<b>Recharging may not be safe during a heatwave.</b> At ${fmt(c.Td,1)} °C the tank ${isFinite(c.rechH)?`needs ${fmt(c.rechH)} h to recharge at ${night}, more than the safe ${lim}`:`does not refill before morning at ${night}`}. Either raise the design temperature toward the extreme (a smaller cut${ST.low?`, e.g. the recommended ${fmt(rec,1)} °C`:''}), or include a <b>standby chiller</b> to cover the shortage on those days.`;
@@ -60,7 +68,7 @@ function render(){
       <div class="bn"><div class="v${c.safe?'':' bad'}">${rech.v}</div><div class="l">${rech.l}</div></div>
       <div class="bn"><div class="v">~${fmt(c.above)} <small>h/yr</small></div><div class="l">Hours the tank works (above ${fmt(c.Td,1)} °C at full IT load)</div></div>
     </div>
-    <div class="verdict${c.safe?'':' warn'}">${msg}</div>${safeNote}`;
+    <div class="verdict${c.safe?'':' warn'}">${msg}</div>${uses}${safeNote}`;
   charts_(c);
   details(c,b);
 }
