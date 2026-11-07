@@ -52,7 +52,7 @@ function render(){
   // the reserve kept full (net of the sizing margin) also covers a power changeover at full load
   const rideMin=c.V*I.reserve/(1+I.margin)*RHO_CP*(I.Tr-I.Ts)*I.eff/3600/I.Q*60;
   const uses=c.cut>0?`<div class="uses">
-      <div><b>~${fmt(rideMin)} min ride-through</b><span>from the ${fmt(I.reserve*100)}% reserve kept full (${fmt(c.V*I.reserve)} m³): the same tank can also cover the changeover to generator, so no separate ride-through tank.</span></div>
+      <div><b>${fmt(I.reserve*100)}% reserve kept full · ${fmt(c.V*I.reserve)} m³</b><span>Never used for peak shaving. It supports a changeover to generator at the peak (about ${fmt(rideMin)} min at full load), and covers what the design does not count: weather hotter than the ASHRAE extreme, chiller fouling and ageing, or a chiller out of service. For a dedicated ride-through design, use the Ride-Through Tank.</span></div>
     </div>`:'';
   const msg=c.safe
     ? `Rate the cooling plant for <b>${fmt(c.Td,1)} °C</b> instead of the extreme <b>${fmt(b.extDB,1)} °C</b>. On the hottest afternoons the tank covers the peak, and at ${night} over the night it is full again ${fmt(c.rechH)} h after the peak. ${save}`
