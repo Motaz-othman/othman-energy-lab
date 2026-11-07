@@ -28,7 +28,7 @@ function loadJump(r,fmin,Mt,tEnd){
 }
 
 function rackStudy(p,i){
-  const f=FLUIDS[i.fluid], Ql=p.P*p.liq, Qa=p.P-Ql, QlIdle=Ql*i.idle, Ts=Math.min(i.Ts,p.TsMax), Tr=p.TrMax, cp=f.cp;
+  const f=FLUIDS[i.fluid], Ql=p.P*p.liq, Qa=p.P-Ql, QlIdle=Ql*i.idle, Ts=Math.min(i.Ts,p.TrMax-2), Tr=p.TrMax, cp=f.cp;
   const mReq=Ql/(cp*(Tr-Ts)), Freq=lpm(mReq,f);                   // minimum flow at rated power
   const mOp=mReq*(1+i.margin), Fop=lpm(mOp,f), TrOp=Ts+Ql/(mOp*cp);  // operating flow with the margin
   const Mr=i.Vrack*f.rho/1000, air=Qa/(1.2*1.006*i.dTair)*3600;

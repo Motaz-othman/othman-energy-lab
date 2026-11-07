@@ -15,8 +15,7 @@ function loadPlatform(){ const p=plat(); $('rTs').value=p.TsMax; $('rIdle').valu
 
 function run(){
   const p=plat();
-  if(num('rTs',p.TsMax)>p.TsMax) $('rTs').value=p.TsMax;
-  const i={fluid:$('rFluid').value,Ts:lim(num('rTs',p.TsMax),5,p.TsMax),margin:lim(num('rMargin',20),0,100)/100,idle:lim(num('rIdle',30),5,100)/100,
+    const i={fluid:$('rFluid').value,Ts:lim(num('rTs',p.TsMax),5,p.TrMax-2),margin:lim(num('rMargin',20),0,100)/100,idle:lim(num('rIdle',30),5,100)/100,
     tDet:Math.max(0,num('rDet',5)),tRamp:Math.max(0,num('rRamp',15)),tMCV:Math.max(0,num('rMCV',60)),
     Vrack:Math.max(1,num('rVrack',p.Vrack)),Vcdu:Math.max(0,num('rVcdu',40)),Vbuf:Math.max(0,num('rVbuf',100)),
     tcsL:Math.max(1,num('rTcsL',20)),tcsV:lim(num('rTcsV',0.8),0.3,3),sensAt:$('rSens').value,dTair:lim(num('rAir',12),5,25)};
@@ -26,15 +25,18 @@ function run(){
   const flowV=(s,lab)=>`<div><span class="v${s.ok?'':' bad'}">${s.ok?`${fmt(s.F)} <small>L/min</small>`:'none'}</span><span class="l">${s.ok?`${fmt(s.fSafe*100)}% · `:''}${lab}</span></div>`;
   const riseV=(s,lab)=>`<div><span class="v${s.ok?'':' bad'}">+${fmt(s.rise,1)} <small>K</small></span><span class="l">${lab}</span></div>`;
   const pair=(fn)=>withTank?fn(a,'no tank')+fn(b,`with ${tk}`):fn(a,'no tank');
+  const maker=p.group==='CPU / HPC'?p.name.split(' ')[0]:p.group, over=r.Ts>p.TsMax+1e-9;
+  $('rTsNote').innerHTML=over?`<span style="color:var(--bad)"><b>Above the ${fmt(p.TsMax)} °C platform maximum:</b> risky unless confirmed by ${esc(maker)}.</span>`:'Starts at the platform maximum, which saves the most on the facility water. The flow follows the platform rule at the supply chosen.';
   $('rStatus').textContent=`Per rack · ${p.name}`;
   $('rRes').innerHTML=`
     <div class="big4">
-      <div class="bn"><div class="v good">${fmt(p.TsMax)} <small>°C</small></div><div class="l">Max coolant supply (ASHRAE ${p.cls}) · return limit ${fmt(r.Tr)} °C</div></div>
+      <div class="bn"><div class="v${over?' bad':' good'}">${fmt(p.TsMax)} <small>°C</small></div><div class="l">Max coolant supply (ASHRAE ${p.cls}) · return limit ${fmt(r.Tr)} °C</div></div>
       <div class="bn"><div class="v">${fmt(r.Fop)} <small>L/min</small></div><div class="l">Operating flow · ${fmt(r.Ql,1)} kW to liquid, return ${fmt(r.TrOp,1)} °C at ${fmt(r.Ts,r.Ts%1?1:0)} °C supply${r.Qa>0.05?` · ${fmt(r.Qa,1)} kW to air, ${fmt(r.air)} m³/h`:''}</div></div>
       <div class="bn"><div class="l">Safe minimum flow at idle</div><div class="pair">${pair(flowV)}</div></div>
       <div class="bn"><div class="l">TCS supply rise while the MCV opens</div><div class="pair">${pair(riseV)}</div></div>
     </div>
-    <div class="verdict${a.ok||b.ok&&withTank?'':' warn'}">
+    <div class="verdict${(a.ok||b.ok&&withTank)&&!over?'':' warn'}">
+      ${over?`<b>Supply above the platform maximum:</b> ${fmt(r.Ts,r.Ts%1?1:0)} °C is above the ${fmt(p.TsMax)} °C that ${esc(maker)} supports (ASHRAE ${p.cls}). This is risky unless confirmed in writing by ${esc(maker)} for this platform.<br>`:''}
       ${a.ok?`<b>Variable flow</b> can go down to ${fmt(a.F)} L/min per rack at idle (${fmt(a.fSafe*100)}% of the operating flow)${withTank&&b.ok?`, or ${fmt(b.F)} L/min with the ${tk}`:''}. Below that, a jump from idle to the ${fmt(p.P)} kW rated load heats the coolant past ${fmt(r.Tr)} °C before the VFD pump ramps up (${fmt(r.tSense)} s to react + ${fmt(i.tRamp)} s ramp).`
         :withTank&&b.ok?`<b>Without a tank</b> the coolant passes ${fmt(r.Tr)} °C after a load jump even at full flow: the MCV (${fmt(i.tMCV)} s) is too slow for the loop water alone. With the ${tk}, variable flow can go down to ${fmt(b.F)} L/min per rack at idle (${fmt(b.fSafe*100)}%).`
         :`<b>No safe turndown:</b> after a load jump the coolant passes ${fmt(r.Tr)} °C even at full flow. Use a faster MCV or pump${withTank?', or a larger TCS tank':', or add a TCS buffer tank'}${i.sensAt==='cdu'?', or sense the return at the rack manifold':''}.`}<br>
