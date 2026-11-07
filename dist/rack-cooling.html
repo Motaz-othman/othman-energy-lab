@@ -480,8 +480,8 @@ function run(){
     tDet:Math.max(0,num('rDet',5)),tRamp:Math.max(0,num('rRamp',15)),tMCV:Math.max(0,num('rMCV',60)),
     Vrack:Math.max(1,num('rVrack',p.Vrack)),Vcdu:Math.max(0,num('rVcdu',40)),Vbuf:userTank?Math.max(0,num('rVbuf',0)):null,
     tcsL:Math.max(1,num('rTcsL',20)),tcsV:lim(num('rTcsV',0.8),0.3,3),sensAt:$('rSens').value,dTair:lim(num('rAir',12),5,25)};
-  R=rackStudy(p,i); i.Vbuf=R.Vbuf; R.i=i; if(!userTank) $('rVbuf').value=R.Vbuf;
-  $('rVbufNote').innerHTML=!isFinite(R.Vmin)?'No practical tank covers the response: use a faster MCV or VFD pump.':userTank?`Minimum to cover the response: ${fmt(R.Vmin)} L/rack · <a href="#" id="rVbufReset">use it</a>`:`Filled with the minimum that covers the response. More only lowers the supply rise.`;
+  R=rackStudy(p,i); i.Vbuf=R.Vbuf; R.i=i; if(!userTank&&document.activeElement!==$('rVbuf')) $('rVbuf').value=R.Vbuf;   // never rewrite the field while it is being typed in
+  $('rVbufNote').innerHTML=!isFinite(R.Vmin)?'No practical tank covers the response: use a faster MCV or VFD pump.':R.Vmin===0?'No tank needed: the loop water covers the response. A tank only lowers the supply rise.':userTank?`Minimum to cover the response: ${fmt(R.Vmin)} L/rack · <a href="#" id="rVbufReset">use it</a>`:`Filled with the minimum that covers the response. More only lowers the supply rise.`;
   if($('rVbufReset')) $('rVbufReset').onclick=e=>{ e.preventDefault(); userTank=false; run(); };
   const r=R, a=r.noTank, b=r.tank, tk=`${fmt(i.Vbuf)} L/rack tank${isFinite(r.Vmin)&&i.Vbuf===r.Vmin?' (minimum)':''}`, withTank=i.Vbuf>0;
   // one value of a pair: safe minimum flow, or TCS supply rise
@@ -576,6 +576,7 @@ function details(){
 }
 
 $('rP').onchange=()=>{ loadPlatform(); run(); };
+$('rVbuf').addEventListener('blur',()=>{ if($('rVbuf').value===''){ userTank=false; run(); } });   // left empty: back to the minimum
 document.querySelectorAll('#inRack input, #rFluid, #rSens').forEach(el=>el.addEventListener('input',()=>{ if(el.id==='rVbuf') userTank=$('rVbuf').value!==''; run(); }));
 document.querySelectorAll('#rScen button').forEach(b=>b.onclick=()=>{ SCEN=b.dataset.s; document.querySelectorAll('#rScen button').forEach(x=>x.classList.toggle('on',x===b)); chart(); });
 loadPlatform(); run();
