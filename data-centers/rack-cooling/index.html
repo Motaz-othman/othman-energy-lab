@@ -41,8 +41,8 @@
   <div class="note" id="rPnote"></div>
   <label for="rTs" style="margin-top:12px">Coolant supply to the rack (°C)</label><input type="number" id="rTs" step="1">
   <div class="note" id="rTsNote">Default 40 °C. Maximum 45 °C as per ASHRAE W45. The flow follows the platform rule at the supply chosen.</div>
-  <label for="rVbuf" style="margin-top:12px">Buffer tank on the TCS loop (L per rack)</label><input type="number" id="rVbuf" value="100" min="0" step="50">
-  <div class="note">Buffers the TCS supply while the CDU control valve opens after a load jump.</div>
+  <label for="rVbuf" style="margin-top:12px">Buffer tank on the TCS loop (L per rack)</label><input type="number" id="rVbuf" min="0" step="10">
+  <div class="note" id="rVbufNote"></div>
   <h2 style="margin-top:18px">CDU response</h2>
   <div class="row">
     <div><label for="rRamp">VFD pump ramp (s)</label><input type="number" id="rRamp" value="15" min="0" step="1"></div>

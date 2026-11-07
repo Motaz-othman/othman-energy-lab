@@ -46,11 +46,12 @@ function rackStudy(p,i){
     const run=loadJump(r,fSafe??1,Mt,tEnd);
     return {Mt,ok:fullOK,fSafe,F:fSafe==null?null:fSafe*Fop,rise:run.tsPeak-Ts,peak:run.peak,tr:run.tr};
   };
-  const noTank=study(Mpipe+Mcdu), tank=study(Mpipe+Mcdu+i.Vbuf*f.rho/1000);
   // smallest TCS tank that covers the response gap: the rack stays at or below the limit through a load jump.
   // More volume only lowers the supply rise; the rack side (pump ramp, chip buffer) then sets the minimum flow.
   const passes=V=>loadJump(r,1,Mpipe+Mcdu+V*f.rho/1000,tEnd).peak<=Tr+1e-3;
   let Vmin=0; if(!passes(0)){ if(!passes(5000)) Vmin=Infinity; else { let a=0,b=5000; for(let n=0;n<20;n++){ const c=(a+b)/2; if(passes(c)) b=c; else a=c; } Vmin=Math.ceil(b/10)*10; } }
+  const Vbuf=i.Vbuf??(isFinite(Vmin)?Vmin:0);                        // tank entered, or the minimum by default
+  const noTank=study(Mpipe+Mcdu), tank=study(Mpipe+Mcdu+Vbuf*f.rho/1000);
 
   // CDU pump trip at rated power: no flow; the chip buffer absorbs the heat
   const head=Tr-TrOp, tPump=head*Mr*cp/Ql;
@@ -61,5 +62,5 @@ function rackStudy(p,i){
     {k:'CDU sensing',d:`control reaction${i.sensAt==='cdu'?' + return transit to the CDU':''}`,t:tSense},
     {k:'VFD pump',d:'ramp to the operating flow',t:i.tRamp},
     {k:'MCV',d:'stroke to full facility water on the CDU heat exchanger',t:i.tMCV}];
-  return {p,f,P,Ql,Qa,QlIdle,Ts,Tr,Freq,Fop,TrOp,air,tSense,tTCS,Mpipe,Mcdu,noTank,tank,Vmin,head,tPump,pumpTrace,chain};
+  return {p,f,P,Ql,Qa,QlIdle,Ts,Tr,Freq,Fop,TrOp,air,tSense,tTCS,Mpipe,Mcdu,noTank,tank,Vmin,Vbuf,head,tPump,pumpTrace,chain};
 }
