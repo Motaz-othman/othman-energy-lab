@@ -51,6 +51,10 @@ function rackStudy(p,i){
   const TsRide=Tr-(Ql/(mOp*cp))-Ql*tReset/(Mloop*cp);               // supply that rides through without a buffer (same flow)
   // with a small buffer tank on the TCS loop (litres per rack), mixed into the loop water
   const Mbuf=Mloop+i.Vbuf*f.rho/1000, tSafeBuf=head*Mbuf*cp/Ql, TsRideBuf=Tr-(Ql/(mOp*cp))-Ql*tReset/(Mbuf*cp);
+  // flow the CDU must deliver through the reset with a VL-litre tank per rack (supply fixed): the loop warms by
+  // Ql·t/(M·cp), and the rack ΔT at that flow must fit in what is left below the return limit
+  const flowReset=VL=>{ const M=Mloop+VL*f.rho/1000, avail=Tr-Ts-Ql*tReset/(M*cp); return avail<=0?Infinity:lpm(Math.max(mOp,Ql/(cp*avail)),f); };
+  const FresetNo=flowReset(0), FresetBuf=flowReset(i.Vbuf), tankTable=[0,100,250,500,1000,2000].map(V=>({V,F:flowReset(V)}));
   const resetTrace=[]; for(let k=0;k<=40;k++){ const t=k*Math.max(tReset,tSafeReset)*1.2/40; resetTrace.push({t:t/60,T:TrOp+rise*Math.min(t,tReset)}); }
 
   // 3. CDU pump trip at rated power: no flow; the cold-plate coolant and metal absorb the heat
@@ -61,5 +65,5 @@ function rackStudy(p,i){
   const chain=[{k:'Rack',d:'cold-plate coolant and metal, at the operating flow',t:Mr/mOp},{k:'TCS pipes',d:`round trip CDU ⇄ rack at ${fmt(i.tcsV,1)} m/s`,t:tTCS},{k:'CDU',d:`sensing and control ${fmt(i.tDet)} s${i.sensAt==='cdu'?` + return transit ${fmt(tTCS/2)} s`:''} + pump ramp ${fmt(i.tRamp)} s`,t:tResp},
     {k:'Facility pipes',d:`round trip plant ⇄ CDU at ${fmt(i.vel,1)} m/s`,t:tRT},{k:'Plant',d:'chiller reset',t:tReset}];
   return {p,f,Ql,Qa,QlJ,Ts,Tr,Freq,Fop,TrOp,air,tResp,tSense,tTCS,fSafe,FSafe:fSafe*Fop,peakOK,fFollow,jumpFollow,jumpSafe,tNoResp,
-    tRT,Mloop,rise,head,tReset,tSafeReset,bufL,TsRide,tSafeBuf,TsRideBuf,resetTrace,tPump,pumpTrace,chain};
+    tRT,Mloop,rise,head,tReset,tSafeReset,bufL,TsRide,tSafeBuf,TsRideBuf,FresetNo,FresetBuf,tankTable,resetTrace,tPump,pumpTrace,chain};
 }

@@ -39,9 +39,10 @@
   <h2>Platform</h2>
   <label for="rP">Liquid-cooled rack</label><select id="rP"></select>
   <div class="note" id="rPnote"></div>
-  <label for="rTs" style="margin-top:12px">Coolant supply to the rack (°C)</label><input type="number" id="rTs" step="1">
-  <div class="note" id="rTsNote">The flow is sized at the platform maximum. A lower supply with the same flow gives more headroom for turndown and plant resets.</div>
+  <div class="note">The coolant supply is kept at the platform maximum, which saves the most on the facility water.</div>
   <label for="rReset" style="margin-top:12px">Chiller plant</label><select id="rReset"></select>
+  <label for="rVbuf" style="margin-top:12px">Buffer tank on the TCS loop (L per rack)</label><input type="number" id="rVbuf" value="100" min="0" step="50">
+  <div class="note">Covers a plant reset together with the CDU flow: a bigger tank needs less flow.</div>
   <details>
     <summary>Customize</summary>
     <label for="rFluid">Coolant</label><select id="rFluid"><option value="water">Water</option><option value="pg25">PG25 (25% propylene glycol)</option></select>
@@ -53,10 +54,7 @@
       <div><label for="rDet">CDU sensing + control (s)</label><input type="number" id="rDet" value="3" min="0" step="1"></div>
       <div><label for="rRamp">CDU pump ramp (s)</label><input type="number" id="rRamp" value="7" min="0" step="1"></div>
     </div>
-    <div class="row">
-      <div><label for="rResetMin">Plant reset (min)</label><input type="number" id="rResetMin" min="0.5" step="0.5"></div>
-      <div><label for="rVbuf">TCS buffer tank per rack (L)</label><input type="number" id="rVbuf" value="100" min="0" step="50"></div>
-    </div>
+    <label for="rResetMin">Plant reset (min)</label><input type="number" id="rResetMin" min="0.5" step="0.5">
     <div class="row">
       <div><label for="rPipe">Pipe run plant → CDU (m)</label><input type="number" id="rPipe" value="150" min="5" step="10"></div>
       <div><label for="rVel">Facility water velocity (m/s)</label><input type="number" id="rVel" value="2" min="0.5" max="4" step="0.1"></div>

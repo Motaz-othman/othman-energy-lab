@@ -281,9 +281,10 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
   <h2>Platform</h2>
   <label for="rP">Liquid-cooled rack</label><select id="rP"></select>
   <div class="note" id="rPnote"></div>
-  <label for="rTs" style="margin-top:12px">Coolant supply to the rack (°C)</label><input type="number" id="rTs" step="1">
-  <div class="note" id="rTsNote">The flow is sized at the platform maximum. A lower supply with the same flow gives more headroom for turndown and plant resets.</div>
+  <div class="note">The coolant supply is kept at the platform maximum, which saves the most on the facility water.</div>
   <label for="rReset" style="margin-top:12px">Chiller plant</label><select id="rReset"></select>
+  <label for="rVbuf" style="margin-top:12px">Buffer tank on the TCS loop (L per rack)</label><input type="number" id="rVbuf" value="100" min="0" step="50">
+  <div class="note">Covers a plant reset together with the CDU flow: a bigger tank needs less flow.</div>
   <details>
     <summary>Customize</summary>
     <label for="rFluid">Coolant</label><select id="rFluid"><option value="water">Water</option><option value="pg25">PG25 (25% propylene glycol)</option></select>
@@ -295,10 +296,7 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
       <div><label for="rDet">CDU sensing + control (s)</label><input type="number" id="rDet" value="3" min="0" step="1"></div>
       <div><label for="rRamp">CDU pump ramp (s)</label><input type="number" id="rRamp" value="7" min="0" step="1"></div>
     </div>
-    <div class="row">
-      <div><label for="rResetMin">Plant reset (min)</label><input type="number" id="rResetMin" min="0.5" step="0.5"></div>
-      <div><label for="rVbuf">TCS buffer tank per rack (L)</label><input type="number" id="rVbuf" value="100" min="0" step="50"></div>
-    </div>
+    <label for="rResetMin">Plant reset (min)</label><input type="number" id="rResetMin" min="0.5" step="0.5">
     <div class="row">
       <div><label for="rPipe">Pipe run plant → CDU (m)</label><input type="number" id="rPipe" value="150" min="5" step="10"></div>
       <div><label for="rVel">Facility water velocity (m/s)</label><input type="number" id="rVel" value="2" min="0.5" max="4" step="0.1"></div>
@@ -451,6 +449,10 @@ function rackStudy(p,i){
   const TsRide=Tr-(Ql/(mOp*cp))-Ql*tReset/(Mloop*cp);               // supply that rides through without a buffer (same flow)
   // with a small buffer tank on the TCS loop (litres per rack), mixed into the loop water
   const Mbuf=Mloop+i.Vbuf*f.rho/1000, tSafeBuf=head*Mbuf*cp/Ql, TsRideBuf=Tr-(Ql/(mOp*cp))-Ql*tReset/(Mbuf*cp);
+  // flow the CDU must deliver through the reset with a VL-litre tank per rack (supply fixed): the loop warms by
+  // Ql·t/(M·cp), and the rack ΔT at that flow must fit in what is left below the return limit
+  const flowReset=VL=>{ const M=Mloop+VL*f.rho/1000, avail=Tr-Ts-Ql*tReset/(M*cp); return avail<=0?Infinity:lpm(Math.max(mOp,Ql/(cp*avail)),f); };
+  const FresetNo=flowReset(0), FresetBuf=flowReset(i.Vbuf), tankTable=[0,100,250,500,1000,2000].map(V=>({V,F:flowReset(V)}));
   const resetTrace=[]; for(let k=0;k<=40;k++){ const t=k*Math.max(tReset,tSafeReset)*1.2/40; resetTrace.push({t:t/60,T:TrOp+rise*Math.min(t,tReset)}); }
 
   // 3. CDU pump trip at rated power: no flow; the cold-plate coolant and metal absorb the heat
@@ -461,7 +463,7 @@ function rackStudy(p,i){
   const chain=[{k:'Rack',d:'cold-plate coolant and metal, at the operating flow',t:Mr/mOp},{k:'TCS pipes',d:`round trip CDU ⇄ rack at ${fmt(i.tcsV,1)} m/s`,t:tTCS},{k:'CDU',d:`sensing and control ${fmt(i.tDet)} s${i.sensAt==='cdu'?` + return transit ${fmt(tTCS/2)} s`:''} + pump ramp ${fmt(i.tRamp)} s`,t:tResp},
     {k:'Facility pipes',d:`round trip plant ⇄ CDU at ${fmt(i.vel,1)} m/s`,t:tRT},{k:'Plant',d:'chiller reset',t:tReset}];
   return {p,f,Ql,Qa,QlJ,Ts,Tr,Freq,Fop,TrOp,air,tResp,tSense,tTCS,fSafe,FSafe:fSafe*Fop,peakOK,fFollow,jumpFollow,jumpSafe,tNoResp,
-    tRT,Mloop,rise,head,tReset,tSafeReset,bufL,TsRide,tSafeBuf,TsRideBuf,resetTrace,tPump,pumpTrace,chain};
+    tRT,Mloop,rise,head,tReset,tSafeReset,bufL,TsRide,tSafeBuf,TsRideBuf,FresetNo,FresetBuf,tankTable,resetTrace,tPump,pumpTrace,chain};
 }
 // ---------- Liquid Rack Cooling: page logic ----------
 const num=(id,d)=>{ const v=parseFloat($(id).value); return isNaN(v)?d:v; };
@@ -476,32 +478,30 @@ RESETS.forEach(x=>{ const o=document.createElement('option'); o.value=x.id; o.te
 const plat=()=>PLATFORMS.find(p=>p.id===$('rP').value);
 
 // platform defaults go into the fields; the user can still change them
-function loadPlatform(){ const p=plat(); $('rTs').value=p.TsMax; $('rIdle').value=Math.round(p.idle*100); $('rVrack').value=p.Vrack;
+function loadPlatform(){ const p=plat(); $('rIdle').value=Math.round(p.idle*100); $('rVrack').value=p.Vrack;
   $('rPnote').textContent=`${fmt(p.P)} kW per rack${p.Ppeak>p.P?` (up to ${fmt(p.Ppeak)} kW peak)`:''} · ${fmt(p.liq*100)}% to liquid · ASHRAE ${p.cls}`; }
 function loadReset(){ $('rResetMin').value=RESETS.find(x=>x.id===$('rReset').value).min; }
 
 function run(){
   const p=plat();
-  const i={fluid:$('rFluid').value,Ts:lim(num('rTs',p.TsMax),5,p.TsMax),margin:lim(num('rMargin',20),0,100)/100,idle:lim(num('rIdle',30),5,100)/100,
+  const i={fluid:$('rFluid').value,Ts:p.TsMax,margin:lim(num('rMargin',20),0,100)/100,idle:lim(num('rIdle',30),5,100)/100,
     tDet:Math.max(0,num('rDet',3)),tRamp:Math.max(0,num('rRamp',7)),pipeL:Math.max(5,num('rPipe',150)),vel:lim(num('rVel',2),0.5,4),Vrack:Math.max(1,num('rVrack',p.Vrack)),
     Vcdu:Math.max(0,num('rVcdu',40)),dTair:lim(num('rAir',12),5,25),Vbuf:Math.max(0,num('rVbuf',100)),tcsL:Math.max(1,num('rTcsL',20)),tcsV:lim(num('rTcsV',0.8),0.3,3),sensAt:$('rSens').value,resetMin:Math.max(0.5,num('rResetMin',3))};
-  if(num('rTs',p.TsMax)>p.TsMax) $('rTs').value=p.TsMax;
   R=rackStudy(p,i); R.i=i;
-  const r=R, okReset=r.tSafeReset>=r.tReset, okBuf=r.tSafeBuf>=r.tReset;
-  // a supply limit for the plant reset: the chosen supply already rides through, a lower one, or none practical
-  const ride=(T,lab)=>`<div><span class="v${T>=r.Ts-1e-6?' good':T<15?' bad':''}">${T<15?'none':`${fmt(T,1)} <small>°C</small>${T>=r.Ts-1e-6?' ✓':''}`}</span><span class="l">${lab}</span></div>`;
+  const r=R, okBuf=r.FresetBuf<=r.Fop+0.5;
+  // flow the CDU must deliver through a plant reset: covered by the operating flow, a higher flow, or not possible
+  const ride=(F,lab)=>`<div><span class="v${!isFinite(F)?' bad':F<=r.Fop+0.5?' good':''}">${isFinite(F)?`${fmt(F)} <small>L/min</small>`:'none'}</span><span class="l">${lab}</span></div>`;
   $('rStatus').textContent=`Per rack · ${p.name}`;
   $('rRes').innerHTML=`
     <div class="big4">
       <div class="bn"><div class="v good">${fmt(p.TsMax)} <small>°C</small></div><div class="l">Max coolant supply (ASHRAE ${p.cls}) · return limit ${fmt(r.Tr)} °C</div></div>
       <div class="bn"><div class="v">${fmt(r.Fop)} <small>L/min</small></div><div class="l">${fmt(r.Ql,1)} kW to liquid · return ${fmt(r.TrOp,1)} °C at ${fmt(r.Ts,r.Ts%1?1:0)} °C supply${r.Qa>0.05?` · ${fmt(r.Qa,1)} kW to air, ${fmt(r.air)} m³/h`:''}</div></div>
       <div class="bn"><div class="v">${fmt(r.FSafe)} <small>L/min</small></div><div class="l">${r.peakOK?`Safe minimum flow · ${fmt(r.fSafe*100)}% of operating. Survives a jump from idle to peak load`:`No turndown: even full flow does not hold a jump to the ${fmt(r.p.Ppeak)} kW peak`}</div></div>
-      <div class="bn"><div class="l">Max supply to ride through a ${fmt(i.resetMin,1)}-min plant reset</div><div class="pair">${ride(r.TsRide,'no tank')}${ride(r.TsRideBuf,`${fmt(i.Vbuf)} L/rack TCS tank`)}</div></div>
+      <div class="bn"><div class="l">Flow to ride through a ${fmt(i.resetMin,1)}-min plant reset</div><div class="pair">${ride(r.FresetBuf,`with ${fmt(i.Vbuf)} L/rack tank`)}${ride(r.FresetNo,'no tank')}</div></div>
     </div>
-    <div class="verdict${okReset?'':' warn'}">
-      ${r.peakOK?`<b>Variable flow</b> can go down to ${fmt(r.fSafe*100)}% of the operating flow (${fmt(r.FSafe)} L/min per rack). Below that, a jump from idle to the ${fmt(r.p.Ppeak)} kW peak heats the coolant past ${fmt(r.Tr)} °C before the CDU responds (${fmt(r.tResp)} s).`:`<b>Variable flow:</b> no turndown. A jump to the ${fmt(r.p.Ppeak)} kW peak passes ${fmt(r.Tr)} °C even at full flow: raise the flow margin or lower the supply temperature.`}<br>
-      ${okReset?`<b>Plant reset:</b> the loop water alone covers a ${fmt(i.resetMin,1)}-min reset.`
-        :`<b>Plant reset:</b> at ${fmt(r.Ts,r.Ts%1?1:0)} °C supply the loop water lasts only ${secs(r.tSafeReset)}${i.Vbuf>0?` (${secs(r.tSafeBuf)} with the ${fmt(i.Vbuf)} L/rack tank)`:''}, short of the ${fmt(i.resetMin,1)}-min reset. ${okBuf?`The ${fmt(i.Vbuf)} L/rack TCS tank covers it.`:`To ride it through, run the supply at <b>${fmt(r.TsRide,1)} °C</b> or lower${i.Vbuf>0?`, or <b>${fmt(r.TsRideBuf,1)} °C</b> with a ${fmt(i.Vbuf)} L/rack buffer tank on the TCS loop`:''}.`}`}<br>
+    <div class="verdict${okBuf?'':' warn'}">
+      ${r.peakOK?`<b>Variable flow</b> can go down to ${fmt(r.fSafe*100)}% of the operating flow (${fmt(r.FSafe)} L/min per rack). Below that, a jump from idle to the ${fmt(r.p.Ppeak)} kW peak heats the coolant past ${fmt(r.Tr)} °C before the CDU responds (${fmt(r.tResp)} s).`:`<b>Variable flow:</b> no turndown. A jump to the ${fmt(r.p.Ppeak)} kW peak passes ${fmt(r.Tr)} °C even at full flow: raise the flow margin.`}<br>
+      <b>Plant reset:</b> ${okBuf?`the ${fmt(i.Vbuf)} L/rack tank covers a ${fmt(i.resetMin,1)}-min reset at the operating flow.`:isFinite(r.FresetBuf)?`to ride through a ${fmt(i.resetMin,1)}-min reset at ${fmt(r.Ts)} °C supply, the CDU must deliver <b>${fmt(r.FresetBuf)} L/min per rack</b> with the ${fmt(i.Vbuf)} L/rack tank${isFinite(r.FresetNo)?` (${fmt(r.FresetNo)} L/min without a tank)`:''}. Size the CDU pumps and the TCS pipes for it, or use a ${fmt(r.bufL)} L/rack tank to stay at the operating flow.`:`no flow is enough with a ${fmt(i.Vbuf)} L/rack tank: the loop warms past the limit within the reset. Use at least ${fmt(r.bufL)} L/rack at the operating flow.`}<br>
       <b>Pump trip:</b> the rack reaches its limit in about ${secs(r.tPump)}. Run the standby CDU pump in parallel (hot standby) with automatic changeover.
     </div>`;
   chart(); details();
@@ -559,10 +559,9 @@ function details(){
       `<tr><td>Operating flow (sized at ${fmt(p.TsMax)} °C, +${fmt(i.margin*100)}%)</td><td>${fmt(r.Fop)}</td><td>return ${fmt(r.TrOp,1)} °C, ${fmt(r.head,1)} K below the limit</td></tr>`,
       `<tr><td>Safe minimum (variable flow)</td><td>${fmt(r.FSafe)}</td><td>${fmt(r.fSafe*100)}% of the operating flow</td></tr>`])}
     <h3>Plant reset (${fmt(i.resetMin,1)} min, no cooling)</h3>
-    ${table(['Case','Safe at '+fmt(r.Ts)+' °C','Max supply to ride through'],[
-      `<tr><td>Loop water only (${fmt(r.Mloop/r.f.rho,2)} m³ per rack)</td><td>${secs(r.tSafeReset)}</td><td>${fmt(r.TsRide,1)} °C</td></tr>`,
-      `<tr><td>+ ${fmt(i.Vbuf)} L/rack TCS buffer tank</td><td>${secs(r.tSafeBuf)}</td><td>${fmt(r.TsRideBuf,1)} °C</td></tr>`,
-      `<tr><td>Buffer to ride through at ${fmt(r.Ts)} °C</td><td colspan="2">${r.bufL>0?fmt(r.bufL)+' L per rack':'none needed'}</td></tr>`])}
+    <p class="note">Supply fixed at ${fmt(r.Ts)} °C. Loop water already in the pipes, CDU and rack: ${fmt(r.Mloop/r.f.rho,2)} m³ per rack (safe for ${secs(r.tSafeReset)} at the operating flow).</p>
+    ${table(['TCS tank per rack','Flow needed through the reset'],[...r.tankTable.map(x=>`<tr><td>${fmt(x.V)} L</td><td>${isFinite(x.F)?fmt(x.F)+' L/min'+(x.F<=r.Fop+0.5?' (operating flow)':' ('+fmt(x.F/r.Fop,1)+'× operating)'):'not possible'}</td></tr>`),
+      `<tr><td>${fmt(r.bufL)} L</td><td>${fmt(r.Fop)} L/min (operating flow)</td></tr>`])}
     <h3>Response chain</h3>
     ${table(['Stage','What sets it','Time'],r.chain.map(c=>`<tr><td>${c.k}</td><td>${c.d}</td><td>${secs(c.t)}</td></tr>`))}
     <ul class="method">
