@@ -10,12 +10,12 @@ let SCEN='jump', R=null;
 const plat=()=>PLATFORMS.find(p=>p.id===$('rP').value);
 
 // platform defaults go into the fields; the user can still change them
-function loadPlatform(){ const p=plat(); $('rTs').value=Math.min(40,p.TsMax); $('rIdle').value=Math.round(p.idle*100); $('rVrack').value=p.Vrack;
+function loadPlatform(){ const p=plat(); $('rPkw').value=p.P; $('rTs').value=Math.min(40,p.TsMax); $('rIdle').value=Math.round(p.idle*100); $('rVrack').value=p.Vrack;
   $('rPnote').textContent=`${fmt(p.P)} kW per rack${p.Ppeak>p.P?` (short peaks to ${fmt(p.Ppeak)} kW)`:''} · ${fmt(p.liq*100)}% to liquid · ASHRAE ${p.cls}`; }
 
 function run(){
   const p=plat();
-    const i={fluid:$('rFluid').value,Ts:lim(num('rTs',Math.min(40,p.TsMax)),5,p.TrMax-2),margin:lim(num('rMargin',20),0,100)/100,idle:lim(num('rIdle',30),5,100)/100,
+    const i={fluid:$('rFluid').value,P:Math.max(1,num('rPkw',p.P)),Ts:lim(num('rTs',Math.min(40,p.TsMax)),5,p.TrMax-2),margin:lim(num('rMargin',20),0,100)/100,idle:lim(num('rIdle',30),5,100)/100,
     tDet:Math.max(0,num('rDet',5)),tRamp:Math.max(0,num('rRamp',15)),tMCV:Math.max(0,num('rMCV',60)),
     Vrack:Math.max(1,num('rVrack',p.Vrack)),Vcdu:Math.max(0,num('rVcdu',40)),Vbuf:Math.max(0,num('rVbuf',100)),
     tcsL:Math.max(1,num('rTcsL',20)),tcsV:lim(num('rTcsV',0.8),0.3,3),sensAt:$('rSens').value,dTair:lim(num('rAir',12),5,25)};
@@ -36,7 +36,7 @@ function run(){
     </div>
     <div class="verdict${(a.ok||b.ok&&withTank)&&!over?'':' warn'}">
       ${over?`<b>Supply above the platform maximum:</b> ${fmt(r.Ts,r.Ts%1?1:0)} °C is above the ${fmt(p.TsMax)} °C maximum (ASHRAE ${p.cls}). This is risky unless confirmed in writing by the manufacturer for this platform.<br>`:''}
-      ${a.ok?`<b>Variable flow</b> can go down to ${fmt(a.F)} L/min per rack at idle (${fmt(a.fSafe*100)}% of the operating flow)${withTank&&b.ok?`, or ${fmt(b.F)} L/min with the ${tk}`:''}. Below that, a jump from idle to the ${fmt(p.P)} kW rated load heats the coolant past ${fmt(r.Tr)} °C before the VFD pump ramps up (${fmt(r.tSense)} s to react + ${fmt(i.tRamp)} s ramp).`
+      ${a.ok?`<b>Variable flow</b> can go down to ${fmt(a.F)} L/min per rack at idle (${fmt(a.fSafe*100)}% of the operating flow)${withTank&&b.ok?`, or ${fmt(b.F)} L/min with the ${tk}`:''}. Below that, a jump from idle to the ${fmt(r.P)} kW rated load heats the coolant past ${fmt(r.Tr)} °C before the VFD pump ramps up (${fmt(r.tSense)} s to react + ${fmt(i.tRamp)} s ramp).`
         :withTank&&b.ok?`<b>Without a tank</b> the coolant passes ${fmt(r.Tr)} °C after a load jump even at full flow: the MCV (${fmt(i.tMCV)} s) is too slow for the loop water alone. With the ${tk}, variable flow can go down to ${fmt(b.F)} L/min per rack at idle (${fmt(b.fSafe*100)}%).`
         :`<b>No safe turndown:</b> after a load jump the coolant passes ${fmt(r.Tr)} °C even at full flow. Use a faster MCV or pump${withTank?', or a larger TCS tank':', or add a TCS buffer tank'}${i.sensAt==='cdu'?', or sense the return at the rack manifold':''}.`}<br>
       <b>Control valve:</b> while the MCV opens (${fmt(i.tMCV)} s) the TCS supply rises by up to ${fmt(a.rise,1)} K${withTank?` (${fmt(b.rise,1)} K with the ${tk})`:''}.<br>
@@ -65,7 +65,7 @@ function chart(){
     const s=withTank?b:a;
     ds.push(line('Rack flow',s.tr.map(x=>({x:x.t,y:x.f*100})),css('--s1'),{borderDash:[2,3],borderWidth:1.5,yAxisID:'y1'}),
       line('Return limit',[{x:0,y:r.Tr},{x:end,y:r.Tr}],limC,{borderDash:[6,4],borderWidth:1}));
-    title=`Idle (${fmt(i.idle*100)}%) → ${fmt(r.p.P)} kW at once, from the safe minimum flow; VFD pump ${fmt(i.tRamp)} s, MCV ${fmt(i.tMCV)} s`;
+    title=`Idle (${fmt(i.idle*100)}%) → ${fmt(r.P)} kW at once, from the safe minimum flow; VFD pump ${fmt(i.tRamp)} s, MCV ${fmt(i.tMCV)} s`;
     note=`The CDU reacts after ${fmt(r.tSense)} s. Until the MCV is open, the heat exchanger removes only the idle heat, so the TCS supply warms; the loop water${withTank?' and the tank':''} slow that rise.`;
   }else{
     o.scales.x.title.text='Seconds after the CDU pump trips';
@@ -84,7 +84,7 @@ function details(){
   const fl=s=>s.ok?`${fmt(s.F)} L/min (${fmt(s.fSafe*100)}%)`:`${fmt(r.Fop)} L/min (100%, no turndown)`;
   $('rDet').innerHTML=`<h3>Platform data</h3>
     ${table(['Item','Value','Basis'],[
-      `<tr><td>Rack power</td><td>${fmt(p.P)} kW${p.Ppeak>p.P?` (short peaks to ${fmt(p.Ppeak)} kW)`:''}</td><td>${q('P')}</td></tr>`,
+      `<tr><td>Rack power</td><td>${fmt(r.P)} kW${Math.abs(r.P-p.P)>1e-6?` (platform ${fmt(p.P)} kW)`:''}${p.Ppeak>p.P?` (short peaks to ${fmt(p.Ppeak)} kW)`:''}</td><td>${q('P')}</td></tr>`,
       `<tr><td>Heat to liquid</td><td>${fmt(p.liq*100)}%</td><td>${q('liq')}</td></tr>`,
       `<tr><td>Max coolant supply</td><td>${fmt(p.TsMax)} °C (ASHRAE ${p.cls})</td><td>${q('TsMax')}</td></tr>`,
       `<tr><td>Max coolant return</td><td>${fmt(p.TrMax)} °C</td><td>${q('TrMax')}</td></tr>`,
@@ -102,7 +102,7 @@ function details(){
     ${table(['Stage','What sets it','Time'],r.chain.map(c=>`<tr><td>${c.k}</td><td>${c.d}</td><td>${secs(c.t)}</td></tr>`))}
     <ul class="method">
       <li><b>Flow:</b> liquid heat ÷ (ρ·cp·(return limit − supply)), with ${esc(r.f.name)} (ρ ${fmt(r.f.rho)} kg/m³, cp ${fmt(r.f.cp,2)} kJ/kg·K). This reproduces the Lenovo GB300 table (59 L/min at 25 °C … 177 L/min at 45 °C). The supply is the value entered, at most the platform maximum.</li>
-      <li><b>Load jump:</b> the rack goes from idle to its ${fmt(p.P)} kW rated load at once. Short electrical peaks${p.Ppeak>p.P?` (to ${fmt(p.Ppeak)} kW)`:''} last milliseconds to seconds and are smoothed by the thermal mass. Two water masses: the buffer at the chips, and the TCS loop (CDU, TCS pipes${i.Vbuf>0?', buffer tank':''}) at the supply temperature. The CDU reacts after the sensing time; then the VFD pump ramps the rack flow to the operating flow and the MCV opens the facility water to the heat exchanger (taken with the same ${fmt(i.margin*100)}% margin). The safe minimum is the lowest idle flow whose return stays at or below the limit${p.minLpm?', and not below the vendor minimum':''}.</li>
+      <li><b>Load jump:</b> the rack goes from idle to its ${fmt(r.P)} kW rated load at once. Short electrical peaks${p.Ppeak>p.P?` (to ${fmt(p.Ppeak)} kW)`:''} last milliseconds to seconds and are smoothed by the thermal mass. Two water masses: the buffer at the chips, and the TCS loop (CDU, TCS pipes${i.Vbuf>0?', buffer tank':''}) at the supply temperature. The CDU reacts after the sensing time; then the VFD pump ramps the rack flow to the operating flow and the MCV opens the facility water to the heat exchanger (taken with the same ${fmt(i.margin*100)}% margin). The safe minimum is the lowest idle flow whose return stays at or below the limit${p.minLpm?', and not below the vendor minimum':''}.</li>
       <li><b>Load drop:</b> going from full load to idle is not a thermal risk for the chips; the flow and the valve follow at their own pace, and the ΔT is low for a short time.</li>
       <li><b>Pump trip:</b> no flow at rated load; only the buffer at the chips absorbs the heat, from the operating return up to the limit.</li>
       <li><b>Return limit as the safety line:</b> it is the platform design rating; the chips throttle at their own junction limit, somewhat later. The CDU is assumed to raise the flow when the return temperature rises (temperature or ΔT control); with fixed differential-pressure control the rack flow does not follow the load at all.</li>

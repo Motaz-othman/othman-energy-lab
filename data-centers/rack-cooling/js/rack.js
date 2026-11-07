@@ -28,7 +28,7 @@ function loadJump(r,fmin,Mt,tEnd){
 }
 
 function rackStudy(p,i){
-  const f=FLUIDS[i.fluid], Ql=p.P*p.liq, Qa=p.P-Ql, QlIdle=Ql*i.idle, Ts=Math.min(i.Ts,p.TrMax-2), Tr=p.TrMax, cp=f.cp;
+  const f=FLUIDS[i.fluid], P=i.P??p.P, Ql=P*p.liq, Qa=P-Ql, QlIdle=Ql*i.idle, Ts=Math.min(i.Ts,p.TrMax-2), Tr=p.TrMax, cp=f.cp;
   const mReq=Ql/(cp*(Tr-Ts)), Freq=lpm(mReq,f);                   // minimum flow at rated power
   const mOp=mReq*(1+i.margin), Fop=lpm(mOp,f), TrOp=Ts+Ql/(mOp*cp);  // operating flow with the margin
   const Mr=i.Vrack*f.rho/1000, air=Qa/(1.2*1.006*i.dTair)*3600;
@@ -57,5 +57,5 @@ function rackStudy(p,i){
     {k:'CDU sensing',d:`control reaction${i.sensAt==='cdu'?' + return transit to the CDU':''}`,t:tSense},
     {k:'VFD pump',d:'ramp to the operating flow',t:i.tRamp},
     {k:'MCV',d:'stroke to full facility water on the CDU heat exchanger',t:i.tMCV}];
-  return {p,f,Ql,Qa,QlIdle,Ts,Tr,Freq,Fop,TrOp,air,tSense,tTCS,Mpipe,Mcdu,noTank,tank,head,tPump,pumpTrace,chain};
+  return {p,f,P,Ql,Qa,QlIdle,Ts,Tr,Freq,Fop,TrOp,air,tSense,tTCS,Mpipe,Mcdu,noTank,tank,head,tPump,pumpTrace,chain};
 }

@@ -51,7 +51,10 @@
   <div class="note">The MCV is the CDU control valve on the facility water side of its heat exchanger. Defaults are on the safe side (standard actuator and pump ramp); enter the vendor values when known.</div>
   <details>
     <summary>Customize</summary>
-    <label for="rFluid">Coolant</label><select id="rFluid"><option value="water">Water</option><option value="pg25">PG25 (25% propylene glycol)</option></select>
+    <div class="row">
+      <div><label for="rFluid">Coolant</label><select id="rFluid"><option value="pg25" selected>PG25 (25% propylene glycol)</option><option value="water">Water</option></select></div>
+      <div><label for="rPkw">Rack power (kW)</label><input type="number" id="rPkw" min="1" step="5"></div>
+    </div>
     <div class="row">
       <div><label for="rMargin">Flow margin (%)</label><input type="number" id="rMargin" value="20" min="0" max="100" step="5"></div>
       <div><label for="rIdle">Idle heat (%)</label><input type="number" id="rIdle" min="5" max="100" step="5"></div>
