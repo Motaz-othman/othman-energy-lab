@@ -11,9 +11,10 @@ const NAV=[
   {id:'data-centers',l:'Data Centers',href:'data-centers/index.html'},
   {id:'contact',l:'Contact',href:'contact/index.html'},
 ];
-// mark: three bars stepping down (code minimum → beyond), the last in brand green
+// mark: an "O" for Othman with an energy bolt breaking through it, the bolt in brand green
 const MARK=`<svg viewBox="0 0 26 26" aria-hidden="true"><rect width="26" height="26" rx="6" style="fill:var(--text)"/>
-<rect x="6" y="6" width="3.6" height="14" rx="1" style="fill:var(--surface)"/><rect x="11.2" y="10" width="3.6" height="10" rx="1" style="fill:var(--surface)"/><rect x="16.4" y="14" width="3.6" height="6" rx="1" style="fill:var(--brand-ink)"/></svg>`;
+<ellipse cx="12.4" cy="13.4" rx="6.6" ry="7" fill="none" style="stroke:var(--surface)" stroke-width="2.6"/>
+<path d="M19.4 3 L11.4 13.6 H15.4 L9.6 22.8 L22 10.6 H18.6 L22.6 3 Z" style="fill:var(--brand-ink);stroke:var(--text)" stroke-width="1.3" stroke-linejoin="round"/></svg>`;
 (function(){
   const bar=document.querySelector('header.sitebar');
   if(bar){ const r=bar.dataset.root||'';
