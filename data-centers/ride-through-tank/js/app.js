@@ -10,7 +10,7 @@ function rideThroughTank(i){
 
 function run(){
   const lim=(v,a,b)=>Math.min(b,Math.max(a,v));   // typed values are not held to the min / max of the fields
-  const i={Q:Math.max(1,num('eQ',20000)),min:Math.max(0.5,num('eMin',10)),Ts:num('eTs',30),Tr:num('eTr',40),eff:lim(num('eEff',85),50,100)/100,margin:Math.max(0,num('eMar',20))/100,Hmax:Math.max(3,num('eH',15)),costV:Math.max(0,num('eCost',500))};
+  const i={Q:Math.max(0.1,num('eQ',20))*1000,min:Math.max(0.5,num('eMin',10)),Ts:num('eTs',30),Tr:num('eTr',40),eff:lim(num('eEff',85),50,100)/100,margin:Math.max(0,num('eMar',20))/100,Hmax:Math.max(3,num('eH',15)),costV:Math.max(0,num('eCost',500))};
   const r=rideThroughTank(i);
   $('eRes').innerHTML=`
     <div class="big4">

@@ -45,7 +45,7 @@
     <div class="note" id="gFileInfo">Same formats as the Cooling Plant Selector.</div>
   </div>
   <h2 style="margin-top:18px">Load and plant</h2>
-  <label for="gQ">Cooling load / chiller capacity at full IT (kW)</label><input type="number" id="gQ" value="20000" min="1" step="500">
+  <label for="gQ">Cooling load / chiller capacity at full IT (MW)</label><input type="number" id="gQ" value="20" min="0.1" step="1">
   <label for="gNight">Average IT load over the 12-hour night (%)</label><input type="number" id="gNight" value="80" min="10" max="100" step="5">
   <div class="note">The tank recharges at night, 19:00 to 07:00, with the chiller capacity the IT load leaves free. The lower the night load, the faster it recharges. By day the IT load is taken at 100%.</div>
   <label for="gSys">Cooling system</label><select id="gSys"></select>

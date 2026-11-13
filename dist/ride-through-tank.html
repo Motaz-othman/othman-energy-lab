@@ -288,7 +288,7 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
 <div class="colhead"><b>Inputs</b><span>Results update instantly</span></div>
 <aside class="card inputs" id="inEmg">
   <h2>Load and time</h2>
-  <label for="eQ">Cooling load (kW)</label><input type="number" id="eQ" value="20000" min="1" step="500">
+  <label for="eQ">Cooling load (MW)</label><input type="number" id="eQ" value="20" min="0.1" step="0.5">
   <label for="eMin">Ride-through time (minutes)</label><input type="number" id="eMin" value="10" min="0.5" step="0.5">
   <div class="note">Time from the power cut until the chillers are cooling again on generator power: generator start, changeover and chiller restart. Typically 5–15 minutes.</div>
   <h2 style="margin-top:18px">Chilled water</h2>
@@ -382,7 +382,7 @@ function rideThroughTank(i){
 
 function run(){
   const lim=(v,a,b)=>Math.min(b,Math.max(a,v));   // typed values are not held to the min / max of the fields
-  const i={Q:Math.max(1,num('eQ',20000)),min:Math.max(0.5,num('eMin',10)),Ts:num('eTs',30),Tr:num('eTr',40),eff:lim(num('eEff',85),50,100)/100,margin:Math.max(0,num('eMar',20))/100,Hmax:Math.max(3,num('eH',15)),costV:Math.max(0,num('eCost',500))};
+  const i={Q:Math.max(0.1,num('eQ',20))*1000,min:Math.max(0.5,num('eMin',10)),Ts:num('eTs',30),Tr:num('eTr',40),eff:lim(num('eEff',85),50,100)/100,margin:Math.max(0,num('eMar',20))/100,Hmax:Math.max(3,num('eH',15)),costV:Math.max(0,num('eCost',500))};
   const r=rideThroughTank(i);
   $('eRes').innerHTML=`
     <div class="big4">

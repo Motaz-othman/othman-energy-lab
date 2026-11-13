@@ -23,7 +23,7 @@ $('gFile').onchange=e=>{ const f=e.target.files[0]; if(!f) return; const rd=new 
 // ---------- study ----------
 function inputs(){
   const lim=(v,a,b)=>Math.min(b,Math.max(a,v));   // typed values are not held to the min / max of the fields
-  return {Q:Math.max(1,num('gQ',20000)),night:lim(num('gNight',80),10,100)/100,sys:$('gSys').value,Ts:num('gTs',30),Tr:Math.max(num('gTr',40),num('gTs',30)+1),
+  return {Q:Math.max(0.1,num('gQ',20))*1000,night:lim(num('gNight',80),10,100)/100,sys:$('gSys').value,Ts:num('gTs',30),Tr:Math.max(num('gTr',40),num('gTs',30)+1),
     reserve:lim(num('gReserve',20),0,80)/100,margin:Math.max(0,num('gMar',20))/100,days:lim(Math.round(num('gDays',3)),1,7),rechMax:lim(num('gRechMax',4),1,12),
     eff:lim(num('gEff',85),50,100)/100,Hmax:Math.max(3,num('gH',15)),safety:Math.max(0,num('gSafe',0))};
 }
