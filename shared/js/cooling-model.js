@@ -4,6 +4,7 @@ const OPTIONS=[
  {id:'accfc',name:'Air-cooled chillers + free-cooling dry coolers', short:'Chillers + dry coolers', water:false, comp:['acch','dc']},
  {id:'adia', name:'Water-cooled chillers + adiabatic coolers', short:'Chillers + adiabatic', water:true, comp:['wcch','adc','hx']},
  {id:'wcc',  name:'Water-cooled chillers + cooling towers',   short:'Chillers + towers',     water:true, comp:['wcch','ct','hx']},
+ {id:'hyb',  name:'Water-cooled chillers + dry coolers + cooling towers (hybrid)', short:'Chillers + hybrid', water:true, comp:['wcch','dc','ct','hx']},
 ];
 const RATES=[
  {id:'acch',l:'Air-cooled chillers',lo:180,hi:280},
@@ -34,11 +35,18 @@ function chillerPower(Qch, capEach, n, kind, Ts, Tc, p){
 
 
 function hourModel(o,L,db,wb,p){
-  let Tout,Tc,kind,fanK,cwK=0,teff=db;
+  let Tout,Tc,kind,fanK,cwK=0,teff=db,wet=1,dShare=0;
   if(o.id==='acc'){Tout=Infinity;Tc=db+15;kind='ac';fanK=0;}
   else if(o.id==='accfc'){Tout=db+p.aDC;Tc=db+15;kind='ac';fanK=0.015;}
   else if(o.id==='adia'){teff=db>p.swAD?db-p.eAD*(db-wb):db; Tout=teff+p.aDC+p.aHX; Tc=teff+p.aDC+7.6; kind='wc'; fanK=0.018; cwK=p.cwp;}
   else if(o.id==='wcc'){Tout=wb+p.aCT+p.aHX; Tc=wb+p.aCT+7.6; kind='wc'; fanK=0.008; cwK=p.cwp;}
+  else if(o.id==='hyb'){
+    // hybrid: dry coolers and cooling towers in series on the condenser water. At or below the switch temperature
+    // the dry coolers alone cool the water (no water used). Above it the towers run, and the dry coolers
+    // pre-cool the water ahead of them while the air is cooler than the water (range 6 K), cutting tower water.
+    let Tcw; if(db<=p.swHY){ Tcw=db+p.aDC; wet=0; dShare=1; }
+    else { Tcw=wb+p.aCT; dShare=Math.max(0,Math.min(1,(Tcw+6-(db+p.aDC))/6)); wet=1-dShare; }
+    Tout=Tcw+p.aHX; Tc=Tcw+7.6; kind='wc'; fanK=0.018; cwK=p.cwp;}
   const ff=Tout<=L.Ts?1:Math.max(0,Math.min(1,(L.Tr-Tout)/(L.Tr-L.Ts)));
   // terminal units in the hall: CRAH / FWU fans on the air loop, CDU pumps on the liquid loop;
   // their power is cooling energy and also ends up as heat in the loop
@@ -52,6 +60,7 @@ function hourModel(o,L,db,wb,p){
     if(o.id==='accfc') Pf = ff>0 ? fanK*qL*airFrac : 0;
     else if(o.id==='adia') Pf=fanK*Qr*airFrac;
     else if(o.id==='wcc') Pf=fanK*Qr;
+    else if(o.id==='hyb') Pf=wet>0 ? 0.008*Qr+fanK*Qr*dShare : fanK*Qr*airFrac;   // towers + dry coolers, or dry coolers alone
     const Pp=p.pump*qL + cwK*Qr;
     return {Pc:ch.P,Pf,Pp,Pt,Qr,cop:ch.cop,P:ch.P+Pf+Pp+Pt};
   };
@@ -59,7 +68,7 @@ function hourModel(o,L,db,wb,p){
   let limit=null;
   if(kind==='ac' && db>p.acMax) limit=`ambient ${db.toFixed(1)} °C > air-cooled chiller limit ${p.acMax} °C`;
   if(kind==='wc'){ const ecw=Tc-7.6; if(ecw>p.wcMax) limit=`entering condenser water ${ecw.toFixed(1)} °C > limit ${p.wcMax} °C`; }
-  return {Tout,Tc,kind,ff,teff,calc,limit};
+  return {Tout,Tc,kind,ff,teff,wet,calc,limit};
 }
 
 function designCheck(p,dbD,wbD){
@@ -67,7 +76,7 @@ function designCheck(p,dbD,wbD){
   for(const o of OPTIONS){
     let P=0,Qr=0,Pc=0,W=0; const issues=[];
     p.loops.forEach(L=>{ if(L.Qd<=0) return; const hm=hourModel(o,L,dbD,wbD,p), d=hm.calc(L.Qd);
-      P+=d.P; Qr+=d.Qr; Pc+=d.Pc; W+=waterKgH(o,d.Qr,dbD,hm.teff,p)/1000;
+      P+=d.P; Qr+=d.Qr; Pc+=d.Pc; W+=waterKgH(o,d.Qr,dbD,hm.teff,p,hm.wet)/1000;
       if(hm.limit && hm.ff<1) issues.push(hm.limit);
     });
     out[o.id]={P,Qr,Pc,W,ok:issues.length===0,issues:[...new Set(issues)],ratio:P/p.Qd};
@@ -75,9 +84,9 @@ function designCheck(p,dbD,wbD){
   return out;
 }
 
-// make-up water, kg/h: tower evaporation + blowdown, or adiabatic pad water when wet
-function waterKgH(o,Qr,db,teff,p){
-  if(o.id==='wcc') return 0.8*Qr*3600/2430*(p.coc/(p.coc-1));
+// make-up water, kg/h: tower evaporation + blowdown (hybrid: only the towers' share of the heat), or adiabatic pad water when wet
+function waterKgH(o,Qr,db,teff,p,wet=1){
+  if(o.id==='wcc'||o.id==='hyb') return (o.id==='hyb'?wet:1)*0.8*Qr*3600/2430*(p.coc/(p.coc-1));
   if(o.id==='adia'&&db>p.swAD) return Qr*3600*(db-teff)/(12*2430)*1.15;
   return 0;
 }
@@ -95,7 +104,7 @@ function simulate(wx,p){
         const a=calc(L.Q), d=calc(L.Qd);
         r.E+=a.P; r.Ec+=a.Pc; r.Ef+=a.Pf; r.Ep+=a.Pp; r.Et+=a.Pt; Pd+=d.P;
         if(a.cop){r.copSum+=a.cop; r.copN++;}
-        r.W+=waterKgH(o,a.Qr,db,teff,p); Wd+=waterKgH(o,d.Qr,db,teff,p);
+        r.W+=waterKgH(o,a.Qr,db,teff,p,hm.wet); Wd+=waterKgH(o,d.Qr,db,teff,p,hm.wet);
         if(ff>=1){r.free[li]++; r.mFree[li][m]++;} else if(ff>0){r.part[li]++; r.mPart[li][m]++;} else {r.mech[li]++; r.mMech[li][m]++;}
       });
       r.peak=Math.max(r.peak,Pd); r.Wpeak=Math.max(r.Wpeak,Wd);   // peaks at 100% load on the worst hour

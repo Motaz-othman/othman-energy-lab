@@ -311,7 +311,7 @@ details[open]>:not(summary){animation:fadeUp .2s ease both}
 <body class="wide" style="--navh:0px">
 <div class="pagehead">
   <h1>Cooling Plant Selector</h1>
-  <p class="sub">Compare air-cooled chillers, free-cooling dry coolers, adiabatic coolers and cooling towers for a data hall with liquid and air cooling loops, hour by hour over a full year.</p>
+  <p class="sub">Compare air-cooled chillers, free-cooling dry coolers, adiabatic coolers, cooling towers and hybrid dry coolers + towers for a data hall with liquid and air cooling loops, hour by hour over a full year.</p>
   <div class="chips"><span>ASHRAE 90.4 MLC</span><span>ASHRAE 90.1 chiller minimums</span><span>AHRI 550/590</span><span>8,760-hour simulation</span></div>
 </div>
 <main class="layout">
@@ -414,6 +414,10 @@ details[open]>:not(summary){animation:fadeUp .2s ease both}
     <div class="row">
       <div><label for="swAD">Adiabatic on above (°C)</label><input type="number" id="swAD" value="24" step="1"></div>
       <div><label for="coc">Tower cycles of conc.</label><input type="number" id="coc" value="4" step="0.5" min="1.5"></div>
+    </div>
+    <div class="row">
+      <div><label for="swHY">Hybrid: towers on above (°C)</label><input type="number" id="swHY" value="24" step="1"></div>
+      <div></div>
     </div>
     <div class="row">
       <div><label for="pump">Primary pumps, FW / CHW (% of load)</label><input type="number" id="pump" value="1.5" step="0.5" min="0"></div>
@@ -540,10 +544,10 @@ details[open]>:not(summary){animation:fadeUp .2s ease both}
       <li><b>Psychrometrics</b> (ASHRAE Handbook Fundamentals, Ch. 1): saturation pressure by the Hyland–Wexler equations; humidity ratio <code>W = 0.621945·p<sub>w</sub>/(p − p<sub>w</sub>)</code>; wet-bulb solved from <code>W = [(2501 − 2.326t*)W<sub>s</sub>* − 1.006(t − t*)] / (2501 + 1.86t − 4.186t*)</code>. Station pressure from elevation.</li>
       <li><b>Each loop, every hour</b>: return water is first cooled by the outdoor device, leaving at <code>T<sub>out</sub></code>; free-cooling fraction <code>FF = (T<sub>ret</sub> − T<sub>out</sub>)/(T<sub>ret</sub> − T<sub>sup</sub>)</code> (0–1); the chiller trims the rest.</li>
       <li><b>Terminal units</b>: CRAH / FWU fans (air loop) and CDU pumps (liquid loop) draw a set % of their loop load. Their power is cooling energy, and the same power is added to the loop as heat: <code>Q<sub>loop</sub> = Q<sub>IT</sub> × (1 + terminal %)</code>, which the pre-cooling, chillers and heat rejection must remove. Chillers are sized for this load.</li>
-      <li><b>T<sub>out</sub></b>: dry cooler <code>T<sub>db</sub> + approach</code>; adiabatic <code>T<sub>eff</sub> + approach + HX</code> with <code>T<sub>eff</sub> = T<sub>db</sub> − ε(T<sub>db</sub> − T<sub>wb</sub>)</code> (ASHRAE Systems &amp; Equipment, evaporative cooling); tower <code>T<sub>wb</sub> + approach + HX</code>.</li>
+      <li><b>T<sub>out</sub></b>: dry cooler <code>T<sub>db</sub> + approach</code>; adiabatic <code>T<sub>eff</sub> + approach + HX</code> with <code>T<sub>eff</sub> = T<sub>db</sub> − ε(T<sub>db</sub> − T<sub>wb</sub>)</code> (ASHRAE Systems &amp; Equipment, evaporative cooling); tower <code>T<sub>wb</sub> + approach + HX</code>; hybrid: dry coolers alone at or below the switch temperature (<code>T<sub>db</sub> + dry cooler approach + HX</code>), towers above it (<code>T<sub>wb</sub> + tower approach + HX</code>) with the dry coolers in series ahead of them, taking the share <code>(T<sub>CW,ret</sub> − T<sub>db</sub> − approach)/6 K</code> of the heat while the air is cooler than the water.</li>
       <li><b>Chillers</b> (DOE-2 / EnergyPlus EIR form): <code>P = (Q<sub>cap</sub>/COP<sub>rated</sub>) × EIRFT × EIRFPLR</code>. COP<sub>rated</sub> at AHRI 550/590 conditions (defaults: ASHRAE 90.1-2019 Path A minimums). EIRFT scales with lift at constant Carnot fraction, because 20–30 °C chilled water is outside published curve ranges. EIRFPLR from EnergyPlus reference curves: water-cooled VSD centrifugal 0.0731 + 0.1514·PLR + 0.7709·PLR²; air-cooled screw = PLR. Duty chillers stage to keep PLR high.</li>
       <li><b>Condensing temperature</b>: air-cooled <code>T<sub>db</sub> + 15 K</code>; water-cooled <code>T<sub>ECW</sub> + 7.6 K</code>, where entering condenser water = <code>T<sub>wb</sub> + tower approach</code> or <code>T<sub>eff</sub> + cooler approach</code>.</li>
-      <li><b>Water</b>: tower evaporation <code>0.8·Q<sub>rej</sub>/h<sub>fg</sub></code> plus blowdown <code>E/(CoC − 1)</code>; adiabatic water only when pads are wet (above the switch temperature).</li>
+      <li><b>Water</b>: tower evaporation <code>0.8·Q<sub>rej</sub>/h<sub>fg</sub></code> plus blowdown <code>E/(CoC − 1)</code>; adiabatic water only when pads are wet (above the switch temperature); hybrid: tower water only above its switch temperature, on the towers' share of the heat.</li>
       <li><b>Design-day check</b>: each option at 100% load at the design dry-bulb and wet-bulb (applied together, which is conservative). Fails if a chiller would exceed its condenser limit (air-cooled max ambient, max entering condenser water).</li>
       <li><b>MLC</b> (ASHRAE 90.4): annual mechanical energy (compressors, heat-rejection fans, primary, condenser and CDU pumps, CRAH / FWU fans) ÷ annual IT energy.</li>
       <li><b>Peaks</b>: at 100% load on the worst hour of the year. Electrical peak (cooling) = compressors + heat-rejection fans + pumps + CRAH / FWU fans + CDU pumps. It excludes the IT load and the electrical equipment and its losses. Water peak = make-up water rate in m³/h (tower evaporation and blowdown, or adiabatic pad water). Chillers are staged each hour to the number that gives the lowest power.</li>
@@ -724,6 +728,7 @@ const OPTIONS=[
  {id:'accfc',name:'Air-cooled chillers + free-cooling dry coolers', short:'Chillers + dry coolers', water:false, comp:['acch','dc']},
  {id:'adia', name:'Water-cooled chillers + adiabatic coolers', short:'Chillers + adiabatic', water:true, comp:['wcch','adc','hx']},
  {id:'wcc',  name:'Water-cooled chillers + cooling towers',   short:'Chillers + towers',     water:true, comp:['wcch','ct','hx']},
+ {id:'hyb',  name:'Water-cooled chillers + dry coolers + cooling towers (hybrid)', short:'Chillers + hybrid', water:true, comp:['wcch','dc','ct','hx']},
 ];
 const RATES=[
  {id:'acch',l:'Air-cooled chillers',lo:180,hi:280},
@@ -754,11 +759,18 @@ function chillerPower(Qch, capEach, n, kind, Ts, Tc, p){
 
 
 function hourModel(o,L,db,wb,p){
-  let Tout,Tc,kind,fanK,cwK=0,teff=db;
+  let Tout,Tc,kind,fanK,cwK=0,teff=db,wet=1,dShare=0;
   if(o.id==='acc'){Tout=Infinity;Tc=db+15;kind='ac';fanK=0;}
   else if(o.id==='accfc'){Tout=db+p.aDC;Tc=db+15;kind='ac';fanK=0.015;}
   else if(o.id==='adia'){teff=db>p.swAD?db-p.eAD*(db-wb):db; Tout=teff+p.aDC+p.aHX; Tc=teff+p.aDC+7.6; kind='wc'; fanK=0.018; cwK=p.cwp;}
   else if(o.id==='wcc'){Tout=wb+p.aCT+p.aHX; Tc=wb+p.aCT+7.6; kind='wc'; fanK=0.008; cwK=p.cwp;}
+  else if(o.id==='hyb'){
+    // hybrid: dry coolers and cooling towers in series on the condenser water. At or below the switch temperature
+    // the dry coolers alone cool the water (no water used). Above it the towers run, and the dry coolers
+    // pre-cool the water ahead of them while the air is cooler than the water (range 6 K), cutting tower water.
+    let Tcw; if(db<=p.swHY){ Tcw=db+p.aDC; wet=0; dShare=1; }
+    else { Tcw=wb+p.aCT; dShare=Math.max(0,Math.min(1,(Tcw+6-(db+p.aDC))/6)); wet=1-dShare; }
+    Tout=Tcw+p.aHX; Tc=Tcw+7.6; kind='wc'; fanK=0.018; cwK=p.cwp;}
   const ff=Tout<=L.Ts?1:Math.max(0,Math.min(1,(L.Tr-Tout)/(L.Tr-L.Ts)));
   // terminal units in the hall: CRAH / FWU fans on the air loop, CDU pumps on the liquid loop;
   // their power is cooling energy and also ends up as heat in the loop
@@ -772,6 +784,7 @@ function hourModel(o,L,db,wb,p){
     if(o.id==='accfc') Pf = ff>0 ? fanK*qL*airFrac : 0;
     else if(o.id==='adia') Pf=fanK*Qr*airFrac;
     else if(o.id==='wcc') Pf=fanK*Qr;
+    else if(o.id==='hyb') Pf=wet>0 ? 0.008*Qr+fanK*Qr*dShare : fanK*Qr*airFrac;   // towers + dry coolers, or dry coolers alone
     const Pp=p.pump*qL + cwK*Qr;
     return {Pc:ch.P,Pf,Pp,Pt,Qr,cop:ch.cop,P:ch.P+Pf+Pp+Pt};
   };
@@ -779,7 +792,7 @@ function hourModel(o,L,db,wb,p){
   let limit=null;
   if(kind==='ac' && db>p.acMax) limit=`ambient ${db.toFixed(1)} °C > air-cooled chiller limit ${p.acMax} °C`;
   if(kind==='wc'){ const ecw=Tc-7.6; if(ecw>p.wcMax) limit=`entering condenser water ${ecw.toFixed(1)} °C > limit ${p.wcMax} °C`; }
-  return {Tout,Tc,kind,ff,teff,calc,limit};
+  return {Tout,Tc,kind,ff,teff,wet,calc,limit};
 }
 
 function designCheck(p,dbD,wbD){
@@ -787,7 +800,7 @@ function designCheck(p,dbD,wbD){
   for(const o of OPTIONS){
     let P=0,Qr=0,Pc=0,W=0; const issues=[];
     p.loops.forEach(L=>{ if(L.Qd<=0) return; const hm=hourModel(o,L,dbD,wbD,p), d=hm.calc(L.Qd);
-      P+=d.P; Qr+=d.Qr; Pc+=d.Pc; W+=waterKgH(o,d.Qr,dbD,hm.teff,p)/1000;
+      P+=d.P; Qr+=d.Qr; Pc+=d.Pc; W+=waterKgH(o,d.Qr,dbD,hm.teff,p,hm.wet)/1000;
       if(hm.limit && hm.ff<1) issues.push(hm.limit);
     });
     out[o.id]={P,Qr,Pc,W,ok:issues.length===0,issues:[...new Set(issues)],ratio:P/p.Qd};
@@ -795,9 +808,9 @@ function designCheck(p,dbD,wbD){
   return out;
 }
 
-// make-up water, kg/h: tower evaporation + blowdown, or adiabatic pad water when wet
-function waterKgH(o,Qr,db,teff,p){
-  if(o.id==='wcc') return 0.8*Qr*3600/2430*(p.coc/(p.coc-1));
+// make-up water, kg/h: tower evaporation + blowdown (hybrid: only the towers' share of the heat), or adiabatic pad water when wet
+function waterKgH(o,Qr,db,teff,p,wet=1){
+  if(o.id==='wcc'||o.id==='hyb') return (o.id==='hyb'?wet:1)*0.8*Qr*3600/2430*(p.coc/(p.coc-1));
   if(o.id==='adia'&&db>p.swAD) return Qr*3600*(db-teff)/(12*2430)*1.15;
   return 0;
 }
@@ -815,7 +828,7 @@ function simulate(wx,p){
         const a=calc(L.Q), d=calc(L.Qd);
         r.E+=a.P; r.Ec+=a.Pc; r.Ef+=a.Pf; r.Ep+=a.Pp; r.Et+=a.Pt; Pd+=d.P;
         if(a.cop){r.copSum+=a.cop; r.copN++;}
-        r.W+=waterKgH(o,a.Qr,db,teff,p); Wd+=waterKgH(o,d.Qr,db,teff,p);
+        r.W+=waterKgH(o,a.Qr,db,teff,p,hm.wet); Wd+=waterKgH(o,d.Qr,db,teff,p,hm.wet);
         if(ff>=1){r.free[li]++; r.mFree[li][m]++;} else if(ff>0){r.part[li]++; r.mPart[li][m]++;} else {r.mech[li]++; r.mMech[li][m]++;}
       });
       r.peak=Math.max(r.peak,Pd); r.Wpeak=Math.max(r.Wpeak,Wd);   // peaks at 100% load on the worst hour
@@ -873,6 +886,10 @@ const SYS={
   pre:'Plate heat exchanger', ch:'Water-cooled chillers', shared:'Adiabatic coolers',
   pros:['Far less water than cooling towers (wet only in hot hours)','Efficient water-cooled chillers','Closed circuit: little water treatment'],
   cons:['Uses some water on hot days','Larger footprint than cooling towers','Pads or sprays need maintenance and legionella control']},
+ hyb:{how:'Dry coolers and cooling towers serve the same condenser water, in series. In cool weather the dry coolers alone cool the water, with no water use. Above the switch temperature the towers start and cool the water close to the wet-bulb, while the dry coolers keep pre-cooling it ahead of them whenever the air is cooler than the water. The condenser water pre-cools the return through a plate heat exchanger and serves water-cooled chillers, which trim the rest.',
+  pre:'Plate heat exchanger', ch:'Water-cooled chillers', shared:'Dry coolers + cooling towers',
+  pros:['Tower-level energy and peak power on the hottest days','Water used only in hot hours, and less of it','Either set keeps running if the other is out of service'],
+  cons:['Highest initial cost: two sets of heat rejection','Most yard or roof space','Towers still need water treatment and legionella control']},
  wcc:{how:'Open cooling towers cool condenser water close to the outdoor wet-bulb by evaporation. That water pre-cools the return through a plate heat exchanger and serves the condensers of water-cooled chillers, which trim the rest.',
   pre:'Plate heat exchanger', ch:'Water-cooled chillers', shared:'Cooling towers',
   pros:['Lowest energy of the chiller options in most climates','Lowest condensing temperature, so the most efficient chillers','Compact heat rejection'],
@@ -881,9 +898,9 @@ const SYS={
 const ROLE={
  acch:o=>o.id==='acc'?'HT and LT chillers cool each loop; reject heat through built-in condenser fans':'HT and LT chillers trim each loop to setpoint when free cooling is not enough',
  wcch:()=>'HT and LT chillers trim each loop to setpoint; reject heat to condenser water',
- dc:()=>'Pre-cools the return water with outdoor air',
+ dc:o=>o.id==='hyb'?`Cools the condenser water dry up to ${P.swHY} °C; pre-cools it ahead of the towers above`:'Pre-cools the return water with outdoor air',
  adc:()=>'Cools the condenser water; pads wetted on hot hours',
- ct:()=>'Cools the condenser water by evaporation',
+ ct:o=>o.id==='hyb'?`Cools the condenser water by evaporation above ${P.swHY} °C`:'Cools the condenser water by evaporation',
  hx:()=>'Pre-cools the return water with condenser water (economiser)',
 };
 
@@ -905,7 +922,7 @@ function schematic(id){
     // outdoors
     g+=`<rect class="zone" x="0" y="46" width="${W}" height="72" rx="8"/>`+t(10,62,'Outdoors','t2','start');
     if(s.shared){
-      g+=box(20,68,390,44,[s.shared+(loops.length>1?' (shared by both loops)':''),id==='wcc'?`approach ${P.aCT} K to wet-bulb · ${P.coc} cycles`:`wet above ${P.swAD} °C · effectiveness ${P.eAD}`]);
+      g+=box(20,68,390,44,[s.shared+(loops.length>1?' (shared by both loops)':''),id==='wcc'?`approach ${P.aCT} K to wet-bulb · ${P.coc} cycles`:id==='hyb'?`dry up to ${P.swHY} °C · towers above, approach ${P.aCT} K`:`wet above ${P.swAD} °C · effectiveness ${P.eAD}`]);
       g+=up(105,'condenser water')+up(325,'condenser water');
     } else {
       if(s.pre){ g+=box(20,68,170,44,['Outdoor air','dry-cooler fans']); g+=up(105,'heat'); }
@@ -946,7 +963,7 @@ function params(){
     {name:'Air',Ts:g('acs'),Tr:Math.max(g('acr'),g('acs')+1),Qd:Qd*(1-lcp),Q:Qd*(1-lcp)*lf}];
   const rates={}; RATES.forEach(r=>rates[r.id]={lo:g('rl_'+r.id),hi:g('rh_'+r.id)});
   return {Qd,lf,loops,water:$('water').value,copA:g('copA'),copW:g('copW'),nCh:Math.max(1,Math.round(g('nCh'))),copMax:g('copMax'),acMax:g('acMax'),wcMax:g('wcMax'),dbIn:g('dbD'),wbIn:g('wbD'),
-    aDC:g('aDC'),aCT:g('aCT'),aHX:g('aHX'),eAD:g('eAD'),swAD:g('swAD'),coc:Math.max(1.5,g('coc')),pump:g('pump')/100,cwp:g('cwp')/100,fanT:g('fanT')/100,cduP:g('cduP')/100,
+    aDC:g('aDC'),aCT:g('aCT'),aHX:g('aHX'),eAD:g('eAD'),swAD:g('swAD'),swHY:g('swHY'),coc:Math.max(1.5,g('coc')),pump:g('pump')/100,cwp:g('cwp')/100,fanT:g('fanT')/100,cduP:g('cduP')/100,
     tE:g('tE'),tW:g('tW'),tD:g('tD'),
     red:g('red')/100,ups:Math.min(1,Math.max(0.5,g('ups')/100)),dloss:Math.min(0.3,Math.max(0,g('dloss')/100)),rates,...Object.fromEntries(WEIGHTS.map(w=>[w.id,w.v]))};
 }

@@ -12,6 +12,10 @@ const SYS={
   pre:'Plate heat exchanger', ch:'Water-cooled chillers', shared:'Adiabatic coolers',
   pros:['Far less water than cooling towers (wet only in hot hours)','Efficient water-cooled chillers','Closed circuit: little water treatment'],
   cons:['Uses some water on hot days','Larger footprint than cooling towers','Pads or sprays need maintenance and legionella control']},
+ hyb:{how:'Dry coolers and cooling towers serve the same condenser water, in series. In cool weather the dry coolers alone cool the water, with no water use. Above the switch temperature the towers start and cool the water close to the wet-bulb, while the dry coolers keep pre-cooling it ahead of them whenever the air is cooler than the water. The condenser water pre-cools the return through a plate heat exchanger and serves water-cooled chillers, which trim the rest.',
+  pre:'Plate heat exchanger', ch:'Water-cooled chillers', shared:'Dry coolers + cooling towers',
+  pros:['Tower-level energy and peak power on the hottest days','Water used only in hot hours, and less of it','Either set keeps running if the other is out of service'],
+  cons:['Highest initial cost: two sets of heat rejection','Most yard or roof space','Towers still need water treatment and legionella control']},
  wcc:{how:'Open cooling towers cool condenser water close to the outdoor wet-bulb by evaporation. That water pre-cools the return through a plate heat exchanger and serves the condensers of water-cooled chillers, which trim the rest.',
   pre:'Plate heat exchanger', ch:'Water-cooled chillers', shared:'Cooling towers',
   pros:['Lowest energy of the chiller options in most climates','Lowest condensing temperature, so the most efficient chillers','Compact heat rejection'],
@@ -20,9 +24,9 @@ const SYS={
 const ROLE={
  acch:o=>o.id==='acc'?'HT and LT chillers cool each loop; reject heat through built-in condenser fans':'HT and LT chillers trim each loop to setpoint when free cooling is not enough',
  wcch:()=>'HT and LT chillers trim each loop to setpoint; reject heat to condenser water',
- dc:()=>'Pre-cools the return water with outdoor air',
+ dc:o=>o.id==='hyb'?`Cools the condenser water dry up to ${P.swHY} °C; pre-cools it ahead of the towers above`:'Pre-cools the return water with outdoor air',
  adc:()=>'Cools the condenser water; pads wetted on hot hours',
- ct:()=>'Cools the condenser water by evaporation',
+ ct:o=>o.id==='hyb'?`Cools the condenser water by evaporation above ${P.swHY} °C`:'Cools the condenser water by evaporation',
  hx:()=>'Pre-cools the return water with condenser water (economiser)',
 };
 
@@ -44,7 +48,7 @@ function schematic(id){
     // outdoors
     g+=`<rect class="zone" x="0" y="46" width="${W}" height="72" rx="8"/>`+t(10,62,'Outdoors','t2','start');
     if(s.shared){
-      g+=box(20,68,390,44,[s.shared+(loops.length>1?' (shared by both loops)':''),id==='wcc'?`approach ${P.aCT} K to wet-bulb · ${P.coc} cycles`:`wet above ${P.swAD} °C · effectiveness ${P.eAD}`]);
+      g+=box(20,68,390,44,[s.shared+(loops.length>1?' (shared by both loops)':''),id==='wcc'?`approach ${P.aCT} K to wet-bulb · ${P.coc} cycles`:id==='hyb'?`dry up to ${P.swHY} °C · towers above, approach ${P.aCT} K`:`wet above ${P.swAD} °C · effectiveness ${P.eAD}`]);
       g+=up(105,'condenser water')+up(325,'condenser water');
     } else {
       if(s.pre){ g+=box(20,68,170,44,['Outdoor air','dry-cooler fans']); g+=up(105,'heat'); }

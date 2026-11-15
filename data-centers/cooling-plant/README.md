@@ -1,7 +1,7 @@
 # Cooling Plant Selector
 
 Hourly (8,760 h) screening tool comparing complete cooling plants (pre-cooling, HT/LT chillers, heat rejection, pumps and terminal units) for a data hall with a liquid cooling loop and an air cooling loop:
-air-cooled chillers, air-cooled chillers with free-cooling dry coolers, water-cooled chillers with adiabatic coolers, and water-cooled chillers with cooling towers.
+air-cooled chillers, air-cooled chillers with free-cooling dry coolers, water-cooled chillers with adiabatic coolers, water-cooled chillers with hybrid dry coolers + cooling towers, and water-cooled chillers with cooling towers.
 
 Open `index.html` here, or the standalone build `dist/cooling-plant.html`.
 
