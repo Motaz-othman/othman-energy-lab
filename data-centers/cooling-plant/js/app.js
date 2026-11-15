@@ -15,7 +15,7 @@ function params(){
     {name:'Air',Ts:g('acs'),Tr:Math.max(g('acr'),g('acs')+1),Qd:Qd*(1-lcp),Q:Qd*(1-lcp)*lf}];
   const rates={}; RATES.forEach(r=>rates[r.id]={lo:g('rl_'+r.id),hi:g('rh_'+r.id)});
   return {Qd,lf,loops,water:$('water').value,copA:g('copA'),copW:g('copW'),nCh:Math.max(1,Math.round(g('nCh'))),copMax:g('copMax'),acMax:g('acMax'),wcMax:g('wcMax'),dbIn:g('dbD'),wbIn:g('wbD'),
-    aDC:g('aDC'),aCT:g('aCT'),aHX:g('aHX'),eAD:g('eAD'),swAD:g('swAD'),swHY:g('swHY'),coc:Math.max(1.5,g('coc')),pump:g('pump')/100,cwp:g('cwp')/100,fanT:g('fanT')/100,cduP:g('cduP')/100,
+    aDC:g('aDC'),aCT:g('aCT'),aHX:g('aHX'),eAD:g('eAD'),swAD:g('swAD'),swHY:g('swHY'),coc:Math.max(1.5,g('coc')),pumpW:g('pumpW'),cwW:g('cwW'),ctEff:Math.max(5,g('ctEff')),fanT:g('fanT')/100,cduP:g('cduP')/100,
     tE:g('tE'),tW:g('tW'),tD:g('tD'),
     red:g('red')/100,ups:Math.min(1,Math.max(0.5,g('ups')/100)),dloss:Math.min(0.3,Math.max(0,g('dloss')/100)),rates,...Object.fromEntries(WEIGHTS.map(w=>[w.id,w.v]))};
 }
@@ -26,6 +26,9 @@ function loadCity(){
   stationYear(c).catch(()=>synthYear(c)).then(w=>{ if(n===cityReq){ WX=w; run(); } });
 }
 const ashrae=()=>WX&&WX.station&&WX.station.ashrae;
+// ASHRAE 90.4 maximum annualized MLC for the station's climate zone (none for an uploaded file)
+const mlcLim=()=>WX&&WX.station?mlcMax(WX.station.zone,P.Qd):null;
+const mlcTxt=r=>{ const m=mlcLim(); return m==null?'':(r.mlc<=m?`Meets ASHRAE 90.4 MLC (${r.mlc.toFixed(3)} ≤ ${m.toFixed(2)})`:`Exceeds ASHRAE 90.4 MLC (${r.mlc.toFixed(3)} > ${m.toFixed(2)})`); };
 
 function run(){
   if(!WX) return;
@@ -72,6 +75,7 @@ function renderReco(){
     const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="tag ok">Recommended</span>':`<span class="tag">#${k+1}</span>`;
     const notes=[id==='acc'?'No free cooling':`Free cooling ${loopTxt(r.free)} h/yr (liquid / air)`];
     if(id!=='acc') notes.push(`Saves ${fmt(Math.max(0,RES.acc.E-r.E)/1000,1)} GWh/yr vs air-cooled chillers`);
+    if(mlcTxt(r)) notes.push(r.mlc<=mlcLim()?mlcTxt(r):`<b style="color:var(--bad)">${mlcTxt(r)}</b>`);
     return `<div class="scard${k===0?' rec':''}${r.excluded?' off':''}">
       <div class="stop">${status}${r.excluded?'':`<span class="note">score ${fmt(r.score)}</span>`}</div>
       <div class="sname">${r.o.name}</div>
@@ -139,8 +143,10 @@ function renderSystem(){
 }
 
 function renderEff(){
-  const rows=order().map((id,i)=>{ const r=RES[id]; return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td>${r.mlc.toFixed(3)}</td><td>${r.peakRatio.toFixed(3)}</td><td>${r.cop?r.cop.toFixed(1):'–'}</td><td>${loopTxt(r.free)}</td><td>${loopTxt(r.mech)}</td></tr>`; });
-  $('tEff').innerHTML=table(['Option','Annual MLC','Peak kW/kW','Avg chiller COP','Free-cooling h (LC / air)','Chiller-only h (LC / air)'],rows);
+  const m=mlcLim(), zone=WX.station&&WX.station.zone;
+  const res=r=>m==null?'–':(r.mlc<=m?'<span class="tag ok">Meets</span>':'<span class="tag x">Exceeds</span>');
+  const rows=order().map((id,i)=>{ const r=RES[id]; return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td>${r.mlc.toFixed(3)}</td><td>${m==null?'–':m.toFixed(2)}</td><td>${res(r)}</td><td>${r.peakRatio.toFixed(3)}</td><td>${r.cop?r.cop.toFixed(1):'–'}</td><td>${loopTxt(r.free)}</td><td>${loopTxt(r.mech)}</td></tr>`; });
+  $('tEff').innerHTML=table(['Option','Annual MLC',`ASHRAE 90.4 max MLC${zone?' (zone '+esc(zone)+')':''}`,'90.4 result','Peak kW/kW','Avg chiller COP','Free-cooling h (LC / air)','Chiller-only h (LC / air)'],rows);
   const ids=RANK;
   $('effTitle').textContent=ids.length?`Annual MLC: ${RES[ids[0]].o.short} ${RES[ids[0]].mlc.toFixed(3)} kW/kW`:'Annual MLC';
   hbar('cEff',ids.map(id=>RES[id].o.short),ids.map(id=>RES[id].mlc),'kW per kW of cooling',3);

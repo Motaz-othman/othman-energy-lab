@@ -17,6 +17,19 @@ const RATES=[
 // fixed weights for the recommendation score
 const WEIGHTS=[{id:'w_energy',l:'Energy',v:4},{id:'w_water',l:'Water',v:3},{id:'w_peak',l:'Peak power (grid)',v:3},{id:'w_capex',l:'Initial cost',v:2}];
 
+// ---------- ASHRAE 90.1 / 90.4 references ----------
+// water flow per kW at a ΔT of 1 K, in gpm: 1 kW / (4.18 kJ/kg·K × 1 K) = 0.2392 L/s = 3.792 gpm
+const GPM_PER_KW_K=3.792;
+// pump power as a share of the heat carried: W/gpm × gpm per kW ÷ 1000 (ASHRAE 90.1 Appendix G: CHW 22 W/gpm, CW 19 W/gpm)
+const pumpShare=(wPerGpm,dT)=>wPerGpm*GPM_PER_KW_K/Math.max(dT,0.5)/1000;
+// open cooling tower fan power per kW rejected, from its efficiency in gpm/hp at the 90.1 rating point
+// (35 °C entering, 29.4 °C leaving water = 5.56 K range): hp per kW = gpm per kW ÷ (gpm/hp); 0.7457 kW per hp
+const towerFanShare=gpmPerHp=>GPM_PER_KW_K/5.556/gpmPerHp*0.7457;
+// ASHRAE 90.4-2022 (Addendum g, 2024) Table 6.5: maximum annualized MLC by climate zone, [ITE > 300 kW, ITE ≤ 300 kW]
+const MLC_MAX={'0A':[.29,.37],'0B':[.32,.41],'1A':[.30,.37],'1B':[.31,.39],'2A':[.27,.35],'2B':[.20,.33],'3A':[.24,.33],'3B':[.20,.33],'3C':[.17,.27],
+  '4A':[.21,.33],'4B':[.17,.29],'4C':[.17,.27],'5A':[.19,.34],'5B':[.17,.30],'5C':[.17,.29],'6A':[.19,.31],'6B':[.17,.31],'7':[.17,.31],'8':[.15,.32]};
+const mlcMax=(zone,itKW)=>{ const v=MLC_MAX[String(zone||'').toUpperCase()]; return v?v[itKW>300?0:1]:null; };
+
 // ---------- chiller model ----------
 const AHRI={ac:{Te:6.7-2, Tc:35+15}, wc:{Te:6.7-2, Tc:29.4+7.6}};
 const eirPLR={ac:x=>x, wc:x=>0.07308728+0.1513521*x+0.7709311*x*x};
@@ -36,17 +49,20 @@ function chillerPower(Qch, capEach, n, kind, Ts, Tc, p){
 
 function hourModel(o,L,db,wb,p){
   let Tout,Tc,kind,fanK,cwK=0,teff=db,wet=1,dShare=0;
+  // pumps and tower fans: ASHRAE 90.1 values when given (W/gpm, gpm/hp), else the older % inputs (Peak Shaving Tank)
+  const cwShare=p.cwW!=null?pumpShare(p.cwW,5.556):p.cwp, ctFan=p.ctEff?towerFanShare(p.ctEff):0.008;
+  const pumpK=p.pumpW!=null?pumpShare(p.pumpW,L.Tr-L.Ts):p.pump;
   if(o.id==='acc'){Tout=Infinity;Tc=db+15;kind='ac';fanK=0;}
   else if(o.id==='accfc'){Tout=db+p.aDC;Tc=db+15;kind='ac';fanK=0.015;}
-  else if(o.id==='adia'){teff=db>p.swAD?db-p.eAD*(db-wb):db; Tout=teff+p.aDC+p.aHX; Tc=teff+p.aDC+7.6; kind='wc'; fanK=0.018; cwK=p.cwp;}
-  else if(o.id==='wcc'){Tout=wb+p.aCT+p.aHX; Tc=wb+p.aCT+7.6; kind='wc'; fanK=0.008; cwK=p.cwp;}
+  else if(o.id==='adia'){teff=db>p.swAD?db-p.eAD*(db-wb):db; Tout=teff+p.aDC+p.aHX; Tc=teff+p.aDC+7.6; kind='wc'; fanK=0.018; cwK=cwShare;}
+  else if(o.id==='wcc'){Tout=wb+p.aCT+p.aHX; Tc=wb+p.aCT+7.6; kind='wc'; fanK=ctFan; cwK=cwShare;}
   else if(o.id==='hyb'){
     // hybrid: dry coolers and cooling towers in series on the condenser water. At or below the switch temperature
     // the dry coolers alone cool the water (no water used). Above it the towers run, and the dry coolers
     // pre-cool the water ahead of them while the air is cooler than the water (range 6 K), cutting tower water.
     let Tcw; if(db<=p.swHY){ Tcw=db+p.aDC; wet=0; dShare=1; }
     else { Tcw=wb+p.aCT; dShare=Math.max(0,Math.min(1,(Tcw+6-(db+p.aDC))/6)); wet=1-dShare; }
-    Tout=Tcw+p.aHX; Tc=Tcw+7.6; kind='wc'; fanK=0.018; cwK=p.cwp;}
+    Tout=Tcw+p.aHX; Tc=Tcw+7.6; kind='wc'; fanK=0.018; cwK=cwShare;}
   const ff=Tout<=L.Ts?1:Math.max(0,Math.min(1,(L.Tr-Tout)/(L.Tr-L.Ts)));
   // terminal units in the hall: CRAH / FWU fans on the air loop, CDU pumps on the liquid loop;
   // their power is cooling energy and also ends up as heat in the loop
@@ -60,8 +76,8 @@ function hourModel(o,L,db,wb,p){
     if(o.id==='accfc') Pf = ff>0 ? fanK*qL*airFrac : 0;
     else if(o.id==='adia') Pf=fanK*Qr*airFrac;
     else if(o.id==='wcc') Pf=fanK*Qr;
-    else if(o.id==='hyb') Pf=wet>0 ? 0.008*Qr+fanK*Qr*dShare : fanK*Qr*airFrac;   // towers + dry coolers, or dry coolers alone
-    const Pp=p.pump*qL + cwK*Qr;
+    else if(o.id==='hyb') Pf=wet>0 ? ctFan*Qr+fanK*Qr*dShare : fanK*Qr*airFrac;   // towers + dry coolers, or dry coolers alone
+    const Pp=pumpK*qL + cwK*Qr;
     return {Pc:ch.P,Pf,Pp,Pt,Qr,cop:ch.cop,P:ch.P+Pf+Pp+Pt};
   };
   // condenser operating limit

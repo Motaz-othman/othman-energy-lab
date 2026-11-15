@@ -116,7 +116,7 @@ function buildReport(){
         <div class="kpi"><div class="v">${fmt(rec.run/1e6,2)} M$/yr</div><div class="l">Running cost, cooling</div></div>
         <div class="kpi"><div class="v">${fmt(rec.capLo/1e6,1)}–${fmt(rec.capHi/1e6,1)} M$</div><div class="l">Initial cost (estimate)</div></div>
         <div class="kpi"><div class="v">${pb.txt}</div><div class="l">Payback vs air-cooled chillers</div></div>
-        <div class="kpi"><div class="v">${fmt(rec.mlc,3)}</div><div class="l">Annual MLC, kW/kW (ASHRAE 90.4)</div></div>
+        <div class="kpi"><div class="v">${fmt(rec.mlc,3)}</div><div class="l">Annual MLC, kW/kW${mlcLim()!=null?` · ASHRAE 90.4 max ${mlcLim().toFixed(2)}: ${rec.mlc<=mlcLim()?'meets':'<b style="color:#c62828">exceeds</b>'}`:' (ASHRAE 90.4)'}</div></div>
       </div>
       <p class="why">${rec.o.id==='acc'?'':`Against air-cooled chillers it saves <b>${fmt(Math.max(0,acc.E-rec.E)/1000,1)} GWh/yr</b> of electricity and <b>${fmt(Math.max(0,acc.peak-rec.peak)/1000,2)} MW</b> of peak cooling power. `}Free cooling covers ${fmt(rec.free[0])} h/yr on the liquid loop and ${fmt(rec.free[1])} h/yr on the air loop. ${DES[rec.o.id].ok?`It holds the supply temperatures at the design condition (${fmt(P.dbD,1)} °C dry-bulb / ${fmt(P.wbD,1)} °C wet-bulb).`:''}</p></div>`;
   } else h+=`<div class="rec"><div class="nm">No system meets every constraint</div><p class="why">Allow water, raise the loop supply temperatures, or check the design conditions and chiller limits.</p></div>`;
