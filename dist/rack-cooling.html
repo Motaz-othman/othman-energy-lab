@@ -516,7 +516,10 @@ function run(){
   if($('rVbufReset')) $('rVbufReset').onclick=e=>{ e.preventDefault(); userTank=false; run(); };
   const r=R, a=r.noTank, b=r.tank, tk=`${fmt(i.Vbuf)} L/rack tank${isFinite(r.Vmin)&&i.Vbuf===r.Vmin?' (minimum)':''}`, withTank=i.Vbuf>0;
   // one value of a pair: safe minimum flow, or TCS supply rise
-  const flowV=(s,lab)=>`<div><span class="v${s.ok?'':' bad'}">${fmt(s.ok?s.F:r.Fop)} <small>L/min</small></span><span class="l">${s.ok?`${fmt(s.fSafe*100)}% · `:'100% · no turndown · '}${lab}</span></div>`;
+  // vendor floor: the published minimum flow, not the load jump, sets the safe minimum
+  const atV=s=>p.minLpm&&s.ok&&s.F<=p.minLpm*(1+1e-4), floored=atV(a)||(withTank&&atV(b));
+  const th=floored?rackStudy({...p,minLpm:null},i):null;   // thermal minimum without the vendor floor
+  const flowV=(s,lab)=>`<div><span class="v${s.ok?'':' bad'}">${fmt(s.ok?s.F:r.Fop)} <small>L/min</small></span><span class="l">${s.ok?`${fmt(s.fSafe*100)}% · `:'100% · no turndown · '}${atV(s)?'vendor minimum · ':''}${lab}</span></div>`;
   const riseV=(s,lab)=>`<div><span class="v${s.ok?'':' bad'}">+${fmt(s.rise,1)} <small>K</small></span><span class="l">${lab}</span></div>`;
   const pair=(fn)=>withTank?fn(a,'no tank')+fn(b,`with ${tk}`):fn(a,'no tank');
   const over=r.Ts>p.TsMax+1e-9;
@@ -530,9 +533,10 @@ function run(){
     </div>
     <div class="verdict${(a.ok||b.ok&&withTank)&&!over?'':' warn'}">
       ${over?`<b>Supply above the platform maximum:</b> ${fmt(r.Ts,r.Ts%1?1:0)} °C is above the ${fmt(p.TsMax)} °C maximum (ASHRAE ${p.cls}). This is risky unless confirmed in writing by the manufacturer for this platform.<br>`:''}
-      ${a.ok?`<b>Variable flow</b> can go down to ${fmt(a.F)} L/min per rack at idle (${fmt(a.fSafe*100)}% of the operating flow)${withTank&&b.ok?`, or ${fmt(b.F)} L/min with the ${tk}`:''}. Below that, a jump from idle to the ${fmt(r.P)} kW rated load heats the coolant past ${fmt(r.Tr)} °C before the VFD pump ramps up (${fmt(r.tSense)} s to react + ${fmt(i.tRamp)} s ramp).`
+      ${a.ok?`<b>Variable flow</b> can go down to ${fmt(a.F)} L/min per rack at idle (${fmt(a.fSafe*100)}% of the operating flow)${withTank&&b.ok?`, or ${fmt(b.F)} L/min with the ${tk}`:''}${atV(a)?` (the vendor minimum)`:`. Below that, a jump from idle to the ${fmt(r.P)} kW rated load heats the coolant past ${fmt(r.Tr)} °C before the VFD pump ramps up (${fmt(r.tSense)} s to react + ${fmt(i.tRamp)} s ramp)`}.`
         :withTank&&b.ok?`<b>Without a tank</b> the coolant passes ${fmt(r.Tr)} °C after a load jump even at full flow: the MCV (${fmt(i.tMCV)} s) is too slow for the loop water alone. With the ${tk}, variable flow can go down to ${fmt(b.F)} L/min per rack at idle (${fmt(b.fSafe*100)}%).`
         :`<b>No safe turndown:</b> after a load jump the coolant passes ${fmt(r.Tr)} °C even at full flow. Use a faster MCV or pump${withTank?', or a larger TCS tank':', or add a TCS buffer tank'}${i.sensAt==='cdu'?', or sense the return at the rack manifold':''}.`}<br>
+      ${floored?`<b>Vendor minimum flow:</b> the manufacturer requires at least ${fmt(p.minLpm)} L/min per rack for even flow through every cold plate, so the minimum stops there${withTank?', with or without a tank':''}. The load jump alone would allow ${fmt(th.noTank.F,1)} L/min${withTank&&th.tank.ok?` (${fmt(th.tank.F,1)} L/min with the ${tk})`:''}; a tank cannot take the flow below the vendor minimum.<br>`:''}
       <b>Minimum TCS tank:</b> ${!isFinite(r.Vmin)?`no practical tank covers the response; use a faster MCV or VFD pump`:r.Vmin===0?'none needed; the water in the CDU and the TCS pipes covers the response':`${fmt(r.Vmin)} L per rack covers the response gap. Extra volume only lowers the supply rise; a faster VFD pump, not a bigger tank, lowers the minimum flow further`}.<br>
       <b>Control valve:</b> while the MCV opens (${fmt(i.tMCV)} s) the TCS supply rises by up to ${fmt(a.rise,1)} K${withTank?`; ${fmt(b.rise,1)} K with the ${tk}`:''}.<br>
       <b>Pump trip:</b> the rack reaches its limit in about ${secs(r.tPump)}. Run the standby CDU pump in parallel (hot standby) with automatic changeover.<br>
