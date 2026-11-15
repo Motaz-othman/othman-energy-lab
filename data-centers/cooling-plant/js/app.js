@@ -267,6 +267,8 @@ if(window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListene
 showPane('ov');
 loadCity();
 
+// input labels that repeat between the two loops
+const INPUT_NAMES={lcp:'Liquid loop share (%)',lcs:'Liquid loop supply (°C)',lcr:'Liquid loop return (°C)',acs:'Air loop supply (°C)',acr:'Air loop return (°C)'};
 // ---------- export: every results table as an Excel workbook, one sheet each ----------
 function exportReport(){
   if(!RES) return;
@@ -292,7 +294,7 @@ function exportReport(){
     [B('Ranking')],[B('#'),B('Option'),B('Score (0–100)')],...rank,
     ...order().filter(id=>RES[id].excluded).map(id=>['–',RES[id].o.name,'Excluded: '+RES[id].excluded]),
     [],
-    [B('Inputs')],[B('Input'),B('Value')],...inputRows(document.querySelector('aside.inputs')||document)];
+    [B('Inputs')],[B('Input'),B('Value')],...inputRows(document.querySelector('aside.inputs')||document,INPUT_NAMES)];
   // equipment of every option
   const cap=P.Qd*(1+P.red), equip=[['Option','Component','Role','Sized MW','Cost low M$','Cost high M$']];
   order().forEach(id=>{ const r=RES[id]; r.o.comp.forEach(c=>{ const rt=P.rates[c]; equip.push([r.o.name,RATES.find(x=>x.id===c).l,ROLE[c](r.o),+(cap/1000).toFixed(2),+(cap*rt.lo/1e6).toFixed(2),+(cap*rt.hi/1e6).toFixed(2)]); }); });

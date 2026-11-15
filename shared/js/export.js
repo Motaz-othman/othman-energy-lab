@@ -51,10 +51,10 @@ function tableRows(el){
   return [...t.querySelectorAll('tr')].map(tr=>[...tr.children].map(td=>{ const c=td.cloneNode(true); c.querySelectorAll('.sbar').forEach(x=>x.remove()); c.querySelectorAll('.tag').forEach(x=>{ const own=c.textContent.replace(x.textContent,'').trim(); x.textContent=own?` (${x.textContent})`:x.textContent; }); return c.textContent.replace(/\s+/g,' ').trim(); }));
 }
 // label / value of every input in a form panel (blank = "auto"), for the report's inputs list
-function inputRows(root){
+function inputRows(root,names={}){
   return [...root.querySelectorAll('input,select')].filter(e=>e.type!=='file'&&e.type!=='button'&&!e.closest('[hidden]')).map(e=>{
     const lab=(root.querySelector(`label[for="${e.id}"]`)||{}).textContent||e.getAttribute('aria-label')||e.id;
     const v=e.tagName==='SELECT'?(e.selectedOptions[0]||{}).textContent:(e.value===''?'auto':e.value);
-    return [lab.replace(/\s+/g,' ').trim(),v]; });
+    return [names[e.id]||lab.replace(/\s+/g,' ').trim(),v]; });
 }
 function downloadBlob(blob,name){ const url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000); }

@@ -78,4 +78,4 @@
 .climbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin-bottom:10px}
 .climbar .seg,.climbar .legend{margin:0}
 .wxsrc{font-size:12.5px;color:var(--muted);margin-top:2px}
-.colhead .xport{margin-left:auto;padding:4px 10px;font-size:13px}
+.colhead .xports{margin-left:auto;display:flex;gap:6px}.colhead .xports button{padding:4px 10px;font-size:13px}
