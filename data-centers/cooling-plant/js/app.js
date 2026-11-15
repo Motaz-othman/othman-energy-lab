@@ -266,3 +266,51 @@ document.querySelectorAll('#loopSeg button').forEach(b=>b.onclick=()=>{ document
 if(window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',run);
 showPane('ov');
 loadCity();
+
+// ---------- export: every results table as an Excel workbook, one sheet each ----------
+function exportReport(){
+  if(!RES) return;
+  const st=WX.station, M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], sc=8760/WX.T.length;
+  const loopName=i=>i?'Air loop':'Liquid loop', B=v=>({v,b:true});
+  const withNote=(rows,id)=>{ const n=id&&$(id)&&$(id).textContent.trim(); return n?[...rows,[],['Note: '+n]]:rows; };
+  const sheet=(name,id,note,extra)=>({name,rows:withNote(tableRows($(id)),note),head:[0],...extra});
+  const rank=RANK.map((id,k)=>[k+1,RES[id].o.name,Math.round(RES[id].score)]);
+  const summary=[
+    [B('Othman Energy Lab · Cooling Plant Selector report')],
+    ['Exported',new Date().toLocaleString('en-GB')],
+    ['Source','https://www.oenergylab.com/data-centers/cooling-plant/'],
+    [],
+    [B('Site and weather')],
+    ['Location',WX.name],
+    ...(st?[['Station',`${st.station} (WMO ${st.wmo})`],['Weather year',`TMYx ${st.period}, climate.onebuilding.org`],['ASHRAE climate zone',st.zone]]:[['Weather',WX.synthetic?'generated from monthly normals':'uploaded file']]),
+    ['Design dry-bulb (°C)',+P.dbD.toFixed(1)],['Design wet-bulb (°C)',+P.wbD.toFixed(1)],
+    [],
+    [B('Load')],
+    ['Cooling load (MW)',P.Qd/1000],
+    ...P.loops.map((L,i)=>[`${loopName(i)}: load MW, supply / return °C`,L.Qd/1000,`${L.Ts} / ${L.Tr}`]),
+    [],
+    [B('Ranking')],[B('#'),B('Option'),B('Score (0–100)')],...rank,
+    ...order().filter(id=>RES[id].excluded).map(id=>['–',RES[id].o.name,'Excluded: '+RES[id].excluded]),
+    [],
+    [B('Inputs')],[B('Input'),B('Value')],...inputRows(document.querySelector('aside.inputs')||document)];
+  // equipment of every option
+  const cap=P.Qd*(1+P.red), equip=[['Option','Component','Role','Sized MW','Cost low M$','Cost high M$']];
+  order().forEach(id=>{ const r=RES[id]; r.o.comp.forEach(c=>{ const rt=P.rates[c]; equip.push([r.o.name,RATES.find(x=>x.id===c).l,ROLE[c](r.o),+(cap/1000).toFixed(2),+(cap*rt.lo/1e6).toFixed(2),+(cap*rt.hi/1e6).toFixed(2)]); }); });
+  // operating hours by month: free cooling / partial / chiller only, per option and loop
+  const hrs=[['Option','Loop','Mode',...M,'Total h/yr']];
+  order().forEach(id=>{ const r=RES[id]; P.loops.forEach((L,i)=>{ if(L.Q<=0) return;
+    [['Free cooling',r.mFree],['Partial',r.mPart],['Chiller only',r.mMech]].forEach(([m,a])=>{ const v=a[i].map(x=>Math.round(x*sc)); hrs.push([r.o.name,`${loopName(i)} ${L.Ts}/${L.Tr} °C`,m,...v,v.reduce((s,x)=>s+x,0)]); }); }); });
+  const sheets=[
+    {name:'Summary',rows:summary,widths:[46,48,20]},
+    sheet('Overview','tOv'),
+    sheet('Design day','tDes','desNote'),
+    sheet('Efficiency','tEff'),
+    sheet('Energy and water','tCons'),
+    sheet('Running cost','tRun','runNote'),
+    sheet('Initial cost','tCap'),
+    {name:'Equipment',rows:withNote(equip,'compNote'),head:[0]},
+    {name:'Operating hours',rows:hrs,head:[0]}];
+  const slug=String(WX.name).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'site';
+  downloadBlob(xlsxBlob(sheets),`cooling-plant-report-${slug}-${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+$('xport').onclick=exportReport;
