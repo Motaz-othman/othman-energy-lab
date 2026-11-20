@@ -22,8 +22,10 @@ const WEIGHTS=[{id:'w_energy',l:'Energy',v:4},{id:'w_water',l:'Water',v:3},{id:'
 // ---------- environmental impact ----------
 // grid emission factor, t CO2 per MWh (= kg/kWh). Countries: Our World in Data / Ember, carbon intensity of electricity, latest year (2024–2025).
 // US cities: EPA eGRID2023 (rev 2) subregion total output CO2e rates, lb/MWh × 0.4536/1000: SRVC 596.3 (N. Virginia), ERCT 736.6 (Dallas),
-// AZNM 706.2 (Phoenix), RFCW 916.1 (Chicago). Sydney: Australian NGA / Clean Energy Regulator scope 2 location-based factor, NSW 2025–26.
+// AZNM 706.2 (Phoenix), RFCW 916.1 (Chicago, Columbus), SRSO 846.0 (Atlanta), CAMX 430.0 (San Jose), NWPP 635.3 (Hillsboro, Reno,
+// Salt Lake City), ERCT 736.6 (Abilene, San Antonio), MROW 926.6 (Des Moines), RFCE 599.2 (Newark), SRVC 596.3 (Charlotte), SRMV 741.7 (Monroe). Sydney: Australian NGA / Clean Energy Regulator scope 2 location-based factor, NSW 2025–26.
 const GRID_EF={dubai:.468,abudhabi:.468,riyadh:.692,jeddah:.692,dammam:.692,manama:.902,cairo:.563,nova:.2705,dallas:.3341,phoenix:.3203,chicago:.4155,
+  atlanta:0.3837,columbus:0.4155,sanjose:0.1950,hillsboro:0.2882,reno:0.2882,saltlake:0.2882,abilene:0.3341,sanantonio:0.3341,desmoines:0.4203,newark:0.2718,charlotte:0.2705,monroela:0.3364,
   saopaulo:.110,frankfurt:.330,london:.217,dublin:.257,madrid:.154,stockholm:.035,singapore:.497,mumbai:.670,tokyo:.477,sydney:.64};
 // energy to supply 1 m³ of water, kWh: seawater desalination (Gulf) about 3.5, conventional treated supply about 0.5 (IEA World Energy Outlook 2016, Water-Energy Nexus)
 const WATER_KWH={dubai:3.5,abudhabi:3.5,riyadh:3.5,jeddah:3.5,dammam:3.5,manama:3.5};
