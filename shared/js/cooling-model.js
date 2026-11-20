@@ -20,9 +20,11 @@ const RATES=[
 const WEIGHTS=[{id:'w_energy',l:'Energy',v:4},{id:'w_water',l:'Water',v:3},{id:'w_peak',l:'Peak power (grid)',v:3},{id:'w_capex',l:'Initial cost',v:2},{id:'w_carbon',l:'Carbon',v:3}];
 
 // ---------- environmental impact ----------
-// grid emission factor, t CO2 per MWh (= kg/kWh): Our World in Data / Ember, carbon intensity of electricity, latest year (2024–2025)
-const GRID_EF={dubai:.468,abudhabi:.468,riyadh:.692,jeddah:.692,dammam:.692,manama:.902,cairo:.563,nova:.384,dallas:.384,phoenix:.384,chicago:.384,
-  saopaulo:.110,frankfurt:.330,london:.217,dublin:.257,madrid:.154,stockholm:.035,singapore:.497,mumbai:.670,tokyo:.477,sydney:.525};
+// grid emission factor, t CO2 per MWh (= kg/kWh). Countries: Our World in Data / Ember, carbon intensity of electricity, latest year (2024–2025).
+// US cities: EPA eGRID2023 (rev 2) subregion total output CO2e rates, lb/MWh × 0.4536/1000: SRVC 596.3 (N. Virginia), ERCT 736.6 (Dallas),
+// AZNM 706.2 (Phoenix), RFCW 916.1 (Chicago). Sydney: Australian NGA / Clean Energy Regulator scope 2 location-based factor, NSW 2025–26.
+const GRID_EF={dubai:.468,abudhabi:.468,riyadh:.692,jeddah:.692,dammam:.692,manama:.902,cairo:.563,nova:.2705,dallas:.3341,phoenix:.3203,chicago:.4155,
+  saopaulo:.110,frankfurt:.330,london:.217,dublin:.257,madrid:.154,stockholm:.035,singapore:.497,mumbai:.670,tokyo:.477,sydney:.64};
 // energy to supply 1 m³ of water, kWh: seawater desalination (Gulf) about 3.5, conventional treated supply about 0.5 (IEA World Energy Outlook 2016, Water-Energy Nexus)
 const WATER_KWH={dubai:3.5,abudhabi:3.5,riyadh:3.5,jeddah:3.5,dammam:3.5,manama:3.5};
 const waterKwh=id=>WATER_KWH[id]??0.5;
