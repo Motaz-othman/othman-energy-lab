@@ -471,6 +471,22 @@ details[open]>:not(summary){animation:fadeUp .2s ease both}
     <div class="note">P = Q × ΔP / (ρ × cp × ΔT × η). CDU pumps on a 10 K coolant ΔT; primary and secondary pumps on each loop's ΔT; condenser pumps on 5.56 K (211 kPa ≈ ASHRAE 90.1 Appendix G, 19 W/gpm). All pump and fan heat is added to the chiller load. VFD affinity law at part load (minimum speed 50% pumps, 30% fans).</div>
   </details>
   <details>
+    <summary>Environmental impact (carbon)</summary>
+    <div class="row">
+      <div><label for="envEF">Grid emission factor (kg CO₂/kWh)</label><input type="number" id="envEF" step="0.01" min="0" placeholder="auto"></div>
+      <div><label for="envW">Water supply energy (kWh/m³)</label><input type="number" id="envW" step="0.1" min="0" placeholder="auto"></div>
+    </div>
+    <div class="row">
+      <div><label for="refr">Chiller refrigerant</label><select id="refr"><option value="r513a">R-513A (GWP 631)</option><option value="r134a">R-134a (GWP 1,430)</option><option value="r1234ze">R-1234ze(E) (GWP 1)</option></select></div>
+      <div><label for="leak">Refrigerant leak (% of charge per year)</label><input type="number" id="leak" value="2" step="0.5" min="0"></div>
+    </div>
+    <div class="row">
+      <div><label for="chW">Charge, water-cooled (kg/kW)</label><input type="number" id="chW" value="0.3" step="0.05" min="0"></div>
+      <div><label for="chA">Charge, air-cooled (kg/kW)</label><input type="number" id="chA" value="0.4" step="0.05" min="0"></div>
+    </div>
+    <div class="note" id="envNote">Leave blank for the city's values: grid factor from Our World in Data / Ember (latest year); water supply energy 3.5 kWh/m³ for Gulf desalination, 0.5 elsewhere (IEA WEO 2016). GWP: IPCC AR4. Refrigerant charge and leak rate are assumptions; enter the selected chiller's data. Carbon counts in the recommendation (weight 3).</div>
+  </details>
+  <details>
     <summary>Electrical losses</summary>
     <div class="row">
       <div><label for="ups">UPS efficiency (%)</label><input type="number" id="ups" value="96" step="0.5" min="80" max="100"></div>
@@ -535,6 +551,12 @@ details[open]>:not(summary){animation:fadeUp .2s ease both}
       <div><div id="tEff"></div><div class="note">MLC = annual mechanical energy ÷ annual cooling load (ASHRAE 90.4 definition, cooling load taken as IT energy). Maximum: ASHRAE 90.4-2022 Addendum g, Table 6.5, for the station's climate zone and ITE above / at or below 300 kW. Screening check: a compliance calculation follows the 90.4 load points and TMY3 weather. Free-cooling hours: chiller fully off.</div></div>
       <div><div class="ctitle" id="effTitle">Annual MLC</div><div class="chartbox"><canvas id="cEff"></canvas></div></div>
     </div></div>
+    <div class="card"><h2>Carbon emissions</h2><div class="split">
+      <div><div id="tCO2"></div><div class="note" id="co2Note"></div></div>
+      <div><div class="ctitle" id="co2Title">Annual carbon by source</div>
+        <div class="legend"><span><i style="background:var(--s1)"></i>Electricity</span><span><i style="background:var(--s3)"></i>Water supply</span><span><i style="background:var(--s2)"></i>Refrigerant leakage</span></div>
+        <div class="chartbox" style="height:220px"><canvas id="cCO2"></canvas></div></div>
+    </div></div>
     <div class="card"><h2>Electricity and water consumption</h2><div class="split">
       <div><div id="tCons"></div><div class="note">Annual totals at the frequent load. Peaks are the design peak: the higher of Case A and Case B at 100% load. Electrical peak = cooling only: chillers + heat-rejection fans + pumps + CRAH / FWU fans + CDU pumps (no IT load, no electrical equipment or losses). Water peak = make-up water (evaporation, blowdown, pad water). PUE = (IT + cooling + losses) ÷ IT, annual. CRAH / fan-wall fans are not included.</div></div>
       <div>
@@ -588,7 +610,8 @@ details[open]>:not(summary){animation:fadeUp .2s ease both}
       <li><b>MLC</b> (ASHRAE 90.4): annual mechanical energy ÷ annual IT energy; checked against ASHRAE 90.4-2025 Table 6.5 for the climate zone.</li>
       <li><b>Electrical losses and PUE</b>: <code>PUE = (IT / η<sub>UPS</sub> + cooling) / (1 − losses) / IT</code>, UPS 96%, distribution 2%. Simplified, not the 90.4 ELC method.</li>
       <li><b>Running cost</b>: <code>electricity × tariff + water × tariff + cooling peak × demand charge × 12</code>. Simple payback against air-cooled chillers = extra initial cost (mid estimate) ÷ running cost saved.</li>
-      <li><b>Recommendation</b>: energy 4, water 3 (doubled when water is limited), peak 3, initial cost 2, normalised across feasible options. Full basis: the Cooling Plant Calculation Basis. Screening-level; confirm with vendor selections.</li>
+      <li><b>Carbon</b> (t CO₂e/yr): electricity × grid factor + water × supply energy (kWh/m³) × grid factor + refrigerant charge (duty + 1 standby per loop, kg/kW × capacity) × leak rate × GWP. Grid factors: Our World in Data / Ember; water energy: IEA WEO 2016; GWP: IPCC AR4.</li>
+      <li><b>Recommendation</b>: energy 4, water 3 (doubled when water is limited), peak 3, initial cost 2, carbon 3, normalised across feasible options. Full basis: the Cooling Plant Calculation Basis. Screening-level; confirm with vendor selections.</li>
     </ul>
   </div>
   </div>
@@ -776,7 +799,17 @@ const RATES=[
  {id:'hx',  l:'Economiser plate HX',lo:15,hi:30},
 ];
 // fixed weights for the recommendation score
-const WEIGHTS=[{id:'w_energy',l:'Energy',v:4},{id:'w_water',l:'Water',v:3},{id:'w_peak',l:'Peak power (grid)',v:3},{id:'w_capex',l:'Initial cost',v:2}];
+const WEIGHTS=[{id:'w_energy',l:'Energy',v:4},{id:'w_water',l:'Water',v:3},{id:'w_peak',l:'Peak power (grid)',v:3},{id:'w_capex',l:'Initial cost',v:2},{id:'w_carbon',l:'Carbon',v:3}];
+
+// ---------- environmental impact ----------
+// grid emission factor, t CO2 per MWh (= kg/kWh): Our World in Data / Ember, carbon intensity of electricity, latest year (2024–2025)
+const GRID_EF={dubai:.468,abudhabi:.468,riyadh:.692,jeddah:.692,dammam:.692,manama:.902,cairo:.563,nova:.384,dallas:.384,phoenix:.384,chicago:.384,
+  saopaulo:.110,frankfurt:.330,london:.217,dublin:.257,madrid:.154,stockholm:.035,singapore:.497,mumbai:.670,tokyo:.477,sydney:.525};
+// energy to supply 1 m³ of water, kWh: seawater desalination (Gulf) about 3.5, conventional treated supply about 0.5 (IEA World Energy Outlook 2016, Water-Energy Nexus)
+const WATER_KWH={dubai:3.5,abudhabi:3.5,riyadh:3.5,jeddah:3.5,dammam:3.5,manama:3.5};
+const waterKwh=id=>WATER_KWH[id]??0.5;
+// refrigerants, 100-year GWP (IPCC AR4, as used by the EU F-gas Regulation)
+const REFRIGERANTS={r513a:{name:'R-513A',gwp:631},r134a:{name:'R-134a',gwp:1430},r1234ze:{name:'R-1234ze(E)',gwp:1}};
 
 // default basis values (inputs override them in the Cooling Plant Selector)
 const BASIS={
@@ -790,6 +823,7 @@ const BASIS={
   dpCDU:320, dtCDU:10, dpPri:200, dpSec:400, dpCW:211, etaP:0.70,   // pump heads (kPa), CDU coolant ΔT, pump × motor × VFD efficiency
   dpFWU:0.30, dtAir:12, etaF:0.65,            // fan wall units: static pressure (kPa), air rise across IT (K), fan efficiency
   minPump:0.5, minFan:0.3,                    // VFD minimum speed
+  ef:0.45, wkwh:0.5, refr:'r513a', chW:0.3, chA:0.4, leak:0.02,   // grid t CO2/MWh; water kWh/m³; refrigerant; charge kg per kW (water-cooled / air-cooled); leak per year
 };
 
 // ---------- ASHRAE 90.4-2025 Table 6.5: maximum annualized MLC by climate zone, [ITE > 300 kW, ITE ≤ 300 kW] ----------
@@ -941,6 +975,11 @@ function simulate(wx,p,des){
     const cap=p.Qd*(1+p.red);
     r.capLo=0; r.capHi=0; r.capParts=[];
     for(const c of o.comp){ const rt=p.rates[c]; r.capLo+=cap*rt.lo; r.capHi+=cap*rt.hi; r.capParts.push(c); }
+    // carbon, t CO2e per year: electricity × grid factor; water × supply energy × grid factor; refrigerant charge (duty + 1 standby per loop) × leak × GWP
+    r.chCap=d.units.reduce((s,u)=>s+(u.N+1)*u.unit,0);
+    r.charge=r.chCap*(d.units.some(u=>u.kind==='ac')?p.chA:p.chW);
+    r.co2E=r.E*p.ef; r.co2W=r.W*p.wkwh/1000*p.ef; r.co2R=r.charge*p.leak*(REFRIGERANTS[p.refr]||REFRIGERANTS.r513a).gwp/1000;
+    r.co2=r.co2E+r.co2W+r.co2R; r.co2IT=r.co2*1000/r.Eit;   // kg CO2e per MWh of IT
     out[o.id]=r;
   }
   return out;
@@ -955,8 +994,8 @@ function score(res,p,des){
   });
   const ok=ids.filter(id=>!res[id].excluded);
   const norm=(k,id)=>{ const v=ok.map(i=>res[i][k]); const mn=Math.min(...v), mx=Math.max(...v); return mx-mn<1e-9?0:(res[id][k]-mn)/(mx-mn); };
-  const wW=p.water==='limited'?p.w_water*2:p.w_water, tot=(p.w_energy+wW+p.w_peak+p.w_capex)||1;
-  ok.forEach(id=>{ res[id].score=100*(1-(p.w_energy*norm('E',id)+wW*norm('W',id)+p.w_peak*norm('peak',id)+p.w_capex*norm('capMid',id))/tot); });
+  const wW=p.water==='limited'?p.w_water*2:p.w_water, wC=p.w_carbon||0, tot=(p.w_energy+wW+p.w_peak+p.w_capex+wC)||1;
+  ok.forEach(id=>{ res[id].score=100*(1-(p.w_energy*norm('E',id)+wW*norm('W',id)+p.w_peak*norm('peak',id)+p.w_capex*norm('capMid',id)+wC*norm('co2',id))/tot); });
   ok.sort((a,b)=>res[b].score-res[a].score);
   return ok;
 }
@@ -1101,6 +1140,9 @@ const groups=[...new Set(CITIES.map(c=>c.g))];
 groups.forEach(g=>{ const og=document.createElement('optgroup'); og.label=g; CITIES.filter(c=>c.g===g).forEach(c=>{const o=document.createElement('option'); o.value=c.id; o.textContent=c.name; og.appendChild(o);}); $('city').appendChild(og); });
 RATES.forEach(r=>{ const d=document.createElement('div'); d.innerHTML=`<label>${r.l}</label><div class="row"><input type="number" id="rl_${r.id}" value="${r.lo}" step="5" min="0" aria-label="${r.l} low"><input type="number" id="rh_${r.id}" value="${r.hi}" step="5" min="0" aria-label="${r.l} high"></div>`; $('rates').appendChild(d); });
 
+// built-in city id when the City tab is in use (none for an uploaded weather file); grid factor: city default or a world-average 0.45
+const cityId=()=>$('tabFile').classList.contains('on')?null:$('city').value;
+const cityEF=()=>GRID_EF[cityId()]??0.45;
 function params(){
   // blank field falls back to its default; design dry-bulb / wet-bulb default is blank = auto
   const g=id=>{ const v=parseFloat($(id).value); return isNaN(v)?parseFloat($(id).defaultValue):v; };
@@ -1114,6 +1156,7 @@ function params(){
     copA:g('copA'),copW:g('copW'),copMax:g('copMax'),unitWL:Math.max(100,g('unitWL')),unitWA:Math.max(100,g('unitWA')),unitA:Math.max(50,g('unitA')),derA:Math.max(0,g('derA'))/100,
     acMax:g('acMax'),wcMax:g('wcMax'),aCT:g('aCT'),aDC:g('aDC'),aAD:g('aAD'),aHX:g('aHX'),swAD:g('swAD'),swHY:g('swHY'),eAD:g('eAD'),coc:Math.max(1.5,g('coc')),
     kCT:g('kCT')/100,kDC:g('kDC')/100,kAD:g('kAD')/100,dpCDU:g('dpCDU'),dpPri:g('dpPri'),dpSec:g('dpSec'),dpCW:g('dpCW'),etaP:Math.min(1,Math.max(0.2,g('etaP')/100)),
+    ef:isNaN(g('envEF'))?cityEF():g('envEF'),wkwh:isNaN(g('envW'))?waterKwh(cityId()):g('envW'),refr:$('refr').value,chW:Math.max(0,g('chW')),chA:Math.max(0,g('chA')),leak:Math.max(0,g('leak'))/100,
     dpFWU:g('dpFWU')/1000,dtAir:Math.max(2,g('dtAir')),etaF:Math.min(1,Math.max(0.2,g('etaF')/100)),
     tE:g('tE'),tW:g('tW'),tD:g('tD'),
     red:g('red')/100,ups:Math.min(1,Math.max(0.5,g('ups')/100)),dloss:Math.min(0.3,Math.max(0,g('dloss')/100)),rates,...Object.fromEntries(WEIGHTS.map(w=>[w.id,w.v]))};
@@ -1135,7 +1178,7 @@ function run(){
   const A=ashrae();
   P=params(); P.cases=designCases(WX,A,P.dbIn,P.wbIn); P.dbA=P.cases.A.db; P.dbD=P.cases.A.db; P.wbD=P.cases.B.wb;
   DES=designCheck(P); RES=simulate(WX,P,DES); RANK=score(RES,P,DES);
-  renderReco(); renderOverview(); renderDes(); renderSystem(); renderEff(); renderCons(); renderRun(); renderCap(); renderClimate();
+  renderReco(); renderOverview(); renderDes(); renderSystem(); renderEff(); renderCarbon(); renderCons(); renderRun(); renderCap(); renderClimate();
 }
 const order=()=>[...RANK,...OPTIONS.map(o=>o.id).filter(id=>!RANK.includes(id))];
 const sel=()=>PICK||RANK[0]||OPTIONS[0].id;   // system shown in the Systems tab: user's pick, else the recommendation
@@ -1168,7 +1211,7 @@ function renderReco(){
     <span class="an">Extremes from ${src}; coincident values from the hourly weather</span></div>`;
   const top=RANK.length?'':'<div class="sub" style="margin-top:4px"><b>No system meets every constraint.</b> Try allowing water, raising the loop supply temperatures, or checking the design conditions and chiller limits.</div>';
   // one summary card per system, recommended first
-  const lines=[['Electricity',r=>r.E,r=>`${fmt(r.E/1000,1)} GWh/yr`],['Annual PUE',r=>r.pue,r=>r.pue.toFixed(3)],[`Electrical peak <small>cooling, ${atPk}</small>`,r=>r.peak,r=>`${fmt(r.peak/1000,2)} MW`],['Water',r=>r.W,r=>`${fmt(r.W)} m³/yr`],[`Water peak <small>${atPk}</small>`,r=>r.Wpeak,r=>`${fmt(r.Wpeak,1)} m³/h`],['Running cost',r=>r.run,runTxt],['Initial cost',r=>r.capMid,costTxt]];
+  const lines=[['Electricity',r=>r.E,r=>`${fmt(r.E/1000,1)} GWh/yr`],['Annual PUE',r=>r.pue,r=>r.pue.toFixed(3)],[`Electrical peak <small>cooling, ${atPk}</small>`,r=>r.peak,r=>`${fmt(r.peak/1000,2)} MW`],['Water',r=>r.W,r=>`${fmt(r.W)} m³/yr`],[`Water peak <small>${atPk}</small>`,r=>r.Wpeak,r=>`${fmt(r.Wpeak,1)} m³/h`],['Carbon',r=>r.co2,r=>`${fmt(r.co2)} t CO₂/yr`],['Running cost',r=>r.run,runTxt],['Initial cost',r=>r.capMid,costTxt]];
   const bestV=lines.map(([,v])=>RANK.length?Math.min(...RANK.map(i=>v(RES[i]))):null);
   const cards=order().map(id=>{ const r=RES[id], k=RANK.indexOf(id);
     const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="tag ok">Recommended</span>':`<span class="tag">#${k+1}</span>`;
@@ -1194,6 +1237,7 @@ function renderOverview(){
     {h:`Electrical peak MW (cooling, ${atPk})`,v:r=>r.peak/1000,d:2,lo:true},
     {h:'Water m³/yr',v:r=>r.W,d:0,lo:true},
     {h:`Water peak m³/h (${atPk})`,v:r=>r.Wpeak,d:1,lo:true},
+    {h:'Carbon t CO₂/yr',v:r=>r.co2,d:0,lo:true},
     {h:'Running cost M$/yr',v:r=>r.run/1e6,d:2,lo:true},
     {h:'Initial cost M$',v:r=>r.capMid,lo:true,txt:r=>`${fmt(r.capLo/1e6,1)}–${fmt(r.capHi/1e6,1)}`},
     {h:'Free-cooling h (LC / air)',v:sumF,lo:false,txt:r=>loopTxt(r.free)}];
@@ -1251,6 +1295,20 @@ function renderEff(){
   const ids=RANK;
   $('effTitle').textContent=ids.length?`Annual MLC: ${RES[ids[0]].o.short} ${RES[ids[0]].mlc.toFixed(3)} kW/kW`:'Annual MLC';
   hbar('cEff',ids.map(id=>RES[id].o.short),ids.map(id=>RES[id].mlc),'kW per kW of cooling',3);
+}
+
+function renderCarbon(){
+  const b=RES.acc, rows=order().map((id,i)=>{ const r=RES[id]; return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td>${fmt(r.co2E)}</td><td>${fmt(r.co2W)}</td><td>${fmt(r.co2R)}</td><td>${fmt(r.co2)}</td><td>${fmt(r.co2IT,1)}</td><td>${id==='acc'?'–':fmt(b.co2-r.co2)}</td></tr>`; });
+  $('tCO2').innerHTML=table(['Option','Electricity t CO₂/yr','Water supply t CO₂/yr','Refrigerant t CO₂e/yr','Total t CO₂e/yr','kg CO₂e per MWh IT','Saving vs air-cooled t/yr'],rows);
+  const rf=REFRIGERANTS[P.refr];
+  $('co2Note').textContent=`Grid factor ${P.ef.toFixed(3)} kg CO₂/kWh${isNaN(parseFloat($('envEF').value))?(cityId()?' (Our World in Data / Ember, latest year)':' (world average; enter the local grid)'):''}; water supply ${fmt(P.wkwh,1)} kWh/m³; ${rf.name} GWP ${fmt(rf.gwp)}, charge ${P.chW} / ${P.chA} kg/kW (water / air-cooled), leak ${fmt(P.leak*100,1)}%/yr on duty + 1 standby chillers. Cooling plant only; IT electricity not included.`;
+  const ids=RANK, labels=ids.map(id=>RES[id].o.short);
+  const o=baseOpts(); o.indexAxis='y'; o.scales.x={stacked:true,grid:{color:css('--border')},border:{display:false},ticks:{color:css('--text2')},title:{display:true,text:'t CO₂e/yr',color:css('--text2')},beginAtZero:true};
+  o.scales.y={stacked:true,grid:{display:false},ticks:{color:css('--text')}};
+  o.plugins.tooltip={mode:'index',intersect:false,callbacks:{label:c=>`${c.dataset.label}: ${fmt(c.raw)} t`}};
+  const ds=(lab,k,col,last)=>({label:lab,data:ids.map(id=>RES[id][k]),backgroundColor:col,borderColor:css('--surface'),borderWidth:{right:2},barThickness:18,borderRadius:last?{topRight:4,bottomRight:4}:0});
+  mk('cCO2',{type:'bar',data:{labels,datasets:[ds('Electricity','co2E',css('--s1')),ds('Water supply','co2W',css('--s3')),ds('Refrigerant leakage','co2R',css('--s2'),true)]},options:o});
+  $('co2Title').textContent=ids.length?`Annual carbon: lowest ${fmt(Math.min(...ids.map(i=>RES[i].co2)))} t CO₂e/yr`:'Annual carbon by source';
 }
 
 function renderCons(){
@@ -1414,6 +1472,7 @@ function exportReport(){
     sheet('Overview','tOv'),
     sheet('Design day','tDes','desNote'),
     sheet('Efficiency','tEff'),
+    sheet('Carbon','tCO2','co2Note'),
     sheet('Energy and water','tCons'),
     sheet('Running cost','tRun','runNote'),
     sheet('Initial cost','tCap'),
@@ -1545,9 +1604,9 @@ function buildReport(){
       </div>
       <p class="why">${rec.o.id==='acc'?'':`Against air-cooled chillers it saves <b>${fmt(Math.max(0,acc.E-rec.E)/1000,1)} GWh/yr</b> of electricity and <b>${fmt(Math.max(0,acc.peak-rec.peak)/1000,2)} MW</b> of peak cooling power. `}Free cooling covers ${fmt(rec.free[0])} h/yr on the liquid loop and ${fmt(rec.free[1])} h/yr on the air loop. ${DES[rec.o.id].ok?`It holds the supply temperatures at the design condition (${fmt(P.dbD,1)} °C dry-bulb / ${fmt(P.wbD,1)} °C wet-bulb).`:''}</p></div>`;
   } else h+=`<div class="rec"><div class="nm">No system meets every constraint</div><p class="why">Allow water, raise the loop supply temperatures, or check the design conditions and chiller limits.</p></div>`;
-  h+=`<h2>Ranking</h2><table><thead><tr><th>#</th><th class="l">System</th><th>Score</th><th>Electricity GWh/yr</th><th>Peak MW</th><th>Water m³/yr</th><th>Running M$/yr</th><th>Initial M$</th></tr></thead><tbody>${ids.map(id=>{ const r=RES[id], k=RANK.indexOf(id);
-    return `<tr class="${k===0?'best':''}"><td>${k>=0?k+1:'–'}</td><td class="l">${r.o.name}${r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="tag ok">Recommended</span>':''}</td><td>${r.excluded?'–':fmt(r.score)}</td><td>${fmt(r.E/1000,1)}</td><td>${fmt(r.peak/1000,2)}</td><td>${fmt(r.W)}</td><td>${fmt(r.run/1e6,2)}</td><td>${fmt(r.capLo/1e6,1)}–${fmt(r.capHi/1e6,1)}</td></tr>`; }).join('')}</tbody></table>
-  <div class="note">Score: energy, water, peak power and initial cost normalised across the feasible options and weighted 4 / 3 / 3 / 2 (water doubled when limited). Annual figures at the frequent load; peaks at 100% load on the worst hour of the year.</div>`;
+  h+=`<h2>Ranking</h2><table><thead><tr><th>#</th><th class="l">System</th><th>Score</th><th>Electricity GWh/yr</th><th>Peak MW</th><th>Water m³/yr</th><th>Carbon t CO₂/yr</th><th>Running M$/yr</th><th>Initial M$</th></tr></thead><tbody>${ids.map(id=>{ const r=RES[id], k=RANK.indexOf(id);
+    return `<tr class="${k===0?'best':''}"><td>${k>=0?k+1:'–'}</td><td class="l">${r.o.name}${r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="tag ok">Recommended</span>':''}</td><td>${r.excluded?'–':fmt(r.score)}</td><td>${fmt(r.E/1000,1)}</td><td>${fmt(r.peak/1000,2)}</td><td>${fmt(r.W)}</td><td>${fmt(r.co2)}</td><td>${fmt(r.run/1e6,2)}</td><td>${fmt(r.capLo/1e6,1)}–${fmt(r.capHi/1e6,1)}</td></tr>`; }).join('')}</tbody></table>
+  <div class="note">Score: energy, water, peak power, initial cost and carbon normalised across the feasible options and weighted 4 / 3 / 3 / 2 / 3 (water doubled when limited). Annual figures at the frequent load; peaks at 100% load on the worst hour of the year.</div>`;
   // ---- page 2: comparison charts
   const lab=id=>({label:RES[id].o.short,bold:id===RANK[0]});
   h+=`<section class="sec"><h2>Comparison</h2>
@@ -1576,6 +1635,7 @@ function buildReport(){
    <h3>Design-day check</h3>${rptTable('tDes')}<div class="note">${esc($('desNote').textContent)}</div>
    <h3>Efficiency</h3>${rptTable('tEff')}
    <h3>Energy and water</h3>${rptTable('tCons')}
+   <h3>Carbon emissions</h3>${rptTable('tCO2')}<div class="note">${esc($('co2Note').textContent)}</div>
    <h3>Running cost</h3>${rptTable('tRun')}<div class="note">${esc($('runNote').textContent)}</div>
    <h3>Initial cost</h3>${rptTable('tCap')}<div class="note">Rate-based estimate, not a quotation: capacity × redundancy × low/high rate for each component. Excludes building works, electrical and controls.</div></section>`;
   // ---- inputs and method

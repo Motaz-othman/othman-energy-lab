@@ -120,9 +120,9 @@ function buildReport(){
       </div>
       <p class="why">${rec.o.id==='acc'?'':`Against air-cooled chillers it saves <b>${fmt(Math.max(0,acc.E-rec.E)/1000,1)} GWh/yr</b> of electricity and <b>${fmt(Math.max(0,acc.peak-rec.peak)/1000,2)} MW</b> of peak cooling power. `}Free cooling covers ${fmt(rec.free[0])} h/yr on the liquid loop and ${fmt(rec.free[1])} h/yr on the air loop. ${DES[rec.o.id].ok?`It holds the supply temperatures at the design condition (${fmt(P.dbD,1)} °C dry-bulb / ${fmt(P.wbD,1)} °C wet-bulb).`:''}</p></div>`;
   } else h+=`<div class="rec"><div class="nm">No system meets every constraint</div><p class="why">Allow water, raise the loop supply temperatures, or check the design conditions and chiller limits.</p></div>`;
-  h+=`<h2>Ranking</h2><table><thead><tr><th>#</th><th class="l">System</th><th>Score</th><th>Electricity GWh/yr</th><th>Peak MW</th><th>Water m³/yr</th><th>Running M$/yr</th><th>Initial M$</th></tr></thead><tbody>${ids.map(id=>{ const r=RES[id], k=RANK.indexOf(id);
-    return `<tr class="${k===0?'best':''}"><td>${k>=0?k+1:'–'}</td><td class="l">${r.o.name}${r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="tag ok">Recommended</span>':''}</td><td>${r.excluded?'–':fmt(r.score)}</td><td>${fmt(r.E/1000,1)}</td><td>${fmt(r.peak/1000,2)}</td><td>${fmt(r.W)}</td><td>${fmt(r.run/1e6,2)}</td><td>${fmt(r.capLo/1e6,1)}–${fmt(r.capHi/1e6,1)}</td></tr>`; }).join('')}</tbody></table>
-  <div class="note">Score: energy, water, peak power and initial cost normalised across the feasible options and weighted 4 / 3 / 3 / 2 (water doubled when limited). Annual figures at the frequent load; peaks at 100% load on the worst hour of the year.</div>`;
+  h+=`<h2>Ranking</h2><table><thead><tr><th>#</th><th class="l">System</th><th>Score</th><th>Electricity GWh/yr</th><th>Peak MW</th><th>Water m³/yr</th><th>Carbon t CO₂/yr</th><th>Running M$/yr</th><th>Initial M$</th></tr></thead><tbody>${ids.map(id=>{ const r=RES[id], k=RANK.indexOf(id);
+    return `<tr class="${k===0?'best':''}"><td>${k>=0?k+1:'–'}</td><td class="l">${r.o.name}${r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="tag ok">Recommended</span>':''}</td><td>${r.excluded?'–':fmt(r.score)}</td><td>${fmt(r.E/1000,1)}</td><td>${fmt(r.peak/1000,2)}</td><td>${fmt(r.W)}</td><td>${fmt(r.co2)}</td><td>${fmt(r.run/1e6,2)}</td><td>${fmt(r.capLo/1e6,1)}–${fmt(r.capHi/1e6,1)}</td></tr>`; }).join('')}</tbody></table>
+  <div class="note">Score: energy, water, peak power, initial cost and carbon normalised across the feasible options and weighted 4 / 3 / 3 / 2 / 3 (water doubled when limited). Annual figures at the frequent load; peaks at 100% load on the worst hour of the year.</div>`;
   // ---- page 2: comparison charts
   const lab=id=>({label:RES[id].o.short,bold:id===RANK[0]});
   h+=`<section class="sec"><h2>Comparison</h2>
@@ -151,6 +151,7 @@ function buildReport(){
    <h3>Design-day check</h3>${rptTable('tDes')}<div class="note">${esc($('desNote').textContent)}</div>
    <h3>Efficiency</h3>${rptTable('tEff')}
    <h3>Energy and water</h3>${rptTable('tCons')}
+   <h3>Carbon emissions</h3>${rptTable('tCO2')}<div class="note">${esc($('co2Note').textContent)}</div>
    <h3>Running cost</h3>${rptTable('tRun')}<div class="note">${esc($('runNote').textContent)}</div>
    <h3>Initial cost</h3>${rptTable('tCap')}<div class="note">Rate-based estimate, not a quotation: capacity × redundancy × low/high rate for each component. Excludes building works, electrical and controls.</div></section>`;
   // ---- inputs and method

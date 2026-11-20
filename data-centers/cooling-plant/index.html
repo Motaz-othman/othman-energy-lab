@@ -188,6 +188,22 @@
     <div class="note">P = Q × ΔP / (ρ × cp × ΔT × η). CDU pumps on a 10 K coolant ΔT; primary and secondary pumps on each loop's ΔT; condenser pumps on 5.56 K (211 kPa ≈ ASHRAE 90.1 Appendix G, 19 W/gpm). All pump and fan heat is added to the chiller load. VFD affinity law at part load (minimum speed 50% pumps, 30% fans).</div>
   </details>
   <details>
+    <summary>Environmental impact (carbon)</summary>
+    <div class="row">
+      <div><label for="envEF">Grid emission factor (kg CO₂/kWh)</label><input type="number" id="envEF" step="0.01" min="0" placeholder="auto"></div>
+      <div><label for="envW">Water supply energy (kWh/m³)</label><input type="number" id="envW" step="0.1" min="0" placeholder="auto"></div>
+    </div>
+    <div class="row">
+      <div><label for="refr">Chiller refrigerant</label><select id="refr"><option value="r513a">R-513A (GWP 631)</option><option value="r134a">R-134a (GWP 1,430)</option><option value="r1234ze">R-1234ze(E) (GWP 1)</option></select></div>
+      <div><label for="leak">Refrigerant leak (% of charge per year)</label><input type="number" id="leak" value="2" step="0.5" min="0"></div>
+    </div>
+    <div class="row">
+      <div><label for="chW">Charge, water-cooled (kg/kW)</label><input type="number" id="chW" value="0.3" step="0.05" min="0"></div>
+      <div><label for="chA">Charge, air-cooled (kg/kW)</label><input type="number" id="chA" value="0.4" step="0.05" min="0"></div>
+    </div>
+    <div class="note" id="envNote">Leave blank for the city's values: grid factor from Our World in Data / Ember (latest year); water supply energy 3.5 kWh/m³ for Gulf desalination, 0.5 elsewhere (IEA WEO 2016). GWP: IPCC AR4. Refrigerant charge and leak rate are assumptions; enter the selected chiller's data. Carbon counts in the recommendation (weight 3).</div>
+  </details>
+  <details>
     <summary>Electrical losses</summary>
     <div class="row">
       <div><label for="ups">UPS efficiency (%)</label><input type="number" id="ups" value="96" step="0.5" min="80" max="100"></div>
@@ -252,6 +268,12 @@
       <div><div id="tEff"></div><div class="note">MLC = annual mechanical energy ÷ annual cooling load (ASHRAE 90.4 definition, cooling load taken as IT energy). Maximum: ASHRAE 90.4-2022 Addendum g, Table 6.5, for the station's climate zone and ITE above / at or below 300 kW. Screening check: a compliance calculation follows the 90.4 load points and TMY3 weather. Free-cooling hours: chiller fully off.</div></div>
       <div><div class="ctitle" id="effTitle">Annual MLC</div><div class="chartbox"><canvas id="cEff"></canvas></div></div>
     </div></div>
+    <div class="card"><h2>Carbon emissions</h2><div class="split">
+      <div><div id="tCO2"></div><div class="note" id="co2Note"></div></div>
+      <div><div class="ctitle" id="co2Title">Annual carbon by source</div>
+        <div class="legend"><span><i style="background:var(--s1)"></i>Electricity</span><span><i style="background:var(--s3)"></i>Water supply</span><span><i style="background:var(--s2)"></i>Refrigerant leakage</span></div>
+        <div class="chartbox" style="height:220px"><canvas id="cCO2"></canvas></div></div>
+    </div></div>
     <div class="card"><h2>Electricity and water consumption</h2><div class="split">
       <div><div id="tCons"></div><div class="note">Annual totals at the frequent load. Peaks are the design peak: the higher of Case A and Case B at 100% load. Electrical peak = cooling only: chillers + heat-rejection fans + pumps + CRAH / FWU fans + CDU pumps (no IT load, no electrical equipment or losses). Water peak = make-up water (evaporation, blowdown, pad water). PUE = (IT + cooling + losses) ÷ IT, annual. CRAH / fan-wall fans are not included.</div></div>
       <div>
@@ -305,7 +327,8 @@
       <li><b>MLC</b> (ASHRAE 90.4): annual mechanical energy ÷ annual IT energy; checked against ASHRAE 90.4-2025 Table 6.5 for the climate zone.</li>
       <li><b>Electrical losses and PUE</b>: <code>PUE = (IT / η<sub>UPS</sub> + cooling) / (1 − losses) / IT</code>, UPS 96%, distribution 2%. Simplified, not the 90.4 ELC method.</li>
       <li><b>Running cost</b>: <code>electricity × tariff + water × tariff + cooling peak × demand charge × 12</code>. Simple payback against air-cooled chillers = extra initial cost (mid estimate) ÷ running cost saved.</li>
-      <li><b>Recommendation</b>: energy 4, water 3 (doubled when water is limited), peak 3, initial cost 2, normalised across feasible options. Full basis: the Cooling Plant Calculation Basis. Screening-level; confirm with vendor selections.</li>
+      <li><b>Carbon</b> (t CO₂e/yr): electricity × grid factor + water × supply energy (kWh/m³) × grid factor + refrigerant charge (duty + 1 standby per loop, kg/kW × capacity) × leak rate × GWP. Grid factors: Our World in Data / Ember; water energy: IEA WEO 2016; GWP: IPCC AR4.</li>
+      <li><b>Recommendation</b>: energy 4, water 3 (doubled when water is limited), peak 3, initial cost 2, carbon 3, normalised across feasible options. Full basis: the Cooling Plant Calculation Basis. Screening-level; confirm with vendor selections.</li>
     </ul>
   </div>
   </div>

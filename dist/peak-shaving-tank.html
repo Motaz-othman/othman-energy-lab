@@ -534,7 +534,17 @@ const RATES=[
  {id:'hx',  l:'Economiser plate HX',lo:15,hi:30},
 ];
 // fixed weights for the recommendation score
-const WEIGHTS=[{id:'w_energy',l:'Energy',v:4},{id:'w_water',l:'Water',v:3},{id:'w_peak',l:'Peak power (grid)',v:3},{id:'w_capex',l:'Initial cost',v:2}];
+const WEIGHTS=[{id:'w_energy',l:'Energy',v:4},{id:'w_water',l:'Water',v:3},{id:'w_peak',l:'Peak power (grid)',v:3},{id:'w_capex',l:'Initial cost',v:2},{id:'w_carbon',l:'Carbon',v:3}];
+
+// ---------- environmental impact ----------
+// grid emission factor, t CO2 per MWh (= kg/kWh): Our World in Data / Ember, carbon intensity of electricity, latest year (2024–2025)
+const GRID_EF={dubai:.468,abudhabi:.468,riyadh:.692,jeddah:.692,dammam:.692,manama:.902,cairo:.563,nova:.384,dallas:.384,phoenix:.384,chicago:.384,
+  saopaulo:.110,frankfurt:.330,london:.217,dublin:.257,madrid:.154,stockholm:.035,singapore:.497,mumbai:.670,tokyo:.477,sydney:.525};
+// energy to supply 1 m³ of water, kWh: seawater desalination (Gulf) about 3.5, conventional treated supply about 0.5 (IEA World Energy Outlook 2016, Water-Energy Nexus)
+const WATER_KWH={dubai:3.5,abudhabi:3.5,riyadh:3.5,jeddah:3.5,dammam:3.5,manama:3.5};
+const waterKwh=id=>WATER_KWH[id]??0.5;
+// refrigerants, 100-year GWP (IPCC AR4, as used by the EU F-gas Regulation)
+const REFRIGERANTS={r513a:{name:'R-513A',gwp:631},r134a:{name:'R-134a',gwp:1430},r1234ze:{name:'R-1234ze(E)',gwp:1}};
 
 // default basis values (inputs override them in the Cooling Plant Selector)
 const BASIS={
@@ -548,6 +558,7 @@ const BASIS={
   dpCDU:320, dtCDU:10, dpPri:200, dpSec:400, dpCW:211, etaP:0.70,   // pump heads (kPa), CDU coolant ΔT, pump × motor × VFD efficiency
   dpFWU:0.30, dtAir:12, etaF:0.65,            // fan wall units: static pressure (kPa), air rise across IT (K), fan efficiency
   minPump:0.5, minFan:0.3,                    // VFD minimum speed
+  ef:0.45, wkwh:0.5, refr:'r513a', chW:0.3, chA:0.4, leak:0.02,   // grid t CO2/MWh; water kWh/m³; refrigerant; charge kg per kW (water-cooled / air-cooled); leak per year
 };
 
 // ---------- ASHRAE 90.4-2025 Table 6.5: maximum annualized MLC by climate zone, [ITE > 300 kW, ITE ≤ 300 kW] ----------
@@ -699,6 +710,11 @@ function simulate(wx,p,des){
     const cap=p.Qd*(1+p.red);
     r.capLo=0; r.capHi=0; r.capParts=[];
     for(const c of o.comp){ const rt=p.rates[c]; r.capLo+=cap*rt.lo; r.capHi+=cap*rt.hi; r.capParts.push(c); }
+    // carbon, t CO2e per year: electricity × grid factor; water × supply energy × grid factor; refrigerant charge (duty + 1 standby per loop) × leak × GWP
+    r.chCap=d.units.reduce((s,u)=>s+(u.N+1)*u.unit,0);
+    r.charge=r.chCap*(d.units.some(u=>u.kind==='ac')?p.chA:p.chW);
+    r.co2E=r.E*p.ef; r.co2W=r.W*p.wkwh/1000*p.ef; r.co2R=r.charge*p.leak*(REFRIGERANTS[p.refr]||REFRIGERANTS.r513a).gwp/1000;
+    r.co2=r.co2E+r.co2W+r.co2R; r.co2IT=r.co2*1000/r.Eit;   // kg CO2e per MWh of IT
     out[o.id]=r;
   }
   return out;
@@ -713,8 +729,8 @@ function score(res,p,des){
   });
   const ok=ids.filter(id=>!res[id].excluded);
   const norm=(k,id)=>{ const v=ok.map(i=>res[i][k]); const mn=Math.min(...v), mx=Math.max(...v); return mx-mn<1e-9?0:(res[id][k]-mn)/(mx-mn); };
-  const wW=p.water==='limited'?p.w_water*2:p.w_water, tot=(p.w_energy+wW+p.w_peak+p.w_capex)||1;
-  ok.forEach(id=>{ res[id].score=100*(1-(p.w_energy*norm('E',id)+wW*norm('W',id)+p.w_peak*norm('peak',id)+p.w_capex*norm('capMid',id))/tot); });
+  const wW=p.water==='limited'?p.w_water*2:p.w_water, wC=p.w_carbon||0, tot=(p.w_energy+wW+p.w_peak+p.w_capex+wC)||1;
+  ok.forEach(id=>{ res[id].score=100*(1-(p.w_energy*norm('E',id)+wW*norm('W',id)+p.w_peak*norm('peak',id)+p.w_capex*norm('capMid',id)+wC*norm('co2',id))/tot); });
   ok.sort((a,b)=>res[b].score-res[a].score);
   return ok;
 }
