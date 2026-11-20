@@ -4,9 +4,9 @@
 const OPTIONS=[
  {id:'acc',  name:'Air-cooled chillers',                     short:'Air-cooled chillers',  water:false, comp:['acch']},
  {id:'accfc',name:'Air-cooled chillers + free-cooling dry coolers', short:'Chillers + dry coolers', water:false, comp:['acch','dc']},
- {id:'adia', name:'Water-cooled chillers + adiabatic coolers', short:'Chillers + adiabatic', water:true, comp:['wcch','adc','hx']},
+ {id:'adia', name:'Water-cooled chillers + adiabatic coolers + free cooling', short:'Chillers + adiabatic + free cooling', water:true, comp:['wcch','adc','hx']},
  {id:'wcc',  name:'Water-cooled chillers + cooling towers + free cooling', short:'Chillers + towers + free cooling',     water:true, comp:['wcch','ct','hx']},
- {id:'hyb',  name:'Water-cooled chillers + dry coolers + cooling towers (hybrid)', short:'Chillers + hybrid', water:true, comp:['wcch','dc','ct','hx']},
+ {id:'hyb',  name:'Water-cooled chillers + hybrid dry coolers and cooling towers + free cooling', short:'Chillers + hybrid + free cooling', water:true, comp:['wcch','dc','ct','hx']},
 ];
 const RATES=[
  {id:'acch',l:'Air-cooled chillers',lo:180,hi:280},
