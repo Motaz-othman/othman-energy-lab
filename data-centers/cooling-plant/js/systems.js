@@ -30,45 +30,72 @@ const ROLE={
  hx:()=>'Pre-cools the return water with condenser water (economiser)',
 };
 
-// ---------- schematic: one panel per loop (HT liquid cooling, LT air cooling), as in the energy model ----------
-// each panel: IT terminals -> return -> pre-cooling -> HT/LT chillers -> buffer/TES tank -> pumps -> supply; heat to outdoors
+// ---------- schematic: one panel per loop (liquid / air cooling), piping as in the energy model ----------
+// water-cooled: outdoor heat rejection -> condenser water, in parallel to the plate HX and the chiller condensers, common return;
+//   loop: IT return -> plate HX (free cooling) -> chiller evaporators -> buffer tank -> pumps -> supply to IT
+// air-cooled: loop return -> (dry coolers, direct) -> chiller evaporators -> tank -> pumps -> supply; condenser fans reject to outdoor air
 function schematic(id){
-  const s=SYS[id], r=RES[id], ac=id==='acc'||id==='accfc', W=430, G=24, H=396;
+  const s=SYS[id], r=RES[id], d=DES[id], ac=id==='acc'||id==='accfc', W=430, G=24, H=420;
   const loops=P.loops.map((L,i)=>({L,i})).filter(x=>x.L.Q>0);
-  const hot=P.loops[0].Ts===P.loops[1].Ts?null:(P.loops[0].Ts>P.loops[1].Ts?0:1);   // warmer supply = HT loop
   const t=(x,y,txt,c='',a='middle')=>`<text class="${c}" x="${x}" y="${y}" text-anchor="${a}">${txt}</text>`;
   const box=(x,y,w,h,lines,c='bx')=>`<rect class="${c}" x="${x}" y="${y}" width="${w}" height="${h}" rx="6"/>`
     +lines.map((l,k)=>t(x+w/2,y+(h-(lines.length-1)*15)/2+4+k*15,l,k?'t2':'')).join('');
-  const pipe=d=>`<path class="pipe" d="${d}" marker-end="url(#ar)"/>`;
-  const up=(x,lab)=>`<path class="heat" d="M${x} 148V116" marker-end="url(#ah)"/>${t(x+6,136,lab,'t2','start')}`;
+  const pipe=(d,c)=>`<path class="pipe ${c}" d="${d}" marker-end="url(#ar-${c})"/>`;
+  const line=(d,c)=>`<path class="pipe ${c}" d="${d}"/>`;
+  const hx=P.aHX, cw=v=>`${fmt(v,0)}`;
+  const heatRej={
+    wcc:['Cooling towers (shared by both loops)',`water out = wb + ${P.aCT} K · ${P.coc} cycles`],
+    adia:['Adiabatic coolers (shared by both loops)',`pads on above ${P.swAD} °C: wb + ${P.aAD} K · dry: db + ${P.aDC} K`],
+  };
   const panel=({L,i},k)=>{
-    const tag=hot===null?'':(i===hot?'HT':'LT'), liquid=i===0;
-    let g=t(0,16,(tag?tag+' loop · ':'')+(liquid?'liquid cooling':'air cooling'),'h','start')
-      +t(0,34,`${fmt(L.Qd/1000,1)} MW · supply ${L.Ts} °C / return ${L.Tr} °C`,'t2','start');
-    // outdoors
-    g+=`<rect class="zone" x="0" y="46" width="${W}" height="72" rx="8"/>`+t(10,62,'Outdoors','t2','start');
-    if(s.shared){
-      g+=box(20,68,390,44,[s.shared+(loops.length>1?' (shared by both loops)':''),id==='wcc'?`approach ${P.aCT} K to wet-bulb · ${P.coc} cycles`:id==='hyb'?`dry up to ${P.swHY} °C · towers above, approach ${P.aCT} K`:`wet above ${P.swAD} °C · approach ${P.aAD} K to wet-bulb`]);
-      g+=up(105,'condenser water')+up(325,'condenser water');
+    const liquid=L.name==='LC', u=d.units.find(x=>x.loop===L.name)||{N:0,unit:0};
+    let g=t(0,16,liquid?'Liquid cooling loop':'Air cooling loop','h','start')
+      +t(0,32,`${fmt(L.Qd/1000,1)} MW · supply ${L.Ts} °C / return ${L.Tr} °C`,'t2','start');
+    g+=`<rect class="zone" x="0" y="40" width="${W}" height="80" rx="8"/>`+t(10,115,'Outdoors','t2','start');
+    // loop end: chiller evaporators -> tank -> pumps -> supply to IT; IT return
+    const chil=ac?box(240,150,170,82,['Air-cooled chillers',`${u.N} × ${fmt(u.unit/1000,1)} MW + 1 standby`,`rated COP ${P.copA.toFixed(2)} · on ${fmt(r.part[i]+r.mech[i])} h/yr`])
+      :box(240,140,170,36,['Chiller condensers','Tc = condenser water + 7 K'])+box(240,192,170,50,['Chiller evaporators',`${u.N} × ${fmt(u.unit/1000,1)} MW + 1 · COP ${P.copW.toFixed(2)}`]);
+    g+=chil;
+    if(!ac) g+=`<path class="refr" d="M325 176V192"/>`+t(332,188,'compressors','t2','start');
+    const evapY=ac?191:217, evapB=ac?232:242;
+    g+=box(260,264,130,34,['Buffer / TES tank','not in energy calc'],'bx tes');
+    g+=pipe(`M325 ${evapB}V262`,'sup')+line('M325 298V318','sup');
+    g+=`<circle class="pump" cx="325" cy="326" r="8"/><path class="pumpv" d="M321 321L331 326L321 331z"/>`+t(338,330,'pumps','t2','start');
+    g+=pipe('M325 334V376H312','sup')+t(333,360,`Supply ${L.Ts} °C`,'t2','start');
+    g+=box(120,352,190,50,[liquid?'Liquid-cooled IT (CDUs)':'Air-cooled IT (fan wall units)',`${fmt(L.Qd/1000,1)} MW · ${liquid?'CDU pumps':'FWU fans'} ${fmt(L.Qd*termShare(L,P))} kW`],'bx it');
+    if(ac){
+      g+=box(240,58,170,48,['Air-cooled condensers','Tc = db + 15 K'])+`<path class="heat" d="M325 150V108" marker-end="url(#ar-heat)"/>`+t(332,132,'heat to air','t2','start');
+      if(id==='accfc'){
+        g+=box(20,58,170,48,['Dry coolers (on the loop)',`water out = db + ${P.aDC} K`]);
+        g+=pipe('M120 377H105V108','ret')+t(112,300,`Return ${L.Tr} °C`,'t2','start');
+        g+=pipe(`M190 92H215V${evapY}H238`,'ret')+t(222,140,`free cooling ${fmt(r.free[i])} h/yr`,'t2','start');
+      } else {
+        g+=pipe(`M120 377H105V${evapY}H238`,'ret')+t(112,300,`Return ${L.Tr} °C`,'t2','start');
+      }
     } else {
-      if(s.pre){ g+=box(20,68,170,44,['Outdoor air','dry-cooler fans']); g+=up(105,'heat'); }
-      g+=box(240,68,170,44,['Outdoor air','chiller condenser fans']); g+=up(325,'heat');
+      // outdoor heat rejection (hybrid: dry coolers then towers, in series)
+      if(id==='hyb'){
+        g+=box(20,58,180,48,['Dry coolers',`dry only up to ${P.swHY} °C`])+box(230,58,180,48,['Cooling towers',`wb + ${P.aCT} K above ${P.swHY} °C`]);
+        g+=pipe('M200 82H228','cw')+line('M8 50H422','cwr')+pipe('M110 50V56','cwr')+line('M320 106V128','cw');
+      } else {
+        const hr=heatRej[id]; g+=box(20,58,390,48,hr);
+        g+=line('M8 50H422','cwr')+pipe('M215 50V56','cwr')+line('M215 106V128','cw');
+      }
+      // condenser water supply in parallel to the plate HX and the condensers; returns to the common header
+      g+=line('M105 128H325','cw')+pipe('M105 128V148','cw')+pipe('M325 128V138','cw');
+      g+=t(id==='hyb'?232:224,124,'condenser water supply','t2','start');
+      g+=line('M20 180H8V50','cwr')+line('M410 158H422V50','cwr');
+      g+=box(20,150,170,62,['Plate heat exchanger',`approach ${hx} K`,`free cooling ${fmt(r.free[i])} h/yr`]);
+      // loop: return -> plate HX -> evaporators
+      g+=pipe('M120 377H105V214','ret')+t(112,300,`Return ${L.Tr} °C`,'t2','start');
+      g+=pipe(`M190 196H215V${evapY}H238`,'ret')+t(196,246,'pre-cooled','t2','start');
     }
-    // water loop: pre-cooling and chillers
-    if(s.pre) g+=box(20,150,170,62,[s.pre,id==='accfc'?`approach ${P.aDC} K`:`HX approach ${P.aHX} K`,`free cooling ${fmt(r.free[i])} h/yr`]);
-    g+=box(240,150,170,62,[(tag?tag+' ':'')+'chillers',`${(DES[id].units.find(u=>u.loop===L.name)||{}).N} × ${fmt(((DES[id].units.find(u=>u.loop===L.name)||{}).unit||0)/1000,1)} MW + 1, ${ac?'air':'water'}-cooled`,`rated COP ${(ac?P.copA:P.copW).toFixed(2)} · on ${fmt(r.part[i]+r.mech[i])} h/yr`]);
-    g+=box(240,244,170,46,['Buffer / TES tank','ride-through; not in energy calc'],'bx tes');
-    g+=box(20,328,390,56,[liquid?'Liquid-cooled IT (CDUs)':'Air-cooled IT (fan wall units)',`${fmt(L.Qd/1000,1)} MW at full load · ${fmt(L.Q/1000,1)} MW typical`,`${liquid?'CDU pumps':'FWU fans'} ${fmt(L.Qd*termShare(L,P))} kW at full load, heat added to loop`],'bx it');
-    g+=s.pre?pipe('M105 326V214')+pipe('M190 181H238'):pipe('M105 326V181H238');
-    g+=t(112,272,`Return ${L.Tr} °C`,'t2','start');
-    g+=pipe('M325 212V242')+pipe('M325 290V326');
-    g+=`<circle class="pump" cx="325" cy="308" r="8"/><path class="pumpv" d="M321 303L331 308L321 313z"/>`+t(338,312,'pumps','t2','start');
-    g+=t(310,312,`Supply ${L.Ts} °C`,'t2','end');
     return `<g transform="translate(${k*(W+G)},0)">${g}</g>`;
   };
   const vw=loops.length*W+(loops.length-1)*G;
-  return `<svg class="schem" viewBox="-2 0 ${vw+4} ${H}" style="--vw:${vw}" role="img" aria-label="Schematic of ${r.o.name}, one panel per cooling loop">
-<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:var(--text2)"/></marker>
-<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:var(--grey2)"/></marker></defs>${loops.map(panel).join('')}</svg>
-<div class="note">Each loop has its own ${s.pre?'pre-cooling, ':''}chillers and pumps, as in the energy model.${s.shared?` The ${s.shared.toLowerCase()} are one shared plant.`:''} The buffer / TES tank is shown for chiller ride-through and is not part of the energy calculation.</div>`;
+  const mk=(n,c)=>`<marker id="ar-${n}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:var(${c})"/></marker>`;
+  return `<div class="legend"><span><i style="background:var(--s2)"></i>Loop return (warm)</span><span><i style="background:var(--s1)"></i>Loop supply (cooled)</span>${ac?'':'<span><i style="background:var(--s3)"></i>Condenser water (dashed: return to outdoors)</span>'}<span><i style="background:var(--grey2)"></i>Heat to outdoor air</span></div>
+<svg class="schem" viewBox="-2 0 ${vw+4} ${H}" style="--vw:${vw}" role="img" aria-label="Schematic of ${r.o.name}, one panel per cooling loop">
+<defs>${mk('sup','--s1')}${mk('ret','--s2')}${mk('cw','--s3')}${mk('cwr','--s3')}${mk('heat','--grey2')}</defs>${loops.map(panel).join('')}</svg>
+<div class="note">${ac?'Loop water goes straight to the chiller evaporators'+(id==='accfc'?' through the dry coolers when the air is cooler than the return':'')+'; each chiller rejects its heat through its own condenser fans.':`${id==='hyb'?'The dry coolers and the cooling towers are in series on one shared condenser-water circuit.':`The ${s.shared.toLowerCase()} are one shared plant.`} Condenser water feeds the plate heat exchangers and the chiller condensers in parallel and returns through one common header. The loop water is pre-cooled in the plate HX, then the chillers cool it to the supply temperature.`} Duty chillers + 1 standby per loop. The buffer / TES tank is shown for ride-through and is not part of the energy calculation.</div>`;
 }

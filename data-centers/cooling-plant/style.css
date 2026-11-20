@@ -24,6 +24,8 @@
 .schem .bx{fill:var(--bg);stroke:var(--grey2);stroke-width:1.2}
 .schem .zone{fill:color-mix(in srgb,var(--s1) 5%,transparent);stroke:var(--border);stroke-dasharray:4 3}
 .schem .pipe{fill:none;stroke:var(--text2);stroke-width:2}
+.schem .pipe.sup{stroke:var(--s1)}.schem .pipe.ret{stroke:var(--s2)}.schem .pipe.cw{stroke:var(--s3)}.schem .pipe.cwr{stroke:var(--s3);stroke-dasharray:5 3}
+.schem .refr{fill:none;stroke:var(--grey2);stroke-width:2;stroke-dasharray:2 2}
 .schem .heat{fill:none;stroke:var(--grey2);stroke-width:1.5;stroke-dasharray:4 3}
 .mode{display:grid;grid-template-columns:170px 1fr;gap:4px 12px;align-items:center;margin:10px 0}
 .mode .mbar{display:flex;gap:2px;height:14px}
