@@ -14,8 +14,11 @@ function params(){
     {name:'LC',Ts:g('lcs'),Tr:Math.max(g('lcr'),g('lcs')+1),Qd:Qd*lcp,Q:Qd*lcp*lf},
     {name:'Air',Ts:g('acs'),Tr:Math.max(g('acr'),g('acs')+1),Qd:Qd*(1-lcp),Q:Qd*(1-lcp)*lf}];
   const rates={}; RATES.forEach(r=>rates[r.id]={lo:g('rl_'+r.id),hi:g('rh_'+r.id)});
-  return {Qd,lf,loops,water:$('water').value,copA:g('copA'),copW:g('copW'),nCh:Math.max(1,Math.round(g('nCh'))),copMax:g('copMax'),acMax:g('acMax'),wcMax:g('wcMax'),dbIn:g('dbD'),wbIn:g('wbD'),
-    aDC:g('aDC'),aCT:g('aCT'),aHX:g('aHX'),eAD:g('eAD'),swAD:g('swAD'),swHY:g('swHY'),coc:Math.max(1.5,g('coc')),pumpW:g('pumpW'),cwW:g('cwW'),ctEff:Math.max(5,g('ctEff')),fanT:g('fanT')/100,cduP:g('cduP')/100,
+  return {...BASIS,Qd,lf,loops,water:$('water').value,dbIn:g('dbD'),wbIn:g('wbD'),
+    copA:g('copA'),copW:g('copW'),copMax:g('copMax'),unitWL:Math.max(100,g('unitWL')),unitWA:Math.max(100,g('unitWA')),unitA:Math.max(50,g('unitA')),derA:Math.max(0,g('derA'))/100,
+    acMax:g('acMax'),wcMax:g('wcMax'),aCT:g('aCT'),aDC:g('aDC'),aAD:g('aAD'),aHX:g('aHX'),swAD:g('swAD'),swHY:g('swHY'),eAD:g('eAD'),coc:Math.max(1.5,g('coc')),
+    kCT:g('kCT')/100,kDC:g('kDC')/100,kAD:g('kAD')/100,dpCDU:g('dpCDU'),dpPri:g('dpPri'),dpSec:g('dpSec'),dpCW:g('dpCW'),etaP:Math.min(1,Math.max(0.2,g('etaP')/100)),
+    dpFWU:g('dpFWU')/1000,dtAir:Math.max(2,g('dtAir')),etaF:Math.min(1,Math.max(0.2,g('etaF')/100)),
     tE:g('tE'),tW:g('tW'),tD:g('tD'),
     red:g('red')/100,ups:Math.min(1,Math.max(0.5,g('ups')/100)),dloss:Math.min(0.3,Math.max(0,g('dloss')/100)),rates,...Object.fromEntries(WEIGHTS.map(w=>[w.id,w.v]))};
 }
@@ -32,10 +35,10 @@ const mlcTxt=r=>{ const m=mlcLim(); return m==null?'':(r.mlc<=m?`Meets ASHRAE 90
 
 function run(){
   if(!WX) return;
-  // design condition: entered values, else the ASHRAE extreme annual values, else the hottest hours in the data
+  // two coincident design cases: A = extreme dry-bulb + wet-bulb of the hottest hour; B = extreme wet-bulb + dry-bulb of the most humid hour
   const A=ashrae();
-  P=params(); P.dbD=isNaN(P.dbIn)?(A?A.extDB:Math.max(...WX.T)):P.dbIn; P.wbD=isNaN(P.wbIn)?(A?A.extWB:Math.max(...WX.Twb)):P.wbIn; P.wbD=Math.min(P.wbD,P.dbD);
-  RES=simulate(WX,P); DES=designCheck(P,P.dbD,P.wbD); RANK=score(RES,P);
+  P=params(); P.cases=designCases(WX,A,P.dbIn,P.wbIn); P.dbA=P.cases.A.db; P.dbD=P.cases.A.db; P.wbD=P.cases.B.wb;
+  DES=designCheck(P); RES=simulate(WX,P,DES); RANK=score(RES,P,DES);
   renderReco(); renderOverview(); renderDes(); renderSystem(); renderEff(); renderCons(); renderRun(); renderCap(); renderClimate();
 }
 const order=()=>[...RANK,...OPTIONS.map(o=>o.id).filter(id=>!RANK.includes(id))];
@@ -43,7 +46,7 @@ const sel=()=>PICK||RANK[0]||OPTIONS[0].id;   // system shown in the Systems tab
 const tag=(id,i)=>RES[id].excluded?`<span class="tag x">${RES[id].excluded}</span>`:(i===0?'<span class="tag ok">Recommended</span>':'');
 const loopTxt=(arr)=>P.loops.map((L,i)=>L.Q>0?fmt(arr[i]):'–').join(' / ');
 // basis label for peaks (annual figures are at the frequent load, stated in the notes)
-const atPk='100% load';
+const atPk='design case';
 const costTxt=r=>`${fmt(r.capLo/1e6,1)}–${fmt(r.capHi/1e6,1)} M$`;
 const runTxt=r=>`${fmt(r.run/1e6,2)} M$/yr`;
 // simple payback of extra initial cost against air-cooled chillers, from the running cost saved
@@ -63,10 +66,10 @@ function renderReco(){
     +(st?`<div class="wxsrc">Weather: ${esc(st.station)} (WMO ${esc(st.wmo)}), measured hourly year TMYx ${esc(st.period)} · ASHRAE climate zone ${esc(st.zone)} · climate.onebuilding.org</div>`:'');
   // extreme ambient: the design condition every system is checked against
   const src=isNaN(P.dbIn)||isNaN(P.wbIn)?(ashrae()?'ASHRAE extreme annual values (2025 Fundamentals)':'hottest hours in the weather data'):'entered design values';
-  const amb=`<div class="amb"><span class="al">Extreme ambient</span>
-    <span class="av"><i style="background:var(--s1)"></i>Dry-bulb <b>${fmt(P.dbD,1)} °C</b></span>
-    <span class="av"><i style="background:var(--s2)"></i>Wet-bulb <b>${fmt(P.wbD,1)} °C</b></span>
-    <span class="an">Design condition, from ${src}</span></div>`;
+  const C=P.cases, amb=`<div class="amb"><span class="al">Design cases</span>
+    <span class="av"><i style="background:var(--s1)"></i>Case A: dry-bulb <b>${fmt(C.A.db,1)} °C</b> · wb ${fmt(C.A.wb,1)} °C</span>
+    <span class="av"><i style="background:var(--s2)"></i>Case B: wet-bulb <b>${fmt(C.B.wb,1)} °C</b> · db ${fmt(C.B.db,1)} °C</span>
+    <span class="an">Extremes from ${src}; coincident values from the hourly weather</span></div>`;
   const top=RANK.length?'':'<div class="sub" style="margin-top:4px"><b>No system meets every constraint.</b> Try allowing water, raising the loop supply temperatures, or checking the design conditions and chiller limits.</div>';
   // one summary card per system, recommended first
   const lines=[['Electricity',r=>r.E,r=>`${fmt(r.E/1000,1)} GWh/yr`],['Annual PUE',r=>r.pue,r=>r.pue.toFixed(3)],[`Electrical peak <small>cooling, ${atPk}</small>`,r=>r.peak,r=>`${fmt(r.peak/1000,2)} MW`],['Water',r=>r.W,r=>`${fmt(r.W)} m³/yr`],[`Water peak <small>${atPk}</small>`,r=>r.Wpeak,r=>`${fmt(r.Wpeak,1)} m³/h`],['Running cost',r=>r.run,runTxt],['Initial cost',r=>r.capMid,costTxt]];
@@ -75,6 +78,7 @@ function renderReco(){
     const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="tag ok">Recommended</span>':`<span class="tag">#${k+1}</span>`;
     const notes=[id==='acc'?'No free cooling':`Free cooling ${loopTxt(r.free)} h/yr (liquid / air)`];
     if(id!=='acc') notes.push(`Saves ${fmt(Math.max(0,RES.acc.E-r.E)/1000,1)} GWh/yr vs air-cooled chillers`);
+    const dw=DES[id]; if(dw.warns.length) notes.push(`<b style="color:var(--warn)">Condenser water above ${P.wcMax} °C at design: needs a chiller rated above ${P.wcMax} °C</b>`); else if(r.hotCW>0) notes.push(`Condenser water above ${P.wcMax} °C for ${fmt(r.hotCW)} h/yr`);
     if(mlcTxt(r)) notes.push(r.mlc<=mlcLim()?mlcTxt(r):`<b style="color:var(--bad)">${mlcTxt(r)}</b>`);
     return `<div class="scard${k===0?' rec':''}${r.excluded?' off':''}">
       <div class="stop">${status}${r.excluded?'':`<span class="note">score ${fmt(r.score)}</span>`}</div>
@@ -108,10 +112,11 @@ function renderOverview(){
 
 function renderDes(){
   const rows=order().map(id=>{ const r=RES[id], d=DES[id];
-    return `<tr><td>${r.o.name}</td><td>${d.ok?'<span class="tag ok">Holds supply</span>':'<span class="tag x">Fails</span>'}</td><td>${fmt(d.P/1000,2)}</td><td>${d.ratio.toFixed(3)}</td><td>${fmt(d.W,1)}</td><td>${fmt(d.Qr/1000,1)}</td><td class="l">${d.issues.join('; ')||'–'}</td></tr>`; });
-  $('tDes').innerHTML=table(['Option','Result','Electrical MW','kW/kW','Water m³/h','Heat rejection MW','Notes'],rows);
+    const res=!d.ok?'<span class="tag x">Fails</span>':d.warns.length?'<span class="tag">Warning</span>':'<span class="tag ok">Holds supply</span>';
+    return `<tr><td>${r.o.name}</td><td>${res}</td><td>${fmt(d.cases.A.P/1000,2)}</td><td>${fmt(d.cases.B.P/1000,2)}</td><td>${fmt(d.P/1000,2)} (${d.worst})</td><td>${d.ratio.toFixed(3)}</td><td>${fmt(d.W,1)}</td><td>${fmt(d.Qr/1000,1)}</td><td class="l">${d.units.map(u=>`${u.N} × ${fmt(u.unit/1000,1)} MW`).join(' / ')}</td><td class="l">${[...d.issues,...d.warns].join('; ')||'–'}</td></tr>`; });
+  $('tDes').innerHTML=table(['Option','Result','Case A MW','Case B MW','Design peak MW','kW/kW','Water m³/h','Heat rejection MW','Duty chillers (liquid / air loop)','Notes'],rows);
   const auto=isNaN(P.dbIn)||isNaN(P.wbIn);
-  $('desNote').textContent=`Checked at 100% load, ${fmt(P.dbD,1)} °C dry-bulb and ${fmt(P.wbD,1)} °C wet-bulb${auto?(ashrae()?' (ASHRAE extreme annual values for this station)':' (hottest hours in the weather data; enter ASHRAE extreme values for design)'):''}. Heat rejection capacity = cooling load + compressor power. Options that fail are excluded from the recommendation.`;
+  $('desNote').textContent=`Checked at 100% load at Case A (${fmt(P.cases.A.db,1)} °C db / ${fmt(P.cases.A.wb,1)} °C wb) and Case B (${fmt(P.cases.B.db,1)} °C db / ${fmt(P.cases.B.wb,1)} °C wb)${auto?(ashrae()?', from the ASHRAE extreme annual values with coincident values from the hourly weather':', from the hottest and most humid hours in the weather data'):''}. Design peak = the higher of the two. Heat rejection = loop load + compressor power. Air-cooled chillers above ${P.acMax} °C fail and are excluded; condenser water above ${P.wcMax} °C gives a warning.`;
 }
 
 function renderSystem(){
@@ -125,8 +130,8 @@ function renderSystem(){
   $('sysKpi').innerHTML=kpis([[`${fmt(r.E/1000,1)} GWh`,'Cooling electricity per year'],[r.mlc.toFixed(3),'Annual MLC (kW/kW)'],[r.pue.toFixed(3),'Annual PUE (incl. losses)'],
     [`${fmt(r.peak/1000,2)} MW`,`Electrical peak, cooling plant (${atPk})`],[`${fmt(r.Wpeak,1)} m³/h`,`Water peak, make-up (${atPk})`],
     [`${fmt(r.W)} m³`,'Water per year'],[runTxt(r),'Running cost, cooling'],[costTxt(r),'Initial cost (estimate)'],[payback(r).txt,'Payback vs air-cooled chillers'],[`${fmt(d.Qr/1000,1)} MW`,'Heat rejection at design']]);
-  $('sysDes').innerHTML=d.ok?`Design day (${fmt(P.dbD,1)} °C db / ${fmt(P.wbD,1)} °C wb): holds supply temperature, ${fmt(d.P/1000,2)} MW mechanical power.`
-    :`<span class="tag x">Fails design day</span> ${d.issues.join('; ')}`;
+  $('sysDes').innerHTML=(d.ok?`Design cases: Case A ${fmt(d.cases.A.P/1000,2)} MW, Case B ${fmt(d.cases.B.P/1000,2)} MW; design peak ${fmt(d.P/1000,2)} MW (Case ${d.worst}). Duty chillers ${d.units.map(u=>`${u.N} × ${fmt(u.unit/1000,1)} MW`).join(' (liquid) / ')} (air), plus 1 standby each.`
+    :`<span class="tag x">Fails design day</span> ${d.issues.join('; ')}`)+(d.warns.length?` <span class="tag">Warning</span> ${d.warns[0]}.`:'');
   // annual operating mode per loop
   $('sysModes').innerHTML=P.loops.map((L,i)=>{ if(L.Q<=0) return '';
     const seg=[['Free cooling',r.free[i],'--s3'],['Partial',r.part[i],'--s1'],['Chiller only',r.mech[i],'--s2']].filter(x=>x[1]>0);
@@ -291,7 +296,7 @@ function exportReport(){
     [B('Site and weather')],
     ['Location',WX.name],
     ...(st?[['Station',`${st.station} (WMO ${st.wmo})`],['Weather year',`TMYx ${st.period}, climate.onebuilding.org`],['ASHRAE climate zone',st.zone]]:[['Weather',WX.synthetic?'generated from monthly normals':'uploaded file']]),
-    ['Design dry-bulb (°C)',+P.dbD.toFixed(1)],['Design wet-bulb (°C)',+P.wbD.toFixed(1)],
+    ['Case A: dry-bulb / coincident wet-bulb (°C)',+P.cases.A.db.toFixed(1),+P.cases.A.wb.toFixed(1)],['Case B: wet-bulb / coincident dry-bulb (°C)',+P.cases.B.wb.toFixed(1),+P.cases.B.db.toFixed(1)],
     [],
     [B('Load')],
     ['Cooling load (MW)',P.Qd/1000],

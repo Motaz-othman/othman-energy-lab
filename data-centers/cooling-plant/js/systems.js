@@ -48,7 +48,7 @@ function schematic(id){
     // outdoors
     g+=`<rect class="zone" x="0" y="46" width="${W}" height="72" rx="8"/>`+t(10,62,'Outdoors','t2','start');
     if(s.shared){
-      g+=box(20,68,390,44,[s.shared+(loops.length>1?' (shared by both loops)':''),id==='wcc'?`approach ${P.aCT} K to wet-bulb · ${P.coc} cycles`:id==='hyb'?`dry up to ${P.swHY} °C · towers above, approach ${P.aCT} K`:`wet above ${P.swAD} °C · effectiveness ${P.eAD}`]);
+      g+=box(20,68,390,44,[s.shared+(loops.length>1?' (shared by both loops)':''),id==='wcc'?`approach ${P.aCT} K to wet-bulb · ${P.coc} cycles`:id==='hyb'?`dry up to ${P.swHY} °C · towers above, approach ${P.aCT} K`:`wet above ${P.swAD} °C · approach ${P.aAD} K to wet-bulb`]);
       g+=up(105,'condenser water')+up(325,'condenser water');
     } else {
       if(s.pre){ g+=box(20,68,170,44,['Outdoor air','dry-cooler fans']); g+=up(105,'heat'); }
@@ -56,9 +56,9 @@ function schematic(id){
     }
     // water loop: pre-cooling and chillers
     if(s.pre) g+=box(20,150,170,62,[s.pre,id==='accfc'?`approach ${P.aDC} K`:`HX approach ${P.aHX} K`,`free cooling ${fmt(r.free[i])} h/yr`]);
-    g+=box(240,150,170,62,[(tag?tag+' ':'')+'chillers',`${P.nCh} × ${fmt(L.Qd/P.nCh/1000,1)} MW, ${ac?'air':'water'}-cooled`,`rated COP ${(ac?P.copA:P.copW).toFixed(2)} · on ${fmt(r.part[i]+r.mech[i])} h/yr`]);
+    g+=box(240,150,170,62,[(tag?tag+' ':'')+'chillers',`${(DES[id].units.find(u=>u.loop===L.name)||{}).N} × ${fmt(((DES[id].units.find(u=>u.loop===L.name)||{}).unit||0)/1000,1)} MW + 1, ${ac?'air':'water'}-cooled`,`rated COP ${(ac?P.copA:P.copW).toFixed(2)} · on ${fmt(r.part[i]+r.mech[i])} h/yr`]);
     g+=box(240,244,170,46,['Buffer / TES tank','ride-through; not in energy calc'],'bx tes');
-    g+=box(20,328,390,56,[liquid?'Liquid-cooled IT (CDUs)':'Air-cooled IT (CRAHs / fan walls)',`${fmt(L.Qd/1000,1)} MW at full load · ${fmt(L.Q/1000,1)} MW typical`,`${liquid?'CDU pumps':'CRAH / FWU fans'} ${fmt(L.Qd*(liquid?P.cduP:P.fanT))} kW at full load, heat added to loop`],'bx it');
+    g+=box(20,328,390,56,[liquid?'Liquid-cooled IT (CDUs)':'Air-cooled IT (fan wall units)',`${fmt(L.Qd/1000,1)} MW at full load · ${fmt(L.Q/1000,1)} MW typical`,`${liquid?'CDU pumps':'FWU fans'} ${fmt(L.Qd*termShare(L,P))} kW at full load, heat added to loop`],'bx it');
     g+=s.pre?pipe('M105 326V214')+pipe('M190 181H238'):pipe('M105 326V181H238');
     g+=t(112,272,`Return ${L.Tr} °C`,'t2','start');
     g+=pipe('M325 212V242')+pipe('M325 290V326');

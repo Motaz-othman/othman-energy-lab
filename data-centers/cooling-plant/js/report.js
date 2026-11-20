@@ -98,7 +98,7 @@ function buildReport(){
     <div class="box"><h3>Site and climate</h3><dl class="kv">
       <dt>Location</dt><dd>${esc(WX.name)}</dd>
       ${st?`<dt>Weather station</dt><dd>${esc(st.station)} (WMO ${esc(st.wmo)})</dd><dt>Weather year</dt><dd>TMYx ${esc(st.period)}</dd><dt>ASHRAE climate zone</dt><dd>${esc(st.zone)}</dd>`:`<dt>Weather</dt><dd>${WX.synthetic?'Generated from monthly normals':'Uploaded weather file'}</dd>`}
-      <dt>Design dry-bulb</dt><dd>${fmt(P.dbD,1)} °C</dd><dt>Design wet-bulb</dt><dd>${fmt(P.wbD,1)} °C</dd><dt>Design basis</dt><dd>${desSrc}</dd></dl></div>
+      <dt>Case A</dt><dd>db ${fmt(P.cases.A.db,1)} °C / wb ${fmt(P.cases.A.wb,1)} °C</dd><dt>Case B</dt><dd>wb ${fmt(P.cases.B.wb,1)} °C / db ${fmt(P.cases.B.db,1)} °C</dd><dt>Design basis</dt><dd>${desSrc}</dd></dl></div>
     <div class="box"><h3>Load and site conditions</h3><dl class="kv">
       <dt>Cooling load</dt><dd>${fmt(P.Qd/1000,1)} MW at full IT load</dd><dt>Frequent load</dt><dd>${fmt(P.lf*100)}%</dd>
       <dt>Liquid loop</dt><dd>${fmt(P.loops[0].Qd/1000,1)} MW · ${P.loops[0].Ts}/${P.loops[0].Tr} °C</dd>
@@ -142,7 +142,7 @@ function buildReport(){
        return `<tr><td class="l">${RATES.find(x=>x.id===c).l}</td><td class="l">${ROLE[c](r.o)}</td><td>${fmt(cap/1000,1)}</td><td>${fmt(cap*rt.lo/1e6,1)}–${fmt(cap*rt.hi/1e6,1)}</td></tr>`; }).join('')}</tbody></table>
      <div class="note">Each component sized for ${fmt(P.Qd/1000,1)} MW + ${fmt(P.red*100)}% redundancy. Pumps, CDUs, piping and controls not included.</div>
      <div class="cols2"><div><h3>Strengths</h3><ul>${s.pros.map(x=>`<li>${x}</li>`).join('')}</ul></div><div><h3>Watch-outs</h3><ul>${s.cons.map(x=>`<li>${x}</li>`).join('')}</ul></div></div>
-     <h3>Design day</h3><p>${d.ok?`At ${fmt(P.dbD,1)} °C dry-bulb / ${fmt(P.wbD,1)} °C wet-bulb and 100% load it holds the supply temperatures, with ${fmt(d.P/1000,2)} MW of mechanical power and ${fmt(d.Qr/1000,1)} MW of heat rejection.`:`<span class="tag x">Fails design day</span> ${d.issues.join('; ')}`}</p>
+     <h3>Design cases</h3><p>${d.ok?`At 100% load: Case A (db ${fmt(P.cases.A.db,1)} °C / wb ${fmt(P.cases.A.wb,1)} °C) ${fmt(d.cases.A.P/1000,2)} MW; Case B (wb ${fmt(P.cases.B.wb,1)} °C / db ${fmt(P.cases.B.db,1)} °C) ${fmt(d.cases.B.P/1000,2)} MW. Design peak ${fmt(d.P/1000,2)} MW (Case ${d.worst}), heat rejection ${fmt(d.Qr/1000,1)} MW. Duty chillers ${d.units.map(u=>u.N+" × "+fmt(u.unit/1000,1)+" MW").join(" / ")}, plus 1 standby per loop.${d.warns.length?" Warning: "+d.warns[0]+".":""}`:`<span class="tag x">Fails design day</span> ${d.issues.join("; ")}`}</p>
      <h3>Operating modes over the year</h3>${rptLegend([['Free cooling (chillers off)',RPT_C.s3],['Partial free cooling',RPT_C.s1],['Chillers only',RPT_C.s2]])}
      ${P.loops.map((L,i)=>L.Q>0?`<div class="chart"><div class="ct">${i?'Air':'Liquid'} loop ${L.Ts}/${L.Tr} °C: free ${fmt(r.free[i])} h · partial ${fmt(r.part[i])} h · chillers only ${fmt(r.mech[i])} h per year</div>${rptMonthly(r,i)}</div>`:'').join('')}
     </section>`; });

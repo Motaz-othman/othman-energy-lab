@@ -99,7 +99,7 @@
     <div><label for="dbD">Design dry-bulb (°C)</label><input type="number" id="dbD" step="0.1" placeholder="auto"></div>
     <div><label for="wbD">Design wet-bulb (°C)</label><input type="number" id="wbD" step="0.1" placeholder="auto"></div>
   </div>
-  <div class="note">Leave blank to use the ASHRAE extreme annual dry-bulb and wet-bulb for the selected city (for an uploaded file: its hottest hours). To design to a stricter condition, e.g. the ASHRAE 20-year return period dry-bulb (ASHRAE Climatic Design Conditions, n = 20 years), enter it here.</div>
+  <div class="note">Two coincident design cases. Case A: the extreme dry-bulb with the wet-bulb of the hottest hour. Case B: the extreme wet-bulb with the dry-bulb of the most humid hour. Leave blank to use the ASHRAE extreme annual values (for an uploaded file: its hottest and most humid hours). Enter a stricter value, e.g. the ASHRAE 20-year return period, to replace the extreme.</div>
 
 
   <details>
@@ -112,56 +112,80 @@
     <div class="note">Running cost of cooling only (not the IT load). The demand charge is applied to the cooling electrical peak every month. Indicative defaults; enter the local tariff.</div>
   </details>
   <details>
-    <summary>Chillers (ASHRAE 90.1 / AHRI 550/590 basis)</summary>
+    <summary>Chillers (ASHRAE 90.1-2025 Path B / AHRI 551/591)</summary>
     <div class="row">
-      <div><label for="copA">Air-cooled rated COP</label><input type="number" id="copA" value="2.985" step="0.1" min="1"></div>
-      <div><label for="copW">Water-cooled rated COP</label><input type="number" id="copW" value="6.286" step="0.1" min="1"></div>
+      <div><label for="copA">Air-cooled rated COP</label><input type="number" id="copA" value="2.866" step="0.1" min="1"></div>
+      <div><label for="copW">Water-cooled rated COP</label><input type="number" id="copW" value="6.018" step="0.1" min="1"></div>
     </div>
     <div class="row">
-      <div><label for="nCh">Duty chillers per loop</label><input type="number" id="nCh" value="4" step="1" min="1"></div>
+      <div><label for="unitWL">Water-cooled unit, liquid loop (kW)</label><input type="number" id="unitWL" value="7000" step="100" min="100"></div>
+      <div><label for="unitWA">Water-cooled unit, air loop (kW)</label><input type="number" id="unitWA" value="5500" step="100" min="100"></div>
+    </div>
+    <div class="row">
+      <div><label for="unitA">Air-cooled unit (kW)</label><input type="number" id="unitA" value="1500" step="50" min="50"></div>
+      <div><label for="derA">Air-cooled capacity loss above 35 °C (%/K)</label><input type="number" id="derA" value="1.35" step="0.05" min="0"></div>
+    </div>
+    <div class="row">
       <div><label for="copMax">Max COP (low lift)</label><input type="number" id="copMax" value="14" step="1" min="4"></div>
+      <div><label for="acMax">Air-cooled max ambient (°C)</label><input type="number" id="acMax" value="52" step="1"></div>
     </div>
     <div class="row">
-      <div><label for="acMax">Air-cooled max ambient (°C)</label><input type="number" id="acMax" value="52" step="1"></div>
-      <div><label for="wcMax">Max entering condenser water (°C)</label><input type="number" id="wcMax" value="43" step="1"></div>
+      <div><label for="wcMax">Condenser water warning above (°C)</label><input type="number" id="wcMax" value="43" step="1"></div>
+      <div></div>
     </div>
-    <div class="note">Defaults are ASHRAE 90.1-2019 Path A minimums (air-cooled; water-cooled ≥ 2,110 kW). Enter selected equipment values to override.</div>
+    <div class="note">Rated COP: ASHRAE 90.1-2025 Table 6.8.1-3, Path B full load, at AHRI 551/591 (7 °C chilled water; 35 °C air or 30 °C condenser water). Part load: VSD curve calibrated to the Path B IPLV. The number of duty units follows the unit size; units are staged by load (the next starts above 90% PLR), plus 1 standby per loop in the cost. Air-cooled capacity loss from public Trane RTAC data; units sized at Case A. Above the condenser-water limit a system is flagged, not excluded.</div>
   </details>
   <details>
-    <summary>Heat rejection and pumps</summary>
+    <summary>Heat rejection</summary>
     <div class="row">
-      <div><label for="aDC">Dry cooler approach (K)</label><input type="number" id="aDC" value="6" step="0.5"></div>
-      <div><label for="aCT">Tower approach (K)</label><input type="number" id="aCT" value="4" step="0.5"></div>
+      <div><label for="aCT">Tower approach to wb (K)</label><input type="number" id="aCT" value="5.56" step="0.1"></div>
+      <div><label for="aDC">Dry cooler approach to db (K)</label><input type="number" id="aDC" value="5.56" step="0.1"></div>
     </div>
     <div class="row">
+      <div><label for="aAD">Adiabatic approach to wb, pads on (K)</label><input type="number" id="aAD" value="11.1" step="0.1"></div>
       <div><label for="aHX">Plate HX approach (K)</label><input type="number" id="aHX" value="1.5" step="0.5"></div>
-      <div><label for="eAD">Adiabatic effectiveness</label><input type="number" id="eAD" value="0.85" step="0.05" min="0" max="1"></div>
     </div>
     <div class="row">
-      <div><label for="swAD">Adiabatic on above (°C)</label><input type="number" id="swAD" value="24" step="1"></div>
+      <div><label for="swAD">Adiabatic pads on above (°C)</label><input type="number" id="swAD" value="24" step="1"></div>
+      <div><label for="swHY">Hybrid: towers on above (°C)</label><input type="number" id="swHY" value="24" step="1"></div>
+    </div>
+    <div class="row">
+      <div><label for="kCT">Tower fans (% of heat rejected)</label><input type="number" id="kCT" value="1.2" step="0.1" min="0"></div>
+      <div><label for="kDC">Dry-cooler fans (% of heat)</label><input type="number" id="kDC" value="3" step="0.1" min="0"></div>
+    </div>
+    <div class="row">
+      <div><label for="kAD">Adiabatic fans (% of heat rejected)</label><input type="number" id="kAD" value="3" step="0.1" min="0"></div>
       <div><label for="coc">Tower cycles of conc.</label><input type="number" id="coc" value="4" step="0.5" min="1.5"></div>
     </div>
     <div class="row">
-      <div><label for="swHY">Hybrid: towers on above (°C)</label><input type="number" id="swHY" value="24" step="1"></div>
+      <div><label for="eAD">Pad effectiveness (water use)</label><input type="number" id="eAD" value="0.85" step="0.05" min="0" max="1"></div>
       <div></div>
     </div>
-    <div class="row">
-      <div><label for="pumpW">Primary pumps, FW / CHW (W/gpm)</label><input type="number" id="pumpW" value="22" step="1" min="0"></div>
-      <div><label for="cwW">Condenser pumps (W/gpm)</label><input type="number" id="cwW" value="19" step="1" min="0"></div>
-    </div>
-    <div class="row">
-      <div><label for="ctEff">Cooling tower fans (gpm/hp)</label><input type="number" id="ctEff" value="40.2" step="0.5" min="5"></div>
-      <div></div>
-    </div>
-    <div class="note" id="ashNote">Pumps: ASHRAE 90.1 Appendix G baseline, 22 W/gpm chilled water and 19 W/gpm condenser water (1 W/gpm = 15.85 W per L/s). Tower fans: ASHRAE 90.1 Table 6.8.1-7 minimum for axial-fan open towers, 40.2 gpm/hp. Enter your selections to override.</div>
+    <div class="note">Approaches: ASHRAE 90.1-2025 Table 6.8.1-7 rating points. Fan power at full speed: towers the ASHRAE 2025 minimum (3.56 L/s per kW); dry and adiabatic coolers 3% from public manufacturer data sheets. Fans on VFDs follow the affinity law (minimum speed 30%).</div>
   </details>
   <details>
-    <summary>Data hall terminal units (CRAH / FWU / CDU)</summary>
+    <summary>Pumps and fan wall units</summary>
     <div class="row">
-      <div><label for="fanT">CRAH / FWU fans (% of air-loop load)</label><input type="number" id="fanT" value="3" step="0.5" min="0"></div>
-      <div><label for="cduP">CDU pumps (% of liquid-loop load)</label><input type="number" id="cduP" value="1" step="0.25" min="0"></div>
+      <div><label for="dpCDU">CDU pumps head (kPa)</label><input type="number" id="dpCDU" value="320" step="10" min="0"></div>
+      <div><label for="dpPri">Primary pumps head (kPa)</label><input type="number" id="dpPri" value="200" step="10" min="0"></div>
     </div>
-    <div class="note">Electrical input including motor and drive losses. Counted as cooling energy (as in the ASHRAE 90.4 MLC), and added as heat to its loop, so the chillers and heat rejection remove it too.</div>
+    <div class="row">
+      <div><label for="dpSec">Secondary pumps head (kPa)</label><input type="number" id="dpSec" value="400" step="10" min="0"></div>
+      <div><label for="dpCW">Condenser pumps head (kPa)</label><input type="number" id="dpCW" value="211" step="10" min="0"></div>
+    </div>
+    <div class="row">
+      <div><label for="etaP">Pump × motor × VFD efficiency (%)</label><input type="number" id="etaP" value="70" step="1" min="20" max="100"></div>
+      <div></div>
+    </div>
+    <div class="row">
+      <div><label for="dpFWU">FWU static pressure (Pa)</label><input type="number" id="dpFWU" value="300" step="10" min="0"></div>
+      <div><label for="dtAir">Air rise across the IT (K)</label><input type="number" id="dtAir" value="12" step="1" min="2"></div>
+    </div>
+    <div class="row">
+      <div><label for="etaF">Fan × motor × VFD efficiency (%)</label><input type="number" id="etaF" value="65" step="1" min="20" max="100"></div>
+      <div></div>
+    </div>
+    <div class="note">P = Q × ΔP / (ρ × cp × ΔT × η). CDU pumps on a 10 K coolant ΔT; primary and secondary pumps on each loop's ΔT; condenser pumps on 5.56 K (211 kPa ≈ ASHRAE 90.1 Appendix G, 19 W/gpm). All pump and fan heat is added to the chiller load. VFD affinity law at part load (minimum speed 50% pumps, 30% fans).</div>
   </details>
   <details>
     <summary>Electrical losses</summary>
@@ -229,7 +253,7 @@
       <div><div class="ctitle" id="effTitle">Annual MLC</div><div class="chartbox"><canvas id="cEff"></canvas></div></div>
     </div></div>
     <div class="card"><h2>Electricity and water consumption</h2><div class="split">
-      <div><div id="tCons"></div><div class="note">Annual totals at the frequent load. Peaks are at 100% load on the worst hour of the year. Electrical peak = cooling only: chillers + heat-rejection fans + pumps + CRAH / FWU fans + CDU pumps (no IT load, no electrical equipment or losses). Water peak = make-up water (evaporation, blowdown, pad water). PUE = (IT + cooling + losses) ÷ IT, annual. CRAH / fan-wall fans are not included.</div></div>
+      <div><div id="tCons"></div><div class="note">Annual totals at the frequent load. Peaks are the design peak: the higher of Case A and Case B at 100% load. Electrical peak = cooling only: chillers + heat-rejection fans + pumps + CRAH / FWU fans + CDU pumps (no IT load, no electrical equipment or losses). Water peak = make-up water (evaporation, blowdown, pad water). PUE = (IT + cooling + losses) ÷ IT, annual. CRAH / fan-wall fans are not included.</div></div>
       <div>
         <div class="ctitle" id="elTitle">Annual electricity by component</div>
         <div class="legend"><span><i style="background:var(--s1)"></i>Chiller compressors</span><span><i style="background:var(--s4)"></i>Heat-rejection fans</span><span><i style="background:var(--grey2)"></i>Pumps</span><span><i style="background:var(--s2)"></i>CRAH / FWU fans + CDU pumps</span></div>
@@ -271,22 +295,17 @@
   <div class="card">
     <h2>Method and equations</h2>
     <ul class="method">
-      <li><b>Weather</b>: built-in cities use a measured typical year (TMYx 2011–2025, ISD/ERA5 records) from the main airport station, and ASHRAE 2025 Handbook of Fundamentals design conditions, both from climate.onebuilding.org. Hourly wet-bulb is limited to the ASHRAE extreme annual wet-bulb + 1 K to remove faulty humidity readings. The automatic design condition is the ASHRAE extreme annual dry-bulb and wet-bulb.</li>
-      <li><b>Psychrometrics</b> (ASHRAE Handbook Fundamentals, Ch. 1): saturation pressure by the Hyland–Wexler equations; humidity ratio <code>W = 0.621945·p<sub>w</sub>/(p − p<sub>w</sub>)</code>; wet-bulb solved from <code>W = [(2501 − 2.326t*)W<sub>s</sub>* − 1.006(t − t*)] / (2501 + 1.86t − 4.186t*)</code>. Station pressure from elevation.</li>
-      <li><b>Each loop, every hour</b>: return water is first cooled by the outdoor device, leaving at <code>T<sub>out</sub></code>; free-cooling fraction <code>FF = (T<sub>ret</sub> − T<sub>out</sub>)/(T<sub>ret</sub> − T<sub>sup</sub>)</code> (0–1); the chiller trims the rest.</li>
-      <li><b>Terminal units</b>: CRAH / FWU fans (air loop) and CDU pumps (liquid loop) draw a set % of their loop load. Their power is cooling energy, and the same power is added to the loop as heat: <code>Q<sub>loop</sub> = Q<sub>IT</sub> × (1 + terminal %)</code>, which the pre-cooling, chillers and heat rejection must remove. Chillers are sized for this load.</li>
-      <li><b>T<sub>out</sub></b>: dry cooler <code>T<sub>db</sub> + approach</code>; adiabatic <code>T<sub>eff</sub> + approach + HX</code> with <code>T<sub>eff</sub> = T<sub>db</sub> − ε(T<sub>db</sub> − T<sub>wb</sub>)</code> (ASHRAE Systems &amp; Equipment, evaporative cooling); tower <code>T<sub>wb</sub> + approach + HX</code>; hybrid: dry coolers alone at or below the switch temperature (<code>T<sub>db</sub> + dry cooler approach + HX</code>), towers above it (<code>T<sub>wb</sub> + tower approach + HX</code>) with the dry coolers in series ahead of them, taking the share <code>(T<sub>CW,ret</sub> − T<sub>db</sub> − approach)/6 K</code> of the heat while the air is cooler than the water.</li>
-      <li><b>Chillers</b> (DOE-2 / EnergyPlus EIR form): <code>P = (Q<sub>cap</sub>/COP<sub>rated</sub>) × EIRFT × EIRFPLR</code>. COP<sub>rated</sub> at AHRI 550/590 conditions (defaults: ASHRAE 90.1-2019 Path A minimums). EIRFT scales with lift at constant Carnot fraction, because 20–30 °C chilled water is outside published curve ranges. EIRFPLR from EnergyPlus reference curves: water-cooled VSD centrifugal 0.0731 + 0.1514·PLR + 0.7709·PLR²; air-cooled screw = PLR. Duty chillers stage to keep PLR high.</li>
-      <li><b>Condensing temperature</b>: air-cooled <code>T<sub>db</sub> + 15 K</code>; water-cooled <code>T<sub>ECW</sub> + 7.6 K</code>, where entering condenser water = <code>T<sub>wb</sub> + tower approach</code> or <code>T<sub>eff</sub> + cooler approach</code>.</li>
-      <li><b>Pumps and tower fans</b> (ASHRAE 90.1): pump power = W/gpm × flow, with flow = Q / (ρ·c<sub>p</sub>·ΔT): primary pumps on each loop's ΔT (Appendix G baseline 22 W/gpm), condenser pumps on a 5.6 K range (19 W/gpm). Tower fans from the tower efficiency at the 90.1 rating point (35 / 29.4 / 23.9 °C): <code>kW fan per kW rejected = gpm per kW ÷ (gpm/hp) × 0.7457</code>, with 40.2 gpm/hp (Table 6.8.1-7 minimum, axial fan), held at full-speed power. Dry and adiabatic cooler fans: 1.5–1.8% of the heat (screening values).</li>
-      <li><b>ASHRAE 90.4 check</b>: annual MLC against the maximum annualized MLC for the climate zone (90.4-2022 Addendum g, Table 6.5).</li>
-      <li><b>Water</b>: tower evaporation <code>0.8·Q<sub>rej</sub>/h<sub>fg</sub></code> plus blowdown <code>E/(CoC − 1)</code>; adiabatic water only when pads are wet (above the switch temperature); hybrid: tower water only above its switch temperature, on the towers' share of the heat.</li>
-      <li><b>Design-day check</b>: each option at 100% load at the design dry-bulb and wet-bulb (applied together, which is conservative). Fails if a chiller would exceed its condenser limit (air-cooled max ambient, max entering condenser water).</li>
-      <li><b>MLC</b> (ASHRAE 90.4): annual mechanical energy (compressors, heat-rejection fans, primary, condenser and CDU pumps, CRAH / FWU fans) ÷ annual IT energy.</li>
-      <li><b>Peaks</b>: at 100% load on the worst hour of the year. Electrical peak (cooling) = compressors + heat-rejection fans + pumps + CRAH / FWU fans + CDU pumps. It excludes the IT load and the electrical equipment and its losses. Water peak = make-up water rate in m³/h (tower evaporation and blowdown, or adiabatic pad water). Chillers are staged each hour to the number that gives the lowest power.</li>
-      <li><b>Electrical losses and PUE</b>: UPS losses on the IT load, transformer and distribution losses on the whole facility. Annual PUE <code>= (IT + cooling + losses) ÷ IT</code>. Simplified; not the full ASHRAE 90.4 ELC method. CRAH / fan-wall fans and electrical-room cooling are not included.</li>
-      <li><b>Running cost</b>: cooling only, at the frequent load: <code>electricity × tariff + water × tariff + cooling peak × demand charge × 12</code>. Simple payback against air-cooled chillers = extra initial cost (mid estimate) ÷ running cost saved, with no discounting, maintenance or tariff escalation.</li>
-      <li><b>Recommendation</b>: metrics normalised across feasible options and weighted: energy 4, water 3 (doubled when water is limited), peak power 3, initial cost 2. Options that fail the design day, or need water you don't have, are excluded. Screening-level; confirm with vendor selections and a detailed model.</li>
+      <li><b>Weather</b>: built-in cities use a measured typical year (TMYx 2011–2025) from the main airport station and ASHRAE 2025 Handbook of Fundamentals design conditions, both from climate.onebuilding.org. Hourly wet-bulb is limited to the ASHRAE extreme annual wet-bulb + 1 K. Psychrometrics per ASHRAE Fundamentals, Ch. 1.</li>
+      <li><b>Design cases</b>: Case A = extreme dry-bulb + the wet-bulb of the hottest hour; Case B = extreme wet-bulb + the dry-bulb of the most humid hour. Every system is checked at both at 100% load; the design peak is the higher.</li>
+      <li><b>Loads</b>: chiller load = IT load + CDU pumps or FWU fans + primary and secondary pumps. Pumps and fans: <code>P = Q·ΔP / (ρ·c<sub>p</sub>·ΔT·η)</code>; VFD part load <code>P = P<sub>full</sub>·(Q/Q<sub>design</sub>)³</code>, minimum speed 50% pumps, 30% fans.</li>
+      <li><b>Free cooling</b> = (T<sub>return</sub> − T<sub>out</sub>) / (T<sub>return</sub> − T<sub>supply</sub>), 0–1. T<sub>out</sub>: towers wb + 5.56 + 1.5 (plate HX); dry coolers db + 5.56 (direct on the loop); adiabatic wb + 11.1 + 1.5 with pads on (above 24 °C), db + 5.56 + 1.5 dry; hybrid: dry coolers alone up to 24 °C, towers above, dry share = (wb + 5.56 − db) / 5.56. Approaches: ASHRAE 90.1-2025 Table 6.8.1-7.</li>
+      <li><b>Chillers</b>: <code>COP = COP<sub>rated</sub> × [(T<sub>e</sub> + 273.15)/(T<sub>c</sub> − T<sub>e</sub>)] ÷ [(T<sub>e,ref</sub> + 273.15)/(T<sub>c,ref</sub> − T<sub>e,ref</sub>)]</code>, limited to 14. T<sub>e</sub> = supply − 2; T<sub>c</sub> = db + 15 (air-cooled) or condenser water + 7 (water-cooled). Rated COP: ASHRAE 90.1-2025 Path B (2.866 air-cooled, 6.018 water-cooled) at AHRI 551/591 (T<sub>e,ref</sub> 5 °C; T<sub>c,ref</sub> 50 / 37 °C). Part load: <code>a + b·PLR + c·PLR²</code> calibrated to the Path B IPLV (water-cooled 0.1969 / 0.1318 / 0.6713; air-cooled 0.1752 / 0.1354 / 0.6895). Units staged by load, the next above 90% PLR. Air-cooled capacity −1.35% per K above 35 °C.</li>
+      <li><b>Heat rejection</b>: Q<sub>r</sub> = chiller load + chiller power. Fans at full speed: towers 1.2%, dry and adiabatic coolers 3% of the heat (ASHRAE 2025 minimum / public data sheets); condenser pumps 211 kPa on 5.56 K. Condenser water above 43 °C gives a warning (a chiller rated above 43 °C is needed).</li>
+      <li><b>Water</b>: towers <code>0.00153 × flow × range</code> evaporation (ASHRAE) plus blowdown at CoC 4 = 1.76 L/h per kW rejected; hybrid on the towers' share; adiabatic <code>Q<sub>r</sub> × (db − T<sub>pad</sub>) / (12 × 2,430) × 1.15</code> with pads on.</li>
+      <li><b>MLC</b> (ASHRAE 90.4): annual mechanical energy ÷ annual IT energy; checked against ASHRAE 90.4-2025 Table 6.5 for the climate zone.</li>
+      <li><b>Electrical losses and PUE</b>: <code>PUE = (IT / η<sub>UPS</sub> + cooling) / (1 − losses) / IT</code>, UPS 96%, distribution 2%. Simplified, not the 90.4 ELC method.</li>
+      <li><b>Running cost</b>: <code>electricity × tariff + water × tariff + cooling peak × demand charge × 12</code>. Simple payback against air-cooled chillers = extra initial cost (mid estimate) ÷ running cost saved.</li>
+      <li><b>Recommendation</b>: energy 4, water 3 (doubled when water is limited), peak 3, initial cost 2, normalised across feasible options. Full basis: the Cooling Plant Calculation Basis. Screening-level; confirm with vendor selections.</li>
     </ul>
   </div>
   </div>

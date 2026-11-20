@@ -382,7 +382,7 @@ details[open]>:not(summary){animation:fadeUp .2s ease both}
     <div><label for="dbD">Design dry-bulb (°C)</label><input type="number" id="dbD" step="0.1" placeholder="auto"></div>
     <div><label for="wbD">Design wet-bulb (°C)</label><input type="number" id="wbD" step="0.1" placeholder="auto"></div>
   </div>
-  <div class="note">Leave blank to use the ASHRAE extreme annual dry-bulb and wet-bulb for the selected city (for an uploaded file: its hottest hours). To design to a stricter condition, e.g. the ASHRAE 20-year return period dry-bulb (ASHRAE Climatic Design Conditions, n = 20 years), enter it here.</div>
+  <div class="note">Two coincident design cases. Case A: the extreme dry-bulb with the wet-bulb of the hottest hour. Case B: the extreme wet-bulb with the dry-bulb of the most humid hour. Leave blank to use the ASHRAE extreme annual values (for an uploaded file: its hottest and most humid hours). Enter a stricter value, e.g. the ASHRAE 20-year return period, to replace the extreme.</div>
 
 
   <details>
@@ -395,56 +395,80 @@ details[open]>:not(summary){animation:fadeUp .2s ease both}
     <div class="note">Running cost of cooling only (not the IT load). The demand charge is applied to the cooling electrical peak every month. Indicative defaults; enter the local tariff.</div>
   </details>
   <details>
-    <summary>Chillers (ASHRAE 90.1 / AHRI 550/590 basis)</summary>
+    <summary>Chillers (ASHRAE 90.1-2025 Path B / AHRI 551/591)</summary>
     <div class="row">
-      <div><label for="copA">Air-cooled rated COP</label><input type="number" id="copA" value="2.985" step="0.1" min="1"></div>
-      <div><label for="copW">Water-cooled rated COP</label><input type="number" id="copW" value="6.286" step="0.1" min="1"></div>
+      <div><label for="copA">Air-cooled rated COP</label><input type="number" id="copA" value="2.866" step="0.1" min="1"></div>
+      <div><label for="copW">Water-cooled rated COP</label><input type="number" id="copW" value="6.018" step="0.1" min="1"></div>
     </div>
     <div class="row">
-      <div><label for="nCh">Duty chillers per loop</label><input type="number" id="nCh" value="4" step="1" min="1"></div>
+      <div><label for="unitWL">Water-cooled unit, liquid loop (kW)</label><input type="number" id="unitWL" value="7000" step="100" min="100"></div>
+      <div><label for="unitWA">Water-cooled unit, air loop (kW)</label><input type="number" id="unitWA" value="5500" step="100" min="100"></div>
+    </div>
+    <div class="row">
+      <div><label for="unitA">Air-cooled unit (kW)</label><input type="number" id="unitA" value="1500" step="50" min="50"></div>
+      <div><label for="derA">Air-cooled capacity loss above 35 °C (%/K)</label><input type="number" id="derA" value="1.35" step="0.05" min="0"></div>
+    </div>
+    <div class="row">
       <div><label for="copMax">Max COP (low lift)</label><input type="number" id="copMax" value="14" step="1" min="4"></div>
+      <div><label for="acMax">Air-cooled max ambient (°C)</label><input type="number" id="acMax" value="52" step="1"></div>
     </div>
     <div class="row">
-      <div><label for="acMax">Air-cooled max ambient (°C)</label><input type="number" id="acMax" value="52" step="1"></div>
-      <div><label for="wcMax">Max entering condenser water (°C)</label><input type="number" id="wcMax" value="43" step="1"></div>
+      <div><label for="wcMax">Condenser water warning above (°C)</label><input type="number" id="wcMax" value="43" step="1"></div>
+      <div></div>
     </div>
-    <div class="note">Defaults are ASHRAE 90.1-2019 Path A minimums (air-cooled; water-cooled ≥ 2,110 kW). Enter selected equipment values to override.</div>
+    <div class="note">Rated COP: ASHRAE 90.1-2025 Table 6.8.1-3, Path B full load, at AHRI 551/591 (7 °C chilled water; 35 °C air or 30 °C condenser water). Part load: VSD curve calibrated to the Path B IPLV. The number of duty units follows the unit size; units are staged by load (the next starts above 90% PLR), plus 1 standby per loop in the cost. Air-cooled capacity loss from public Trane RTAC data; units sized at Case A. Above the condenser-water limit a system is flagged, not excluded.</div>
   </details>
   <details>
-    <summary>Heat rejection and pumps</summary>
+    <summary>Heat rejection</summary>
     <div class="row">
-      <div><label for="aDC">Dry cooler approach (K)</label><input type="number" id="aDC" value="6" step="0.5"></div>
-      <div><label for="aCT">Tower approach (K)</label><input type="number" id="aCT" value="4" step="0.5"></div>
+      <div><label for="aCT">Tower approach to wb (K)</label><input type="number" id="aCT" value="5.56" step="0.1"></div>
+      <div><label for="aDC">Dry cooler approach to db (K)</label><input type="number" id="aDC" value="5.56" step="0.1"></div>
     </div>
     <div class="row">
+      <div><label for="aAD">Adiabatic approach to wb, pads on (K)</label><input type="number" id="aAD" value="11.1" step="0.1"></div>
       <div><label for="aHX">Plate HX approach (K)</label><input type="number" id="aHX" value="1.5" step="0.5"></div>
-      <div><label for="eAD">Adiabatic effectiveness</label><input type="number" id="eAD" value="0.85" step="0.05" min="0" max="1"></div>
     </div>
     <div class="row">
-      <div><label for="swAD">Adiabatic on above (°C)</label><input type="number" id="swAD" value="24" step="1"></div>
+      <div><label for="swAD">Adiabatic pads on above (°C)</label><input type="number" id="swAD" value="24" step="1"></div>
+      <div><label for="swHY">Hybrid: towers on above (°C)</label><input type="number" id="swHY" value="24" step="1"></div>
+    </div>
+    <div class="row">
+      <div><label for="kCT">Tower fans (% of heat rejected)</label><input type="number" id="kCT" value="1.2" step="0.1" min="0"></div>
+      <div><label for="kDC">Dry-cooler fans (% of heat)</label><input type="number" id="kDC" value="3" step="0.1" min="0"></div>
+    </div>
+    <div class="row">
+      <div><label for="kAD">Adiabatic fans (% of heat rejected)</label><input type="number" id="kAD" value="3" step="0.1" min="0"></div>
       <div><label for="coc">Tower cycles of conc.</label><input type="number" id="coc" value="4" step="0.5" min="1.5"></div>
     </div>
     <div class="row">
-      <div><label for="swHY">Hybrid: towers on above (°C)</label><input type="number" id="swHY" value="24" step="1"></div>
+      <div><label for="eAD">Pad effectiveness (water use)</label><input type="number" id="eAD" value="0.85" step="0.05" min="0" max="1"></div>
       <div></div>
     </div>
-    <div class="row">
-      <div><label for="pumpW">Primary pumps, FW / CHW (W/gpm)</label><input type="number" id="pumpW" value="22" step="1" min="0"></div>
-      <div><label for="cwW">Condenser pumps (W/gpm)</label><input type="number" id="cwW" value="19" step="1" min="0"></div>
-    </div>
-    <div class="row">
-      <div><label for="ctEff">Cooling tower fans (gpm/hp)</label><input type="number" id="ctEff" value="40.2" step="0.5" min="5"></div>
-      <div></div>
-    </div>
-    <div class="note" id="ashNote">Pumps: ASHRAE 90.1 Appendix G baseline, 22 W/gpm chilled water and 19 W/gpm condenser water (1 W/gpm = 15.85 W per L/s). Tower fans: ASHRAE 90.1 Table 6.8.1-7 minimum for axial-fan open towers, 40.2 gpm/hp. Enter your selections to override.</div>
+    <div class="note">Approaches: ASHRAE 90.1-2025 Table 6.8.1-7 rating points. Fan power at full speed: towers the ASHRAE 2025 minimum (3.56 L/s per kW); dry and adiabatic coolers 3% from public manufacturer data sheets. Fans on VFDs follow the affinity law (minimum speed 30%).</div>
   </details>
   <details>
-    <summary>Data hall terminal units (CRAH / FWU / CDU)</summary>
+    <summary>Pumps and fan wall units</summary>
     <div class="row">
-      <div><label for="fanT">CRAH / FWU fans (% of air-loop load)</label><input type="number" id="fanT" value="3" step="0.5" min="0"></div>
-      <div><label for="cduP">CDU pumps (% of liquid-loop load)</label><input type="number" id="cduP" value="1" step="0.25" min="0"></div>
+      <div><label for="dpCDU">CDU pumps head (kPa)</label><input type="number" id="dpCDU" value="320" step="10" min="0"></div>
+      <div><label for="dpPri">Primary pumps head (kPa)</label><input type="number" id="dpPri" value="200" step="10" min="0"></div>
     </div>
-    <div class="note">Electrical input including motor and drive losses. Counted as cooling energy (as in the ASHRAE 90.4 MLC), and added as heat to its loop, so the chillers and heat rejection remove it too.</div>
+    <div class="row">
+      <div><label for="dpSec">Secondary pumps head (kPa)</label><input type="number" id="dpSec" value="400" step="10" min="0"></div>
+      <div><label for="dpCW">Condenser pumps head (kPa)</label><input type="number" id="dpCW" value="211" step="10" min="0"></div>
+    </div>
+    <div class="row">
+      <div><label for="etaP">Pump × motor × VFD efficiency (%)</label><input type="number" id="etaP" value="70" step="1" min="20" max="100"></div>
+      <div></div>
+    </div>
+    <div class="row">
+      <div><label for="dpFWU">FWU static pressure (Pa)</label><input type="number" id="dpFWU" value="300" step="10" min="0"></div>
+      <div><label for="dtAir">Air rise across the IT (K)</label><input type="number" id="dtAir" value="12" step="1" min="2"></div>
+    </div>
+    <div class="row">
+      <div><label for="etaF">Fan × motor × VFD efficiency (%)</label><input type="number" id="etaF" value="65" step="1" min="20" max="100"></div>
+      <div></div>
+    </div>
+    <div class="note">P = Q × ΔP / (ρ × cp × ΔT × η). CDU pumps on a 10 K coolant ΔT; primary and secondary pumps on each loop's ΔT; condenser pumps on 5.56 K (211 kPa ≈ ASHRAE 90.1 Appendix G, 19 W/gpm). All pump and fan heat is added to the chiller load. VFD affinity law at part load (minimum speed 50% pumps, 30% fans).</div>
   </details>
   <details>
     <summary>Electrical losses</summary>
@@ -512,7 +536,7 @@ details[open]>:not(summary){animation:fadeUp .2s ease both}
       <div><div class="ctitle" id="effTitle">Annual MLC</div><div class="chartbox"><canvas id="cEff"></canvas></div></div>
     </div></div>
     <div class="card"><h2>Electricity and water consumption</h2><div class="split">
-      <div><div id="tCons"></div><div class="note">Annual totals at the frequent load. Peaks are at 100% load on the worst hour of the year. Electrical peak = cooling only: chillers + heat-rejection fans + pumps + CRAH / FWU fans + CDU pumps (no IT load, no electrical equipment or losses). Water peak = make-up water (evaporation, blowdown, pad water). PUE = (IT + cooling + losses) ÷ IT, annual. CRAH / fan-wall fans are not included.</div></div>
+      <div><div id="tCons"></div><div class="note">Annual totals at the frequent load. Peaks are the design peak: the higher of Case A and Case B at 100% load. Electrical peak = cooling only: chillers + heat-rejection fans + pumps + CRAH / FWU fans + CDU pumps (no IT load, no electrical equipment or losses). Water peak = make-up water (evaporation, blowdown, pad water). PUE = (IT + cooling + losses) ÷ IT, annual. CRAH / fan-wall fans are not included.</div></div>
       <div>
         <div class="ctitle" id="elTitle">Annual electricity by component</div>
         <div class="legend"><span><i style="background:var(--s1)"></i>Chiller compressors</span><span><i style="background:var(--s4)"></i>Heat-rejection fans</span><span><i style="background:var(--grey2)"></i>Pumps</span><span><i style="background:var(--s2)"></i>CRAH / FWU fans + CDU pumps</span></div>
@@ -554,22 +578,17 @@ details[open]>:not(summary){animation:fadeUp .2s ease both}
   <div class="card">
     <h2>Method and equations</h2>
     <ul class="method">
-      <li><b>Weather</b>: built-in cities use a measured typical year (TMYx 2011–2025, ISD/ERA5 records) from the main airport station, and ASHRAE 2025 Handbook of Fundamentals design conditions, both from climate.onebuilding.org. Hourly wet-bulb is limited to the ASHRAE extreme annual wet-bulb + 1 K to remove faulty humidity readings. The automatic design condition is the ASHRAE extreme annual dry-bulb and wet-bulb.</li>
-      <li><b>Psychrometrics</b> (ASHRAE Handbook Fundamentals, Ch. 1): saturation pressure by the Hyland–Wexler equations; humidity ratio <code>W = 0.621945·p<sub>w</sub>/(p − p<sub>w</sub>)</code>; wet-bulb solved from <code>W = [(2501 − 2.326t*)W<sub>s</sub>* − 1.006(t − t*)] / (2501 + 1.86t − 4.186t*)</code>. Station pressure from elevation.</li>
-      <li><b>Each loop, every hour</b>: return water is first cooled by the outdoor device, leaving at <code>T<sub>out</sub></code>; free-cooling fraction <code>FF = (T<sub>ret</sub> − T<sub>out</sub>)/(T<sub>ret</sub> − T<sub>sup</sub>)</code> (0–1); the chiller trims the rest.</li>
-      <li><b>Terminal units</b>: CRAH / FWU fans (air loop) and CDU pumps (liquid loop) draw a set % of their loop load. Their power is cooling energy, and the same power is added to the loop as heat: <code>Q<sub>loop</sub> = Q<sub>IT</sub> × (1 + terminal %)</code>, which the pre-cooling, chillers and heat rejection must remove. Chillers are sized for this load.</li>
-      <li><b>T<sub>out</sub></b>: dry cooler <code>T<sub>db</sub> + approach</code>; adiabatic <code>T<sub>eff</sub> + approach + HX</code> with <code>T<sub>eff</sub> = T<sub>db</sub> − ε(T<sub>db</sub> − T<sub>wb</sub>)</code> (ASHRAE Systems &amp; Equipment, evaporative cooling); tower <code>T<sub>wb</sub> + approach + HX</code>; hybrid: dry coolers alone at or below the switch temperature (<code>T<sub>db</sub> + dry cooler approach + HX</code>), towers above it (<code>T<sub>wb</sub> + tower approach + HX</code>) with the dry coolers in series ahead of them, taking the share <code>(T<sub>CW,ret</sub> − T<sub>db</sub> − approach)/6 K</code> of the heat while the air is cooler than the water.</li>
-      <li><b>Chillers</b> (DOE-2 / EnergyPlus EIR form): <code>P = (Q<sub>cap</sub>/COP<sub>rated</sub>) × EIRFT × EIRFPLR</code>. COP<sub>rated</sub> at AHRI 550/590 conditions (defaults: ASHRAE 90.1-2019 Path A minimums). EIRFT scales with lift at constant Carnot fraction, because 20–30 °C chilled water is outside published curve ranges. EIRFPLR from EnergyPlus reference curves: water-cooled VSD centrifugal 0.0731 + 0.1514·PLR + 0.7709·PLR²; air-cooled screw = PLR. Duty chillers stage to keep PLR high.</li>
-      <li><b>Condensing temperature</b>: air-cooled <code>T<sub>db</sub> + 15 K</code>; water-cooled <code>T<sub>ECW</sub> + 7.6 K</code>, where entering condenser water = <code>T<sub>wb</sub> + tower approach</code> or <code>T<sub>eff</sub> + cooler approach</code>.</li>
-      <li><b>Pumps and tower fans</b> (ASHRAE 90.1): pump power = W/gpm × flow, with flow = Q / (ρ·c<sub>p</sub>·ΔT): primary pumps on each loop's ΔT (Appendix G baseline 22 W/gpm), condenser pumps on a 5.6 K range (19 W/gpm). Tower fans from the tower efficiency at the 90.1 rating point (35 / 29.4 / 23.9 °C): <code>kW fan per kW rejected = gpm per kW ÷ (gpm/hp) × 0.7457</code>, with 40.2 gpm/hp (Table 6.8.1-7 minimum, axial fan), held at full-speed power. Dry and adiabatic cooler fans: 1.5–1.8% of the heat (screening values).</li>
-      <li><b>ASHRAE 90.4 check</b>: annual MLC against the maximum annualized MLC for the climate zone (90.4-2022 Addendum g, Table 6.5).</li>
-      <li><b>Water</b>: tower evaporation <code>0.8·Q<sub>rej</sub>/h<sub>fg</sub></code> plus blowdown <code>E/(CoC − 1)</code>; adiabatic water only when pads are wet (above the switch temperature); hybrid: tower water only above its switch temperature, on the towers' share of the heat.</li>
-      <li><b>Design-day check</b>: each option at 100% load at the design dry-bulb and wet-bulb (applied together, which is conservative). Fails if a chiller would exceed its condenser limit (air-cooled max ambient, max entering condenser water).</li>
-      <li><b>MLC</b> (ASHRAE 90.4): annual mechanical energy (compressors, heat-rejection fans, primary, condenser and CDU pumps, CRAH / FWU fans) ÷ annual IT energy.</li>
-      <li><b>Peaks</b>: at 100% load on the worst hour of the year. Electrical peak (cooling) = compressors + heat-rejection fans + pumps + CRAH / FWU fans + CDU pumps. It excludes the IT load and the electrical equipment and its losses. Water peak = make-up water rate in m³/h (tower evaporation and blowdown, or adiabatic pad water). Chillers are staged each hour to the number that gives the lowest power.</li>
-      <li><b>Electrical losses and PUE</b>: UPS losses on the IT load, transformer and distribution losses on the whole facility. Annual PUE <code>= (IT + cooling + losses) ÷ IT</code>. Simplified; not the full ASHRAE 90.4 ELC method. CRAH / fan-wall fans and electrical-room cooling are not included.</li>
-      <li><b>Running cost</b>: cooling only, at the frequent load: <code>electricity × tariff + water × tariff + cooling peak × demand charge × 12</code>. Simple payback against air-cooled chillers = extra initial cost (mid estimate) ÷ running cost saved, with no discounting, maintenance or tariff escalation.</li>
-      <li><b>Recommendation</b>: metrics normalised across feasible options and weighted: energy 4, water 3 (doubled when water is limited), peak power 3, initial cost 2. Options that fail the design day, or need water you don't have, are excluded. Screening-level; confirm with vendor selections and a detailed model.</li>
+      <li><b>Weather</b>: built-in cities use a measured typical year (TMYx 2011–2025) from the main airport station and ASHRAE 2025 Handbook of Fundamentals design conditions, both from climate.onebuilding.org. Hourly wet-bulb is limited to the ASHRAE extreme annual wet-bulb + 1 K. Psychrometrics per ASHRAE Fundamentals, Ch. 1.</li>
+      <li><b>Design cases</b>: Case A = extreme dry-bulb + the wet-bulb of the hottest hour; Case B = extreme wet-bulb + the dry-bulb of the most humid hour. Every system is checked at both at 100% load; the design peak is the higher.</li>
+      <li><b>Loads</b>: chiller load = IT load + CDU pumps or FWU fans + primary and secondary pumps. Pumps and fans: <code>P = Q·ΔP / (ρ·c<sub>p</sub>·ΔT·η)</code>; VFD part load <code>P = P<sub>full</sub>·(Q/Q<sub>design</sub>)³</code>, minimum speed 50% pumps, 30% fans.</li>
+      <li><b>Free cooling</b> = (T<sub>return</sub> − T<sub>out</sub>) / (T<sub>return</sub> − T<sub>supply</sub>), 0–1. T<sub>out</sub>: towers wb + 5.56 + 1.5 (plate HX); dry coolers db + 5.56 (direct on the loop); adiabatic wb + 11.1 + 1.5 with pads on (above 24 °C), db + 5.56 + 1.5 dry; hybrid: dry coolers alone up to 24 °C, towers above, dry share = (wb + 5.56 − db) / 5.56. Approaches: ASHRAE 90.1-2025 Table 6.8.1-7.</li>
+      <li><b>Chillers</b>: <code>COP = COP<sub>rated</sub> × [(T<sub>e</sub> + 273.15)/(T<sub>c</sub> − T<sub>e</sub>)] ÷ [(T<sub>e,ref</sub> + 273.15)/(T<sub>c,ref</sub> − T<sub>e,ref</sub>)]</code>, limited to 14. T<sub>e</sub> = supply − 2; T<sub>c</sub> = db + 15 (air-cooled) or condenser water + 7 (water-cooled). Rated COP: ASHRAE 90.1-2025 Path B (2.866 air-cooled, 6.018 water-cooled) at AHRI 551/591 (T<sub>e,ref</sub> 5 °C; T<sub>c,ref</sub> 50 / 37 °C). Part load: <code>a + b·PLR + c·PLR²</code> calibrated to the Path B IPLV (water-cooled 0.1969 / 0.1318 / 0.6713; air-cooled 0.1752 / 0.1354 / 0.6895). Units staged by load, the next above 90% PLR. Air-cooled capacity −1.35% per K above 35 °C.</li>
+      <li><b>Heat rejection</b>: Q<sub>r</sub> = chiller load + chiller power. Fans at full speed: towers 1.2%, dry and adiabatic coolers 3% of the heat (ASHRAE 2025 minimum / public data sheets); condenser pumps 211 kPa on 5.56 K. Condenser water above 43 °C gives a warning (a chiller rated above 43 °C is needed).</li>
+      <li><b>Water</b>: towers <code>0.00153 × flow × range</code> evaporation (ASHRAE) plus blowdown at CoC 4 = 1.76 L/h per kW rejected; hybrid on the towers' share; adiabatic <code>Q<sub>r</sub> × (db − T<sub>pad</sub>) / (12 × 2,430) × 1.15</code> with pads on.</li>
+      <li><b>MLC</b> (ASHRAE 90.4): annual mechanical energy ÷ annual IT energy; checked against ASHRAE 90.4-2025 Table 6.5 for the climate zone.</li>
+      <li><b>Electrical losses and PUE</b>: <code>PUE = (IT / η<sub>UPS</sub> + cooling) / (1 − losses) / IT</code>, UPS 96%, distribution 2%. Simplified, not the 90.4 ELC method.</li>
+      <li><b>Running cost</b>: <code>electricity × tariff + water × tariff + cooling peak × demand charge × 12</code>. Simple payback against air-cooled chillers = extra initial cost (mid estimate) ÷ running cost saved.</li>
+      <li><b>Recommendation</b>: energy 4, water 3 (doubled when water is limited), peak 3, initial cost 2, normalised across feasible options. Full basis: the Cooling Plant Calculation Basis. Screening-level; confirm with vendor selections.</li>
     </ul>
   </div>
   </div>
@@ -738,7 +757,9 @@ function stationYear(c){
     document.head.appendChild(s);
   });
 }
-// ---------- shared cooling plant model (Cooling Plant Selector, Thermal Storage Tank): options, cost rates ----------
+// ---------- shared cooling plant model (Cooling Plant Selector, Peak Shaving Tank) ----------
+// Basis: "Cooling Plant Calculation Basis", Part A. ASHRAE 90.1-2025 Path B chillers, AHRI 551/591 rating points,
+// ASHRAE 90.1-2025 heat-rejection approaches, pump and fan power from head equations, two coincident design cases.
 const OPTIONS=[
  {id:'acc',  name:'Air-cooled chillers',                     short:'Air-cooled chillers',  water:false, comp:['acch']},
  {id:'accfc',name:'Air-cooled chillers + free-cooling dry coolers', short:'Chillers + dry coolers', water:false, comp:['acch','dc']},
@@ -757,118 +778,153 @@ const RATES=[
 // fixed weights for the recommendation score
 const WEIGHTS=[{id:'w_energy',l:'Energy',v:4},{id:'w_water',l:'Water',v:3},{id:'w_peak',l:'Peak power (grid)',v:3},{id:'w_capex',l:'Initial cost',v:2}];
 
-// ---------- ASHRAE 90.1 / 90.4 references ----------
-// water flow per kW at a ΔT of 1 K, in gpm: 1 kW / (4.18 kJ/kg·K × 1 K) = 0.2392 L/s = 3.792 gpm
-const GPM_PER_KW_K=3.792;
-// pump power as a share of the heat carried: W/gpm × gpm per kW ÷ 1000 (ASHRAE 90.1 Appendix G: CHW 22 W/gpm, CW 19 W/gpm)
-const pumpShare=(wPerGpm,dT)=>wPerGpm*GPM_PER_KW_K/Math.max(dT,0.5)/1000;
-// open cooling tower fan power per kW rejected, from its efficiency in gpm/hp at the 90.1 rating point
-// (35 °C entering, 29.4 °C leaving water = 5.56 K range): hp per kW = gpm per kW ÷ (gpm/hp); 0.7457 kW per hp
-const towerFanShare=gpmPerHp=>GPM_PER_KW_K/5.556/gpmPerHp*0.7457;
-// ASHRAE 90.4-2022 (Addendum g, 2024) Table 6.5: maximum annualized MLC by climate zone, [ITE > 300 kW, ITE ≤ 300 kW]
+// default basis values (inputs override them in the Cooling Plant Selector)
+const BASIS={
+  copA:2.866, copW:6.018, copMax:14,          // ASHRAE 90.1-2025 Table 6.8.1-3, Path B full load; COPmax = assumption
+  unitWL:7000, unitWA:5500, unitA:1500, derA:0.0135,   // chiller unit sizes (kW): water-cooled liquid / air loop, air-cooled; air-cooled capacity loss per K above 35 °C (Trane RTAC public data)
+  stage:0.90, acMax:52, wcMax:43,             // next chiller above 90% PLR; air-cooled max ambient; condenser-water warning limit
+  acApp:15, wcApp:7,                          // condensing: ambient + 15 K; condenser water + 5 K range (AHRI) + 2 K
+  aCT:5.56, aDC:5.56, aAD:11.1, aHX:1.5, rangeCW:5.56,   // ASHRAE 90.1-2025 Table 6.8.1-7 rating approaches; plate HX
+  swAD:24, swHY:24, eAD:0.85, coc:4,          // adiabatic / hybrid switch; pad effectiveness (water use only); cycles of concentration
+  kCT:0.012, kDC:0.030, kAD:0.030,            // fan kW per kW rejected at full speed: towers ASHRAE 2025 minimum; dry / adiabatic public data sheets
+  dpCDU:320, dtCDU:10, dpPri:200, dpSec:400, dpCW:211, etaP:0.70,   // pump heads (kPa), CDU coolant ΔT, pump × motor × VFD efficiency
+  dpFWU:0.30, dtAir:12, etaF:0.65,            // fan wall units: static pressure (kPa), air rise across IT (K), fan efficiency
+  minPump:0.5, minFan:0.3,                    // VFD minimum speed
+};
+
+// ---------- ASHRAE 90.4-2025 Table 6.5: maximum annualized MLC by climate zone, [ITE > 300 kW, ITE ≤ 300 kW] ----------
 const MLC_MAX={'0A':[.29,.37],'0B':[.32,.41],'1A':[.30,.37],'1B':[.31,.39],'2A':[.27,.35],'2B':[.20,.33],'3A':[.24,.33],'3B':[.20,.33],'3C':[.17,.27],
   '4A':[.21,.33],'4B':[.17,.29],'4C':[.17,.27],'5A':[.19,.34],'5B':[.17,.30],'5C':[.17,.29],'6A':[.19,.31],'6B':[.17,.31],'7':[.17,.31],'8':[.15,.32]};
 const mlcMax=(zone,itKW)=>{ const v=MLC_MAX[String(zone||'').toUpperCase()]; return v?v[itKW>300?0:1]:null; };
 
-// ---------- chiller model ----------
-const AHRI={ac:{Te:6.7-2, Tc:35+15}, wc:{Te:6.7-2, Tc:29.4+7.6}};
-const eirPLR={ac:x=>x, wc:x=>0.07308728+0.1513521*x+0.7709311*x*x};
-function chillerPower(Qch, capEach, n, kind, Ts, Tc, p){
-  if(Qch<=0) return {P:0,cop:null};
-  const Te=Ts-2, lift=Math.max(Tc-Te,3), ref=AHRI[kind], refLift=ref.Tc-ref.Te;
-  const copRated = kind==='ac'?p.copA:p.copW;
-  let copT = copRated * ((Te+273.15)/lift) / ((ref.Te+273.15)/refLift);
-  copT=Math.min(copT,p.copMax);
-  // stage the number of duty chillers that gives the lowest power (VSD chillers are more efficient at part load)
-  const nMin=Math.min(n,Math.max(1,Math.ceil(Qch/capEach-1e-9)));
-  let P=Infinity;
-  for(let k=nMin;k<=n;k++){ const plr=Math.min(1,Qch/(k*capEach)); P=Math.min(P,k*(capEach/copT)*Math.max(eirPLR[kind](plr),0.05)); }
-  return {P, cop:Qch/P};
+// ---------- equations ----------
+// pump or fan power as a share of the heat carried: P / Q = ΔP / (ρ · cp · ΔT · η)
+const pumpK=(dpKPa,dT,eta)=>dpKPa/(1000*4.18*Math.max(dT,0.5)*eta);
+const airFanK=(dpKPa,dT,eta)=>dpKPa/(1.2*1.006*Math.max(dT,0.5)*eta);
+// VFD affinity law: power ∝ speed³, speed ∝ flow, held at the minimum speed
+const affinity=(x,minSpeed)=>Math.pow(Math.max(minSpeed,Math.min(x,1.2)),3);
+// chiller COP at the hour's lift (constant Carnot fraction) from the rated point; AHRI 551/591: 7 °C chilled water,
+// 35 °C air + 15 K = 50 °C condensing, 30 °C condenser water + 7 K = 37 °C condensing; evaporating = supply − 2 K
+const CH_REF={ac:{Te:5,Tc:50}, wc:{Te:5,Tc:37}};
+function copAt(kind,Ts,Tc,p){
+  const Te=Ts-2, lift=Math.max(Tc-Te,3), r=CH_REF[kind];
+  return Math.min(p.copMax,(kind==='ac'?p.copA:p.copW)*((Te+273.15)/lift)/((r.Te+273.15)/(r.Tc-r.Te)));
 }
+// VSD part-load factor, calibrated to ASHRAE 90.1-2025 Path B full-load COP and IPLV (EnergyPlus VSD shape, scaled)
+const PL_CURVE={wc:[0.1969,0.1318,0.6713], ac:[0.1752,0.1354,0.6895]};
+const partLoad=(kind,x)=>{ const c=PL_CURVE[kind]; return Math.max(0.05,c[0]+c[1]*x+c[2]*x*x); };
+// air-cooled unit capacity at a dry-bulb (rated at 35 °C)
+const acCap=(p,db)=>p.unitA*Math.max(0.3,1-p.derA*Math.max(0,db-35));
 
+// terminal units (heat added to their loop): CDU pumps on the liquid loop, fan wall units on the air loop
+const termShare=(L,p)=>L.name==='LC'?pumpK(p.dpCDU,p.dtCDU,p.etaP):L.name==='Air'?airFanK(p.dpFWU,p.dtAir,p.etaF):0;
+const loopPumpShare=(L,p)=>pumpK(p.dpPri+p.dpSec,L.Tr-L.Ts,p.etaP);   // primary + secondary pumps on the loop ΔT
 
+// one hour of one option on one loop at dry-bulb db / wet-bulb wb
 function hourModel(o,L,db,wb,p){
-  let Tout,Tc,kind,fanK,cwK=0,teff=db,wet=1,dShare=0;
-  // pumps and tower fans: ASHRAE 90.1 values when given (W/gpm, gpm/hp), else the older % inputs (Peak Shaving Tank)
-  const cwShare=p.cwW!=null?pumpShare(p.cwW,5.556):p.cwp, ctFan=p.ctEff?towerFanShare(p.ctEff):0.008;
-  const pumpK=p.pumpW!=null?pumpShare(p.pumpW,L.Tr-L.Ts):p.pump;
-  if(o.id==='acc'){Tout=Infinity;Tc=db+15;kind='ac';fanK=0;}
-  else if(o.id==='accfc'){Tout=db+p.aDC;Tc=db+15;kind='ac';fanK=0.015;}
-  else if(o.id==='adia'){teff=db>p.swAD?db-p.eAD*(db-wb):db; Tout=teff+p.aDC+p.aHX; Tc=teff+p.aDC+7.6; kind='wc'; fanK=0.018; cwK=cwShare;}
-  else if(o.id==='wcc'){Tout=wb+p.aCT+p.aHX; Tc=wb+p.aCT+7.6; kind='wc'; fanK=ctFan; cwK=cwShare;}
-  else if(o.id==='hyb'){
-    // hybrid: dry coolers and cooling towers in series on the condenser water. At or below the switch temperature
-    // the dry coolers alone cool the water (no water used). Above it the towers run, and the dry coolers
-    // pre-cool the water ahead of them while the air is cooler than the water (range 6 K), cutting tower water.
-    let Tcw; if(db<=p.swHY){ Tcw=db+p.aDC; wet=0; dShare=1; }
-    else { Tcw=wb+p.aCT; dShare=Math.max(0,Math.min(1,(Tcw+6-(db+p.aDC))/6)); wet=1-dShare; }
-    Tout=Tcw+p.aHX; Tc=Tcw+7.6; kind='wc'; fanK=0.018; cwK=cwShare;}
-  const ff=Tout<=L.Ts?1:Math.max(0,Math.min(1,(L.Tr-Tout)/(L.Tr-L.Ts)));
-  // terminal units in the hall: CRAH / FWU fans on the air loop, CDU pumps on the liquid loop;
-  // their power is cooling energy and also ends up as heat in the loop
-  const term=L.name==='Air'?p.fanT:p.cduP;
-  const capEach=L.Qd*(1+term)/p.nCh;
-  const calc=(q)=>{
-    const Pt=term*q, qL=q+Pt;
-    const ch=chillerPower(qL*(1-ff),capEach,p.nCh,kind,L.Ts,Tc,p);
-    const Qr=qL+ch.P; let Pf=0;
-    const airFrac = ff>=1 ? Math.max(0.25,Math.min(1,(L.Tr-L.Ts)/Math.max(L.Tr-Tout,0.1))) : 1;
-    if(o.id==='accfc') Pf = ff>0 ? fanK*qL*airFrac : 0;
-    else if(o.id==='adia') Pf=fanK*Qr*airFrac;
-    else if(o.id==='wcc') Pf=fanK*Qr;
-    else if(o.id==='hyb') Pf=wet>0 ? ctFan*Qr+fanK*Qr*dShare : fanK*Qr*airFrac;   // towers + dry coolers, or dry coolers alone
-    const Pp=pumpK*qL + cwK*Qr;
-    return {Pc:ch.P,Pf,Pp,Pt,Qr,cop:ch.cop,P:ch.P+Pf+Pp+Pt};
-  };
-  // condenser operating limit
-  let limit=null;
-  if(kind==='ac' && db>p.acMax) limit=`ambient ${db.toFixed(1)} °C > air-cooled chiller limit ${p.acMax} °C`;
-  if(kind==='wc'){ const ecw=Tc-7.6; if(ecw>p.wcMax) limit=`entering condenser water ${ecw.toFixed(1)} °C > limit ${p.wcMax} °C`; }
-  return {Tout,Tc,kind,ff,teff,wet,calc,limit};
-}
-
-function designCheck(p,dbD,wbD){
-  const out={};
-  for(const o of OPTIONS){
-    let P=0,Qr=0,Pc=0,W=0; const issues=[];
-    p.loops.forEach(L=>{ if(L.Qd<=0) return; const hm=hourModel(o,L,dbD,wbD,p), d=hm.calc(L.Qd);
-      P+=d.P; Qr+=d.Qr; Pc+=d.Pc; W+=waterKgH(o,d.Qr,dbD,hm.teff,p,hm.wet)/1000;
-      if(hm.limit && hm.ff<1) issues.push(hm.limit);
-    });
-    out[o.id]={P,Qr,Pc,W,ok:issues.length===0,issues:[...new Set(issues)],ratio:P/p.Qd};
+  let Tout,ecw=null,kind,wet=0,dShare=0;
+  if(o.id==='acc'){ Tout=Infinity; kind='ac'; }
+  else if(o.id==='accfc'){ Tout=db+p.aDC; kind='ac'; }                     // dry coolers directly on the loop
+  else if(o.id==='adia'){ wet=db>p.swAD?1:0; ecw=wet?wb+p.aAD:db+p.aDC; Tout=ecw+p.aHX; kind='wc'; }
+  else if(o.id==='wcc'){ wet=1; ecw=wb+p.aCT; Tout=ecw+p.aHX; kind='wc'; }
+  else { // hybrid: dry coolers in series ahead of the towers on the condenser water
+    if(db<=p.swHY){ ecw=db+p.aDC; dShare=1; wet=0; }
+    else { ecw=wb+p.aCT; dShare=Math.max(0,Math.min(1,(ecw+p.rangeCW-(db+p.aDC))/p.rangeCW)); wet=1-dShare; }
+    Tout=ecw+p.aHX; kind='wc';
   }
-  return out;
+  const Tc=kind==='ac'?db+p.acApp:ecw+p.wcApp;
+  const ff=Tout<=L.Ts?1:Math.max(0,Math.min(1,(L.Tr-Tout)/(L.Tr-L.Ts)));
+  const term=termShare(L,p), pk=loopPumpShare(L,p), qLdes=L.Qd*(1+term+pk);
+  // installed duty units: water-cooled at rated capacity; air-cooled sized at the Case A dry-bulb (derated)
+  let unit,N;
+  const unitW=L.name==='Air'?p.unitWA:p.unitWL;
+  if(kind==='wc'&&unitW){ unit=unitW; N=Math.max(1,Math.ceil(qLdes/unit-1e-9)); }
+  else if(kind==='ac'&&p.unitA){ unit=p.unitA; N=Math.max(1,Math.ceil(qLdes/acCap(p,p.dbA??35)-1e-9)); }
+  else { N=p.nCh||4; unit=qLdes/N; }
+  const capH=kind==='ac'&&p.unitA?acCap(p,db):unit;                       // capacity of one unit this hour
+  const cop=copAt(kind,L.Ts,Tc,p);
+  const des=p.des&&p.des[o.id]&&p.des[o.id][L.name];                       // design heat rejected (fan and condenser-pump speed)
+  const minT=L.name==='Air'?p.minFan:p.minPump;
+  const calc=q=>{
+    const x=L.Qd>0?q/L.Qd:0;
+    const Pt=term*L.Qd*affinity(x,minT), Pl=pk*L.Qd*affinity(x,p.minPump);
+    const qL=q+Pt+Pl, Qch=qL*(1-ff);
+    let Pc=0,nOn=0,plr=0;
+    if(Qch>0){ nOn=Math.min(N,Math.max(1,Math.ceil(Qch/(p.stage*capH)-1e-9))); plr=Qch/(nOn*capH); Pc=nOn*capH/cop*partLoad(kind,Math.min(plr,1.2)); }
+    const Qr=qL+Pc, QrRef=des?des.Qr:Qr, f=(share,k)=>share>0?k*QrRef*affinity(Qr*share/QrRef,p.minFan):0;
+    let Pf=0;
+    if(o.id==='accfc') Pf=ff>0?p.kDC*qLdes*affinity(qL*ff/qLdes,p.minFan):0;
+    else if(o.id==='adia') Pf=f(1,p.kAD);
+    else if(o.id==='wcc') Pf=f(1,p.kCT);
+    else if(o.id==='hyb') Pf=f(wet,p.kCT)+f(dShare,p.kDC);
+    const Pcw=kind==='wc'?pumpK(p.dpCW,p.rangeCW,p.etaP)*QrRef*affinity(Qr/QrRef,p.minPump):0;
+    return {Pc,Pf,Pp:Pl+Pcw,Pt,Qr,qL,Qch,nOn,plr,cop:Qch>0?Qch/Pc:null,P:Pc+Pf+Pl+Pcw+Pt};
+  };
+  // limits: air-cooled max ambient fails the design; condenser water above the standard range only warns
+  const limit=kind==='ac'&&db>p.acMax?`ambient ${db.toFixed(1)} °C > air-cooled chiller limit ${p.acMax} °C`:null;
+  const warn=kind==='wc'&&ecw>p.wcMax?`entering condenser water ${ecw.toFixed(1)} °C is above the standard chiller range (${p.wcMax} °C): a chiller rated for more than ${p.wcMax} °C entering condenser water is needed`:null;
+  return {Tout,Tc,ecw,kind,ff,wet,dShare,N,unit,cop,calc,limit,warn};
 }
 
-// make-up water, kg/h: tower evaporation + blowdown (hybrid: only the towers' share of the heat), or adiabatic pad water when wet
-function waterKgH(o,Qr,db,teff,p,wet=1){
-  if(o.id==='wcc'||o.id==='hyb') return (o.id==='hyb'?wet:1)*0.8*Qr*3600/2430*(p.coc/(p.coc-1));
-  if(o.id==='adia'&&db>p.swAD) return Qr*3600*(db-teff)/(12*2430)*1.15;
+// make-up water, kg/h: towers 0.00153 × flow × range (ASHRAE) + blowdown at CoC; hybrid on the towers' share; adiabatic pads (air-side balance)
+function waterKgH(o,Qr,db,wb,p,wet){
+  if(o.id==='wcc'||o.id==='hyb') return wet*Qr*0.00153/4.18*3600*(p.coc/(p.coc-1));
+  if(o.id==='adia'&&wet){ const Tpad=db-p.eAD*(db-wb); return Qr*(db-Tpad)/(12*2430)*1.15*3600; }
   return 0;
 }
 
-function simulate(wx,p){
+// two coincident design cases: A = extreme dry-bulb + the wet-bulb of the hottest hour; B = extreme wet-bulb + the dry-bulb of the most humid hour
+function designCases(wx,A,dbIn,wbIn){
+  let hA=0,hB=0; wx.T.forEach((t,h)=>{ if(t>wx.T[hA]) hA=h; if(wx.Twb[h]>wx.Twb[hB]) hB=h; });
+  const dbA=isNaN(dbIn)?(A?A.extDB:wx.T[hA]):dbIn, wbB=isNaN(wbIn)?(A?A.extWB:wx.Twb[hB]):wbIn;
+  return {A:{db:dbA,wb:Math.min(wx.Twb[hA],dbA)}, B:{db:Math.max(wx.T[hB],wbB),wb:wbB}};
+}
+
+// design check at both cases, 100% load; also records each option's design heat rejected (sets fan / pump speeds hourly)
+function designCheck(p){
+  const out={}, des={}; p.des=null;   // design cases at full fan / pump speed
+  for(const o of OPTIONS){
+    const cs={}, issues=[], warns=[], units=[]; des[o.id]={};
+    for(const k of ['A','B']){ const {db,wb}=p.cases[k]; let P=0,Qr=0,W=0;
+      p.loops.forEach(L=>{ if(L.Qd<=0) return; const hm=hourModel(o,L,db,wb,p), d=hm.calc(L.Qd);
+        P+=d.P; Qr+=d.Qr; W+=waterKgH(o,d.Qr,db,wb,p,hm.wet)/1000;
+        des[o.id][L.name]={Qr:Math.max(d.Qr,(des[o.id][L.name]||{}).Qr||0)};
+        if(hm.limit&&hm.ff<1) issues.push(hm.limit); if(hm.warn&&hm.ff<1) warns.push(hm.warn);
+        if(k==='A') units.push({loop:L.name,N:hm.N,unit:hm.unit,kind:hm.kind});
+      });
+      cs[k]={P,Qr,W};
+    }
+    const worst=cs.A.P>=cs.B.P?'A':'B';
+    out[o.id]={cases:cs,worst,P:cs[worst].P,Qr:Math.max(cs.A.Qr,cs.B.Qr),W:Math.max(cs.A.W,cs.B.W),units,
+      ok:issues.length===0,issues:[...new Set(issues)],warns:[...new Set(warns)],ratio:cs[worst].P/p.Qd};
+  }
+  p.des=des;
+  return out;
+}
+
+// 8,760-hour simulation; call designCheck first (design heat rejected, design peak)
+function simulate(wx,p,des){
   const n=wx.T.length, hs=8760/n, loops=p.loops, out={};
   for(const o of OPTIONS){
-    const r={o,E:0,Ec:0,Ef:0,Ep:0,Et:0,W:0,peak:0,Wpeak:0,free:[0,0],part:[0,0],mech:[0,0],
+    const r={o,E:0,Ec:0,Ef:0,Ep:0,Et:0,W:0,free:[0,0],part:[0,0],mech:[0,0],hotCW:0,
       mFree:[new Array(12).fill(0),new Array(12).fill(0)],mPart:[new Array(12).fill(0),new Array(12).fill(0)],mMech:[new Array(12).fill(0),new Array(12).fill(0)],copSum:0,copN:0};
     for(let h=0;h<n;h++){
-      const db=wx.T[h], wb=wx.Twb[h], m=wx.mon[h]; let Pd=0, Wd=0;
+      const db=wx.T[h], wb=wx.Twb[h], m=wx.mon[h];
       loops.forEach((L,li)=>{
         if(L.Q<=0) return;
-        const hm=hourModel(o,L,db,wb,p), calc=hm.calc, ff=hm.ff, teff=hm.teff;
-        const a=calc(L.Q), d=calc(L.Qd);
-        r.E+=a.P; r.Ec+=a.Pc; r.Ef+=a.Pf; r.Ep+=a.Pp; r.Et+=a.Pt; Pd+=d.P;
+        const hm=hourModel(o,L,db,wb,p), a=hm.calc(L.Q), ff=hm.ff;
+        r.E+=a.P; r.Ec+=a.Pc; r.Ef+=a.Pf; r.Ep+=a.Pp; r.Et+=a.Pt;
         if(a.cop){r.copSum+=a.cop; r.copN++;}
-        r.W+=waterKgH(o,a.Qr,db,teff,p,hm.wet); Wd+=waterKgH(o,d.Qr,db,teff,p,hm.wet);
+        r.W+=waterKgH(o,a.Qr,db,wb,p,hm.wet);
+        if(hm.warn&&ff<1&&li===0) r.hotCW++;
         if(ff>=1){r.free[li]++; r.mFree[li][m]++;} else if(ff>0){r.part[li]++; r.mPart[li][m]++;} else {r.mech[li]++; r.mMech[li][m]++;}
       });
-      r.peak=Math.max(r.peak,Pd); r.Wpeak=Math.max(r.Wpeak,Wd);   // peaks at 100% load on the worst hour
     }
-    const Qyr=loops.reduce((s,L)=>s+L.Q,0)*n;
+    const Qyr=loops.reduce((s,L)=>s+L.Q,0)*n, d=des[o.id];
     ['E','Ec','Ef','Ep','Et'].forEach(k=>r[k]*=hs/1000);   // MWh
     r.W*=hs/1000;                                     // m3
-    r.Wpeak/=1000;                                    // m3/h
+    r.hotCW*=hs;                                      // h/yr above the condenser-water limit
+    r.peak=d.P; r.Wpeak=d.W;                          // design peak: the higher of Case A and Case B, 100% load
     ['free','part','mech'].forEach(k=>r[k]=r[k].map(v=>v*hs));
     r.mlc=r.E*1000/(Qyr*hs);
     r.cop=r.copN?r.copSum/r.copN:null;
@@ -890,11 +946,11 @@ function simulate(wx,p){
   return out;
 }
 
-function score(res,p){
+function score(res,p,des){
   const ids=OPTIONS.map(o=>o.id);
   ids.forEach(id=>{ const r=res[id]; r.excluded=null;
     if(r.o.water&&p.water==='none') r.excluded='Needs water';
-    if(!r.excluded && DES && !DES[id].ok) r.excluded='Fails design day';
+    if(!r.excluded && des && !des[id].ok) r.excluded='Fails design day';
     r.capMid=(r.capLo+r.capHi)/2;
   });
   const ok=ids.filter(id=>!res[id].excluded);
@@ -954,7 +1010,7 @@ function schematic(id){
     // outdoors
     g+=`<rect class="zone" x="0" y="46" width="${W}" height="72" rx="8"/>`+t(10,62,'Outdoors','t2','start');
     if(s.shared){
-      g+=box(20,68,390,44,[s.shared+(loops.length>1?' (shared by both loops)':''),id==='wcc'?`approach ${P.aCT} K to wet-bulb · ${P.coc} cycles`:id==='hyb'?`dry up to ${P.swHY} °C · towers above, approach ${P.aCT} K`:`wet above ${P.swAD} °C · effectiveness ${P.eAD}`]);
+      g+=box(20,68,390,44,[s.shared+(loops.length>1?' (shared by both loops)':''),id==='wcc'?`approach ${P.aCT} K to wet-bulb · ${P.coc} cycles`:id==='hyb'?`dry up to ${P.swHY} °C · towers above, approach ${P.aCT} K`:`wet above ${P.swAD} °C · approach ${P.aAD} K to wet-bulb`]);
       g+=up(105,'condenser water')+up(325,'condenser water');
     } else {
       if(s.pre){ g+=box(20,68,170,44,['Outdoor air','dry-cooler fans']); g+=up(105,'heat'); }
@@ -962,9 +1018,9 @@ function schematic(id){
     }
     // water loop: pre-cooling and chillers
     if(s.pre) g+=box(20,150,170,62,[s.pre,id==='accfc'?`approach ${P.aDC} K`:`HX approach ${P.aHX} K`,`free cooling ${fmt(r.free[i])} h/yr`]);
-    g+=box(240,150,170,62,[(tag?tag+' ':'')+'chillers',`${P.nCh} × ${fmt(L.Qd/P.nCh/1000,1)} MW, ${ac?'air':'water'}-cooled`,`rated COP ${(ac?P.copA:P.copW).toFixed(2)} · on ${fmt(r.part[i]+r.mech[i])} h/yr`]);
+    g+=box(240,150,170,62,[(tag?tag+' ':'')+'chillers',`${(DES[id].units.find(u=>u.loop===L.name)||{}).N} × ${fmt(((DES[id].units.find(u=>u.loop===L.name)||{}).unit||0)/1000,1)} MW + 1, ${ac?'air':'water'}-cooled`,`rated COP ${(ac?P.copA:P.copW).toFixed(2)} · on ${fmt(r.part[i]+r.mech[i])} h/yr`]);
     g+=box(240,244,170,46,['Buffer / TES tank','ride-through; not in energy calc'],'bx tes');
-    g+=box(20,328,390,56,[liquid?'Liquid-cooled IT (CDUs)':'Air-cooled IT (CRAHs / fan walls)',`${fmt(L.Qd/1000,1)} MW at full load · ${fmt(L.Q/1000,1)} MW typical`,`${liquid?'CDU pumps':'CRAH / FWU fans'} ${fmt(L.Qd*(liquid?P.cduP:P.fanT))} kW at full load, heat added to loop`],'bx it');
+    g+=box(20,328,390,56,[liquid?'Liquid-cooled IT (CDUs)':'Air-cooled IT (fan wall units)',`${fmt(L.Qd/1000,1)} MW at full load · ${fmt(L.Q/1000,1)} MW typical`,`${liquid?'CDU pumps':'FWU fans'} ${fmt(L.Qd*termShare(L,P))} kW at full load, heat added to loop`],'bx it');
     g+=s.pre?pipe('M105 326V214')+pipe('M190 181H238'):pipe('M105 326V181H238');
     g+=t(112,272,`Return ${L.Tr} °C`,'t2','start');
     g+=pipe('M325 212V242')+pipe('M325 290V326');
@@ -1054,8 +1110,11 @@ function params(){
     {name:'LC',Ts:g('lcs'),Tr:Math.max(g('lcr'),g('lcs')+1),Qd:Qd*lcp,Q:Qd*lcp*lf},
     {name:'Air',Ts:g('acs'),Tr:Math.max(g('acr'),g('acs')+1),Qd:Qd*(1-lcp),Q:Qd*(1-lcp)*lf}];
   const rates={}; RATES.forEach(r=>rates[r.id]={lo:g('rl_'+r.id),hi:g('rh_'+r.id)});
-  return {Qd,lf,loops,water:$('water').value,copA:g('copA'),copW:g('copW'),nCh:Math.max(1,Math.round(g('nCh'))),copMax:g('copMax'),acMax:g('acMax'),wcMax:g('wcMax'),dbIn:g('dbD'),wbIn:g('wbD'),
-    aDC:g('aDC'),aCT:g('aCT'),aHX:g('aHX'),eAD:g('eAD'),swAD:g('swAD'),swHY:g('swHY'),coc:Math.max(1.5,g('coc')),pumpW:g('pumpW'),cwW:g('cwW'),ctEff:Math.max(5,g('ctEff')),fanT:g('fanT')/100,cduP:g('cduP')/100,
+  return {...BASIS,Qd,lf,loops,water:$('water').value,dbIn:g('dbD'),wbIn:g('wbD'),
+    copA:g('copA'),copW:g('copW'),copMax:g('copMax'),unitWL:Math.max(100,g('unitWL')),unitWA:Math.max(100,g('unitWA')),unitA:Math.max(50,g('unitA')),derA:Math.max(0,g('derA'))/100,
+    acMax:g('acMax'),wcMax:g('wcMax'),aCT:g('aCT'),aDC:g('aDC'),aAD:g('aAD'),aHX:g('aHX'),swAD:g('swAD'),swHY:g('swHY'),eAD:g('eAD'),coc:Math.max(1.5,g('coc')),
+    kCT:g('kCT')/100,kDC:g('kDC')/100,kAD:g('kAD')/100,dpCDU:g('dpCDU'),dpPri:g('dpPri'),dpSec:g('dpSec'),dpCW:g('dpCW'),etaP:Math.min(1,Math.max(0.2,g('etaP')/100)),
+    dpFWU:g('dpFWU')/1000,dtAir:Math.max(2,g('dtAir')),etaF:Math.min(1,Math.max(0.2,g('etaF')/100)),
     tE:g('tE'),tW:g('tW'),tD:g('tD'),
     red:g('red')/100,ups:Math.min(1,Math.max(0.5,g('ups')/100)),dloss:Math.min(0.3,Math.max(0,g('dloss')/100)),rates,...Object.fromEntries(WEIGHTS.map(w=>[w.id,w.v]))};
 }
@@ -1072,10 +1131,10 @@ const mlcTxt=r=>{ const m=mlcLim(); return m==null?'':(r.mlc<=m?`Meets ASHRAE 90
 
 function run(){
   if(!WX) return;
-  // design condition: entered values, else the ASHRAE extreme annual values, else the hottest hours in the data
+  // two coincident design cases: A = extreme dry-bulb + wet-bulb of the hottest hour; B = extreme wet-bulb + dry-bulb of the most humid hour
   const A=ashrae();
-  P=params(); P.dbD=isNaN(P.dbIn)?(A?A.extDB:Math.max(...WX.T)):P.dbIn; P.wbD=isNaN(P.wbIn)?(A?A.extWB:Math.max(...WX.Twb)):P.wbIn; P.wbD=Math.min(P.wbD,P.dbD);
-  RES=simulate(WX,P); DES=designCheck(P,P.dbD,P.wbD); RANK=score(RES,P);
+  P=params(); P.cases=designCases(WX,A,P.dbIn,P.wbIn); P.dbA=P.cases.A.db; P.dbD=P.cases.A.db; P.wbD=P.cases.B.wb;
+  DES=designCheck(P); RES=simulate(WX,P,DES); RANK=score(RES,P,DES);
   renderReco(); renderOverview(); renderDes(); renderSystem(); renderEff(); renderCons(); renderRun(); renderCap(); renderClimate();
 }
 const order=()=>[...RANK,...OPTIONS.map(o=>o.id).filter(id=>!RANK.includes(id))];
@@ -1083,7 +1142,7 @@ const sel=()=>PICK||RANK[0]||OPTIONS[0].id;   // system shown in the Systems tab
 const tag=(id,i)=>RES[id].excluded?`<span class="tag x">${RES[id].excluded}</span>`:(i===0?'<span class="tag ok">Recommended</span>':'');
 const loopTxt=(arr)=>P.loops.map((L,i)=>L.Q>0?fmt(arr[i]):'–').join(' / ');
 // basis label for peaks (annual figures are at the frequent load, stated in the notes)
-const atPk='100% load';
+const atPk='design case';
 const costTxt=r=>`${fmt(r.capLo/1e6,1)}–${fmt(r.capHi/1e6,1)} M$`;
 const runTxt=r=>`${fmt(r.run/1e6,2)} M$/yr`;
 // simple payback of extra initial cost against air-cooled chillers, from the running cost saved
@@ -1103,10 +1162,10 @@ function renderReco(){
     +(st?`<div class="wxsrc">Weather: ${esc(st.station)} (WMO ${esc(st.wmo)}), measured hourly year TMYx ${esc(st.period)} · ASHRAE climate zone ${esc(st.zone)} · climate.onebuilding.org</div>`:'');
   // extreme ambient: the design condition every system is checked against
   const src=isNaN(P.dbIn)||isNaN(P.wbIn)?(ashrae()?'ASHRAE extreme annual values (2025 Fundamentals)':'hottest hours in the weather data'):'entered design values';
-  const amb=`<div class="amb"><span class="al">Extreme ambient</span>
-    <span class="av"><i style="background:var(--s1)"></i>Dry-bulb <b>${fmt(P.dbD,1)} °C</b></span>
-    <span class="av"><i style="background:var(--s2)"></i>Wet-bulb <b>${fmt(P.wbD,1)} °C</b></span>
-    <span class="an">Design condition, from ${src}</span></div>`;
+  const C=P.cases, amb=`<div class="amb"><span class="al">Design cases</span>
+    <span class="av"><i style="background:var(--s1)"></i>Case A: dry-bulb <b>${fmt(C.A.db,1)} °C</b> · wb ${fmt(C.A.wb,1)} °C</span>
+    <span class="av"><i style="background:var(--s2)"></i>Case B: wet-bulb <b>${fmt(C.B.wb,1)} °C</b> · db ${fmt(C.B.db,1)} °C</span>
+    <span class="an">Extremes from ${src}; coincident values from the hourly weather</span></div>`;
   const top=RANK.length?'':'<div class="sub" style="margin-top:4px"><b>No system meets every constraint.</b> Try allowing water, raising the loop supply temperatures, or checking the design conditions and chiller limits.</div>';
   // one summary card per system, recommended first
   const lines=[['Electricity',r=>r.E,r=>`${fmt(r.E/1000,1)} GWh/yr`],['Annual PUE',r=>r.pue,r=>r.pue.toFixed(3)],[`Electrical peak <small>cooling, ${atPk}</small>`,r=>r.peak,r=>`${fmt(r.peak/1000,2)} MW`],['Water',r=>r.W,r=>`${fmt(r.W)} m³/yr`],[`Water peak <small>${atPk}</small>`,r=>r.Wpeak,r=>`${fmt(r.Wpeak,1)} m³/h`],['Running cost',r=>r.run,runTxt],['Initial cost',r=>r.capMid,costTxt]];
@@ -1115,6 +1174,7 @@ function renderReco(){
     const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="tag ok">Recommended</span>':`<span class="tag">#${k+1}</span>`;
     const notes=[id==='acc'?'No free cooling':`Free cooling ${loopTxt(r.free)} h/yr (liquid / air)`];
     if(id!=='acc') notes.push(`Saves ${fmt(Math.max(0,RES.acc.E-r.E)/1000,1)} GWh/yr vs air-cooled chillers`);
+    const dw=DES[id]; if(dw.warns.length) notes.push(`<b style="color:var(--warn)">Condenser water above ${P.wcMax} °C at design: needs a chiller rated above ${P.wcMax} °C</b>`); else if(r.hotCW>0) notes.push(`Condenser water above ${P.wcMax} °C for ${fmt(r.hotCW)} h/yr`);
     if(mlcTxt(r)) notes.push(r.mlc<=mlcLim()?mlcTxt(r):`<b style="color:var(--bad)">${mlcTxt(r)}</b>`);
     return `<div class="scard${k===0?' rec':''}${r.excluded?' off':''}">
       <div class="stop">${status}${r.excluded?'':`<span class="note">score ${fmt(r.score)}</span>`}</div>
@@ -1148,10 +1208,11 @@ function renderOverview(){
 
 function renderDes(){
   const rows=order().map(id=>{ const r=RES[id], d=DES[id];
-    return `<tr><td>${r.o.name}</td><td>${d.ok?'<span class="tag ok">Holds supply</span>':'<span class="tag x">Fails</span>'}</td><td>${fmt(d.P/1000,2)}</td><td>${d.ratio.toFixed(3)}</td><td>${fmt(d.W,1)}</td><td>${fmt(d.Qr/1000,1)}</td><td class="l">${d.issues.join('; ')||'–'}</td></tr>`; });
-  $('tDes').innerHTML=table(['Option','Result','Electrical MW','kW/kW','Water m³/h','Heat rejection MW','Notes'],rows);
+    const res=!d.ok?'<span class="tag x">Fails</span>':d.warns.length?'<span class="tag">Warning</span>':'<span class="tag ok">Holds supply</span>';
+    return `<tr><td>${r.o.name}</td><td>${res}</td><td>${fmt(d.cases.A.P/1000,2)}</td><td>${fmt(d.cases.B.P/1000,2)}</td><td>${fmt(d.P/1000,2)} (${d.worst})</td><td>${d.ratio.toFixed(3)}</td><td>${fmt(d.W,1)}</td><td>${fmt(d.Qr/1000,1)}</td><td class="l">${d.units.map(u=>`${u.N} × ${fmt(u.unit/1000,1)} MW`).join(' / ')}</td><td class="l">${[...d.issues,...d.warns].join('; ')||'–'}</td></tr>`; });
+  $('tDes').innerHTML=table(['Option','Result','Case A MW','Case B MW','Design peak MW','kW/kW','Water m³/h','Heat rejection MW','Duty chillers (liquid / air loop)','Notes'],rows);
   const auto=isNaN(P.dbIn)||isNaN(P.wbIn);
-  $('desNote').textContent=`Checked at 100% load, ${fmt(P.dbD,1)} °C dry-bulb and ${fmt(P.wbD,1)} °C wet-bulb${auto?(ashrae()?' (ASHRAE extreme annual values for this station)':' (hottest hours in the weather data; enter ASHRAE extreme values for design)'):''}. Heat rejection capacity = cooling load + compressor power. Options that fail are excluded from the recommendation.`;
+  $('desNote').textContent=`Checked at 100% load at Case A (${fmt(P.cases.A.db,1)} °C db / ${fmt(P.cases.A.wb,1)} °C wb) and Case B (${fmt(P.cases.B.db,1)} °C db / ${fmt(P.cases.B.wb,1)} °C wb)${auto?(ashrae()?', from the ASHRAE extreme annual values with coincident values from the hourly weather':', from the hottest and most humid hours in the weather data'):''}. Design peak = the higher of the two. Heat rejection = loop load + compressor power. Air-cooled chillers above ${P.acMax} °C fail and are excluded; condenser water above ${P.wcMax} °C gives a warning.`;
 }
 
 function renderSystem(){
@@ -1165,8 +1226,8 @@ function renderSystem(){
   $('sysKpi').innerHTML=kpis([[`${fmt(r.E/1000,1)} GWh`,'Cooling electricity per year'],[r.mlc.toFixed(3),'Annual MLC (kW/kW)'],[r.pue.toFixed(3),'Annual PUE (incl. losses)'],
     [`${fmt(r.peak/1000,2)} MW`,`Electrical peak, cooling plant (${atPk})`],[`${fmt(r.Wpeak,1)} m³/h`,`Water peak, make-up (${atPk})`],
     [`${fmt(r.W)} m³`,'Water per year'],[runTxt(r),'Running cost, cooling'],[costTxt(r),'Initial cost (estimate)'],[payback(r).txt,'Payback vs air-cooled chillers'],[`${fmt(d.Qr/1000,1)} MW`,'Heat rejection at design']]);
-  $('sysDes').innerHTML=d.ok?`Design day (${fmt(P.dbD,1)} °C db / ${fmt(P.wbD,1)} °C wb): holds supply temperature, ${fmt(d.P/1000,2)} MW mechanical power.`
-    :`<span class="tag x">Fails design day</span> ${d.issues.join('; ')}`;
+  $('sysDes').innerHTML=(d.ok?`Design cases: Case A ${fmt(d.cases.A.P/1000,2)} MW, Case B ${fmt(d.cases.B.P/1000,2)} MW; design peak ${fmt(d.P/1000,2)} MW (Case ${d.worst}). Duty chillers ${d.units.map(u=>`${u.N} × ${fmt(u.unit/1000,1)} MW`).join(' (liquid) / ')} (air), plus 1 standby each.`
+    :`<span class="tag x">Fails design day</span> ${d.issues.join('; ')}`)+(d.warns.length?` <span class="tag">Warning</span> ${d.warns[0]}.`:'');
   // annual operating mode per loop
   $('sysModes').innerHTML=P.loops.map((L,i)=>{ if(L.Q<=0) return '';
     const seg=[['Free cooling',r.free[i],'--s3'],['Partial',r.part[i],'--s1'],['Chiller only',r.mech[i],'--s2']].filter(x=>x[1]>0);
@@ -1331,7 +1392,7 @@ function exportReport(){
     [B('Site and weather')],
     ['Location',WX.name],
     ...(st?[['Station',`${st.station} (WMO ${st.wmo})`],['Weather year',`TMYx ${st.period}, climate.onebuilding.org`],['ASHRAE climate zone',st.zone]]:[['Weather',WX.synthetic?'generated from monthly normals':'uploaded file']]),
-    ['Design dry-bulb (°C)',+P.dbD.toFixed(1)],['Design wet-bulb (°C)',+P.wbD.toFixed(1)],
+    ['Case A: dry-bulb / coincident wet-bulb (°C)',+P.cases.A.db.toFixed(1),+P.cases.A.wb.toFixed(1)],['Case B: wet-bulb / coincident dry-bulb (°C)',+P.cases.B.wb.toFixed(1),+P.cases.B.db.toFixed(1)],
     [],
     [B('Load')],
     ['Cooling load (MW)',P.Qd/1000],
@@ -1462,7 +1523,7 @@ function buildReport(){
     <div class="box"><h3>Site and climate</h3><dl class="kv">
       <dt>Location</dt><dd>${esc(WX.name)}</dd>
       ${st?`<dt>Weather station</dt><dd>${esc(st.station)} (WMO ${esc(st.wmo)})</dd><dt>Weather year</dt><dd>TMYx ${esc(st.period)}</dd><dt>ASHRAE climate zone</dt><dd>${esc(st.zone)}</dd>`:`<dt>Weather</dt><dd>${WX.synthetic?'Generated from monthly normals':'Uploaded weather file'}</dd>`}
-      <dt>Design dry-bulb</dt><dd>${fmt(P.dbD,1)} °C</dd><dt>Design wet-bulb</dt><dd>${fmt(P.wbD,1)} °C</dd><dt>Design basis</dt><dd>${desSrc}</dd></dl></div>
+      <dt>Case A</dt><dd>db ${fmt(P.cases.A.db,1)} °C / wb ${fmt(P.cases.A.wb,1)} °C</dd><dt>Case B</dt><dd>wb ${fmt(P.cases.B.wb,1)} °C / db ${fmt(P.cases.B.db,1)} °C</dd><dt>Design basis</dt><dd>${desSrc}</dd></dl></div>
     <div class="box"><h3>Load and site conditions</h3><dl class="kv">
       <dt>Cooling load</dt><dd>${fmt(P.Qd/1000,1)} MW at full IT load</dd><dt>Frequent load</dt><dd>${fmt(P.lf*100)}%</dd>
       <dt>Liquid loop</dt><dd>${fmt(P.loops[0].Qd/1000,1)} MW · ${P.loops[0].Ts}/${P.loops[0].Tr} °C</dd>
@@ -1506,7 +1567,7 @@ function buildReport(){
        return `<tr><td class="l">${RATES.find(x=>x.id===c).l}</td><td class="l">${ROLE[c](r.o)}</td><td>${fmt(cap/1000,1)}</td><td>${fmt(cap*rt.lo/1e6,1)}–${fmt(cap*rt.hi/1e6,1)}</td></tr>`; }).join('')}</tbody></table>
      <div class="note">Each component sized for ${fmt(P.Qd/1000,1)} MW + ${fmt(P.red*100)}% redundancy. Pumps, CDUs, piping and controls not included.</div>
      <div class="cols2"><div><h3>Strengths</h3><ul>${s.pros.map(x=>`<li>${x}</li>`).join('')}</ul></div><div><h3>Watch-outs</h3><ul>${s.cons.map(x=>`<li>${x}</li>`).join('')}</ul></div></div>
-     <h3>Design day</h3><p>${d.ok?`At ${fmt(P.dbD,1)} °C dry-bulb / ${fmt(P.wbD,1)} °C wet-bulb and 100% load it holds the supply temperatures, with ${fmt(d.P/1000,2)} MW of mechanical power and ${fmt(d.Qr/1000,1)} MW of heat rejection.`:`<span class="tag x">Fails design day</span> ${d.issues.join('; ')}`}</p>
+     <h3>Design cases</h3><p>${d.ok?`At 100% load: Case A (db ${fmt(P.cases.A.db,1)} °C / wb ${fmt(P.cases.A.wb,1)} °C) ${fmt(d.cases.A.P/1000,2)} MW; Case B (wb ${fmt(P.cases.B.wb,1)} °C / db ${fmt(P.cases.B.db,1)} °C) ${fmt(d.cases.B.P/1000,2)} MW. Design peak ${fmt(d.P/1000,2)} MW (Case ${d.worst}), heat rejection ${fmt(d.Qr/1000,1)} MW. Duty chillers ${d.units.map(u=>u.N+" × "+fmt(u.unit/1000,1)+" MW").join(" / ")}, plus 1 standby per loop.${d.warns.length?" Warning: "+d.warns[0]+".":""}`:`<span class="tag x">Fails design day</span> ${d.issues.join("; ")}`}</p>
      <h3>Operating modes over the year</h3>${rptLegend([['Free cooling (chillers off)',RPT_C.s3],['Partial free cooling',RPT_C.s1],['Chillers only',RPT_C.s2]])}
      ${P.loops.map((L,i)=>L.Q>0?`<div class="chart"><div class="ct">${i?'Air':'Liquid'} loop ${L.Ts}/${L.Tr} °C: free ${fmt(r.free[i])} h · partial ${fmt(r.part[i])} h · chillers only ${fmt(r.mech[i])} h per year</div>${rptMonthly(r,i)}</div>`:'').join('')}
     </section>`; });

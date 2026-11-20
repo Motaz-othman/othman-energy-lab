@@ -32,7 +32,7 @@ function schedule(ms){ clearTimeout(timer); $('gStatus').textContent='Calculatin
 let userTd=null;   // design temperature typed by the user; null = use the recommendation
 function run(){
   if(!WX) return;
-  I=inputs(); ST=peakStudy(I,WX,{a:num('gKa',1.2)/100,w:num('gKw',.7)/100});
+  I=inputs(); ST=peakStudy(I,WX,{a:num('gKa',1.35)/100,w:num('gKw',0)/100});
   render();
 }
 
@@ -100,7 +100,7 @@ function details(c,b){
       <li><b>With the tank</b> the plant is rated for full IT load at ${fmt(c.Td,1)} °C: chillers ${fmt(c.capT/1000,1)} MW, and its power never exceeds ${MW(c.Prated)} MW. Above that, the tank covers the difference.</li>
       <li><b>Heatwave:</b> ${I.days} hottest days in a row; IT at 100% from 07:00 to 19:00 and ${fmt(I.night*100)}% over the 12-hour night. Each night the tank recharges; it is safe when full again within ${fmt(I.rechMax,1)} h of the peak, and must be full before 07:00, using only the chiller capacity the IT load leaves free and without passing the new rated power.</li>
       <li><b>Tank:</b> ${fmt(c.E)} kWh usable at ΔT ${fmt(I.Tr-I.Ts)} K and ${fmt(I.eff*100)}% efficiency, + ${fmt(I.margin*100)}% sizing margin, + ${fmt(I.reserve*100)}% reserve kept full.</li>
-      <li><b>Chiller capacity</b> falls ${fmt(num('gKa',1.2),1)}%/K above 35 °C ambient (air-cooled) or ${fmt(num('gKw',.7),1)}%/K above 29.4 °C condenser water (water-cooled). Screening estimate: confirm with chiller selections and a detailed design.</li>
+      <li><b>Chiller capacity</b> falls ${fmt(num('gKa',1.35),2)}%/K above 35 °C ambient (air-cooled) or ${fmt(num('gKw',0),1)}%/K above 30 °C condenser water (water-cooled). Screening estimate: confirm with chiller selections and a detailed design.</li>
     </ul>`;
 }
 document.querySelectorAll('#inGrid input:not([type=file]):not(#gTd), #inGrid select:not(#gCity):not(#gTd)').forEach(el=>el.addEventListener('input',()=>schedule()));

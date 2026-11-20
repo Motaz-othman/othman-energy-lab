@@ -1,11 +1,12 @@
 // ---------- Peak Shaving Tank: sizing model ----------
 // Uses the shared hourly plant model (shared/js/cooling-model.js: OPTIONS, hourModel), shared/js/tank.js and the station weather.
-const TES_P={nCh:4,copA:2.985,copW:6.286,copMax:14,acMax:60,wcMax:50,aDC:6,aCT:4,aHX:1.5,eAD:.85,swAD:24,swHY:24,coc:4,pump:.015,cwp:.012,fanT:0,cduP:0};
+// same basis as the Cooling Plant Selector (shared BASIS); capacity is continuous here (4 equal duty chillers), derated by capFactor; limits relaxed
+const TES_P={...BASIS,unitWL:null,unitWA:null,unitA:null,nCh:4,acMax:60,wcMax:50};
 const DAY0=7, NIGHT0=19;   // full IT load 07:00–19:00; the 12-hour night 19:00–07:00 runs at the night IT load
 
 // chiller capacity factor vs its rating point: air-cooled falls with ambient dry-bulb (rated at 35 °C),
-// water-cooled with entering condenser water (rated at 29.4 °C); k = fraction lost per K
-function capFactor(hm,db,k){ return Math.max(0.3, hm.kind==='wc' ? 1-k.w*((hm.Tc-7.6)-29.4) : 1-k.a*(db-35)); }
+// water-cooled with entering condenser water (rated at 30 °C, AHRI 551/591); k = fraction lost per K
+function capFactor(hm,db,k){ return Math.max(0.3, hm.kind==='wc' ? 1-k.w*(hm.ecw-30) : 1-k.a*(db-35)); }
 
 // one hour of the plant: chiller capacity available, and the electrical power for a cooling load
 function plantAt(o,L,db,wb,capRated,k){

@@ -333,8 +333,8 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
       <div><label for="gH">Max tank height (m)</label><input type="number" id="gH" value="15" min="3" step="1"></div>
     </div>
     <div class="row">
-      <div><label for="gKa">Capacity loss, air-cooled (%/K)</label><input type="number" id="gKa" value="1.2" min="0" step="0.1"></div>
-      <div><label for="gKw">Capacity loss, water-cooled (%/K)</label><input type="number" id="gKw" value="0.7" min="0" step="0.1"></div>
+      <div><label for="gKa">Capacity loss, air-cooled (%/K)</label><input type="number" id="gKa" value="1.35" min="0" step="0.1"></div>
+      <div><label for="gKw">Capacity loss, water-cooled (%/K)</label><input type="number" id="gKw" value="0" min="0" step="0.1"></div>
     </div>
     <label for="gEff">Tank efficiency (%)</label><input type="number" id="gEff" value="85" min="50" max="100" step="1">
   </details>
@@ -515,7 +515,9 @@ function stationYear(c){
     document.head.appendChild(s);
   });
 }
-// ---------- shared cooling plant model (Cooling Plant Selector, Thermal Storage Tank): options, cost rates ----------
+// ---------- shared cooling plant model (Cooling Plant Selector, Peak Shaving Tank) ----------
+// Basis: "Cooling Plant Calculation Basis", Part A. ASHRAE 90.1-2025 Path B chillers, AHRI 551/591 rating points,
+// ASHRAE 90.1-2025 heat-rejection approaches, pump and fan power from head equations, two coincident design cases.
 const OPTIONS=[
  {id:'acc',  name:'Air-cooled chillers',                     short:'Air-cooled chillers',  water:false, comp:['acch']},
  {id:'accfc',name:'Air-cooled chillers + free-cooling dry coolers', short:'Chillers + dry coolers', water:false, comp:['acch','dc']},
@@ -534,118 +536,153 @@ const RATES=[
 // fixed weights for the recommendation score
 const WEIGHTS=[{id:'w_energy',l:'Energy',v:4},{id:'w_water',l:'Water',v:3},{id:'w_peak',l:'Peak power (grid)',v:3},{id:'w_capex',l:'Initial cost',v:2}];
 
-// ---------- ASHRAE 90.1 / 90.4 references ----------
-// water flow per kW at a ΔT of 1 K, in gpm: 1 kW / (4.18 kJ/kg·K × 1 K) = 0.2392 L/s = 3.792 gpm
-const GPM_PER_KW_K=3.792;
-// pump power as a share of the heat carried: W/gpm × gpm per kW ÷ 1000 (ASHRAE 90.1 Appendix G: CHW 22 W/gpm, CW 19 W/gpm)
-const pumpShare=(wPerGpm,dT)=>wPerGpm*GPM_PER_KW_K/Math.max(dT,0.5)/1000;
-// open cooling tower fan power per kW rejected, from its efficiency in gpm/hp at the 90.1 rating point
-// (35 °C entering, 29.4 °C leaving water = 5.56 K range): hp per kW = gpm per kW ÷ (gpm/hp); 0.7457 kW per hp
-const towerFanShare=gpmPerHp=>GPM_PER_KW_K/5.556/gpmPerHp*0.7457;
-// ASHRAE 90.4-2022 (Addendum g, 2024) Table 6.5: maximum annualized MLC by climate zone, [ITE > 300 kW, ITE ≤ 300 kW]
+// default basis values (inputs override them in the Cooling Plant Selector)
+const BASIS={
+  copA:2.866, copW:6.018, copMax:14,          // ASHRAE 90.1-2025 Table 6.8.1-3, Path B full load; COPmax = assumption
+  unitWL:7000, unitWA:5500, unitA:1500, derA:0.0135,   // chiller unit sizes (kW): water-cooled liquid / air loop, air-cooled; air-cooled capacity loss per K above 35 °C (Trane RTAC public data)
+  stage:0.90, acMax:52, wcMax:43,             // next chiller above 90% PLR; air-cooled max ambient; condenser-water warning limit
+  acApp:15, wcApp:7,                          // condensing: ambient + 15 K; condenser water + 5 K range (AHRI) + 2 K
+  aCT:5.56, aDC:5.56, aAD:11.1, aHX:1.5, rangeCW:5.56,   // ASHRAE 90.1-2025 Table 6.8.1-7 rating approaches; plate HX
+  swAD:24, swHY:24, eAD:0.85, coc:4,          // adiabatic / hybrid switch; pad effectiveness (water use only); cycles of concentration
+  kCT:0.012, kDC:0.030, kAD:0.030,            // fan kW per kW rejected at full speed: towers ASHRAE 2025 minimum; dry / adiabatic public data sheets
+  dpCDU:320, dtCDU:10, dpPri:200, dpSec:400, dpCW:211, etaP:0.70,   // pump heads (kPa), CDU coolant ΔT, pump × motor × VFD efficiency
+  dpFWU:0.30, dtAir:12, etaF:0.65,            // fan wall units: static pressure (kPa), air rise across IT (K), fan efficiency
+  minPump:0.5, minFan:0.3,                    // VFD minimum speed
+};
+
+// ---------- ASHRAE 90.4-2025 Table 6.5: maximum annualized MLC by climate zone, [ITE > 300 kW, ITE ≤ 300 kW] ----------
 const MLC_MAX={'0A':[.29,.37],'0B':[.32,.41],'1A':[.30,.37],'1B':[.31,.39],'2A':[.27,.35],'2B':[.20,.33],'3A':[.24,.33],'3B':[.20,.33],'3C':[.17,.27],
   '4A':[.21,.33],'4B':[.17,.29],'4C':[.17,.27],'5A':[.19,.34],'5B':[.17,.30],'5C':[.17,.29],'6A':[.19,.31],'6B':[.17,.31],'7':[.17,.31],'8':[.15,.32]};
 const mlcMax=(zone,itKW)=>{ const v=MLC_MAX[String(zone||'').toUpperCase()]; return v?v[itKW>300?0:1]:null; };
 
-// ---------- chiller model ----------
-const AHRI={ac:{Te:6.7-2, Tc:35+15}, wc:{Te:6.7-2, Tc:29.4+7.6}};
-const eirPLR={ac:x=>x, wc:x=>0.07308728+0.1513521*x+0.7709311*x*x};
-function chillerPower(Qch, capEach, n, kind, Ts, Tc, p){
-  if(Qch<=0) return {P:0,cop:null};
-  const Te=Ts-2, lift=Math.max(Tc-Te,3), ref=AHRI[kind], refLift=ref.Tc-ref.Te;
-  const copRated = kind==='ac'?p.copA:p.copW;
-  let copT = copRated * ((Te+273.15)/lift) / ((ref.Te+273.15)/refLift);
-  copT=Math.min(copT,p.copMax);
-  // stage the number of duty chillers that gives the lowest power (VSD chillers are more efficient at part load)
-  const nMin=Math.min(n,Math.max(1,Math.ceil(Qch/capEach-1e-9)));
-  let P=Infinity;
-  for(let k=nMin;k<=n;k++){ const plr=Math.min(1,Qch/(k*capEach)); P=Math.min(P,k*(capEach/copT)*Math.max(eirPLR[kind](plr),0.05)); }
-  return {P, cop:Qch/P};
+// ---------- equations ----------
+// pump or fan power as a share of the heat carried: P / Q = ΔP / (ρ · cp · ΔT · η)
+const pumpK=(dpKPa,dT,eta)=>dpKPa/(1000*4.18*Math.max(dT,0.5)*eta);
+const airFanK=(dpKPa,dT,eta)=>dpKPa/(1.2*1.006*Math.max(dT,0.5)*eta);
+// VFD affinity law: power ∝ speed³, speed ∝ flow, held at the minimum speed
+const affinity=(x,minSpeed)=>Math.pow(Math.max(minSpeed,Math.min(x,1.2)),3);
+// chiller COP at the hour's lift (constant Carnot fraction) from the rated point; AHRI 551/591: 7 °C chilled water,
+// 35 °C air + 15 K = 50 °C condensing, 30 °C condenser water + 7 K = 37 °C condensing; evaporating = supply − 2 K
+const CH_REF={ac:{Te:5,Tc:50}, wc:{Te:5,Tc:37}};
+function copAt(kind,Ts,Tc,p){
+  const Te=Ts-2, lift=Math.max(Tc-Te,3), r=CH_REF[kind];
+  return Math.min(p.copMax,(kind==='ac'?p.copA:p.copW)*((Te+273.15)/lift)/((r.Te+273.15)/(r.Tc-r.Te)));
 }
+// VSD part-load factor, calibrated to ASHRAE 90.1-2025 Path B full-load COP and IPLV (EnergyPlus VSD shape, scaled)
+const PL_CURVE={wc:[0.1969,0.1318,0.6713], ac:[0.1752,0.1354,0.6895]};
+const partLoad=(kind,x)=>{ const c=PL_CURVE[kind]; return Math.max(0.05,c[0]+c[1]*x+c[2]*x*x); };
+// air-cooled unit capacity at a dry-bulb (rated at 35 °C)
+const acCap=(p,db)=>p.unitA*Math.max(0.3,1-p.derA*Math.max(0,db-35));
 
+// terminal units (heat added to their loop): CDU pumps on the liquid loop, fan wall units on the air loop
+const termShare=(L,p)=>L.name==='LC'?pumpK(p.dpCDU,p.dtCDU,p.etaP):L.name==='Air'?airFanK(p.dpFWU,p.dtAir,p.etaF):0;
+const loopPumpShare=(L,p)=>pumpK(p.dpPri+p.dpSec,L.Tr-L.Ts,p.etaP);   // primary + secondary pumps on the loop ΔT
 
+// one hour of one option on one loop at dry-bulb db / wet-bulb wb
 function hourModel(o,L,db,wb,p){
-  let Tout,Tc,kind,fanK,cwK=0,teff=db,wet=1,dShare=0;
-  // pumps and tower fans: ASHRAE 90.1 values when given (W/gpm, gpm/hp), else the older % inputs (Peak Shaving Tank)
-  const cwShare=p.cwW!=null?pumpShare(p.cwW,5.556):p.cwp, ctFan=p.ctEff?towerFanShare(p.ctEff):0.008;
-  const pumpK=p.pumpW!=null?pumpShare(p.pumpW,L.Tr-L.Ts):p.pump;
-  if(o.id==='acc'){Tout=Infinity;Tc=db+15;kind='ac';fanK=0;}
-  else if(o.id==='accfc'){Tout=db+p.aDC;Tc=db+15;kind='ac';fanK=0.015;}
-  else if(o.id==='adia'){teff=db>p.swAD?db-p.eAD*(db-wb):db; Tout=teff+p.aDC+p.aHX; Tc=teff+p.aDC+7.6; kind='wc'; fanK=0.018; cwK=cwShare;}
-  else if(o.id==='wcc'){Tout=wb+p.aCT+p.aHX; Tc=wb+p.aCT+7.6; kind='wc'; fanK=ctFan; cwK=cwShare;}
-  else if(o.id==='hyb'){
-    // hybrid: dry coolers and cooling towers in series on the condenser water. At or below the switch temperature
-    // the dry coolers alone cool the water (no water used). Above it the towers run, and the dry coolers
-    // pre-cool the water ahead of them while the air is cooler than the water (range 6 K), cutting tower water.
-    let Tcw; if(db<=p.swHY){ Tcw=db+p.aDC; wet=0; dShare=1; }
-    else { Tcw=wb+p.aCT; dShare=Math.max(0,Math.min(1,(Tcw+6-(db+p.aDC))/6)); wet=1-dShare; }
-    Tout=Tcw+p.aHX; Tc=Tcw+7.6; kind='wc'; fanK=0.018; cwK=cwShare;}
-  const ff=Tout<=L.Ts?1:Math.max(0,Math.min(1,(L.Tr-Tout)/(L.Tr-L.Ts)));
-  // terminal units in the hall: CRAH / FWU fans on the air loop, CDU pumps on the liquid loop;
-  // their power is cooling energy and also ends up as heat in the loop
-  const term=L.name==='Air'?p.fanT:p.cduP;
-  const capEach=L.Qd*(1+term)/p.nCh;
-  const calc=(q)=>{
-    const Pt=term*q, qL=q+Pt;
-    const ch=chillerPower(qL*(1-ff),capEach,p.nCh,kind,L.Ts,Tc,p);
-    const Qr=qL+ch.P; let Pf=0;
-    const airFrac = ff>=1 ? Math.max(0.25,Math.min(1,(L.Tr-L.Ts)/Math.max(L.Tr-Tout,0.1))) : 1;
-    if(o.id==='accfc') Pf = ff>0 ? fanK*qL*airFrac : 0;
-    else if(o.id==='adia') Pf=fanK*Qr*airFrac;
-    else if(o.id==='wcc') Pf=fanK*Qr;
-    else if(o.id==='hyb') Pf=wet>0 ? ctFan*Qr+fanK*Qr*dShare : fanK*Qr*airFrac;   // towers + dry coolers, or dry coolers alone
-    const Pp=pumpK*qL + cwK*Qr;
-    return {Pc:ch.P,Pf,Pp,Pt,Qr,cop:ch.cop,P:ch.P+Pf+Pp+Pt};
-  };
-  // condenser operating limit
-  let limit=null;
-  if(kind==='ac' && db>p.acMax) limit=`ambient ${db.toFixed(1)} °C > air-cooled chiller limit ${p.acMax} °C`;
-  if(kind==='wc'){ const ecw=Tc-7.6; if(ecw>p.wcMax) limit=`entering condenser water ${ecw.toFixed(1)} °C > limit ${p.wcMax} °C`; }
-  return {Tout,Tc,kind,ff,teff,wet,calc,limit};
-}
-
-function designCheck(p,dbD,wbD){
-  const out={};
-  for(const o of OPTIONS){
-    let P=0,Qr=0,Pc=0,W=0; const issues=[];
-    p.loops.forEach(L=>{ if(L.Qd<=0) return; const hm=hourModel(o,L,dbD,wbD,p), d=hm.calc(L.Qd);
-      P+=d.P; Qr+=d.Qr; Pc+=d.Pc; W+=waterKgH(o,d.Qr,dbD,hm.teff,p,hm.wet)/1000;
-      if(hm.limit && hm.ff<1) issues.push(hm.limit);
-    });
-    out[o.id]={P,Qr,Pc,W,ok:issues.length===0,issues:[...new Set(issues)],ratio:P/p.Qd};
+  let Tout,ecw=null,kind,wet=0,dShare=0;
+  if(o.id==='acc'){ Tout=Infinity; kind='ac'; }
+  else if(o.id==='accfc'){ Tout=db+p.aDC; kind='ac'; }                     // dry coolers directly on the loop
+  else if(o.id==='adia'){ wet=db>p.swAD?1:0; ecw=wet?wb+p.aAD:db+p.aDC; Tout=ecw+p.aHX; kind='wc'; }
+  else if(o.id==='wcc'){ wet=1; ecw=wb+p.aCT; Tout=ecw+p.aHX; kind='wc'; }
+  else { // hybrid: dry coolers in series ahead of the towers on the condenser water
+    if(db<=p.swHY){ ecw=db+p.aDC; dShare=1; wet=0; }
+    else { ecw=wb+p.aCT; dShare=Math.max(0,Math.min(1,(ecw+p.rangeCW-(db+p.aDC))/p.rangeCW)); wet=1-dShare; }
+    Tout=ecw+p.aHX; kind='wc';
   }
-  return out;
+  const Tc=kind==='ac'?db+p.acApp:ecw+p.wcApp;
+  const ff=Tout<=L.Ts?1:Math.max(0,Math.min(1,(L.Tr-Tout)/(L.Tr-L.Ts)));
+  const term=termShare(L,p), pk=loopPumpShare(L,p), qLdes=L.Qd*(1+term+pk);
+  // installed duty units: water-cooled at rated capacity; air-cooled sized at the Case A dry-bulb (derated)
+  let unit,N;
+  const unitW=L.name==='Air'?p.unitWA:p.unitWL;
+  if(kind==='wc'&&unitW){ unit=unitW; N=Math.max(1,Math.ceil(qLdes/unit-1e-9)); }
+  else if(kind==='ac'&&p.unitA){ unit=p.unitA; N=Math.max(1,Math.ceil(qLdes/acCap(p,p.dbA??35)-1e-9)); }
+  else { N=p.nCh||4; unit=qLdes/N; }
+  const capH=kind==='ac'&&p.unitA?acCap(p,db):unit;                       // capacity of one unit this hour
+  const cop=copAt(kind,L.Ts,Tc,p);
+  const des=p.des&&p.des[o.id]&&p.des[o.id][L.name];                       // design heat rejected (fan and condenser-pump speed)
+  const minT=L.name==='Air'?p.minFan:p.minPump;
+  const calc=q=>{
+    const x=L.Qd>0?q/L.Qd:0;
+    const Pt=term*L.Qd*affinity(x,minT), Pl=pk*L.Qd*affinity(x,p.minPump);
+    const qL=q+Pt+Pl, Qch=qL*(1-ff);
+    let Pc=0,nOn=0,plr=0;
+    if(Qch>0){ nOn=Math.min(N,Math.max(1,Math.ceil(Qch/(p.stage*capH)-1e-9))); plr=Qch/(nOn*capH); Pc=nOn*capH/cop*partLoad(kind,Math.min(plr,1.2)); }
+    const Qr=qL+Pc, QrRef=des?des.Qr:Qr, f=(share,k)=>share>0?k*QrRef*affinity(Qr*share/QrRef,p.minFan):0;
+    let Pf=0;
+    if(o.id==='accfc') Pf=ff>0?p.kDC*qLdes*affinity(qL*ff/qLdes,p.minFan):0;
+    else if(o.id==='adia') Pf=f(1,p.kAD);
+    else if(o.id==='wcc') Pf=f(1,p.kCT);
+    else if(o.id==='hyb') Pf=f(wet,p.kCT)+f(dShare,p.kDC);
+    const Pcw=kind==='wc'?pumpK(p.dpCW,p.rangeCW,p.etaP)*QrRef*affinity(Qr/QrRef,p.minPump):0;
+    return {Pc,Pf,Pp:Pl+Pcw,Pt,Qr,qL,Qch,nOn,plr,cop:Qch>0?Qch/Pc:null,P:Pc+Pf+Pl+Pcw+Pt};
+  };
+  // limits: air-cooled max ambient fails the design; condenser water above the standard range only warns
+  const limit=kind==='ac'&&db>p.acMax?`ambient ${db.toFixed(1)} °C > air-cooled chiller limit ${p.acMax} °C`:null;
+  const warn=kind==='wc'&&ecw>p.wcMax?`entering condenser water ${ecw.toFixed(1)} °C is above the standard chiller range (${p.wcMax} °C): a chiller rated for more than ${p.wcMax} °C entering condenser water is needed`:null;
+  return {Tout,Tc,ecw,kind,ff,wet,dShare,N,unit,cop,calc,limit,warn};
 }
 
-// make-up water, kg/h: tower evaporation + blowdown (hybrid: only the towers' share of the heat), or adiabatic pad water when wet
-function waterKgH(o,Qr,db,teff,p,wet=1){
-  if(o.id==='wcc'||o.id==='hyb') return (o.id==='hyb'?wet:1)*0.8*Qr*3600/2430*(p.coc/(p.coc-1));
-  if(o.id==='adia'&&db>p.swAD) return Qr*3600*(db-teff)/(12*2430)*1.15;
+// make-up water, kg/h: towers 0.00153 × flow × range (ASHRAE) + blowdown at CoC; hybrid on the towers' share; adiabatic pads (air-side balance)
+function waterKgH(o,Qr,db,wb,p,wet){
+  if(o.id==='wcc'||o.id==='hyb') return wet*Qr*0.00153/4.18*3600*(p.coc/(p.coc-1));
+  if(o.id==='adia'&&wet){ const Tpad=db-p.eAD*(db-wb); return Qr*(db-Tpad)/(12*2430)*1.15*3600; }
   return 0;
 }
 
-function simulate(wx,p){
+// two coincident design cases: A = extreme dry-bulb + the wet-bulb of the hottest hour; B = extreme wet-bulb + the dry-bulb of the most humid hour
+function designCases(wx,A,dbIn,wbIn){
+  let hA=0,hB=0; wx.T.forEach((t,h)=>{ if(t>wx.T[hA]) hA=h; if(wx.Twb[h]>wx.Twb[hB]) hB=h; });
+  const dbA=isNaN(dbIn)?(A?A.extDB:wx.T[hA]):dbIn, wbB=isNaN(wbIn)?(A?A.extWB:wx.Twb[hB]):wbIn;
+  return {A:{db:dbA,wb:Math.min(wx.Twb[hA],dbA)}, B:{db:Math.max(wx.T[hB],wbB),wb:wbB}};
+}
+
+// design check at both cases, 100% load; also records each option's design heat rejected (sets fan / pump speeds hourly)
+function designCheck(p){
+  const out={}, des={}; p.des=null;   // design cases at full fan / pump speed
+  for(const o of OPTIONS){
+    const cs={}, issues=[], warns=[], units=[]; des[o.id]={};
+    for(const k of ['A','B']){ const {db,wb}=p.cases[k]; let P=0,Qr=0,W=0;
+      p.loops.forEach(L=>{ if(L.Qd<=0) return; const hm=hourModel(o,L,db,wb,p), d=hm.calc(L.Qd);
+        P+=d.P; Qr+=d.Qr; W+=waterKgH(o,d.Qr,db,wb,p,hm.wet)/1000;
+        des[o.id][L.name]={Qr:Math.max(d.Qr,(des[o.id][L.name]||{}).Qr||0)};
+        if(hm.limit&&hm.ff<1) issues.push(hm.limit); if(hm.warn&&hm.ff<1) warns.push(hm.warn);
+        if(k==='A') units.push({loop:L.name,N:hm.N,unit:hm.unit,kind:hm.kind});
+      });
+      cs[k]={P,Qr,W};
+    }
+    const worst=cs.A.P>=cs.B.P?'A':'B';
+    out[o.id]={cases:cs,worst,P:cs[worst].P,Qr:Math.max(cs.A.Qr,cs.B.Qr),W:Math.max(cs.A.W,cs.B.W),units,
+      ok:issues.length===0,issues:[...new Set(issues)],warns:[...new Set(warns)],ratio:cs[worst].P/p.Qd};
+  }
+  p.des=des;
+  return out;
+}
+
+// 8,760-hour simulation; call designCheck first (design heat rejected, design peak)
+function simulate(wx,p,des){
   const n=wx.T.length, hs=8760/n, loops=p.loops, out={};
   for(const o of OPTIONS){
-    const r={o,E:0,Ec:0,Ef:0,Ep:0,Et:0,W:0,peak:0,Wpeak:0,free:[0,0],part:[0,0],mech:[0,0],
+    const r={o,E:0,Ec:0,Ef:0,Ep:0,Et:0,W:0,free:[0,0],part:[0,0],mech:[0,0],hotCW:0,
       mFree:[new Array(12).fill(0),new Array(12).fill(0)],mPart:[new Array(12).fill(0),new Array(12).fill(0)],mMech:[new Array(12).fill(0),new Array(12).fill(0)],copSum:0,copN:0};
     for(let h=0;h<n;h++){
-      const db=wx.T[h], wb=wx.Twb[h], m=wx.mon[h]; let Pd=0, Wd=0;
+      const db=wx.T[h], wb=wx.Twb[h], m=wx.mon[h];
       loops.forEach((L,li)=>{
         if(L.Q<=0) return;
-        const hm=hourModel(o,L,db,wb,p), calc=hm.calc, ff=hm.ff, teff=hm.teff;
-        const a=calc(L.Q), d=calc(L.Qd);
-        r.E+=a.P; r.Ec+=a.Pc; r.Ef+=a.Pf; r.Ep+=a.Pp; r.Et+=a.Pt; Pd+=d.P;
+        const hm=hourModel(o,L,db,wb,p), a=hm.calc(L.Q), ff=hm.ff;
+        r.E+=a.P; r.Ec+=a.Pc; r.Ef+=a.Pf; r.Ep+=a.Pp; r.Et+=a.Pt;
         if(a.cop){r.copSum+=a.cop; r.copN++;}
-        r.W+=waterKgH(o,a.Qr,db,teff,p,hm.wet); Wd+=waterKgH(o,d.Qr,db,teff,p,hm.wet);
+        r.W+=waterKgH(o,a.Qr,db,wb,p,hm.wet);
+        if(hm.warn&&ff<1&&li===0) r.hotCW++;
         if(ff>=1){r.free[li]++; r.mFree[li][m]++;} else if(ff>0){r.part[li]++; r.mPart[li][m]++;} else {r.mech[li]++; r.mMech[li][m]++;}
       });
-      r.peak=Math.max(r.peak,Pd); r.Wpeak=Math.max(r.Wpeak,Wd);   // peaks at 100% load on the worst hour
     }
-    const Qyr=loops.reduce((s,L)=>s+L.Q,0)*n;
+    const Qyr=loops.reduce((s,L)=>s+L.Q,0)*n, d=des[o.id];
     ['E','Ec','Ef','Ep','Et'].forEach(k=>r[k]*=hs/1000);   // MWh
     r.W*=hs/1000;                                     // m3
-    r.Wpeak/=1000;                                    // m3/h
+    r.hotCW*=hs;                                      // h/yr above the condenser-water limit
+    r.peak=d.P; r.Wpeak=d.W;                          // design peak: the higher of Case A and Case B, 100% load
     ['free','part','mech'].forEach(k=>r[k]=r[k].map(v=>v*hs));
     r.mlc=r.E*1000/(Qyr*hs);
     r.cop=r.copN?r.copSum/r.copN:null;
@@ -667,11 +704,11 @@ function simulate(wx,p){
   return out;
 }
 
-function score(res,p){
+function score(res,p,des){
   const ids=OPTIONS.map(o=>o.id);
   ids.forEach(id=>{ const r=res[id]; r.excluded=null;
     if(r.o.water&&p.water==='none') r.excluded='Needs water';
-    if(!r.excluded && DES && !DES[id].ok) r.excluded='Fails design day';
+    if(!r.excluded && des && !des[id].ok) r.excluded='Fails design day';
     r.capMid=(r.capLo+r.capHi)/2;
   });
   const ok=ids.filter(id=>!res[id].excluded);
@@ -712,12 +749,13 @@ function tankSvg(D,H){
 }
 // ---------- Peak Shaving Tank: sizing model ----------
 // Uses the shared hourly plant model (shared/js/cooling-model.js: OPTIONS, hourModel), shared/js/tank.js and the station weather.
-const TES_P={nCh:4,copA:2.985,copW:6.286,copMax:14,acMax:60,wcMax:50,aDC:6,aCT:4,aHX:1.5,eAD:.85,swAD:24,swHY:24,coc:4,pump:.015,cwp:.012,fanT:0,cduP:0};
+// same basis as the Cooling Plant Selector (shared BASIS); capacity is continuous here (4 equal duty chillers), derated by capFactor; limits relaxed
+const TES_P={...BASIS,unitWL:null,unitWA:null,unitA:null,nCh:4,acMax:60,wcMax:50};
 const DAY0=7, NIGHT0=19;   // full IT load 07:00–19:00; the 12-hour night 19:00–07:00 runs at the night IT load
 
 // chiller capacity factor vs its rating point: air-cooled falls with ambient dry-bulb (rated at 35 °C),
-// water-cooled with entering condenser water (rated at 29.4 °C); k = fraction lost per K
-function capFactor(hm,db,k){ return Math.max(0.3, hm.kind==='wc' ? 1-k.w*((hm.Tc-7.6)-29.4) : 1-k.a*(db-35)); }
+// water-cooled with entering condenser water (rated at 30 °C, AHRI 551/591); k = fraction lost per K
+function capFactor(hm,db,k){ return Math.max(0.3, hm.kind==='wc' ? 1-k.w*(hm.ecw-30) : 1-k.a*(db-35)); }
 
 // one hour of the plant: chiller capacity available, and the electrical power for a cooling load
 function plantAt(o,L,db,wb,capRated,k){
@@ -842,7 +880,7 @@ function schedule(ms){ clearTimeout(timer); $('gStatus').textContent='Calculatin
 let userTd=null;   // design temperature typed by the user; null = use the recommendation
 function run(){
   if(!WX) return;
-  I=inputs(); ST=peakStudy(I,WX,{a:num('gKa',1.2)/100,w:num('gKw',.7)/100});
+  I=inputs(); ST=peakStudy(I,WX,{a:num('gKa',1.35)/100,w:num('gKw',0)/100});
   render();
 }
 
@@ -910,7 +948,7 @@ function details(c,b){
       <li><b>With the tank</b> the plant is rated for full IT load at ${fmt(c.Td,1)} °C: chillers ${fmt(c.capT/1000,1)} MW, and its power never exceeds ${MW(c.Prated)} MW. Above that, the tank covers the difference.</li>
       <li><b>Heatwave:</b> ${I.days} hottest days in a row; IT at 100% from 07:00 to 19:00 and ${fmt(I.night*100)}% over the 12-hour night. Each night the tank recharges; it is safe when full again within ${fmt(I.rechMax,1)} h of the peak, and must be full before 07:00, using only the chiller capacity the IT load leaves free and without passing the new rated power.</li>
       <li><b>Tank:</b> ${fmt(c.E)} kWh usable at ΔT ${fmt(I.Tr-I.Ts)} K and ${fmt(I.eff*100)}% efficiency, + ${fmt(I.margin*100)}% sizing margin, + ${fmt(I.reserve*100)}% reserve kept full.</li>
-      <li><b>Chiller capacity</b> falls ${fmt(num('gKa',1.2),1)}%/K above 35 °C ambient (air-cooled) or ${fmt(num('gKw',.7),1)}%/K above 29.4 °C condenser water (water-cooled). Screening estimate: confirm with chiller selections and a detailed design.</li>
+      <li><b>Chiller capacity</b> falls ${fmt(num('gKa',1.35),2)}%/K above 35 °C ambient (air-cooled) or ${fmt(num('gKw',0),1)}%/K above 30 °C condenser water (water-cooled). Screening estimate: confirm with chiller selections and a detailed design.</li>
     </ul>`;
 }
 document.querySelectorAll('#inGrid input:not([type=file]):not(#gTd), #inGrid select:not(#gCity):not(#gTd)').forEach(el=>el.addEventListener('input',()=>schedule()));
