@@ -81,44 +81,6 @@ a.fc:hover{transform:translateY(-2px);box-shadow:0 8px 22px color-mix(in srgb,va
 @keyframes rise{0%{opacity:0;transform:translateY(8px)}40%{opacity:.85}100%{opacity:0;transform:translateY(-14px)}}
 /* recent tools: cards with a preview image */
 #tools{padding-top:40px}
-.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
-.tcard{display:flex;flex-direction:column;padding:0;overflow:hidden;color:inherit;text-decoration:none}
-a.tcard:hover{transform:translateY(-3px);box-shadow:0 12px 28px color-mix(in srgb,var(--text) 11%,transparent);border-color:var(--brand)}
-.thumb{border-bottom:1px solid var(--border)}
-.thumb svg{display:block;width:100%;height:auto}
-.thumb .tbg{fill:color-mix(in srgb,var(--brand) 9%,var(--surface))}
-.thumb .win{fill:var(--surface);stroke:var(--border);stroke-width:1.5}
-.thumb .win.dashed{fill:none;stroke-dasharray:6 6;stroke:color-mix(in srgb,var(--brand) 40%,var(--border))}
-.thumb .dot{fill:var(--grey)}
-.thumb .sep{stroke:var(--border);stroke-width:1.2}
-.thumb .tt{fill:var(--text2);font-size:12px;font-weight:600}
-.thumb .fc{fill:var(--s3)}.thumb .pt{fill:var(--s1)}.thumb .ch{fill:var(--s2)}
-.thumb .m rect{transform-box:fill-box;transform-origin:bottom;transition:transform .35s ease}
-.thumb .lab{fill:var(--grey)}
-.thumb .bar{fill:var(--grey2)}
-.thumb .best{fill:var(--brand)}
-.thumb .ok{fill:var(--surface)}
-.thumb .rk rect{transform-box:fill-box;transform-origin:left;transition:transform .35s ease}
-a.tcard:hover .thumb .m rect{transform:scaleY(1.06)}
-a.tcard:hover .thumb .rk .best{transform:scaleX(1.04)}
-.thumb .plusc{fill:none;stroke:color-mix(in srgb,var(--brand) 45%,var(--border));stroke-width:2}
-.thumb .plus{stroke:var(--brand-ink);stroke-width:3;stroke-linecap:round}
-.tbody{display:flex;flex-direction:column;gap:8px;padding:20px 22px 22px;flex:1}
-.tmeta{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
-.tmeta .tag{margin-left:0}
-.tbody h3{margin:0;font-size:19px;letter-spacing:-.01em;color:var(--text);text-transform:none}
-.tbody p{margin:0;color:var(--text2)}
-.tbody .chips{margin-top:2px}
-.tbody .open{margin-top:auto;padding-top:6px;color:var(--brand-ink);font-weight:600;font-size:13.5px}
-.soon2 .tbody h3{color:var(--text2)}
-.thumb .orig{fill:none;stroke:var(--grey2);stroke-width:2.5;stroke-dasharray:5 4}
-.thumb .cut{fill:none;stroke:var(--brand);stroke-width:3}
-.thumb .cap{stroke:var(--brand);stroke-width:1;stroke-dasharray:4 4;opacity:.6}
-.thumb .shave{fill:color-mix(in srgb,var(--s2) 35%,transparent)}
-.thumb .rech{fill:color-mix(in srgb,var(--s1) 30%,transparent)}
-.thumb .tk rect{fill:var(--surface);stroke:var(--text2);stroke-width:1.5}
-.thumb .tk .lvl{fill:color-mix(in srgb,var(--s1) 45%,transparent);stroke:none;transform-box:fill-box;transform-origin:bottom;transition:transform .35s ease}
-a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
 </style>
 <meta name="author" content="Mutaz Othman">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://www.oenergylab.com/#org","name":"Othman Energy Lab","url":"https://www.oenergylab.com/","logo":"https://www.oenergylab.com/shared/img/apple-touch-icon.png","email":"Mutaz.othman@outlook.com","slogan":"Code-based. Beyond the minimum.","founder":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"description":"Engineering tools and analysis that guide engineers and clients to the right cooling and energy system for critical and high-demand buildings: less energy, lower cost and a cleaner planet."},{"@type":"WebSite","@id":"https://www.oenergylab.com/#website","name":"Othman Energy Lab","url":"https://www.oenergylab.com/","publisher":{"@id":"https://www.oenergylab.com/#org"},"inLanguage":"en"},{"@type":"Person","@id":"https://www.oenergylab.com/about/#mutaz-othman","name":"Mutaz Othman","honorificPrefix":"Eng.","jobTitle":"Mechanical Design Engineer, Mission-Critical and High-Demand Buildings","description":"Mechanical design engineer with 11 years of experience in the GCC, designing HVAC and cooling systems for mission-critical facilities (data centers, healthcare) and high-demand buildings such as malls and high-rise towers. Founder of Othman Energy Lab.","url":"https://www.oenergylab.com/about/","sameAs":["https://www.linkedin.com/in/mutaz-othman-48aa1556/"],"worksFor":{"@id":"https://www.oenergylab.com/#org"},"knowsAbout":["Data center cooling","HVAC design","Chilled water plants","Liquid cooling","Thermal energy storage","ASHRAE 90.1","ASHRAE 90.4","Energy efficiency","Healthcare HVAC","High-rise building HVAC"]}]}</script>
@@ -196,7 +158,7 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
         <div class="tbody">
           <div class="tmeta"><span class="tag ok">New</span><span>Data Centers</span></div>
           <h3>Liquid Rack Cooling</h3>
-          <p>Choose the GPU or CPU platform (NVIDIA GB300, GB200, Vera Rubin, HGX B200; AMD MI355X, Helios, MI300A; AMD EPYC and Intel Xeon racks) and see the maximum supply temperature, the flow per rack, the safe minimum for variable flow, and how the CDU pump and control valve keep the racks safe through a load jump or a pump trip.</p>
+          <p>Pick the GPU or CPU platform (NVIDIA GB300, Vera Rubin, AMD MI355X, Intel Xeon and more) and see the supply temperature, flow per rack, safe minimum flow, and how the CDU responds to a load jump or pump trip.</p>
           <div class="chips"><span>Vendor data</span><span>Safe minimum flow</span><span>Response times</span></div>
           <span class="open">Open tool →</span>
         </div>

@@ -247,6 +247,46 @@ details[open]>:not(summary){animation:fadeUp .2s ease both}
 @media (max-width:560px){.sitebar .topnav{font-size:13px}.sitebar .topnav a{padding:6px 7px}}
 @media (max-width:430px){.brand .bn{display:none}.sitebar .topnav{font-size:12.5px}.sitebar .topnav a{padding:6px 5px}}
 @media (max-width:370px){.brand svg{width:22px;height:22px}.sitebar .topnav a{padding:6px 4px}}
+
+/* tool cards with preview (home and Data Centers pages) */
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.tcard{display:flex;flex-direction:column;padding:0;overflow:hidden;color:inherit;text-decoration:none}
+a.tcard:hover{transform:translateY(-3px);box-shadow:0 12px 28px color-mix(in srgb,var(--text) 11%,transparent);border-color:var(--brand)}
+.thumb{border-bottom:1px solid var(--border)}
+.thumb svg{display:block;width:100%;height:auto}
+.thumb .tbg{fill:color-mix(in srgb,var(--brand) 9%,var(--surface))}
+.thumb .win{fill:var(--surface);stroke:var(--border);stroke-width:1.5}
+.thumb .win.dashed{fill:none;stroke-dasharray:6 6;stroke:color-mix(in srgb,var(--brand) 40%,var(--border))}
+.thumb .dot{fill:var(--grey)}
+.thumb .sep{stroke:var(--border);stroke-width:1.2}
+.thumb .tt{fill:var(--text2);font-size:12px;font-weight:600}
+.thumb .fc{fill:var(--s3)}.thumb .pt{fill:var(--s1)}.thumb .ch{fill:var(--s2)}
+.thumb .m rect{transform-box:fill-box;transform-origin:bottom;transition:transform .35s ease}
+.thumb .lab{fill:var(--grey)}
+.thumb .bar{fill:var(--grey2)}
+.thumb .best{fill:var(--brand)}
+.thumb .ok{fill:var(--surface)}
+.thumb .rk rect{transform-box:fill-box;transform-origin:left;transition:transform .35s ease}
+a.tcard:hover .thumb .m rect{transform:scaleY(1.06)}
+a.tcard:hover .thumb .rk .best{transform:scaleX(1.04)}
+.thumb .plusc{fill:none;stroke:color-mix(in srgb,var(--brand) 45%,var(--border));stroke-width:2}
+.thumb .plus{stroke:var(--brand-ink);stroke-width:3;stroke-linecap:round}
+.tbody{display:flex;flex-direction:column;gap:8px;padding:20px 22px 22px;flex:1}
+.tmeta{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.tmeta .tag{margin-left:0}
+.tbody h3{margin:0;font-size:19px;letter-spacing:-.01em;color:var(--text);text-transform:none}
+.tbody p{margin:0;color:var(--text2)}
+.tbody .chips{margin-top:auto;padding-top:4px}
+.tbody .open{padding-top:4px;color:var(--brand-ink);font-weight:600;font-size:13.5px}
+.soon2 .tbody h3{color:var(--text2)}
+.thumb .orig{fill:none;stroke:var(--grey2);stroke-width:2.5;stroke-dasharray:5 4}
+.thumb .cut{fill:none;stroke:var(--brand);stroke-width:3}
+.thumb .cap{stroke:var(--brand);stroke-width:1;stroke-dasharray:4 4;opacity:.6}
+.thumb .shave{fill:color-mix(in srgb,var(--s2) 35%,transparent)}
+.thumb .rech{fill:color-mix(in srgb,var(--s1) 30%,transparent)}
+.thumb .tk rect{fill:var(--surface);stroke:var(--text2);stroke-width:1.5}
+.thumb .tk .lvl{fill:color-mix(in srgb,var(--s1) 45%,transparent);stroke:none;transform-box:fill-box;transform-origin:bottom;transition:transform .35s ease}
+a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
 </style>
 <style>
 /* Result pages (Ride-Through Tank, Peak Shaving Tank, Liquid Rack Cooling): shared result styles (load after base.css) */
