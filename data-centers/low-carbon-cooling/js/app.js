@@ -81,6 +81,10 @@ function renderEst(f){
     </div>`; });
   $('cTabTitle').textContent='Each system, CO₂ only';
   $('cTab').innerHTML=`<div class="sgrid">${cards.join('')}</div>`;
+  const rows=ids.map((id,i)=>{ const r=RES[id], bad=!DES[id].ok;
+    return `<tr class="${i===0&&!bad?'best':''}"><td class="sys">${r.o.short}${i===0&&!bad?'<span class="tag ok">Lowest</span>':''}${bad?'<span class="tag">Fails design day</span>':''}</td><td>${fmt(r.E)}</td><td>${fmt(r.W)}</td><td>${fmt(r.charge)}</td><td>${t(r.co2E)}</td><td>${t(r.co2W)}</td><td>${t(r.co2R)}</td><td><b>${t(r.co2)}</b></td><td>${fmt(r.co2IT,1)}</td><td>${fmt(r.co2*Y)}</td></tr>`; });
+  $('cAllCard').hidden=false;
+  $('cAll').innerHTML=table(['System','Electricity MWh/yr','Water m³/yr','Charge kg','Electricity t/yr','Water t/yr','Refrigerant t/yr','Total t CO₂e/yr','kg per MWh IT',`Total over ${Y} yr (t)`],rows);
   details(f,R,true);
 }
 
@@ -99,7 +103,7 @@ function renderOwn(f){
     </div>
     <div class="verdict">Electricity <b>${sh(cE)}%</b>, water supply <b>${sh(cW)}%</b>, refrigerant leakage <b>${sh(cR)}%</b> of the total.${cR>0.1*tot&&R.r.gwp>100?` Refrigerant is a large share: a low-GWP refrigerant such as R-1234ze(E) (GWP 1) would remove most of it.`:''}</div>`;
   chart([name],[{co2E:cE,co2W:cW,co2R:cR}]);
-  $('cTabTitle').textContent='How it is calculated';
+  $('cAllCard').hidden=true; $('cTabTitle').textContent='How it is calculated';
   $('cTab').innerHTML=`<div class="eqs">
     <div><span>Electricity</span><span class="f">${fmt(E)} MWh × ${f.ef.toFixed(3)} t/MWh</span><b>${t(cE)} t</b></div>
     <div><span>Water supply</span><span class="f">${fmt(W)} m³ × ${fmt(f.wkwh,1)} kWh/m³ ÷ 1,000 × ${f.ef.toFixed(3)} t/MWh</span><b>${t(cW)} t</b></div>
@@ -133,7 +137,7 @@ function details(f,R,est){
 
 // ---------- mode tabs and inputs ----------
 function setMode(m){ MODE=m; $('mEst').classList.toggle('on',m==='est'); $('mOwn').classList.toggle('on',m==='own');
-  $('estPane').hidden=m!=='est'; $('ownPane').hidden=m!=='own'; $('chRow').hidden=m!=='est'; $('yrsRow').hidden=m==='est'; schedule(0); }
+  $('estPane').hidden=m!=='est'; $('ownPane').hidden=m!=='own'; $('chRow').hidden=m!=='est'; schedule(0); }
 $('mEst').onclick=()=>setMode('est'); $('mOwn').onclick=()=>setMode('own');
 document.querySelectorAll('#inGrid input, #inGrid select:not(#cCity)').forEach(el=>el.addEventListener('input',()=>schedule()));
 loadCity();
