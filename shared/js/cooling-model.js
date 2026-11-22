@@ -30,17 +30,23 @@ const GRID_EF={dubai:.468,abudhabi:.468,riyadh:.692,jeddah:.692,dammam:.692,mana
 // energy to supply 1 m³ of water, kWh: seawater desalination (Gulf) about 3.5, conventional treated supply about 0.5 (IEA World Energy Outlook 2016, Water-Energy Nexus)
 const WATER_KWH={dubai:3.5,abudhabi:3.5,riyadh:3.5,jeddah:3.5,dammam:3.5,manama:3.5};
 const waterKwh=id=>WATER_KWH[id]??0.5;
-// refrigerants, 100-year GWP (IPCC AR4, as used by the EU F-gas Regulation)
-const REFRIGERANTS={r513a:{name:'R-513A',gwp:631},r134a:{name:'R-134a',gwp:1430},r1234ze:{name:'R-1234ze(E)',gwp:1}};
+// band where the supply mix is known to vary: Phoenix = local surface water (0.5) to Central Arizona Project conveyance + treatment (about 1.6;
+// CAP: 2.8 million MWh for 1.6 million acre-feet = 1.4 kWh/m³ conveyance alone)
+const WATER_KWH_BAND={phoenix:[0.5,1.6]};
+const waterKwhBand=id=>WATER_KWH_BAND[id]||null;
+// refrigerants, 100-year GWP: R-134a and R-513A IPCC AR4 (as used by the U.S. EPA under the AIM Act); R-1234ze(E) EU F-gas Regulation 2024/573
+const REFRIGERANTS={r513a:{name:'R-513A',gwp:631},r134a:{name:'R-134a',gwp:1430},r1234ze:{name:'R-1234ze(E)',gwp:1.37}};
 
 // default basis values (inputs override them in the Cooling Plant Selector)
 const BASIS={
-  copA:2.866, copW:6.018, copMax:14,          // ASHRAE 90.1-2025 Table 6.8.1-3, Path B full load; COPmax = assumption
+  copA:2.866, copW:6.018, copMax:14,          // ASHRAE 90.1-2025 Table 6.8.1-3, Path B full load; COPmax = provisional, pending manufacturer low-lift data
   unitWL:7000, unitWA:5500, unitA:1500, derA:0.0135,   // chiller unit sizes (kW): water-cooled liquid / air loop, air-cooled; air-cooled capacity loss per K above 35 °C (Trane RTAC public data)
   stage:0.90, acMax:52, wcMax:43,             // next chiller above 90% PLR; air-cooled max ambient; condenser-water warning limit
   acApp:15, wcApp:7,                          // condensing: ambient + 15 K; condenser water + 5 K range (AHRI) + 2 K
-  aCT:5.56, aDC:5.56, aAD:11.1, aHX:1.5, rangeCW:5.56,   // ASHRAE 90.1-2025 Table 6.8.1-7 rating approaches; plate HX
-  swAD:24, swHY:24, eAD:0.85, coc:4,          // adiabatic / hybrid switch; pad effectiveness (water use only); cycles of concentration
+  aCT:5.56, aDC:5.56, aAD:9.4, aHX:1.5, rangeCW:5.56,   // ASHRAE 90.1-2025 Table 6.8.1-7 rating approaches; adiabatic: coil approach above the air after the pads
+                                              // (rating 95 °F leaving water, 95 / 75 °F air: pad air 78 °F, so 17 °F = 9.4 K); plate HX
+  swAD:24, swHY:24, eAD:0.85, coc:4,          // adiabatic / hybrid switch; pad effectiveness; cycles of concentration
+  evapK:0.0020, evapLo:0.0015, evapHi:0.0027, // tower evaporation per kg circulated per K of range: EnergyPlus default 0.2 %/K, band 0.15–0.27 %/K
   kCT:0.012, kDC:0.030, kAD:0.030,            // fan kW per kW rejected at full speed: towers ASHRAE 2025 minimum; dry / adiabatic public data sheets
   dpCDU:320, dtCDU:10, dpPri:200, dpSec:400, dpCW:211, etaP:0.70,   // pump heads (kPa), CDU coolant ΔT, pump × motor × VFD efficiency
   dpFWU:0.30, dtAir:12, etaF:0.65,            // fan wall units: static pressure (kPa), air rise across IT (K), fan efficiency
@@ -81,11 +87,18 @@ function hourModel(o,L,db,wb,p){
   let Tout,ecw=null,kind,wet=0,dShare=0;
   if(o.id==='acc'){ Tout=Infinity; kind='ac'; }
   else if(o.id==='accfc'){ Tout=db+p.aDC; kind='ac'; }                     // dry coolers directly on the loop
-  else if(o.id==='adia'){ wet=db>p.swAD?1:0; ecw=wet?wb+p.aAD:db+p.aDC; Tout=ecw+p.aHX; kind='wc'; }
+  else if(o.id==='adia'){ // above the switch the pads run only when they give the colder water: min(db + 5.56, pad air + 9.4)
+    const dry=db+p.aDC, padAir=db-p.eAD*(db-wb), wetOut=padAir+p.aAD;
+    wet=db>p.swAD&&wetOut<dry?1:0; ecw=wet?wetOut:dry; Tout=ecw+p.aHX; kind='wc'; }
   else if(o.id==='wcc'){ wet=1; ecw=wb+p.aCT; Tout=ecw+p.aHX; kind='wc'; }
   else { // hybrid: dry coolers in series ahead of the towers on the condenser water
     if(db<=p.swHY){ ecw=db+p.aDC; dShare=1; wet=0; }
-    else { ecw=wb+p.aCT; dShare=Math.max(0,Math.min(1,(ecw+p.rangeCW-(db+p.aDC))/p.rangeCW)); wet=1-dShare; }
+    else { ecw=wb+p.aCT;
+      const fc=ecw+p.aHX<L.Tr;   // free cooling (full or partial): loop water from the plate HX passes the dry coolers first
+      if(fc){ const Tin=L.Tr-p.aHX, Treq=Math.max(L.Ts-p.aHX,ecw), Tdry=Math.max(db+p.aDC,Treq);
+        dShare=Tin>Treq?Math.max(0,Math.min(1,(Tin-Tdry)/(Tin-Treq))):1; }
+      else dShare=Math.max(0,Math.min(1,(ecw+p.rangeCW-(db+p.aDC))/p.rangeCW));   // chillers only: condenser water over its 5.56 K range
+      wet=1-dShare; }
     Tout=ecw+p.aHX; kind='wc';
   }
   const Tc=kind==='ac'?db+p.acApp:ecw+p.wcApp;
@@ -122,16 +135,23 @@ function hourModel(o,L,db,wb,p){
   return {Tout,Tc,ecw,kind,ff,wet,dShare,N,unit,cop,calc,limit,warn};
 }
 
-// make-up water, kg/h: towers 0.00153 × flow × range (ASHRAE) + blowdown at CoC; hybrid on the towers' share; adiabatic pads (air-side balance)
+// make-up water, kg/h: tower evaporation = evapK × flow × range (EnergyPlus default 0.2 %/K) + blowdown at CoC; hybrid on the towers' share;
+// adiabatic pads (air-side balance), only in wet-mode hours
 function waterKgH(o,Qr,db,wb,p,wet){
-  if(o.id==='wcc'||o.id==='hyb') return wet*Qr*0.00153/4.18*3600*(p.coc/(p.coc-1));
+  if(o.id==='wcc'||o.id==='hyb') return wet*Qr*p.evapK/4.18*3600*(p.coc/(p.coc-1));
   if(o.id==='adia'&&wet){ const Tpad=db-p.eAD*(db-wb); return Qr*(db-Tpad)/(12*2430)*1.15*3600; }
   return 0;
 }
 
+// low / high water for the evaporation-factor band (towers and hybrid scale with it; adiabatic pad water does not)
+const evapScale=(o,p,k)=>o.id==='wcc'||o.id==='hyb'?k/p.evapK:1;
+
 // two coincident design cases: A = extreme dry-bulb + the wet-bulb of the hottest hour; B = extreme wet-bulb + the dry-bulb of the most humid hour
+// Case B takes its dry-bulb from the most humid hour that was not capped (station files cap hourly wet-bulb at the ASHRAE extreme + 1 K)
 function designCases(wx,A,dbIn,wbIn){
-  let hA=0,hB=0; wx.T.forEach((t,h)=>{ if(t>wx.T[hA]) hA=h; if(wx.Twb[h]>wx.Twb[hB]) hB=h; });
+  const capped=new Set((wx.station&&wx.station.capH)||[]), ok=h=>!capped.has(h);
+  let hA=0,hB=-1; wx.T.forEach((t,h)=>{ if(t>wx.T[hA]) hA=h; if(ok(h)&&(hB<0||wx.Twb[h]>wx.Twb[hB])) hB=h; });
+  if(hB<0) hB=wx.Twb.indexOf(Math.max(...wx.Twb));
   const dbA=isNaN(dbIn)?(A?A.extDB:wx.T[hA]):dbIn, wbB=isNaN(wbIn)?(A?A.extWB:wx.Twb[hB]):wbIn;
   return {A:{db:dbA,wb:Math.min(wx.Twb[hA],dbA)}, B:{db:Math.max(wx.T[hB],wbB),wb:wbB}};
 }
@@ -150,8 +170,8 @@ function designCheck(p){
       });
       cs[k]={P,Qr,W};
     }
-    const worst=cs.A.P>=cs.B.P?'A':'B';
-    out[o.id]={cases:cs,worst,P:cs[worst].P,Qr:Math.max(cs.A.Qr,cs.B.Qr),W:Math.max(cs.A.W,cs.B.W),units,
+    const worst=cs.A.P>=cs.B.P?'A':'B', Wd=Math.max(cs.A.W,cs.B.W);
+    out[o.id]={cases:cs,worst,P:cs[worst].P,Qr:Math.max(cs.A.Qr,cs.B.Qr),W:Wd,Wlo:Wd*evapScale(o,p,p.evapLo),Whi:Wd*evapScale(o,p,p.evapHi),units,
       ok:issues.length===0,issues:[...new Set(issues)],warns:[...new Set(warns)],ratio:cs[worst].P/p.Qd};
   }
   p.des=des;
@@ -162,25 +182,32 @@ function designCheck(p){
 function simulate(wx,p,des){
   const n=wx.T.length, hs=8760/n, loops=p.loops, out={};
   for(const o of OPTIONS){
-    const r={o,E:0,Ec:0,Ef:0,Ep:0,Et:0,W:0,free:[0,0],part:[0,0],mech:[0,0],hotCW:0,
+    const r={o,E:0,Ec:0,Ef:0,Ep:0,Et:0,W:0,yMax:0,yAbove:0,free:[0,0],part:[0,0],mech:[0,0],hotCW:0,
       mFree:[new Array(12).fill(0),new Array(12).fill(0)],mPart:[new Array(12).fill(0),new Array(12).fill(0)],mMech:[new Array(12).fill(0),new Array(12).fill(0)],copSum:0,copN:0};
+    const dP=des[o.id].P;
     for(let h=0;h<n;h++){
-      const db=wx.T[h], wb=wx.Twb[h], m=wx.mon[h];
+      const db=wx.T[h], wb=wx.Twb[h], m=wx.mon[h]; let P100=0;
       loops.forEach((L,li)=>{
         if(L.Q<=0) return;
         const hm=hourModel(o,L,db,wb,p), a=hm.calc(L.Q), ff=hm.ff;
+        P100+=hm.calc(L.Qd).P;                        // the same hour at 100% IT load (bounding check of the design cases)
         r.E+=a.P; r.Ec+=a.Pc; r.Ef+=a.Pf; r.Ep+=a.Pp; r.Et+=a.Pt;
         if(a.cop){r.copSum+=a.cop; r.copN++;}
         r.W+=waterKgH(o,a.Qr,db,wb,p,hm.wet);
         if(hm.warn&&ff<1&&li===0) r.hotCW++;
         if(ff>=1){r.free[li]++; r.mFree[li][m]++;} else if(ff>0){r.part[li]++; r.mPart[li][m]++;} else {r.mech[li]++; r.mMech[li][m]++;}
       });
+      if(P100>r.yMax) r.yMax=P100;
+      if(P100>dP+1e-6) r.yAbove+=hs;
     }
     const Qyr=loops.reduce((s,L)=>s+L.Q,0)*n, d=des[o.id];
     ['E','Ec','Ef','Ep','Et'].forEach(k=>r[k]*=hs/1000);   // MWh
     r.W*=hs/1000;                                     // m3
+    r.Wlo=r.W*evapScale(o,p,p.evapLo); r.Whi=r.W*evapScale(o,p,p.evapHi);   // evaporation-factor band
     r.hotCW*=hs;                                      // h/yr above the condenser-water limit
-    r.peak=d.P; r.Wpeak=d.W;                          // design peak: the higher of Case A and Case B, 100% load
+    // design peak: the highest of Case A, Case B and the typical-year maximum, all at 100% IT load
+    r.peak=Math.max(d.P,r.yMax); r.peakCase=r.yMax>d.P+1e-6?'year':d.worst; r.yExcess=Math.max(0,r.yMax-d.P);
+    r.Wpeak=d.W; r.WpeakLo=d.Wlo; r.WpeakHi=d.Whi;
     ['free','part','mech'].forEach(k=>r[k]=r[k].map(v=>v*hs));
     r.mlc=r.E*1000/(Qyr*hs);
     r.cop=r.copN?r.copSum/r.copN:null;
@@ -190,6 +217,8 @@ function simulate(wx,p,des){
     r.Eit=Qyr*hs/1000;                                // MWh, IT energy = cooling load
     r.Efac=fac(r.Eit,r.E); r.Eloss=r.Efac-r.Eit-r.E;  // MWh
     r.pue=r.Efac/r.Eit;
+    // facility electrical peak (grid connection): IT at 100% through the UPS + cooling peak, plus distribution losses; same factors as the PUE
+    r.facPeak=fac(loops.reduce((s,L)=>s+L.Qd,0),r.peak); r.coolShare=r.peak/r.facPeak;
     // annual running cost of cooling, $: electricity + water + demand charge (cooling peak, every month)
     r.costE=r.E*1000*p.tE; r.costW=r.W*p.tW; r.costD=r.peak*12*p.tD;
     r.run=r.costE+r.costW+r.costD;
@@ -200,8 +229,9 @@ function simulate(wx,p,des){
     // carbon, t CO2e per year: electricity × grid factor; water × supply energy × grid factor; refrigerant charge (duty + 1 standby per loop) × leak × GWP
     r.chCap=d.units.reduce((s,u)=>s+(u.N+1)*u.unit,0);
     r.charge=r.chCap*(d.units.some(u=>u.kind==='ac')?p.chA:p.chW);
-    r.co2E=r.E*p.ef; r.co2W=r.W*p.wkwh/1000*p.ef; r.co2R=r.charge*p.leak*(REFRIGERANTS[p.refr]||REFRIGERANTS.r513a).gwp/1000;
-    r.co2=r.co2E+r.co2W+r.co2R; r.co2IT=r.co2*1000/r.Eit;   // kg CO2e per MWh of IT
+    const wk=p.wkwhBand||[p.wkwh,p.wkwh];
+    r.co2E=r.E*p.ef; r.co2W=r.W*p.wkwh/1000*p.ef; r.co2Wlo=r.Wlo*wk[0]/1000*p.ef; r.co2Whi=r.Whi*wk[1]/1000*p.ef; r.co2R=r.charge*p.leak*(REFRIGERANTS[p.refr]||REFRIGERANTS.r513a).gwp/1000;
+    r.co2=r.co2E+r.co2W+r.co2R; r.co2Lo=r.co2E+r.co2Wlo+r.co2R; r.co2Hi=r.co2E+r.co2Whi+r.co2R; r.co2IT=r.co2*1000/r.Eit;   // kg CO2e per MWh of IT
     out[o.id]=r;
   }
   return out;

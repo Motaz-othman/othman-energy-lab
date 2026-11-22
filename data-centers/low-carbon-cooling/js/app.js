@@ -8,7 +8,7 @@ const CAR=4.6;   // t CO2 per typical passenger car per year (US EPA, Greenhouse
 let WX=null, RES=null, DES=null, P=null, MODE='est', timer=null, req=0;
 [...new Set(CITIES.map(c=>c.g))].forEach(g=>{ const og=document.createElement('optgroup'); og.label=g;
   CITIES.filter(c=>c.g===g).forEach(c=>{ const o=document.createElement('option'); o.value=c.id; o.textContent=c.name; og.appendChild(o); }); $('cCity').appendChild(og); });
-Object.entries(REFRIGERANTS).forEach(([k,r])=>{ const o=document.createElement('option'); o.value=k; o.textContent=`${r.name} (GWP ${fmt(r.gwp)})`; $('cRef').appendChild(o); });
+Object.entries(REFRIGERANTS).forEach(([k,r])=>{ const o=document.createElement('option'); o.value=k; o.textContent=`${r.name} (GWP ${fmt(r.gwp,r.gwp<10?2:0)})`; $('cRef').appendChild(o); });
 [...OPTIONS.map(o=>[o.id,o.name]),['other','Other cooling system']].forEach(([v,t])=>{ const o=document.createElement('option'); o.value=v; o.textContent=t; $('oSys').appendChild(o); });
 
 // ---------- location factors ----------
@@ -37,7 +37,7 @@ function params(){
     {name:'LC',Ts:ls,Tr:Math.max(num('cLr',40),ls+1),Qd:Qd*lcp,Q:Qd*lcp*lf},
     {name:'Air',Ts:as,Tr:Math.max(num('cAr',30),as+1),Qd:Qd*(1-lcp),Q:Qd*(1-lcp)*lf}];
   const rates={}; RATES.forEach(r=>rates[r.id]={lo:r.lo,hi:r.hi});
-  return {...BASIS,Qd,lf,loops,water:'plenty',dbIn:NaN,wbIn:NaN,ef:f.ef,wkwh:f.wkwh,refr:R.k,leak:R.leak,
+  return {...BASIS,Qd,lf,loops,water:'plenty',dbIn:NaN,wbIn:NaN,ef:f.ef,wkwh:f.wkwh,wkwhBand:f.wOwn?null:waterKwhBand($('cCity').value),refr:R.k,leak:R.leak,
     chW:Math.max(0,num('cChW',0.3)),chA:Math.max(0,num('cChA',0.4)),tE:0.1,tW:2.5,tD:0,red:0.25,ups:0.96,dloss:0.02,rates,
     ...Object.fromEntries(WEIGHTS.map(w=>[w.id,w.v]))};
 }
@@ -82,7 +82,7 @@ function renderEst(f){
   $('cTabTitle').textContent='Each system, CO₂ only';
   $('cTab').innerHTML=`<div class="sgrid">${cards.join('')}</div>`;
   const rows=ids.map((id,i)=>{ const r=RES[id], bad=!DES[id].ok;
-    return `<tr class="${i===0&&!bad?'best':''}"><td class="sys">${r.o.short}${i===0&&!bad?'<span class="tag ok">Lowest</span>':''}${bad?'<span class="tag">Fails design day</span>':''}</td><td>${fmt(r.E)}</td><td>${fmt(r.W)}</td><td>${fmt(r.charge)}</td><td>${t(r.co2E)}</td><td>${t(r.co2W)}</td><td>${t(r.co2R)}</td><td><b>${t(r.co2)}</b></td><td>${fmt(r.co2IT,1)}</td><td>${fmt(r.co2*Y)}</td></tr>`; });
+    return `<tr class="${i===0&&!bad?'best':''}"><td class="sys">${r.o.short}${i===0&&!bad?'<span class="tag ok">Lowest</span>':''}${bad?'<span class="tag">Fails design day</span>':''}</td><td>${fmt(r.E)}</td><td>${fmt(r.W)}${r.Whi>r.W*1.001?` (${fmt(r.Wlo)}–${fmt(r.Whi)})`:''}</td><td>${fmt(r.charge)}</td><td>${t(r.co2E)}</td><td>${t(r.co2W)}</td><td>${t(r.co2R)}</td><td><b>${t(r.co2)}</b></td><td>${fmt(r.co2IT,1)}</td><td>${fmt(r.co2*Y)}</td></tr>`; });
   $('cAllCard').hidden=false;
   $('cAll').innerHTML=table(['System','Electricity MWh/yr','Water m³/yr','Charge kg','Electricity t/yr','Water t/yr','Refrigerant t/yr','Total t CO₂e/yr','kg per MWh IT',`Total over ${Y} yr (t)`],rows);
   details(f,R,true);
@@ -101,13 +101,13 @@ function renderOwn(f){
       <div class="bn"><div class="v">${fmt(tot/CAR)}</div><div class="l">Passenger cars a year, same CO₂</div></div>
       <div class="bn"><div class="v">${IT>0?`${fmt(tot*1000/IT,1)} <small>kg/MWh</small>`:'–'}</div><div class="l">${IT>0?'CO₂e per MWh of IT energy':'Enter the IT energy for kg per MWh IT'}</div></div>
     </div>
-    <div class="verdict">Electricity <b>${sh(cE)}%</b>, water supply <b>${sh(cW)}%</b>, refrigerant leakage <b>${sh(cR)}%</b> of the total.${cR>0.1*tot&&R.r.gwp>100?` Refrigerant is a large share: a low-GWP refrigerant such as R-1234ze(E) (GWP 1) would remove most of it.`:''}</div>`;
+    <div class="verdict">Electricity <b>${sh(cE)}%</b>, water supply <b>${sh(cW)}%</b>, refrigerant leakage <b>${sh(cR)}%</b> of the total.${cR>0.1*tot&&R.r.gwp>100?` Refrigerant is a large share: a low-GWP refrigerant such as R-1234ze(E) (GWP 1.37) would remove most of it.`:''}</div>`;
   chart([name],[{co2E:cE,co2W:cW,co2R:cR}]);
   $('cAllCard').hidden=true; $('cTabTitle').textContent='How it is calculated';
   $('cTab').innerHTML=`<div class="eqs">
     <div><span>Electricity</span><span class="f">${fmt(E)} MWh × ${f.ef.toFixed(3)} t/MWh</span><b>${t(cE)} t</b></div>
     <div><span>Water supply</span><span class="f">${fmt(W)} m³ × ${fmt(f.wkwh,1)} kWh/m³ ÷ 1,000 × ${f.ef.toFixed(3)} t/MWh</span><b>${t(cW)} t</b></div>
-    <div><span>Refrigerant</span><span class="f">${fmt(ch)} kg × ${fmt(R.leak*100,1)}% × GWP ${fmt(R.r.gwp)} ÷ 1,000</span><b>${t(cR)} t</b></div>
+    <div><span>Refrigerant</span><span class="f">${fmt(ch)} kg × ${fmt(R.leak*100,1)}% × GWP ${fmt(R.r.gwp,R.r.gwp<10?2:0)} ÷ 1,000</span><b>${t(cR)} t</b></div>
     <div class="tot"><span><b>Total per year</b></span><span class="f">CO₂ equivalent</span><b>${t(tot)} t</b></div></div>`;
   details(f,R,false);
 }
@@ -128,8 +128,8 @@ function details(f,R,est){
   const st=WX&&WX.station;
   $('cDet').innerHTML=`<ul class="method">
     <li><b>Grid factor:</b> ${f.ef.toFixed(3)} kg CO₂ per kWh (= t per MWh), ${f.efOwn?'your value':f.src}. Location-based: the average of the local grid.</li>
-    <li><b>Water supply energy:</b> ${fmt(f.wkwh,1)} kWh per m³, ${f.wOwn?'your value':'IEA World Energy Outlook 2016 (Water-Energy Nexus): about 3.5 kWh/m³ for Gulf seawater desalination, 0.5 for conventional treated water'}.</li>
-    <li><b>Refrigerant:</b> ${R.r.name}, GWP ${fmt(R.r.gwp)} (100-year, IPCC AR4, as used by the EU F-gas Regulation); leak ${fmt(R.leak*100,1)}% of the charge per year.${est?` Charge ${fmt(num('cChW',0.3),2)} kg/kW for water-cooled and ${fmt(num('cChA',0.4),2)} kg/kW for air-cooled chillers, on the duty chillers + 1 standby per loop. Charge and leak rate are assumptions: use the chiller data where known.`:''}</li>
+    <li><b>Water supply energy:</b> ${fmt(f.wkwh,1)} kWh per m³, ${f.wOwn?'your value':'IEA World Energy Outlook 2016 (Water-Energy Nexus): about 3.5 kWh/m³ for Gulf seawater desalination, 0.5 for conventional treated water'}${!f.wOwn&&waterKwhBand($('cCity').value)?`; band ${waterKwhBand($('cCity').value).join('–')} kWh/m³ (Central Arizona Project conveyance + treatment at the top)`:''}. Tower water in the table is the central value with the evaporation band 0.15–0.27 %/K (EnergyPlus default 0.20) in brackets.</li>
+    <li><b>Refrigerant:</b> ${R.r.name}, GWP ${fmt(R.r.gwp,R.r.gwp<10?2:0)} (100-year; R-134a and R-513A IPCC AR4 as used by the U.S. EPA under the AIM Act, R-1234ze(E) EU F-gas Regulation 2024/573); leak ${fmt(R.leak*100,1)}% of the charge per year.${est?` Charge ${fmt(num('cChW',0.3),2)} kg/kW for water-cooled and ${fmt(num('cChA',0.4),2)} kg/kW for air-cooled chillers, on the duty chillers + 1 standby per loop. Charge and leak rate are assumptions: use the chiller data where known.`:''}</li>
     ${est?`<li><b>Energy and water:</b> 8,760-hour simulation, ${st?`${esc(st.station)}, measured typical year TMYx ${esc(st.period)}`:'generated typical year'}; ASHRAE 90.1-2025 chillers, heat-rejection approaches, pump and fan power, free cooling. Same model as the <a href="../cooling-plant/index.html">Cooling Plant Selector</a>, which also gives cost and peak power. A system that cannot meet the design day is listed last.</li>`:''}
     <li><b>Cars:</b> ${CAR} t CO₂ per typical passenger car per year (US EPA).</li>
     <li>Cooling system only: IT electricity and UPS losses are not included. Screening-level estimate.</li></ul>`;

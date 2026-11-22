@@ -470,7 +470,7 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
       <div><label for="derA">Air-cooled capacity loss above 35 °C (%/K)</label><input type="number" id="derA" value="1.35" step="0.05" min="0"></div>
     </div>
     <div class="row">
-      <div><label for="copMax">Max COP (low lift)</label><input type="number" id="copMax" value="14" step="1" min="4"></div>
+      <div><label for="copMax">Max COP (low lift, provisional)</label><input type="number" id="copMax" value="14" step="1" min="4"></div>
       <div><label for="acMax">Air-cooled max ambient (°C)</label><input type="number" id="acMax" value="52" step="1"></div>
     </div>
     <div class="row">
@@ -486,7 +486,7 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
       <div><label for="aDC">Dry cooler approach to db (K)</label><input type="number" id="aDC" value="5.56" step="0.1"></div>
     </div>
     <div class="row">
-      <div><label for="aAD">Adiabatic approach to wb, pads on (K)</label><input type="number" id="aAD" value="11.1" step="0.1"></div>
+      <div><label for="aAD">Adiabatic coil approach above pad air (K)</label><input type="number" id="aAD" value="9.4" step="0.1"></div>
       <div><label for="aHX">Plate HX approach (K)</label><input type="number" id="aHX" value="1.5" step="0.5"></div>
     </div>
     <div class="row">
@@ -538,14 +538,14 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
       <div><label for="envW">Water supply energy (kWh/m³)</label><input type="number" id="envW" step="0.1" min="0" placeholder="auto"></div>
     </div>
     <div class="row">
-      <div><label for="refr">Chiller refrigerant</label><select id="refr"><option value="r513a">R-513A (GWP 631)</option><option value="r134a">R-134a (GWP 1,430)</option><option value="r1234ze">R-1234ze(E) (GWP 1)</option></select></div>
+      <div><label for="refr">Chiller refrigerant</label><select id="refr"><option value="r513a">R-513A (GWP 631)</option><option value="r134a">R-134a (GWP 1,430)</option><option value="r1234ze">R-1234ze(E) (GWP 1.37)</option></select></div>
       <div><label for="leak">Refrigerant leak (% of charge per year)</label><input type="number" id="leak" value="2" step="0.5" min="0"></div>
     </div>
     <div class="row">
       <div><label for="chW">Charge, water-cooled (kg/kW)</label><input type="number" id="chW" value="0.3" step="0.05" min="0"></div>
       <div><label for="chA">Charge, air-cooled (kg/kW)</label><input type="number" id="chA" value="0.4" step="0.05" min="0"></div>
     </div>
-    <div class="note" id="envNote">Leave blank for the city's values: grid factor from Our World in Data / Ember (latest year), US cities from EPA eGRID2023 subregions, Sydney from the Australian NGA factors (NSW 2025–26); water supply energy 3.5 kWh/m³ for Gulf desalination, 0.5 elsewhere (IEA WEO 2016). GWP: IPCC AR4. Refrigerant charge and leak rate are assumptions; enter the selected chiller's data. Carbon counts in the recommendation (weight 3).</div>
+    <div class="note" id="envNote">Leave blank for the city's values: grid factor from Our World in Data / Ember (latest year), US cities from EPA eGRID2023 subregions, Sydney from the Australian NGA factors (NSW 2025–26); water supply energy 3.5 kWh/m³ for Gulf desalination, 0.5 elsewhere (IEA WEO 2016), Phoenix shown as a band up to 1.6 (Central Arizona Project conveyance + treatment). GWP: R-134a and R-513A IPCC AR4 (as used by the U.S. EPA under the AIM Act), R-1234ze(E) EU F-gas Regulation 2024/573. Refrigerant charge and leak rate are assumptions; enter the selected chiller's data. Carbon counts in the recommendation (weight 3).</div>
   </details>
   <details>
     <summary>Electrical losses</summary>
@@ -609,7 +609,7 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
 
   <div class="pane" id="p-en" hidden>
     <div class="card"><h2>Energy efficiency</h2><div class="split">
-      <div><div id="tEff"></div><div class="note">MLC = annual mechanical energy ÷ annual cooling load (ASHRAE 90.4 definition, cooling load taken as IT energy). Maximum: ASHRAE 90.4-2022 Addendum g, Table 6.5, for the station's climate zone and ITE above / at or below 300 kW. Screening check: a compliance calculation follows the 90.4 load points and TMY3 weather. Free-cooling hours: chiller fully off.</div></div>
+      <div><div id="tEff"></div><div class="note">MLC = annual mechanical energy ÷ annual cooling load (ASHRAE 90.4 definition, cooling load taken as IT energy). Maximum: ASHRAE 90.4-2025 Table 6.5, for the station's climate zone (ASHRAE 169, station-based; code compliance may use the county zone) and ITE above / at or below 300 kW. Screening check: a compliance calculation follows the 90.4 load points and TMY3 weather. Free-cooling hours: chiller fully off.</div></div>
       <div><div class="ctitle" id="effTitle">Annual MLC</div><div class="chartbox"><canvas id="cEff"></canvas></div></div>
     </div></div>
     <div class="card"><h2>Carbon emissions</h2><div class="split">
@@ -619,7 +619,7 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
         <div class="chartbox" style="height:220px"><canvas id="cCO2"></canvas></div></div>
     </div></div>
     <div class="card"><h2>Electricity and water consumption</h2><div class="split">
-      <div><div id="tCons"></div><div class="note">Annual totals at the frequent load. Peaks are the design peak: the higher of Case A and Case B at 100% load. Electrical peak = cooling only: chillers + heat-rejection fans + pumps + CRAH / FWU fans + CDU pumps (no IT load, no electrical equipment or losses). Water peak = make-up water (evaporation, blowdown, pad water). PUE = (IT + cooling + losses) ÷ IT, annual. CRAH / fan-wall fans are not included.</div></div>
+      <div><div id="tCons"></div><div class="note">Annual totals at the frequent load. Peaks are the design peak at 100% IT load: the highest of Case A, Case B and the typical-year maximum. Facility peak = (IT ÷ UPS efficiency + cooling peak) ÷ (1 − distribution losses), the grid connection. Water in brackets: tower evaporation band 0.15–0.27 %/K (central 0.20, EnergyPlus default). Electrical peak = cooling only: chillers + heat-rejection fans + pumps + CRAH / FWU fans + CDU pumps (no IT load, no electrical equipment or losses). Water peak = make-up water (evaporation, blowdown, pad water). PUE = (IT + cooling + losses) ÷ IT, annual. CRAH / fan-wall fans are not included.</div></div>
       <div>
         <div class="ctitle" id="elTitle">Annual electricity by component</div>
         <div class="legend"><span><i style="background:var(--s1)"></i>Chiller compressors</span><span><i style="background:var(--s4)"></i>Heat-rejection fans</span><span><i style="background:var(--grey2)"></i>Pumps</span><span><i style="background:var(--s2)"></i>CRAH / FWU fans + CDU pumps</span></div>
@@ -662,17 +662,17 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
     <h2>Method and equations</h2>
     <ul class="method">
       <li><b>Weather</b>: built-in cities use a measured typical year (TMYx 2011–2025) from the main airport station and ASHRAE 2025 Handbook of Fundamentals design conditions, both from climate.onebuilding.org. Hourly wet-bulb is limited to the ASHRAE extreme annual wet-bulb + 1 K. Psychrometrics per ASHRAE Fundamentals, Ch. 1.</li>
-      <li><b>Design cases</b>: Case A = extreme dry-bulb + the wet-bulb of the hottest hour; Case B = extreme wet-bulb + the dry-bulb of the most humid hour. Every system is checked at both at 100% load; the design peak is the higher.</li>
+      <li><b>Design cases</b>: Case A = extreme dry-bulb + the wet-bulb of the hottest hour; Case B = extreme wet-bulb + the dry-bulb of the most humid hour that was not capped. Every system is checked at both at 100% load. The design peak is the highest of Case A, Case B and the typical-year maximum at 100% load, so no hour in the weather file exceeds it.</li>
       <li><b>Loads</b>: chiller load = IT load + CDU pumps or FWU fans + primary and secondary pumps. Pumps and fans: <code>P = Q·ΔP / (ρ·c<sub>p</sub>·ΔT·η)</code>; VFD part load <code>P = P<sub>full</sub>·(Q/Q<sub>design</sub>)³</code>, minimum speed 50% pumps, 30% fans.</li>
-      <li><b>Free cooling</b> = (T<sub>return</sub> − T<sub>out</sub>) / (T<sub>return</sub> − T<sub>supply</sub>), 0–1. T<sub>out</sub>: towers wb + 5.56 + 1.5 (plate HX); dry coolers db + 5.56 (direct on the loop); adiabatic wb + 11.1 + 1.5 with pads on (above 24 °C), db + 5.56 + 1.5 dry; hybrid: dry coolers alone up to 24 °C, towers above, dry share = (wb + 5.56 − db) / 5.56. Approaches: ASHRAE 90.1-2025 Table 6.8.1-7.</li>
-      <li><b>Chillers</b>: <code>COP = COP<sub>rated</sub> × [(T<sub>e</sub> + 273.15)/(T<sub>c</sub> − T<sub>e</sub>)] ÷ [(T<sub>e,ref</sub> + 273.15)/(T<sub>c,ref</sub> − T<sub>e,ref</sub>)]</code>, limited to 14. T<sub>e</sub> = supply − 2; T<sub>c</sub> = db + 15 (air-cooled) or condenser water + 7 (water-cooled). Rated COP: ASHRAE 90.1-2025 Path B (2.866 air-cooled, 6.018 water-cooled) at AHRI 551/591 (T<sub>e,ref</sub> 5 °C; T<sub>c,ref</sub> 50 / 37 °C). Part load: <code>a + b·PLR + c·PLR²</code> calibrated to the Path B IPLV (water-cooled 0.1969 / 0.1318 / 0.6713; air-cooled 0.1752 / 0.1354 / 0.6895). Units staged by load, the next above 90% PLR. Air-cooled capacity −1.35% per K above 35 °C.</li>
+      <li><b>Free cooling</b> = (T<sub>return</sub> − T<sub>out</sub>) / (T<sub>return</sub> − T<sub>supply</sub>), 0–1. T<sub>out</sub>: towers wb + 5.56 + 1.5 (plate HX); dry coolers db + 5.56 (direct on the loop); adiabatic above 24 °C: min(db + 5.56, T<sub>pad</sub> + 9.4) + 1.5, with T<sub>pad</sub> = db − 0.85 (db − wb); the pads run only when they give the colder water; db + 5.56 + 1.5 below 24 °C; hybrid: dry coolers alone up to 24 °C, towers above with the dry coolers in series ahead: in free-cooling hours dry share = (T<sub>in</sub> − T<sub>dry,out</sub>) / (T<sub>in</sub> − T<sub>req</sub>), T<sub>in</sub> = return − 1.5, T<sub>req</sub> = max(supply − 1.5, wb + 5.56), T<sub>dry,out</sub> = max(db + 5.56, T<sub>req</sub>); with chillers only (wb + 5.56 − db) / 5.56. Approaches: ASHRAE 90.1-2025 Table 6.8.1-7 rating points (minimum efficiency, not design selections).</li>
+      <li><b>Chillers</b>: <code>COP = COP<sub>rated</sub> × [(T<sub>e</sub> + 273.15)/(T<sub>c</sub> − T<sub>e</sub>)] ÷ [(T<sub>e,ref</sub> + 273.15)/(T<sub>c,ref</sub> − T<sub>e,ref</sub>)]</code>, limited to 14 (provisional, pending manufacturer low-lift data). T<sub>e</sub> = supply − 2; T<sub>c</sub> = db + 15 (air-cooled) or condenser water + 7 (water-cooled). Rated COP: ASHRAE 90.1-2025 Path B (2.866 air-cooled, 6.018 water-cooled) at AHRI 551/591 (T<sub>e,ref</sub> 5 °C; T<sub>c,ref</sub> 50 / 37 °C). Part load: <code>PLF = a + b·PLR + c·PLR²</code> = k × EnergyPlus variable-speed shape + (1 − k), k solved so the AHRI points, each at its own condenser temperature, reproduce the Path B IPLV (k = 0.867 water-cooled, 0.890 air-cooled; coefficients 0.1969 / 0.1318 / 0.6713 and 0.1752 / 0.1354 / 0.6895). The temperature benefit sits only in the Carnot term. Units staged by load, the next above 90% PLR. Air-cooled capacity −1.35% per K above 35 °C.</li>
       <li><b>Heat rejection</b>: Q<sub>r</sub> = chiller load + chiller power. Fans at full speed: towers 1.2%, dry and adiabatic coolers 3% of the heat (ASHRAE 2025 minimum / public data sheets); condenser pumps 211 kPa on 5.56 K. Condenser water above 43 °C gives a warning (a chiller rated above 43 °C is needed).</li>
-      <li><b>Water</b>: towers <code>0.00153 × flow × range</code> evaporation (ASHRAE) plus blowdown at CoC 4 = 1.76 L/h per kW rejected; hybrid on the towers' share; adiabatic <code>Q<sub>r</sub> × (db − T<sub>pad</sub>) / (12 × 2,430) × 1.15</code> with pads on.</li>
+      <li><b>Water</b>: towers <code>0.0020 × flow × range</code> evaporation (EnergyPlus default 0.2 %/K; band 0.15–0.27 %/K) plus blowdown at CoC 4 = 2.3 L/h per kW rejected (1.7–3.1); hybrid on the towers' share; adiabatic <code>Q<sub>r</sub> × (db − T<sub>pad</sub>) / (12 × 2,430) × 1.15</code> in wet-mode hours only.</li>
       <li><b>MLC</b> (ASHRAE 90.4): annual mechanical energy ÷ annual IT energy; checked against ASHRAE 90.4-2025 Table 6.5 for the climate zone.</li>
       <li><b>Electrical losses and PUE</b>: <code>PUE = (IT / η<sub>UPS</sub> + cooling) / (1 − losses) / IT</code>, UPS 96%, distribution 2%. Simplified, not the 90.4 ELC method.</li>
       <li><b>Running cost</b>: <code>electricity × tariff + water × tariff + cooling peak × demand charge × 12</code>. Simple payback against air-cooled chillers = extra initial cost (mid estimate) ÷ running cost saved.</li>
-      <li><b>Carbon</b> (t CO₂e/yr): electricity × grid factor + water × supply energy (kWh/m³) × grid factor + refrigerant charge (duty + 1 standby per loop, kg/kW × capacity) × leak rate × GWP. Grid factors: Our World in Data / Ember; water energy: IEA WEO 2016; GWP: IPCC AR4.</li>
-      <li><b>Recommendation</b>: energy 4, water 3 (doubled when water is limited), peak 3, initial cost 2, carbon 3, normalised across feasible options. Full basis: the Cooling Plant Calculation Basis. Screening-level; confirm with vendor selections.</li>
+      <li><b>Carbon</b> (t CO₂e/yr): electricity × grid factor + water × supply energy (kWh/m³) × grid factor + refrigerant charge (duty + 1 standby per loop, kg/kW × capacity) × leak rate × GWP. Grid factors: EPA eGRID2023 rev 2 (US), Australian NGA (Sydney), Our World in Data / Ember (others); water energy: IEA WEO 2016 (Phoenix band to 1.6, CAP); GWP: IPCC AR4 via the EPA AIM Act, R-1234ze(E) EU 2024/573.</li>
+      <li><b>Recommendation</b>: energy 4, water 3 (doubled when water is limited), peak 3, initial cost 2, carbon 3, normalised across feasible options. Energy and carbon are both scored on purpose: energy is the plant's efficiency, carbon its environmental impact, so electricity carries about half the weight. Full basis: the Cooling Plant Calculation Basis. Screening-level; confirm with vendor selections.</li>
     </ul>
   </div>
   </div>
@@ -905,17 +905,23 @@ const GRID_EF={dubai:.468,abudhabi:.468,riyadh:.692,jeddah:.692,dammam:.692,mana
 // energy to supply 1 m³ of water, kWh: seawater desalination (Gulf) about 3.5, conventional treated supply about 0.5 (IEA World Energy Outlook 2016, Water-Energy Nexus)
 const WATER_KWH={dubai:3.5,abudhabi:3.5,riyadh:3.5,jeddah:3.5,dammam:3.5,manama:3.5};
 const waterKwh=id=>WATER_KWH[id]??0.5;
-// refrigerants, 100-year GWP (IPCC AR4, as used by the EU F-gas Regulation)
-const REFRIGERANTS={r513a:{name:'R-513A',gwp:631},r134a:{name:'R-134a',gwp:1430},r1234ze:{name:'R-1234ze(E)',gwp:1}};
+// band where the supply mix is known to vary: Phoenix = local surface water (0.5) to Central Arizona Project conveyance + treatment (about 1.6;
+// CAP: 2.8 million MWh for 1.6 million acre-feet = 1.4 kWh/m³ conveyance alone)
+const WATER_KWH_BAND={phoenix:[0.5,1.6]};
+const waterKwhBand=id=>WATER_KWH_BAND[id]||null;
+// refrigerants, 100-year GWP: R-134a and R-513A IPCC AR4 (as used by the U.S. EPA under the AIM Act); R-1234ze(E) EU F-gas Regulation 2024/573
+const REFRIGERANTS={r513a:{name:'R-513A',gwp:631},r134a:{name:'R-134a',gwp:1430},r1234ze:{name:'R-1234ze(E)',gwp:1.37}};
 
 // default basis values (inputs override them in the Cooling Plant Selector)
 const BASIS={
-  copA:2.866, copW:6.018, copMax:14,          // ASHRAE 90.1-2025 Table 6.8.1-3, Path B full load; COPmax = assumption
+  copA:2.866, copW:6.018, copMax:14,          // ASHRAE 90.1-2025 Table 6.8.1-3, Path B full load; COPmax = provisional, pending manufacturer low-lift data
   unitWL:7000, unitWA:5500, unitA:1500, derA:0.0135,   // chiller unit sizes (kW): water-cooled liquid / air loop, air-cooled; air-cooled capacity loss per K above 35 °C (Trane RTAC public data)
   stage:0.90, acMax:52, wcMax:43,             // next chiller above 90% PLR; air-cooled max ambient; condenser-water warning limit
   acApp:15, wcApp:7,                          // condensing: ambient + 15 K; condenser water + 5 K range (AHRI) + 2 K
-  aCT:5.56, aDC:5.56, aAD:11.1, aHX:1.5, rangeCW:5.56,   // ASHRAE 90.1-2025 Table 6.8.1-7 rating approaches; plate HX
-  swAD:24, swHY:24, eAD:0.85, coc:4,          // adiabatic / hybrid switch; pad effectiveness (water use only); cycles of concentration
+  aCT:5.56, aDC:5.56, aAD:9.4, aHX:1.5, rangeCW:5.56,   // ASHRAE 90.1-2025 Table 6.8.1-7 rating approaches; adiabatic: coil approach above the air after the pads
+                                              // (rating 95 °F leaving water, 95 / 75 °F air: pad air 78 °F, so 17 °F = 9.4 K); plate HX
+  swAD:24, swHY:24, eAD:0.85, coc:4,          // adiabatic / hybrid switch; pad effectiveness; cycles of concentration
+  evapK:0.0020, evapLo:0.0015, evapHi:0.0027, // tower evaporation per kg circulated per K of range: EnergyPlus default 0.2 %/K, band 0.15–0.27 %/K
   kCT:0.012, kDC:0.030, kAD:0.030,            // fan kW per kW rejected at full speed: towers ASHRAE 2025 minimum; dry / adiabatic public data sheets
   dpCDU:320, dtCDU:10, dpPri:200, dpSec:400, dpCW:211, etaP:0.70,   // pump heads (kPa), CDU coolant ΔT, pump × motor × VFD efficiency
   dpFWU:0.30, dtAir:12, etaF:0.65,            // fan wall units: static pressure (kPa), air rise across IT (K), fan efficiency
@@ -956,11 +962,18 @@ function hourModel(o,L,db,wb,p){
   let Tout,ecw=null,kind,wet=0,dShare=0;
   if(o.id==='acc'){ Tout=Infinity; kind='ac'; }
   else if(o.id==='accfc'){ Tout=db+p.aDC; kind='ac'; }                     // dry coolers directly on the loop
-  else if(o.id==='adia'){ wet=db>p.swAD?1:0; ecw=wet?wb+p.aAD:db+p.aDC; Tout=ecw+p.aHX; kind='wc'; }
+  else if(o.id==='adia'){ // above the switch the pads run only when they give the colder water: min(db + 5.56, pad air + 9.4)
+    const dry=db+p.aDC, padAir=db-p.eAD*(db-wb), wetOut=padAir+p.aAD;
+    wet=db>p.swAD&&wetOut<dry?1:0; ecw=wet?wetOut:dry; Tout=ecw+p.aHX; kind='wc'; }
   else if(o.id==='wcc'){ wet=1; ecw=wb+p.aCT; Tout=ecw+p.aHX; kind='wc'; }
   else { // hybrid: dry coolers in series ahead of the towers on the condenser water
     if(db<=p.swHY){ ecw=db+p.aDC; dShare=1; wet=0; }
-    else { ecw=wb+p.aCT; dShare=Math.max(0,Math.min(1,(ecw+p.rangeCW-(db+p.aDC))/p.rangeCW)); wet=1-dShare; }
+    else { ecw=wb+p.aCT;
+      const fc=ecw+p.aHX<L.Tr;   // free cooling (full or partial): loop water from the plate HX passes the dry coolers first
+      if(fc){ const Tin=L.Tr-p.aHX, Treq=Math.max(L.Ts-p.aHX,ecw), Tdry=Math.max(db+p.aDC,Treq);
+        dShare=Tin>Treq?Math.max(0,Math.min(1,(Tin-Tdry)/(Tin-Treq))):1; }
+      else dShare=Math.max(0,Math.min(1,(ecw+p.rangeCW-(db+p.aDC))/p.rangeCW));   // chillers only: condenser water over its 5.56 K range
+      wet=1-dShare; }
     Tout=ecw+p.aHX; kind='wc';
   }
   const Tc=kind==='ac'?db+p.acApp:ecw+p.wcApp;
@@ -997,16 +1010,23 @@ function hourModel(o,L,db,wb,p){
   return {Tout,Tc,ecw,kind,ff,wet,dShare,N,unit,cop,calc,limit,warn};
 }
 
-// make-up water, kg/h: towers 0.00153 × flow × range (ASHRAE) + blowdown at CoC; hybrid on the towers' share; adiabatic pads (air-side balance)
+// make-up water, kg/h: tower evaporation = evapK × flow × range (EnergyPlus default 0.2 %/K) + blowdown at CoC; hybrid on the towers' share;
+// adiabatic pads (air-side balance), only in wet-mode hours
 function waterKgH(o,Qr,db,wb,p,wet){
-  if(o.id==='wcc'||o.id==='hyb') return wet*Qr*0.00153/4.18*3600*(p.coc/(p.coc-1));
+  if(o.id==='wcc'||o.id==='hyb') return wet*Qr*p.evapK/4.18*3600*(p.coc/(p.coc-1));
   if(o.id==='adia'&&wet){ const Tpad=db-p.eAD*(db-wb); return Qr*(db-Tpad)/(12*2430)*1.15*3600; }
   return 0;
 }
 
+// low / high water for the evaporation-factor band (towers and hybrid scale with it; adiabatic pad water does not)
+const evapScale=(o,p,k)=>o.id==='wcc'||o.id==='hyb'?k/p.evapK:1;
+
 // two coincident design cases: A = extreme dry-bulb + the wet-bulb of the hottest hour; B = extreme wet-bulb + the dry-bulb of the most humid hour
+// Case B takes its dry-bulb from the most humid hour that was not capped (station files cap hourly wet-bulb at the ASHRAE extreme + 1 K)
 function designCases(wx,A,dbIn,wbIn){
-  let hA=0,hB=0; wx.T.forEach((t,h)=>{ if(t>wx.T[hA]) hA=h; if(wx.Twb[h]>wx.Twb[hB]) hB=h; });
+  const capped=new Set((wx.station&&wx.station.capH)||[]), ok=h=>!capped.has(h);
+  let hA=0,hB=-1; wx.T.forEach((t,h)=>{ if(t>wx.T[hA]) hA=h; if(ok(h)&&(hB<0||wx.Twb[h]>wx.Twb[hB])) hB=h; });
+  if(hB<0) hB=wx.Twb.indexOf(Math.max(...wx.Twb));
   const dbA=isNaN(dbIn)?(A?A.extDB:wx.T[hA]):dbIn, wbB=isNaN(wbIn)?(A?A.extWB:wx.Twb[hB]):wbIn;
   return {A:{db:dbA,wb:Math.min(wx.Twb[hA],dbA)}, B:{db:Math.max(wx.T[hB],wbB),wb:wbB}};
 }
@@ -1025,8 +1045,8 @@ function designCheck(p){
       });
       cs[k]={P,Qr,W};
     }
-    const worst=cs.A.P>=cs.B.P?'A':'B';
-    out[o.id]={cases:cs,worst,P:cs[worst].P,Qr:Math.max(cs.A.Qr,cs.B.Qr),W:Math.max(cs.A.W,cs.B.W),units,
+    const worst=cs.A.P>=cs.B.P?'A':'B', Wd=Math.max(cs.A.W,cs.B.W);
+    out[o.id]={cases:cs,worst,P:cs[worst].P,Qr:Math.max(cs.A.Qr,cs.B.Qr),W:Wd,Wlo:Wd*evapScale(o,p,p.evapLo),Whi:Wd*evapScale(o,p,p.evapHi),units,
       ok:issues.length===0,issues:[...new Set(issues)],warns:[...new Set(warns)],ratio:cs[worst].P/p.Qd};
   }
   p.des=des;
@@ -1037,25 +1057,32 @@ function designCheck(p){
 function simulate(wx,p,des){
   const n=wx.T.length, hs=8760/n, loops=p.loops, out={};
   for(const o of OPTIONS){
-    const r={o,E:0,Ec:0,Ef:0,Ep:0,Et:0,W:0,free:[0,0],part:[0,0],mech:[0,0],hotCW:0,
+    const r={o,E:0,Ec:0,Ef:0,Ep:0,Et:0,W:0,yMax:0,yAbove:0,free:[0,0],part:[0,0],mech:[0,0],hotCW:0,
       mFree:[new Array(12).fill(0),new Array(12).fill(0)],mPart:[new Array(12).fill(0),new Array(12).fill(0)],mMech:[new Array(12).fill(0),new Array(12).fill(0)],copSum:0,copN:0};
+    const dP=des[o.id].P;
     for(let h=0;h<n;h++){
-      const db=wx.T[h], wb=wx.Twb[h], m=wx.mon[h];
+      const db=wx.T[h], wb=wx.Twb[h], m=wx.mon[h]; let P100=0;
       loops.forEach((L,li)=>{
         if(L.Q<=0) return;
         const hm=hourModel(o,L,db,wb,p), a=hm.calc(L.Q), ff=hm.ff;
+        P100+=hm.calc(L.Qd).P;                        // the same hour at 100% IT load (bounding check of the design cases)
         r.E+=a.P; r.Ec+=a.Pc; r.Ef+=a.Pf; r.Ep+=a.Pp; r.Et+=a.Pt;
         if(a.cop){r.copSum+=a.cop; r.copN++;}
         r.W+=waterKgH(o,a.Qr,db,wb,p,hm.wet);
         if(hm.warn&&ff<1&&li===0) r.hotCW++;
         if(ff>=1){r.free[li]++; r.mFree[li][m]++;} else if(ff>0){r.part[li]++; r.mPart[li][m]++;} else {r.mech[li]++; r.mMech[li][m]++;}
       });
+      if(P100>r.yMax) r.yMax=P100;
+      if(P100>dP+1e-6) r.yAbove+=hs;
     }
     const Qyr=loops.reduce((s,L)=>s+L.Q,0)*n, d=des[o.id];
     ['E','Ec','Ef','Ep','Et'].forEach(k=>r[k]*=hs/1000);   // MWh
     r.W*=hs/1000;                                     // m3
+    r.Wlo=r.W*evapScale(o,p,p.evapLo); r.Whi=r.W*evapScale(o,p,p.evapHi);   // evaporation-factor band
     r.hotCW*=hs;                                      // h/yr above the condenser-water limit
-    r.peak=d.P; r.Wpeak=d.W;                          // design peak: the higher of Case A and Case B, 100% load
+    // design peak: the highest of Case A, Case B and the typical-year maximum, all at 100% IT load
+    r.peak=Math.max(d.P,r.yMax); r.peakCase=r.yMax>d.P+1e-6?'year':d.worst; r.yExcess=Math.max(0,r.yMax-d.P);
+    r.Wpeak=d.W; r.WpeakLo=d.Wlo; r.WpeakHi=d.Whi;
     ['free','part','mech'].forEach(k=>r[k]=r[k].map(v=>v*hs));
     r.mlc=r.E*1000/(Qyr*hs);
     r.cop=r.copN?r.copSum/r.copN:null;
@@ -1065,6 +1092,8 @@ function simulate(wx,p,des){
     r.Eit=Qyr*hs/1000;                                // MWh, IT energy = cooling load
     r.Efac=fac(r.Eit,r.E); r.Eloss=r.Efac-r.Eit-r.E;  // MWh
     r.pue=r.Efac/r.Eit;
+    // facility electrical peak (grid connection): IT at 100% through the UPS + cooling peak, plus distribution losses; same factors as the PUE
+    r.facPeak=fac(loops.reduce((s,L)=>s+L.Qd,0),r.peak); r.coolShare=r.peak/r.facPeak;
     // annual running cost of cooling, $: electricity + water + demand charge (cooling peak, every month)
     r.costE=r.E*1000*p.tE; r.costW=r.W*p.tW; r.costD=r.peak*12*p.tD;
     r.run=r.costE+r.costW+r.costD;
@@ -1075,8 +1104,9 @@ function simulate(wx,p,des){
     // carbon, t CO2e per year: electricity × grid factor; water × supply energy × grid factor; refrigerant charge (duty + 1 standby per loop) × leak × GWP
     r.chCap=d.units.reduce((s,u)=>s+(u.N+1)*u.unit,0);
     r.charge=r.chCap*(d.units.some(u=>u.kind==='ac')?p.chA:p.chW);
-    r.co2E=r.E*p.ef; r.co2W=r.W*p.wkwh/1000*p.ef; r.co2R=r.charge*p.leak*(REFRIGERANTS[p.refr]||REFRIGERANTS.r513a).gwp/1000;
-    r.co2=r.co2E+r.co2W+r.co2R; r.co2IT=r.co2*1000/r.Eit;   // kg CO2e per MWh of IT
+    const wk=p.wkwhBand||[p.wkwh,p.wkwh];
+    r.co2E=r.E*p.ef; r.co2W=r.W*p.wkwh/1000*p.ef; r.co2Wlo=r.Wlo*wk[0]/1000*p.ef; r.co2Whi=r.Whi*wk[1]/1000*p.ef; r.co2R=r.charge*p.leak*(REFRIGERANTS[p.refr]||REFRIGERANTS.r513a).gwp/1000;
+    r.co2=r.co2E+r.co2W+r.co2R; r.co2Lo=r.co2E+r.co2Wlo+r.co2R; r.co2Hi=r.co2E+r.co2Whi+r.co2R; r.co2IT=r.co2*1000/r.Eit;   // kg CO2e per MWh of IT
     out[o.id]=r;
   }
   return out;
@@ -1284,7 +1314,7 @@ function params(){
     copA:g('copA'),copW:g('copW'),copMax:g('copMax'),unitWL:Math.max(100,g('unitWL')),unitWA:Math.max(100,g('unitWA')),unitA:Math.max(50,g('unitA')),derA:Math.max(0,g('derA'))/100,
     acMax:g('acMax'),wcMax:g('wcMax'),aCT:g('aCT'),aDC:g('aDC'),aAD:g('aAD'),aHX:g('aHX'),swAD:g('swAD'),swHY:g('swHY'),eAD:g('eAD'),coc:Math.max(1.5,g('coc')),
     kCT:g('kCT')/100,kDC:g('kDC')/100,kAD:g('kAD')/100,dpCDU:g('dpCDU'),dpPri:g('dpPri'),dpSec:g('dpSec'),dpCW:g('dpCW'),etaP:Math.min(1,Math.max(0.2,g('etaP')/100)),
-    ef:isNaN(g('envEF'))?cityEF():g('envEF'),wkwh:isNaN(g('envW'))?waterKwh(cityId()):g('envW'),refr:$('refr').value,chW:Math.max(0,g('chW')),chA:Math.max(0,g('chA')),leak:Math.max(0,g('leak'))/100,
+    ef:isNaN(g('envEF'))?cityEF():g('envEF'),wkwh:isNaN(g('envW'))?waterKwh(cityId()):g('envW'),wkwhBand:isNaN(g('envW'))&&cityId()?waterKwhBand(cityId()):null,refr:$('refr').value,chW:Math.max(0,g('chW')),chA:Math.max(0,g('chA')),leak:Math.max(0,g('leak'))/100,
     dpFWU:g('dpFWU')/1000,dtAir:Math.max(2,g('dtAir')),etaF:Math.min(1,Math.max(0.2,g('etaF')/100)),
     tE:g('tE'),tW:g('tW'),tD:g('tD'),
     red:g('red')/100,ups:Math.min(1,Math.max(0.5,g('ups')/100)),dloss:Math.min(0.3,Math.max(0,g('dloss')/100)),rates,...Object.fromEntries(WEIGHTS.map(w=>[w.id,w.v]))};
@@ -1314,6 +1344,9 @@ const tag=(id,i)=>RES[id].excluded?`<span class="tag x">${RES[id].excluded}</spa
 const loopTxt=(arr)=>P.loops.map((L,i)=>L.Q>0?fmt(arr[i]):'–').join(' / ');
 // basis label for peaks (annual figures are at the frequent load, stated in the notes)
 const atPk='design case';
+// annual water with the tower evaporation band (0.15–0.27 %/K) where it applies
+const band=(c,lo,hi,d=0)=>hi>c*1.001?` (${fmt(lo,d)}–${fmt(hi,d)})`:'';
+const wTxt=r=>`${fmt(r.W)} m³/yr${band(r.W,r.Wlo,r.Whi)}`;
 const costTxt=r=>`${fmt(r.capLo/1e6,1)}–${fmt(r.capHi/1e6,1)} M$`;
 const runTxt=r=>`${fmt(r.run/1e6,2)} M$/yr`;
 // simple payback of extra initial cost against air-cooled chillers, from the running cost saved
@@ -1339,7 +1372,7 @@ function renderReco(){
     <span class="an">Extremes from ${src}; coincident values from the hourly weather</span></div>`;
   const top=RANK.length?'':'<div class="sub" style="margin-top:4px"><b>No system meets every constraint.</b> Try allowing water, raising the loop supply temperatures, or checking the design conditions and chiller limits.</div>';
   // one summary card per system, recommended first
-  const lines=[['Electricity',r=>r.E,r=>`${fmt(r.E/1000,1)} GWh/yr`],['Annual PUE',r=>r.pue,r=>r.pue.toFixed(3)],[`Electrical peak <small>cooling, ${atPk}</small>`,r=>r.peak,r=>`${fmt(r.peak/1000,2)} MW`],['Water',r=>r.W,r=>`${fmt(r.W)} m³/yr`],[`Water peak <small>${atPk}</small>`,r=>r.Wpeak,r=>`${fmt(r.Wpeak,1)} m³/h`],['Carbon',r=>r.co2,r=>`${fmt(r.co2)} t CO₂/yr`],['Running cost',r=>r.run,runTxt],['Initial cost',r=>r.capMid,costTxt]];
+  const lines=[['Electricity',r=>r.E,r=>`${fmt(r.E/1000,1)} GWh/yr`],['Annual PUE',r=>r.pue,r=>r.pue.toFixed(3)],[`Electrical peak <small>cooling, ${atPk}</small>`,r=>r.peak,r=>`${fmt(r.peak/1000,2)} MW`],['Water',r=>r.W,wTxt],[`Water peak <small>${atPk}</small>`,r=>r.Wpeak,r=>`${fmt(r.Wpeak,1)} m³/h`],['Carbon',r=>r.co2,r=>`${fmt(r.co2)} t CO₂/yr`],['Running cost',r=>r.run,runTxt],['Initial cost',r=>r.capMid,costTxt]];
   const bestV=lines.map(([,v])=>RANK.length?Math.min(...RANK.map(i=>v(RES[i]))):null);
   const cards=order().map(id=>{ const r=RES[id], k=RANK.indexOf(id);
     const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="tag ok">Recommended</span>':`<span class="tag">#${k+1}</span>`;
@@ -1396,9 +1429,9 @@ function renderSystem(){
   $('sysHow').textContent=s.how;
   $('sysSvg').innerHTML=schematic(id);
   $('sysKpi').innerHTML=kpis([[`${fmt(r.E/1000,1)} GWh`,'Cooling electricity per year'],[r.mlc.toFixed(3),'Annual MLC (kW/kW)'],[r.pue.toFixed(3),'Annual PUE (incl. losses)'],
-    [`${fmt(r.peak/1000,2)} MW`,`Electrical peak, cooling plant (${atPk})`],[`${fmt(r.Wpeak,1)} m³/h`,`Water peak, make-up (${atPk})`],
-    [`${fmt(r.W)} m³`,'Water per year'],[runTxt(r),'Running cost, cooling'],[costTxt(r),'Initial cost (estimate)'],[payback(r).txt,'Payback vs air-cooled chillers'],[`${fmt(d.Qr/1000,1)} MW`,'Heat rejection at design']]);
-  $('sysDes').innerHTML=(d.ok?`Design cases: Case A ${fmt(d.cases.A.P/1000,2)} MW, Case B ${fmt(d.cases.B.P/1000,2)} MW; design peak ${fmt(d.P/1000,2)} MW (Case ${d.worst}). Duty chillers ${d.units.map(u=>`${u.N} × ${fmt(u.unit/1000,1)} MW`).join(' (liquid) / ')} (air), plus 1 standby each.`
+    [`${fmt(r.peak/1000,2)} MW`,`Electrical peak, cooling plant (${atPk})`],[`${fmt(r.facPeak/1000,1)} MW`,`Facility peak, grid connection (cooling ${fmt(r.coolShare*100)}%)`],[`${fmt(r.Wpeak,1)} m³/h`,`Water peak, make-up (${atPk})`],
+    [wTxt(r),'Water per year (evaporation band)'],[runTxt(r),'Running cost, cooling'],[costTxt(r),'Initial cost (estimate)'],[payback(r).txt,'Payback vs air-cooled chillers'],[`${fmt(d.Qr/1000,1)} MW`,'Heat rejection at design']]);
+  $('sysDes').innerHTML=(d.ok?`Design cases: Case A ${fmt(d.cases.A.P/1000,2)} MW, Case B ${fmt(d.cases.B.P/1000,2)} MW; typical-year maximum ${fmt(r.yMax/1000,2)} MW${r.yAbove?` (${fmt(r.yAbove)} h above Cases A/B, up to +${fmt(r.yExcess/1000,2)} MW)`:''}; design peak ${fmt(r.peak/1000,2)} MW (${r.peakCase==='year'?'typical-year hour':'Case '+r.peakCase}). Duty chillers ${d.units.map(u=>`${u.N} × ${fmt(u.unit/1000,1)} MW`).join(' (liquid) / ')} (air), plus 1 standby each.`
     :`<span class="tag x">Fails design day</span> ${d.issues.join('; ')}`)+(d.warns.length?` <span class="tag">Warning</span> ${d.warns[0]}.`:'');
   // annual operating mode per loop
   $('sysModes').innerHTML=P.loops.map((L,i)=>{ if(L.Q<=0) return '';
@@ -1426,10 +1459,10 @@ function renderEff(){
 }
 
 function renderCarbon(){
-  const b=RES.acc, rows=order().map((id,i)=>{ const r=RES[id]; return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td>${fmt(r.co2E)}</td><td>${fmt(r.co2W)}</td><td>${fmt(r.co2R)}</td><td>${fmt(r.co2)}</td><td>${fmt(r.co2IT,1)}</td><td>${id==='acc'?'–':fmt(b.co2-r.co2)}</td></tr>`; });
+  const b=RES.acc, rows=order().map((id,i)=>{ const r=RES[id]; return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td>${fmt(r.co2E)}</td><td>${fmt(r.co2W)}${band(r.co2W,r.co2Wlo,r.co2Whi)}</td><td>${fmt(r.co2R)}</td><td>${fmt(r.co2)}${band(r.co2,r.co2Lo,r.co2Hi)}</td><td>${fmt(r.co2IT,1)}</td><td>${id==='acc'?'–':fmt(b.co2-r.co2)}</td></tr>`; });
   $('tCO2').innerHTML=table(['Option','Electricity t CO₂/yr','Water supply t CO₂/yr','Refrigerant t CO₂e/yr','Total t CO₂e/yr','kg CO₂e per MWh IT','Saving vs air-cooled t/yr'],rows);
   const rf=REFRIGERANTS[P.refr];
-  $('co2Note').textContent=`Grid factor ${P.ef.toFixed(3)} kg CO₂/kWh${isNaN(parseFloat($('envEF').value))?(cityId()?(['nova','dallas','phoenix','chicago'].includes(cityId())?' (EPA eGRID2023 subregion)':cityId()==='sydney'?' (Australian NGA factors, NSW 2025–26)':' (Our World in Data / Ember, latest year)'):' (world average; enter the local grid)'):''}; water supply ${fmt(P.wkwh,1)} kWh/m³; ${rf.name} GWP ${fmt(rf.gwp)}, charge ${P.chW} / ${P.chA} kg/kW (water / air-cooled), leak ${fmt(P.leak*100,1)}%/yr on duty + 1 standby chillers. Cooling plant only; IT electricity not included.`;
+  $('co2Note').textContent=`Grid factor ${P.ef.toFixed(3)} kg CO₂/kWh${isNaN(parseFloat($('envEF').value))?(cityId()?((CITIES.find(c=>c.id===cityId())||{}).g==='Americas'&&cityId()!=='saopaulo'?' (EPA eGRID2023 rev 2 subregion)':cityId()==='sydney'?' (Australian NGA factors, NSW 2025–26)':' (Our World in Data / Ember, latest year)'):' (world average; enter the local grid)'):''}; water supply ${fmt(P.wkwh,1)} kWh/m³${P.wkwhBand?` (band ${fmt(P.wkwhBand[0],1)}–${fmt(P.wkwhBand[1],1)}: Central Arizona Project)`:''}; tower water band 0.15–0.27 %/K evaporation; ${rf.name} GWP ${fmt(rf.gwp,rf.gwp<10?2:0)}, charge ${P.chW} / ${P.chA} kg/kW (water / air-cooled), leak ${fmt(P.leak*100,1)}%/yr on duty + 1 standby chillers. Cooling plant only; IT electricity not included.`;
   const ids=RANK, labels=ids.map(id=>RES[id].o.short);
   const o=baseOpts(); o.indexAxis='y'; o.scales.x={stacked:true,grid:{color:css('--border')},border:{display:false},ticks:{color:css('--text2')},title:{display:true,text:'t CO₂e/yr',color:css('--text2')},beginAtZero:true};
   o.scales.y={stacked:true,grid:{display:false},ticks:{color:css('--text')}};
@@ -1440,8 +1473,8 @@ function renderCarbon(){
 }
 
 function renderCons(){
-  const rows=order().map((id,i)=>{ const r=RES[id]; return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td>${fmt(r.E)}</td><td>${fmt(r.Ec)}</td><td>${fmt(r.Ef)}</td><td>${fmt(r.Ep)}</td><td>${fmt(r.Et)}</td><td>${fmt(r.Eloss)}</td><td>${r.pue.toFixed(3)}</td><td>${fmt(r.peak/1000,2)}</td><td>${fmt(r.W)}</td><td>${fmt(r.Wpeak,1)}</td></tr>`; });
-  $('tCons').innerHTML=table(['Option','Cooling MWh/yr','Chillers','Heat-rejection fans','Pumps','CRAH / FWU / CDU','Electrical losses MWh/yr','Annual PUE',`Electrical peak MW (cooling, ${atPk})`,'Water m³/yr',`Water peak m³/h (${atPk})`],rows);
+  const rows=order().map((id,i)=>{ const r=RES[id]; return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td>${fmt(r.E)}</td><td>${fmt(r.Ec)}</td><td>${fmt(r.Ef)}</td><td>${fmt(r.Ep)}</td><td>${fmt(r.Et)}</td><td>${fmt(r.Eloss)}</td><td>${r.pue.toFixed(3)}</td><td>${fmt(r.peak/1000,2)}</td><td>${fmt(r.facPeak/1000,1)}</td><td>${fmt(r.coolShare*100)}%</td><td>${fmt(r.W)}${band(r.W,r.Wlo,r.Whi)}</td><td>${fmt(r.Wpeak,1)}${band(r.Wpeak,r.WpeakLo,r.WpeakHi,1)}</td></tr>`; });
+  $('tCons').innerHTML=table(['Option','Cooling MWh/yr','Chillers','Heat-rejection fans','Pumps','CRAH / FWU / CDU','Electrical losses MWh/yr','Annual PUE',`Electrical peak MW (cooling, ${atPk})`,'Facility peak MW (grid)','Cooling share of facility peak','Water m³/yr',`Water peak m³/h (${atPk})`],rows);
   const ids=RANK, labels=ids.map(id=>RES[id].o.short);
   const o=baseOpts(); o.indexAxis='y'; o.scales.x={stacked:true,grid:{color:css('--border')},border:{display:false},ticks:{color:css('--text2')},title:{display:true,text:'MWh/yr',color:css('--text2')}};
   o.scales.y={stacked:true,grid:{display:false},ticks:{color:css('--text')}};

@@ -28,8 +28,9 @@ for(const id of fs.readdirSync(SRC).filter(d=>fs.statSync(path.join(SRC,d)).isDi
   const period=(epwF.match(/TMYx\.(\d{4})-(\d{4})/)||[]).slice(1).join('–');
   const station=loc[1].replace(/\./g,' ').replace(/-/g,' – ').replace(/\s+/g,' ').trim();
   // faulty humidity readings: limit hourly wet-bulb to the ASHRAE extreme annual wet-bulb + 1 K
-  const wbMax=ashrae.extWB+1; let capped=0; const wb=w.Twb.map(v=>{ if(v>wbMax){capped++; return wbMax;} return v; });
-  const rec={station, wmo:loc[5], period, elev:num(loc[9]), zone, ashrae, wbCap:wbMax, wbCapped:capped, file:epwF, db:b64(w.T), wb:b64(wb)};
+  const wbMax=ashrae.extWB+1; let capped=0; const capH=[]; const wb=w.Twb.map((v,h)=>{ if(v>wbMax){capped++; capH.push(h); return wbMax;} return v; });
+  const rec={station, wmo:loc[5], period, elev:num(loc[9]), zone, ashrae, wbCap:wbMax, wbCapped:capped, capH,   // capH = hours (0–8759) whose wet-bulb was capped
+    file:epwF, db:b64(w.T), wb:b64(wb)};
   fs.writeFileSync(path.join(OUT,id+'.js'),
     `// ${station} (WMO ${loc[5]}) · TMYx ${period} hourly weather · ASHRAE 2025 Fundamentals design conditions\n`+
     `// Source: climate.onebuilding.org, ${epwF}. Hourly dry-bulb and wet-bulb in 0.1 °C steps (Int16, base64).\n`+
