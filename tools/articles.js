@@ -220,9 +220,9 @@ ${ARTICLES.map(a=>`  <a class="card" href="${a.slug}/index.html"><h2>${a.title}<
 }
 // home page articles: refresh the cards between the markers
 { const f=path.join(ROOT,'index.html'); let h=fs.readFileSync(f,'utf8');
-  const cards=ARTICLES.slice(0,3).map(a=>`
+  const cards=ARTICLES.map(a=>`
       <a class="card acard" href="articles/${a.slug}/index.html"><span class="atag">${a.tool[0]}</span><h3>${a.title}</h3><p>${esc(a.desc)}</p><span class="open">Read article →</span></a>`).join('')+'\n    ';
-  h=h.replace(/<div class="agrid">[\s\S]*?<\/div>\n    <a class="allart"/,`<div class="agrid">${cards}</div>\n    <a class="allart"`);
+  h=h.replace(/<div class="agrid">[\s\S]*?(?:<\/div>)+\n    <a class="allart"/,`<div class="agrid">${cards}</div></div>\n    <a class="allart"`);
   fs.writeFileSync(f,h); }
 module.exports=ARTICLES;
 if(require.main===module) console.log(`articles: ${ARTICLES.length} + index`);

@@ -88,6 +88,16 @@ a.fc:hover{transform:translateY(-2px);box-shadow:0 8px 22px color-mix(in srgb,va
 .acard p{margin:0;font-size:14px;line-height:1.55;color:var(--text2);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .acard .open{margin-top:auto;padding-top:4px;font-weight:600;color:var(--brand-ink);font-size:14px}
 .allart{display:inline-block;margin-top:16px;font-weight:600;color:var(--brand-ink);text-decoration:none}
+.rail{position:relative}
+.rail>.tgrid,.rail>.agrid{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:calc((100% - 32px)/3);overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;padding:4px 2px 6px;margin:-4px -2px 0}
+.rail>.tgrid::-webkit-scrollbar,.rail>.agrid::-webkit-scrollbar{display:none}
+.rail>div>a{scroll-snap-align:start}
+.rail .rbtn{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--brand-ink);font-size:20px;line-height:1;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;z-index:2}
+.rail .rbtn:hover{background:var(--brand-ink);color:#fff}
+.rail .rbtn.next{right:-22px}.rail .rbtn.prev{left:-22px}
+.rail .rbtn[hidden]{display:none}
+@media (max-width:1000px){.rail>.tgrid,.rail>.agrid{grid-auto-columns:calc((100% - 16px)/2)}}
+@media (max-width:640px){.rail>.tgrid,.rail>.agrid{grid-auto-columns:85%}.rail .rbtn.next{right:-6px}.rail .rbtn.prev{left:-6px}}
 </style>
 <meta name="author" content="Mutaz Othman">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://www.oenergylab.com/#org","name":"Othman Energy Lab","url":"https://www.oenergylab.com/","logo":"https://www.oenergylab.com/shared/img/apple-touch-icon.png","email":"Mutaz.othman@outlook.com","slogan":"Code-based. Beyond the minimum.","founder":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"description":"Engineering tools and analysis that guide engineers and clients to the right cooling and energy system for critical and high-demand buildings: less energy, lower cost and a cleaner planet."},{"@type":"WebSite","@id":"https://www.oenergylab.com/#website","name":"Othman Energy Lab","url":"https://www.oenergylab.com/","publisher":{"@id":"https://www.oenergylab.com/#org"},"inLanguage":"en"},{"@type":"Person","@id":"https://www.oenergylab.com/about/#mutaz-othman","name":"Mutaz Othman","honorificPrefix":"Eng.","jobTitle":"Mechanical Design Engineer, Mission-Critical and High-Demand Buildings","description":"Mechanical design engineer with 11 years of experience in the GCC, designing HVAC and cooling systems for mission-critical facilities (data centers, healthcare) and high-demand buildings such as malls and high-rise towers. Founder of Othman Energy Lab.","url":"https://www.oenergylab.com/about/","sameAs":["https://www.linkedin.com/in/mutaz-othman-48aa1556/"],"worksFor":{"@id":"https://www.oenergylab.com/#org"},"knowsAbout":["Data center cooling","HVAC design","Chilled water plants","Liquid cooling","Thermal energy storage","ASHRAE 90.1","ASHRAE 90.4","Energy efficiency","Healthcare HVAC","High-rise building HVAC"]}]}</script>
@@ -147,6 +157,7 @@ a.fc:hover{transform:translateY(-2px);box-shadow:0 8px 22px color-mix(in srgb,va
       <h2>Tools that support the right choice</h2>
       <p>The analysis we use, open for engineers and clients to explore. More tools are added as the Lab grows.</p>
     </div>
+    <div class="rail"><button class="rbtn prev" type="button" aria-label="Previous" hidden>←</button><button class="rbtn next" type="button" aria-label="Next">→</button>
     <div class="tgrid">
       <a class="card tcard" href="data-centers/rack-cooling/index.html">
         <div class="thumb" aria-hidden="true">
@@ -255,7 +266,7 @@ a.fc:hover{transform:translateY(-2px);box-shadow:0 8px 22px color-mix(in srgb,va
           <span class="open">Open tool →</span>
         </div>
       </a>
-    </div>
+    </div></div>
   </section>
 
   <section id="articles">
@@ -264,11 +275,14 @@ a.fc:hover{transform:translateY(-2px);box-shadow:0 8px 22px color-mix(in srgb,va
       <h2>Guides on data center cooling</h2>
       <p>Practical, code-based guides by Eng. Mutaz Othman, each linked to a free tool.</p>
     </div>
+    <div class="rail"><button class="rbtn prev" type="button" aria-label="Previous" hidden>←</button><button class="rbtn next" type="button" aria-label="Next">→</button>
     <div class="agrid">
       <a class="card acard" href="articles/how-to-use-cooling-plant-selector/index.html"><span class="atag">Cooling Plant Selector</span><h3>How to use the Cooling Plant Selector</h3><p>Step-by-step guide to the free Cooling Plant Selector: choose the city, enter the IT load and loop temperatures, read the ranked cooling plants, the design cases, energy, water, carbon and cost, and export a PDF or Excel report.</p><span class="open">Read article →</span></a>
       <a class="card acard" href="articles/ride-through-tank-sizing/index.html"><span class="atag">Ride-Through Tank</span><h3>How to size a chilled-water ride-through tank for a data center</h3><p>How to size a chilled-water tank that keeps a data center cooled while the generators start and the chillers restart: the equation, a worked 20 MW example, recommended ride-through times and what must be on UPS.</p><span class="open">Read article →</span></a>
       <a class="card acard" href="articles/ashrae-90-4-mlc/index.html"><span class="atag">Cooling Plant Selector</span><h3>ASHRAE 90.4 MLC explained, with the limits by climate zone</h3><p>What the ASHRAE 90.4 mechanical load component (MLC) is, how to calculate it, the maximum annualized MLC for every climate zone from ASHRAE 90.4-2025 Table 6.5, and typical values for real cooling plants.</p><span class="open">Read article →</span></a>
-    </div>
+      <a class="card acard" href="articles/cooling-towers-vs-adiabatic-vs-dry-coolers/index.html"><span class="atag">Cooling Plant Selector</span><h3>Cooling towers vs adiabatic coolers vs dry coolers for data centers in hot climates</h3><p>How cooling towers, adiabatic coolers, dry coolers and hybrid plants compare for data centers in hot climates: approaches, free cooling, electrical peak, energy, water and carbon, with a 100 MW Dubai example.</p><span class="open">Read article →</span></a>
+      <a class="card acard" href="articles/gb300-nvl72-liquid-cooling/index.html"><span class="atag">Liquid Rack Cooling</span><h3>NVIDIA GB300 NVL72 liquid cooling: coolant flow, supply temperature and minimum flow</h3><p>What an NVIDIA GB300 NVL72 rack needs from the liquid cooling system: about 135 kW, 90% to liquid, 25–45 °C supply, 59–177 L/min of coolant, the safe minimum flow and why the CDU response matters.</p><span class="open">Read article →</span></a>
+    </div></div>
     <a class="allart" href="articles/index.html">All articles →</a>
   </section>
 
@@ -298,5 +312,11 @@ a.fc:hover{transform:translateY(-2px);box-shadow:0 8px 22px color-mix(in srgb,va
 
 <footer class="sitefoot" data-root=""></footer>
 <script src="shared/js/site.js"></script>
+<script>
+document.querySelectorAll('.rail').forEach(function(rl){var g=rl.querySelector('.tgrid,.agrid'),p=rl.querySelector('.prev'),n=rl.querySelector('.next');
+function upd(){p.hidden=g.scrollLeft<8;n.hidden=g.scrollLeft+g.clientWidth>=g.scrollWidth-8;}
+function step(d){var c=g.querySelector('a');g.scrollBy({left:d*(c?c.offsetWidth+16:300),behavior:'smooth'});}
+p.onclick=function(){step(-1)};n.onclick=function(){step(1)};g.addEventListener('scroll',upd,{passive:true});addEventListener('resize',upd);upd();});
+</script>
 </body>
 </html>
