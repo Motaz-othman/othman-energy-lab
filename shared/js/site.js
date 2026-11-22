@@ -27,7 +27,7 @@ const MARK=`<svg viewBox="0 0 26 26" aria-hidden="true"><rect width="26" height=
   const foot=document.querySelector('footer.sitefoot');
   if(foot){ const r=foot.dataset.root||'';
     foot.innerHTML=`<div class="sitefoot-in">
-      <div><div class="fb">${MARK}<span>${SITE.name}</span></div><div class="ft">${SITE.tagline}</div><div class="ft"><a href="mailto:${SITE.email}">${SITE.email}</a></div></div>
+      <div><div class="fb">${MARK}<span>${SITE.name}</span></div><div class="ft">${SITE.tagline}</div><div class="ft">Founded by <a href="${r}about/index.html#founder">Eng. Mutaz Othman</a></div><div class="ft"><a href="mailto:${SITE.email}">${SITE.email}</a></div></div>
       <nav aria-label="Footer">${NAV.map(n=>`<a href="${r}${n.href}">${n.l}</a>`).join('')}</nav>
       <div class="fn">© ${new Date().getFullYear()} ${SITE.name}. Guiding engineers and clients to the right system for critical and high-demand buildings.</div></div>`; }
 })();
