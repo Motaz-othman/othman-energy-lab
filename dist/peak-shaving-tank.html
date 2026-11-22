@@ -725,13 +725,13 @@ function hourModel(o,L,db,wb,p){
     const qL=q+Pt+Pl, Qch=qL*(1-ff);
     let Pc=0,nOn=0,plr=0;
     if(Qch>0){ nOn=Math.min(N,Math.max(1,Math.ceil(Qch/(p.stage*capH)-1e-9))); plr=Qch/(nOn*capH); Pc=nOn*capH/cop*partLoad(kind,Math.min(plr,1.2)); }
-    const Qr=qL+Pc, QrRef=des?des.Qr:Qr, f=(share,k)=>share>0?k*QrRef*affinity(Qr*share/QrRef,p.minFan):0;
+    const Qr=qL+Pc, QrRef=des?des.Qr:Qr, f=(share,k)=>share>0?k*QrRef*affinity(Math.min(1,Qr*share/QrRef),p.minFan):0;   // fans: full speed at most
     let Pf=0;
-    if(o.id==='accfc') Pf=ff>0?p.kDC*qLdes*affinity(qL*ff/qLdes,p.minFan):0;
+    if(o.id==='accfc') Pf=ff>0?p.kDC*qLdes*affinity(Math.min(1,qL*ff/qLdes),p.minFan):0;
     else if(o.id==='adia') Pf=f(1,p.kAD);
     else if(o.id==='wcc') Pf=f(1,p.kCT);
     else if(o.id==='hyb') Pf=f(wet,p.kCT)+f(dShare,p.kDC);
-    const Pcw=kind==='wc'?pumpK(p.dpCW,p.rangeCW,p.etaP)*QrRef*affinity(Qr/QrRef,p.minPump):0;
+    const Pcw=kind==='wc'?pumpK(p.dpCW,p.rangeCW,p.etaP)*QrRef*affinity(Math.min(1,Qr/QrRef),p.minPump):0;
     return {Pc,Pf,Pp:Pl+Pcw,Pt,Qr,qL,Qch,nOn,plr,cop:Qch>0?Qch/Pc:null,P:Pc+Pf+Pl+Pcw+Pt};
   };
   // limits: air-cooled max ambient fails the design; condenser water above the standard range only warns
@@ -789,7 +789,7 @@ function simulate(wx,p,des){
   for(const o of OPTIONS){
     const r={o,E:0,Ec:0,Ef:0,Ep:0,Et:0,W:0,yMax:0,yAbove:0,free:[0,0],part:[0,0],mech:[0,0],hotCW:0,
       mFree:[new Array(12).fill(0),new Array(12).fill(0)],mPart:[new Array(12).fill(0),new Array(12).fill(0)],mMech:[new Array(12).fill(0),new Array(12).fill(0)],copSum:0,copN:0};
-    const dP=des[o.id].P;
+    const dP=des[o.id].P, capped=new Set((wx.station&&wx.station.capH)||[]);
     for(let h=0;h<n;h++){
       const db=wx.T[h], wb=wx.Twb[h], m=wx.mon[h]; let P100=0;
       loops.forEach((L,li)=>{
@@ -802,8 +802,7 @@ function simulate(wx,p,des){
         if(hm.warn&&ff<1&&li===0) r.hotCW++;
         if(ff>=1){r.free[li]++; r.mFree[li][m]++;} else if(ff>0){r.part[li]++; r.mPart[li][m]++;} else {r.mech[li]++; r.mMech[li][m]++;}
       });
-      if(P100>r.yMax) r.yMax=P100;
-      if(P100>dP+1e-6) r.yAbove+=hs;
+      if(!capped.has(h)){ if(P100>r.yMax) r.yMax=P100; if(P100>dP+1e-6) r.yAbove+=hs; }   // flagged (capped) hours are not design hours
     }
     const Qyr=loops.reduce((s,L)=>s+L.Q,0)*n, d=des[o.id];
     ['E','Ec','Ef','Ep','Et'].forEach(k=>r[k]*=hs/1000);   // MWh
