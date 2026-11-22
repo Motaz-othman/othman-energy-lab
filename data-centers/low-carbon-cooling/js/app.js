@@ -56,7 +56,7 @@ function run(){
 
 // ---------- results: Compare systems ----------
 const yrs=()=>lim(Math.round(num('cYrs',15)),1,40);
-const t=v=>fmt(v,v<10?1:0);
+const t=v=>v<0.05?"0":fmt(v,v<10?1:0);
 function renderEst(f){
   const R=refr(), Y=yrs();
   const all=OPTIONS.map(o=>RES[o.id]), ok=all.filter(r=>DES[r.o.id].ok);
@@ -72,10 +72,17 @@ function renderEst(f){
     </div>
     <div class="verdict">Lowest carbon here: <b>${best.o.name}</b>, ${t(best.co2)} t CO₂e per year. ${save>0.5?`Against air-cooled chillers it saves <b>${t(save)} t a year</b>, about the yearly emissions of <b>${fmt(save/CAR)} passenger cars</b>.`:'It is close to air-cooled chillers in this climate.'} Electricity is ${fmt(100*best.co2E/best.co2)}% of its total.</div>`;
   chart(ids.map(id=>RES[id].o.short),ids.map(id=>RES[id]));
-  const rows=ids.map((id,i)=>{ const r=RES[id], bad=!DES[id].ok;
-    return `<tr class="${i===0&&!bad?'best':''}"><td class="sys">${r.o.short}${i===0&&!bad?'<span class="tag ok">Lowest</span>':''}${bad?'<span class="tag">Fails design day</span>':''}</td><td>${fmt(r.E)}</td><td>${fmt(r.W)}</td><td>${fmt(r.charge)}</td><td>${t(r.co2E)}</td><td>${t(r.co2W)}</td><td>${t(r.co2R)}</td><td><b>${t(r.co2)}</b></td><td>${fmt(r.co2IT,1)}</td><td>${fmt(r.co2*Y)}</td></tr>`; });
-  $('cTabTitle').textContent='Every system';
-  $('cTab').innerHTML=table(['System','Electricity MWh/yr','Water m³/yr','Charge kg','Electricity t/yr','Water t/yr','Refrigerant t/yr','Total t CO₂e/yr','kg per MWh IT',`Total over ${Y} yr (t)`],rows);
+  // one brief card per system: CO2 only (energy, water and cost are in the Cooling Plant Selector)
+  const cards=ids.map((id,i)=>{ const r=RES[id], bad=!DES[id].ok, low=i===0&&!bad, d=base.co2-r.co2, w=v=>`${(100*v/r.co2).toFixed(2)}%`;
+    return `<div class="sc${low?' low':''}">
+      <div class="sn">${r.o.short}${low?'<span class="tag ok">Lowest</span>':''}${bad?'<span class="tag">Fails design day</span>':''}</div>
+      <div class="sv">${t(r.co2)} <small>t CO₂e/yr</small></div>
+      <div class="sbar"><i style="width:${w(r.co2E)};background:var(--s1)"></i><i style="width:${w(r.co2W)};background:var(--s3)"></i><i style="width:${w(r.co2R)};background:var(--s2)"></i></div>
+      <div class="ss"><span>Electricity <b>${t(r.co2E)}</b></span><span>Water <b>${t(r.co2W)}</b></span><span>Refrigerant <b>${t(r.co2R)}</b></span></div>
+      <div class="sf">${id==='acc'?'Baseline':d>0.5?`<b class="ok">−${t(d)} t/yr</b> vs air-cooled`:'About the same as air-cooled'} · ${fmt(r.co2*Y)} t over ${Y} yr</div>
+    </div>`; });
+  $('cTabTitle').textContent='Each system, CO₂ only';
+  $('cTab').innerHTML=`<div class="sgrid">${cards.join('')}</div>`;
   details(f,R,true);
 }
 
