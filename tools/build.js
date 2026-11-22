@@ -35,3 +35,15 @@ if(dup) throw new Error(`two tools are named "${dup}"; tool folder names must be
 const want=process.argv[2], list=want?all.filter(r=>r===want||path.basename(r)===want):all;
 if(!list.length) throw new Error(want?`no tool named "${want}"`:'no tools found');
 list.forEach(build);
+
+// sitemap.xml: every public page, last-modified = the latest commit touching the page (tools: their whole folder)
+(function sitemap(){
+  const {execSync}=require('child_process'), B='https://www.oenergylab.com/';
+  const pages=[['',['index.html']],['about/',['about']],['contact/',['contact']],['data-centers/',['data-centers/index.html']],...all.map(r=>[r+'/',[r]])];
+  const day=paths=>{ try{ return execSync(`git log -1 --format=%cs -- ${paths.join(' ')}`,{cwd:ROOT}).toString().trim(); }catch(e){ return ''; } };
+  const today=new Date().toISOString().slice(0,10);
+  const xml=`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`+
+    pages.map(([u,p])=>`  <url><loc>${B}${u}</loc><lastmod>${day(p)||today}</lastmod></url>`).join('\n')+`\n</urlset>\n`;
+  fs.writeFileSync(path.join(ROOT,'sitemap.xml'),xml);
+  console.log(`sitemap.xml  ${pages.length} pages`);
+})();

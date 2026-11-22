@@ -231,6 +231,15 @@ details[open]>:not(summary){animation:fadeUp .2s ease both}
   box-shadow:0 6px 20px color-mix(in srgb,#000 28%,transparent)}
 @media (max-width:900px){.fab{display:inline-flex}main.layout{padding-bottom:84px}}
 .results,.incol{scroll-margin-top:calc(var(--navh) + 12px)}
+
+/* tool pages: static "how it works" and FAQ (readable without JavaScript, for search and AI crawlers) */
+.toolinfo{max-width:var(--maxw);margin:8px auto 24px;padding:0 28px}
+.toolinfo .card{padding:22px 26px}
+.toolinfo h2{font-size:20px;margin:0 0 8px}
+.toolinfo h3{font-size:15px;margin:16px 0 4px}
+.toolinfo p,.toolinfo li{font-size:14px;line-height:1.55;color:var(--text2)}
+.toolinfo ul{padding-left:18px;margin:6px 0}
+@media (max-width:700px){.toolinfo{padding:0 16px}}
 </style>
 <style>
 /* Result pages (Ride-Through Tank, Peak Shaving Tank, Liquid Rack Cooling): shared result styles (load after base.css) */
@@ -287,6 +296,7 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <meta name="author" content="Mutaz Othman">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Liquid Rack Cooling","url":"https://www.oenergylab.com/data-centers/rack-cooling/","description":"Choose a liquid-cooled GPU or CPU platform: maximum supply temperature, cooling and flow per rack, the safe minimum flow for variable-flow control, and how the CDU pump and control valve respond to a load jump or a pump trip. By Othman Energy Lab.","applicationCategory":"BusinessApplication","operatingSystem":"Any (web browser)","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"author":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"publisher":{"@id":"https://www.oenergylab.com/#org"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.oenergylab.com/"},{"@type":"ListItem","position":2,"name":"Data Centers","item":"https://www.oenergylab.com/data-centers/"},{"@type":"ListItem","position":3,"name":"Liquid Rack Cooling","item":"https://www.oenergylab.com/data-centers/rack-cooling/"}]}]}</script>
+<script type="application/ld+json" id="faq">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What coolant flow does an NVIDIA GB300 NVL72 rack need?","acceptedAnswer":{"@type":"Answer","text":"About 59 L/min at 25 °C supply up to 177 L/min at 45 °C supply, holding the return at about 55 °C (Lenovo GB300 NVL72 data), plus the operating margin."}},{"@type":"Question","name":"What is the safe minimum flow at idle?","acceptedAnswer":{"@type":"Answer","text":"The lowest idle flow from which a jump to rated power does not push the coolant return past its limit before the VFD pump ramps up; never below the vendor minimum flow."}},{"@type":"Question","name":"Do I need a buffer tank on the CDU loop?","acceptedAnswer":{"@type":"Answer","text":"Only if the water in the CDU and its pipes cannot cover the time the control valve and pump take to respond. Beyond that minimum, a bigger tank only lowers the supply temperature rise."}},{"@type":"Question","name":"What happens if the CDU pump trips?","acceptedAnswer":{"@type":"Answer","text":"The racks hold very little heat: the coolant reaches its limit within seconds, so the standby CDU pump should run in parallel with automatic changeover."}}]}</script>
 </head>
 <body class="wide" style="--navh:0px">
 <div class="pagehead">
@@ -351,6 +361,25 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
   <details class="card more"><summary>Show details</summary><div id="rDet"></div></details>
 </section>
 </main>
+
+<section class="toolinfo" aria-labelledby="ti-h">
+  <div class="card">
+  <h2 id="ti-h">How the Liquid Rack Cooling works</h2>
+  <p>Liquid Rack Cooling shows what a liquid-cooled GPU or CPU rack needs: the maximum coolant supply temperature, the cooling and flow per rack, the safe minimum flow for variable-flow control, the minimum buffer tank on the CDU loop, and how the CDU pump and control valve respond to a load jump or a pump trip. Platforms include NVIDIA GB300 and GB200 NVL72, Vera Rubin, HGX B200, AMD Instinct MI355X, Helios and MI300A, and Lenovo Neptune CPU racks.</p>
+  <h3>Method</h3>
+  <ul><li>Required flow = heat to liquid ÷ (ρ × cp × (maximum return − supply)), which reproduces published OEM flow tables; the operating flow adds a margin (20% by default).</li><li>A load jump from idle to rated power is modelled with two water masses: the coolant at the chips and the CDU loop, with the CDU sensing delay, VFD pump ramp and control valve stroke.</li><li>The minimum tank is the smallest volume that keeps the return within its limit through the response gap at full flow.</li></ul>
+  <h2 style="margin-top:20px">Frequently asked questions</h2>
+  <h3>What coolant flow does an NVIDIA GB300 NVL72 rack need?</h3>
+  <p>About 59 L/min at 25 °C supply up to 177 L/min at 45 °C supply, holding the return at about 55 °C (Lenovo GB300 NVL72 data), plus the operating margin.</p>
+  <h3>What is the safe minimum flow at idle?</h3>
+  <p>The lowest idle flow from which a jump to rated power does not push the coolant return past its limit before the VFD pump ramps up; never below the vendor minimum flow.</p>
+  <h3>Do I need a buffer tank on the CDU loop?</h3>
+  <p>Only if the water in the CDU and its pipes cannot cover the time the control valve and pump take to respond. Beyond that minimum, a bigger tank only lowers the supply temperature rise.</p>
+  <h3>What happens if the CDU pump trips?</h3>
+  <p>The racks hold very little heat: the coolant reaches its limit within seconds, so the standby CDU pump should run in parallel with automatic changeover.</p>
+  <p style="margin-top:16px">By <a href="../../about/index.html#founder">Eng. Mutaz Othman</a>, Othman Energy Lab. Screening-level results; confirm with vendor selections and a detailed design.</p>
+  </div>
+</section>
 <script>
 // ---------- shared UI helpers for all calculators (load after Chart.js, before the calculator scripts) ----------
 const $=id=>document.getElementById(id);

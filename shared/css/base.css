@@ -205,3 +205,12 @@ details[open]>:not(summary){animation:fadeUp .2s ease both}
   box-shadow:0 6px 20px color-mix(in srgb,#000 28%,transparent)}
 @media (max-width:900px){.fab{display:inline-flex}main.layout{padding-bottom:84px}}
 .results,.incol{scroll-margin-top:calc(var(--navh) + 12px)}
+
+/* tool pages: static "how it works" and FAQ (readable without JavaScript, for search and AI crawlers) */
+.toolinfo{max-width:var(--maxw);margin:8px auto 24px;padding:0 28px}
+.toolinfo .card{padding:22px 26px}
+.toolinfo h2{font-size:20px;margin:0 0 8px}
+.toolinfo h3{font-size:15px;margin:16px 0 4px}
+.toolinfo p,.toolinfo li{font-size:14px;line-height:1.55;color:var(--text2)}
+.toolinfo ul{padding-left:18px;margin:6px 0}
+@media (max-width:700px){.toolinfo{padding:0 16px}}

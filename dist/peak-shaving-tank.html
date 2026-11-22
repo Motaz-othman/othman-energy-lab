@@ -231,6 +231,15 @@ details[open]>:not(summary){animation:fadeUp .2s ease both}
   box-shadow:0 6px 20px color-mix(in srgb,#000 28%,transparent)}
 @media (max-width:900px){.fab{display:inline-flex}main.layout{padding-bottom:84px}}
 .results,.incol{scroll-margin-top:calc(var(--navh) + 12px)}
+
+/* tool pages: static "how it works" and FAQ (readable without JavaScript, for search and AI crawlers) */
+.toolinfo{max-width:var(--maxw);margin:8px auto 24px;padding:0 28px}
+.toolinfo .card{padding:22px 26px}
+.toolinfo h2{font-size:20px;margin:0 0 8px}
+.toolinfo h3{font-size:15px;margin:16px 0 4px}
+.toolinfo p,.toolinfo li{font-size:14px;line-height:1.55;color:var(--text2)}
+.toolinfo ul{padding-left:18px;margin:6px 0}
+@media (max-width:700px){.toolinfo{padding:0 16px}}
 </style>
 <style>
 /* Result pages (Ride-Through Tank, Peak Shaving Tank, Liquid Rack Cooling): shared result styles (load after base.css) */
@@ -287,6 +296,7 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <meta name="author" content="Mutaz Othman">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Peak Shaving Tank","url":"https://www.oenergylab.com/data-centers/peak-shaving-tank/","description":"Size a chilled-water tank that shaves the rare extreme-hour peak of a data center cooling plant, so the plant and its electrical supply need less rated power. By Othman Energy Lab.","applicationCategory":"BusinessApplication","operatingSystem":"Any (web browser)","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"author":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"publisher":{"@id":"https://www.oenergylab.com/#org"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.oenergylab.com/"},{"@type":"ListItem","position":2,"name":"Data Centers","item":"https://www.oenergylab.com/data-centers/"},{"@type":"ListItem","position":3,"name":"Peak Shaving Tank","item":"https://www.oenergylab.com/data-centers/peak-shaving-tank/"}]}]}</script>
+<script type="application/ld+json" id="faq">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How much can a chilled-water tank cut the cooling plant rated power?","acceptedAnswer":{"@type":"Answer","text":"Across the 33 built-in cities, typically 10–17% of the cooling plant rated power for air-cooled chillers, depending on how short and sharp the hottest hours are."}},{"@type":"Question","name":"Why does recharge time matter?","acceptedAnswer":{"@type":"Answer","text":"After the hottest afternoon the tank must be full again before the next hot day. If it needs more than about 4 hours at the night load, recharging may not be safe during a heatwave: raise the design temperature or add a standby chiller."}},{"@type":"Question","name":"Is this the same as a ride-through tank?","acceptedAnswer":{"@type":"Answer","text":"No. A ride-through tank covers a few minutes of full cooling during a power changeover. A peak shaving tank covers the extreme-weather hours and lets the plant be rated lower. A reserve can be kept full for ride-through."}}]}</script>
 </head>
 <body class="wide" style="--navh:0px">
 <div class="pagehead">
@@ -355,6 +365,23 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
   <details class="card more"><summary>Show details</summary><div id="gDet"></div></details>
 </section>
 </main>
+
+<section class="toolinfo" aria-labelledby="ti-h">
+  <div class="card">
+  <h2 id="ti-h">How the Peak Shaving Tank works</h2>
+  <p>The Peak Shaving Tank sizes a chilled-water thermal storage tank that covers the rare extreme hottest hours of a data center cooling plant, so the chillers and their electrical supply can be rated for a lower design temperature. It finds the lowest design temperature whose tank still recharges safely during the 12-hour night, and shows the cut in rated power, the tank volume and the recharge time.</p>
+  <h3>Method</h3>
+  <ul><li>A heatwave of the hottest days is built from the ASHRAE extreme values and the site daily range, with full IT load by day and the night IT load from 19:00 to 07:00.</li><li>For each design temperature the plant is rated lower and the tank covers the shortfall; it must be full again before morning, using only the capacity the night load leaves free.</li><li>The recommendation is the lowest design temperature whose tank recharges within the safe time (4 hours by default), checked against the ASHRAE 0.4% level.</li><li>The plant model is the same as the Cooling Plant Selector: ASHRAE 90.1-2025 chillers, approaches and pumps.</li></ul>
+  <h2 style="margin-top:20px">Frequently asked questions</h2>
+  <h3>How much can a chilled-water tank cut the cooling plant rated power?</h3>
+  <p>Across the 33 built-in cities, typically 10–17% of the cooling plant rated power for air-cooled chillers, depending on how short and sharp the hottest hours are.</p>
+  <h3>Why does recharge time matter?</h3>
+  <p>After the hottest afternoon the tank must be full again before the next hot day. If it needs more than about 4 hours at the night load, recharging may not be safe during a heatwave: raise the design temperature or add a standby chiller.</p>
+  <h3>Is this the same as a ride-through tank?</h3>
+  <p>No. A ride-through tank covers a few minutes of full cooling during a power changeover. A peak shaving tank covers the extreme-weather hours and lets the plant be rated lower. A reserve can be kept full for ride-through.</p>
+  <p style="margin-top:16px">By <a href="../../about/index.html#founder">Eng. Mutaz Othman</a>, Othman Energy Lab. Screening-level results; confirm with vendor selections and a detailed design.</p>
+  </div>
+</section>
 <script>
 // ---------- shared UI helpers for all calculators (load after Chart.js, before the calculator scripts) ----------
 const $=id=>document.getElementById(id);

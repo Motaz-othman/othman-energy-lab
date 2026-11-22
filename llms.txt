@@ -1,0 +1,17 @@
+# Othman Energy Lab
+
+> Free, code-based engineering tools that guide engineers and clients to the right cooling and energy system for data centers and other critical and high-demand buildings: less energy, lower cost and a cleaner planet. Founded by Eng. Mutaz Othman, a mechanical design engineer with 11 years of experience in the GCC (data centers, healthcare, malls and high-rise towers).
+
+Every result traces back to a published standard: ASHRAE 90.1-2025, ASHRAE 90.4-2025, AHRI 551/591, ASHRAE 2025 Handbook of Fundamentals climatic design conditions, EPA eGRID. Weather: measured typical-year hourly data (TMYx 2011–2025) for 33 data center cities. Results are screening-level.
+
+## Data center tools
+
+- [Cooling Plant Selector](https://www.oenergylab.com/data-centers/cooling-plant/): The Cooling Plant Selector compares five data center cooling plants hour by hour over a full weather year (8,760 hours) and recommends the right one for the site: air-cooled chillers, air-cooled chillers with free-cooling dry coolers, and water-cooled chillers with cooling towers, adiabatic coolers or hybrid dry coolers and towers, each with plate heat exchanger free cooling. It reports cooling electricity, annual PUE and ASHRAE 90.4 MLC, the electrical peak, water use, carbon emissions, running and initial cost, and a ranked recommendation.
+- [Peak Shaving Tank](https://www.oenergylab.com/data-centers/peak-shaving-tank/): The Peak Shaving Tank sizes a chilled-water thermal storage tank that covers the rare extreme hottest hours of a data center cooling plant, so the chillers and their electrical supply can be rated for a lower design temperature. It finds the lowest design temperature whose tank still recharges safely during the 12-hour night, and shows the cut in rated power, the tank volume and the recharge time.
+- [Ride-Through Tank](https://www.oenergylab.com/data-centers/ride-through-tank/): The Ride-Through Tank sizes a chilled-water tank that keeps a data center cooled while the generators start and the chillers restart after a power failure. Enter the cooling load and the ride-through time; it returns the tank volume, the number and shape of tanks, and an indicative cost.
+- [Liquid Rack Cooling](https://www.oenergylab.com/data-centers/rack-cooling/): Liquid Rack Cooling shows what a liquid-cooled GPU or CPU rack needs: the maximum coolant supply temperature, the cooling and flow per rack, the safe minimum flow for variable-flow control, the minimum buffer tank on the CDU loop, and how the CDU pump and control valve respond to a load jump or a pump trip. Platforms include NVIDIA GB300 and GB200 NVL72, Vera Rubin, HGX B200, AMD Instinct MI355X, Helios and MI300A, and Lenovo Neptune CPU racks.
+
+## About
+
+- [About and founder](https://www.oenergylab.com/about/): Eng. Mutaz Othman, Mechanical Design Engineer, mission-critical and high-demand buildings. LinkedIn: https://www.linkedin.com/in/mutaz-othman-48aa1556/
+- [Contact](https://www.oenergylab.com/contact/): Mutaz.othman@outlook.com

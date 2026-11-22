@@ -231,6 +231,15 @@ details[open]>:not(summary){animation:fadeUp .2s ease both}
   box-shadow:0 6px 20px color-mix(in srgb,#000 28%,transparent)}
 @media (max-width:900px){.fab{display:inline-flex}main.layout{padding-bottom:84px}}
 .results,.incol{scroll-margin-top:calc(var(--navh) + 12px)}
+
+/* tool pages: static "how it works" and FAQ (readable without JavaScript, for search and AI crawlers) */
+.toolinfo{max-width:var(--maxw);margin:8px auto 24px;padding:0 28px}
+.toolinfo .card{padding:22px 26px}
+.toolinfo h2{font-size:20px;margin:0 0 8px}
+.toolinfo h3{font-size:15px;margin:16px 0 4px}
+.toolinfo p,.toolinfo li{font-size:14px;line-height:1.55;color:var(--text2)}
+.toolinfo ul{padding-left:18px;margin:6px 0}
+@media (max-width:700px){.toolinfo{padding:0 16px}}
 </style>
 <style>
 /* Result pages (Ride-Through Tank, Peak Shaving Tank, Liquid Rack Cooling): shared result styles (load after base.css) */
@@ -286,6 +295,7 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
 </style>
 <meta name="author" content="Mutaz Othman">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Ride-Through Tank","url":"https://www.oenergylab.com/data-centers/ride-through-tank/","description":"Size a chilled-water tank that keeps a data center cooled through the changeover from grid power to generator. By Othman Energy Lab.","applicationCategory":"BusinessApplication","operatingSystem":"Any (web browser)","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"author":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"publisher":{"@id":"https://www.oenergylab.com/#org"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.oenergylab.com/"},{"@type":"ListItem","position":2,"name":"Data Centers","item":"https://www.oenergylab.com/data-centers/"},{"@type":"ListItem","position":3,"name":"Ride-Through Tank","item":"https://www.oenergylab.com/data-centers/ride-through-tank/"}]}]}</script>
+<script type="application/ld+json" id="faq">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How big a tank do I need to ride through a chiller restart?","acceptedAnswer":{"@type":"Answer","text":"For a 20 MW load, 10 minutes, a 10 K supply/return difference and 85% tank efficiency: 3,333 kWh of cooling, 338 m³ net, about 405 m³ with a 20% margin."}},{"@type":"Question","name":"How many minutes of ride-through should a data center tank give?","acceptedAnswer":{"@type":"Answer","text":"About 10 minutes with quick-restart chillers (typical data center specification), 15–20 minutes with standard chillers, and 15 minutes for Tier IV or liquid cooling with little thermal mass."}},{"@type":"Question","name":"What else must be on UPS?","acceptedAnswer":{"@type":"Answer","text":"The chilled-water pumps and the CDUs or air handlers, or the tank cannot deliver its cooling during the gap."}}]}</script>
 </head>
 <body class="wide" style="--navh:0px">
 <div class="pagehead">
@@ -326,6 +336,23 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
   <details class="card more"><summary>Show details</summary><div id="eDet"></div></details>
 </section>
 </main>
+
+<section class="toolinfo" aria-labelledby="ti-h">
+  <div class="card">
+  <h2 id="ti-h">How the Ride-Through Tank works</h2>
+  <p>The Ride-Through Tank sizes a chilled-water tank that keeps a data center cooled while the generators start and the chillers restart after a power failure. Enter the cooling load and the ride-through time; it returns the tank volume, the number and shape of tanks, and an indicative cost.</p>
+  <h3>Method</h3>
+  <ul><li>Stored cooling = load × ride-through time.</li><li>Volume = stored cooling ÷ (4,180 kJ/m³·K × supply/return ΔT × tank efficiency), plus a safety margin.</li><li>Tanks are shaped up to the height limit with height 1–4 times the diameter for good stratification; larger volumes are split into equal tanks.</li></ul>
+  <h2 style="margin-top:20px">Frequently asked questions</h2>
+  <h3>How big a tank do I need to ride through a chiller restart?</h3>
+  <p>For a 20 MW load, 10 minutes, a 10 K supply/return difference and 85% tank efficiency: 3,333 kWh of cooling, 338 m³ net, about 405 m³ with a 20% margin.</p>
+  <h3>How many minutes of ride-through should a data center tank give?</h3>
+  <p>About 10 minutes with quick-restart chillers (typical data center specification), 15–20 minutes with standard chillers, and 15 minutes for Tier IV or liquid cooling with little thermal mass.</p>
+  <h3>What else must be on UPS?</h3>
+  <p>The chilled-water pumps and the CDUs or air handlers, or the tank cannot deliver its cooling during the gap.</p>
+  <p style="margin-top:16px">By <a href="../../about/index.html#founder">Eng. Mutaz Othman</a>, Othman Energy Lab. Screening-level results; confirm with vendor selections and a detailed design.</p>
+  </div>
+</section>
 <script>
 // ---------- shared UI helpers for all calculators (load after Chart.js, before the calculator scripts) ----------
 const $=id=>document.getElementById(id);

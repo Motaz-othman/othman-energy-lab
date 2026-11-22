@@ -30,6 +30,7 @@
 <link rel="stylesheet" href="../../shared/css/results.css">
 <meta name="author" content="Mutaz Othman">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Ride-Through Tank","url":"https://www.oenergylab.com/data-centers/ride-through-tank/","description":"Size a chilled-water tank that keeps a data center cooled through the changeover from grid power to generator. By Othman Energy Lab.","applicationCategory":"BusinessApplication","operatingSystem":"Any (web browser)","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"author":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"publisher":{"@id":"https://www.oenergylab.com/#org"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.oenergylab.com/"},{"@type":"ListItem","position":2,"name":"Data Centers","item":"https://www.oenergylab.com/data-centers/"},{"@type":"ListItem","position":3,"name":"Ride-Through Tank","item":"https://www.oenergylab.com/data-centers/ride-through-tank/"}]}]}</script>
+<script type="application/ld+json" id="faq">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How big a tank do I need to ride through a chiller restart?","acceptedAnswer":{"@type":"Answer","text":"For a 20 MW load, 10 minutes, a 10 K supply/return difference and 85% tank efficiency: 3,333 kWh of cooling, 338 m³ net, about 405 m³ with a 20% margin."}},{"@type":"Question","name":"How many minutes of ride-through should a data center tank give?","acceptedAnswer":{"@type":"Answer","text":"About 10 minutes with quick-restart chillers (typical data center specification), 15–20 minutes with standard chillers, and 15 minutes for Tier IV or liquid cooling with little thermal mass."}},{"@type":"Question","name":"What else must be on UPS?","acceptedAnswer":{"@type":"Answer","text":"The chilled-water pumps and the CDUs or air handlers, or the tank cannot deliver its cooling during the gap."}}]}</script>
 </head>
 <body class="wide">
 <header class="sitebar" data-root="../../" data-page="data-centers"></header>
@@ -72,6 +73,23 @@
   <details class="card more"><summary>Show details</summary><div id="eDet"></div></details>
 </section>
 </main>
+
+<section class="toolinfo" aria-labelledby="ti-h">
+  <div class="card">
+  <h2 id="ti-h">How the Ride-Through Tank works</h2>
+  <p>The Ride-Through Tank sizes a chilled-water tank that keeps a data center cooled while the generators start and the chillers restart after a power failure. Enter the cooling load and the ride-through time; it returns the tank volume, the number and shape of tanks, and an indicative cost.</p>
+  <h3>Method</h3>
+  <ul><li>Stored cooling = load × ride-through time.</li><li>Volume = stored cooling ÷ (4,180 kJ/m³·K × supply/return ΔT × tank efficiency), plus a safety margin.</li><li>Tanks are shaped up to the height limit with height 1–4 times the diameter for good stratification; larger volumes are split into equal tanks.</li></ul>
+  <h2 style="margin-top:20px">Frequently asked questions</h2>
+  <h3>How big a tank do I need to ride through a chiller restart?</h3>
+  <p>For a 20 MW load, 10 minutes, a 10 K supply/return difference and 85% tank efficiency: 3,333 kWh of cooling, 338 m³ net, about 405 m³ with a 20% margin.</p>
+  <h3>How many minutes of ride-through should a data center tank give?</h3>
+  <p>About 10 minutes with quick-restart chillers (typical data center specification), 15–20 minutes with standard chillers, and 15 minutes for Tier IV or liquid cooling with little thermal mass.</p>
+  <h3>What else must be on UPS?</h3>
+  <p>The chilled-water pumps and the CDUs or air handlers, or the tank cannot deliver its cooling during the gap.</p>
+  <p style="margin-top:16px">By <a href="../../about/index.html#founder">Eng. Mutaz Othman</a>, Othman Energy Lab. Screening-level results; confirm with vendor selections and a detailed design.</p>
+  </div>
+</section>
 
 <footer class="sitefoot" data-root="../../"></footer>
 <script src="../../shared/js/site.js"></script>
