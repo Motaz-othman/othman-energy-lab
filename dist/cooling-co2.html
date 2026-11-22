@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=GTM-WMV8R23W"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FSNWF5QMP9');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cooling CO₂ Calculator · Othman Energy Lab</title>
+<meta name="description" content="Calculate the annual CO₂ of a data center cooling system: electricity, water supply and refrigerant leakage, with official grid factors for 33 cities. Compare five cooling plants or enter your own numbers. By Othman Energy Lab.">
+<meta name="theme-color" content="#0e7c57">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Othman Energy Lab">
+<meta property="og:title" content="Cooling CO₂ Calculator · Othman Energy Lab">
+<meta property="og:description" content="Calculate the annual CO₂ of a data center cooling system: electricity, water supply and refrigerant leakage, with official grid factors for 33 cities. Compare five cooling plants or enter your own numbers. By Othman Energy Lab.">
+<meta property="og:url" content="https://www.oenergylab.com/data-centers/cooling-co2/">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="canonical" href="https://www.oenergylab.com/data-centers/cooling-co2/">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+/* Shared styles for all calculators: theme tokens, layout, inputs, cards, tables, tabs */
+:root{
+  color-scheme: light;
+  --bg:#f6f6f4; --surface:#fcfcfb; --border:#e3e2de; --text:#0b0b0b; --text2:#52514e; --muted:#6f6e69;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --grey:#c9c8c3; --grey2:#9f9e99;
+  --good:#1a7f37; --warn:#b26b00; --bad:#c62828;
+  --brand:#0e7c57; --brand-ink:#0b6b4a;   /* Othman Energy Lab green: fills / text and links */
+}
+@media (prefers-color-scheme: dark){
+  :root:where(:not([data-theme="light"])){
+    color-scheme: dark;
+    --bg:#121211; --surface:#1a1a19; --border:#2e2e2c; --text:#f0efec; --text2:#c3c2b7; --muted:#8f8e88;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --grey:#4a4a47; --grey2:#6c6b67;
+    --good:#4cc26a; --warn:#e0a03a; --bad:#ef6b6b;
+    --brand:#17855e; --brand-ink:#4cc99a;
+  }
+}
+*{box-sizing:border-box}
+:root{--navh:58px;--maxw:1180px}
+html{scroll-padding-top:calc(var(--navh) + 12px)}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.pagehead{padding:20px 28px 8px}
+.pagehead h1{font-size:24px;margin:2px 0 4px;letter-spacing:-.01em}
+.crumbs{font-size:12.5px;color:var(--muted)}
+.crumbs a{color:var(--text2);text-decoration:none}
+.crumbs a:hover{color:var(--brand-ink)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chips span{font-size:11.5px;color:var(--text2);border:1px solid var(--border);border-radius:10px;padding:1px 8px;background:var(--surface)}
+h1{font-size:22px;margin:0 0 4px}
+.sub{color:var(--text2);margin:0}
+main.layout{display:grid;grid-template-columns:340px minmax(0,1fr);gap:18px;padding:12px 28px 40px;align-items:start}
+@media (max-width:900px){main.layout{grid-template-columns:minmax(0,1fr);padding:12px 16px 40px}.pagehead{padding:18px 16px 6px}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px}
+.card h2{font-size:15px;margin:0 0 10px}
+.card h3{font-size:12px;margin:14px 0 4px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em}
+label{display:block;font-size:12.5px;color:var(--text2);margin:8px 0 3px}
+input[type=number],select{width:100%;padding:7px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font:inherit}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.tabs{display:flex;gap:6px;margin-bottom:6px}
+.tabs button,.seg button{flex:1;padding:7px;border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:6px;cursor:pointer;font:inherit}
+.tabs button.on,.seg button.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.seg{display:inline-flex;gap:4px;margin-bottom:8px}.seg button{padding:4px 12px;font-size:12.5px;white-space:nowrap}
+.drop{border:1.5px dashed var(--border);border-radius:8px;padding:14px;text-align:center;color:var(--text2);cursor:pointer}
+.drop:hover{border-color:var(--brand)}
+input[type=range]{width:100%}
+.rng{display:grid;grid-template-columns:1fr 26px;align-items:center;gap:6px}
+.rng span{text-align:right;font-variant-numeric:tabular-nums}
+.note{font-size:12px;color:var(--muted);margin-top:6px}
+details summary{cursor:pointer;color:var(--text2);font-size:13px;margin-top:12px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+@media (max-width:700px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--bg);border-radius:8px;padding:10px}
+.kpi .v{font-size:19px;font-weight:650;font-variant-numeric:tabular-nums}
+.kpi .l{font-size:12px;color:var(--text2)}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--border);text-align:right;white-space:nowrap}
+th:first-child,td:first-child,td.l,th.l{text-align:left;white-space:normal}
+th{color:var(--text2);font-weight:600;font-size:12px}
+tr.best td{font-weight:650}
+.tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:600}
+.tag.ok{background:color-mix(in srgb,var(--good) 15%,transparent);color:var(--good)}
+.tag.x{background:color-mix(in srgb,var(--bad) 15%,transparent);color:var(--bad)}
+.split{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;align-items:start}
+@media (max-width:1150px){.split{grid-template-columns:1fr}}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:1100px){.grid2{grid-template-columns:1fr}}
+.chartbox{position:relative;height:250px}
+.banner{font-size:12.5px;padding:8px 10px;border-radius:6px;background:color-mix(in srgb,var(--warn) 14%,transparent);color:var(--text);margin-bottom:10px}
+.err{color:var(--bad);font-size:12.5px;margin-top:6px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--text2);margin:-2px 0 8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.method{font-size:12.5px;color:var(--text2)}
+.method li{margin:4px 0}
+.method code{font-size:12px;background:var(--bg);padding:1px 4px;border-radius:4px}
+.ctitle{font-size:13px;font-weight:600;margin:0 0 6px}
+/* results tabs */
+.rtabs{display:flex;flex-wrap:wrap;gap:4px;padding:4px;background:var(--surface);border:1px solid var(--border);border-radius:10px;position:sticky;top:calc(var(--navh) + env(safe-area-inset-top,0px));z-index:5}
+.rtabs button{flex:1 1 auto;border:0;background:none;padding:8px 14px;border-radius:7px;font:inherit;font-weight:500;color:var(--text2);cursor:pointer;white-space:nowrap}
+.rtabs button:hover{background:var(--bg);color:var(--text)}
+.rtabs button.on{background:var(--brand);color:#fff;font-weight:600}
+.rtabs button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.pane{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+.pane[hidden]{display:none}
+button.link{border:1px solid var(--brand-ink);background:none;color:var(--brand-ink);border-radius:6px;padding:6px 12px;font:inherit;font-weight:600;cursor:pointer}
+button.link:hover{background:color-mix(in srgb,var(--brand) 10%,transparent)}
+tr.click{cursor:pointer}
+tr.click:hover td{background:color-mix(in srgb,var(--text) 4%,transparent)}
+td.hi{background:color-mix(in srgb,var(--brand) 13%,transparent);font-weight:650}
+.tag:not(.ok):not(.x){background:var(--bg);color:var(--text2);border:1px solid var(--border)}
+/* site bar, footer, buttons (shared/js/site.js fills the bar and footer) */
+.sitebar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding-top:env(safe-area-inset-top,0px)}
+.sitebar-in{max-width:var(--maxw);margin:0 auto;height:var(--navh);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 28px}
+.brand{display:flex;align-items:center;gap:9px;color:var(--text);text-decoration:none;font-weight:650;font-size:15.5px;letter-spacing:-.015em;white-space:nowrap}
+.brand b{color:var(--brand-ink);font-weight:750}
+.brand svg{width:26px;height:26px;display:block}
+.sitebar nav{display:flex;gap:2px;overflow-x:auto}
+.sitebar nav a{color:var(--text2);text-decoration:none;padding:7px 11px;border-radius:7px;font-weight:500;white-space:nowrap}
+.sitebar nav a:hover{color:var(--text);background:var(--bg)}
+.sitebar nav a[aria-current]{color:var(--text);background:var(--bg);font-weight:600}
+.sitefoot{border-top:1px solid var(--border);margin-top:32px;color:var(--muted);font-size:12.5px}
+.sitefoot-in{max-width:var(--maxw);margin:0 auto;padding:28px 28px calc(28px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:16px 32px}
+.sitefoot .fb{display:flex;align-items:center;gap:8px;color:var(--text);font-weight:650;font-size:14px}
+.sitefoot .fb svg{width:22px;height:22px}
+.sitefoot .ft{margin-top:4px;color:var(--text2)}
+.sitefoot nav{display:flex;flex-wrap:wrap;gap:6px 18px}
+.sitefoot .fn{flex-basis:100%;padding-top:14px;border-top:1px solid var(--border)}
+.sitefoot a{color:var(--text2);text-decoration:none}
+.sitefoot a:hover{color:var(--brand-ink)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);text-decoration:none;font-weight:600;font-size:14px}
+.btn:hover{border-color:var(--brand)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.primary:hover{background:color-mix(in srgb,var(--brand) 88%,#000)}
+body.wide{--maxw:none}
+@media (max-width:900px){.sitebar-in,.sitefoot-in{padding-left:16px;padding-right:16px}}
+@media (max-width:560px){.brand .bn{display:none}.sitebar nav a{padding:7px 8px}}
+/* site pages (home, focus areas): sections and tool cards */
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+@media (max-width:900px){.wrap{padding:0 16px}}
+.wrap>section{padding:56px 0 8px}
+.eyebrow{font-size:12.5px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:var(--brand-ink);margin:0 0 10px}
+.shead{max-width:70ch;margin-bottom:22px}
+.shead h2{font-size:26px;letter-spacing:-.015em;margin:0 0 8px}
+.shead p{color:var(--text2);margin:0;font-size:15px}
+.shead p.eyebrow{color:var(--brand-ink);font-size:12.5px;margin-bottom:10px}
+.tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+a.tool{display:flex;flex-direction:column;gap:10px;color:inherit;text-decoration:none;padding:20px;transition:border-color .15s}
+a.tool:hover{border-color:var(--brand)}
+a.tool .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+a.tool .top .tag{margin-left:0}
+a.tool .area{font-size:12px;color:var(--muted)}
+a.tool h3{margin:0;font-size:18px;letter-spacing:-.01em;color:var(--text);text-transform:none}
+a.tool p{margin:0;color:var(--text2)}
+a.tool .chips{margin-top:auto}
+a.tool .open{color:var(--brand-ink);font-weight:600;font-size:13.5px}
+.soon{border-style:dashed;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:180px;text-align:center;padding:20px}
+.soon b{color:var(--text2)}
+/* motion: short and subtle; switched off when the visitor prefers reduced motion */
+html{scroll-behavior:smooth}
+a,button,.btn,.card,.tag,input,select{transition:background-color .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease,transform .18s ease}
+.btn:hover,button.link:hover{transform:translateY(-1px)}
+a.tool:hover,a.areac:hover,tr.click:hover{box-shadow:0 8px 22px color-mix(in srgb,var(--text) 9%,transparent)}
+a.tool:hover,a.areac:hover{transform:translateY(-2px)}
+input:focus-visible,select:focus-visible{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 22%,transparent)}
+.pane:not([hidden]){animation:fadeUp .24s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+details summary{list-style:none;display:flex;align-items:center;gap:8px;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"";flex:none;width:6px;height:6px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(-45deg);transition:transform .2s ease}
+details[open] summary::before{transform:rotate(45deg)}
+details summary:hover{color:var(--text)}
+details[open]>:not(summary){animation:fadeUp .2s ease both}
+.sitebar{transition:box-shadow .2s ease}
+.sitebar.scrolled{box-shadow:0 2px 14px color-mix(in srgb,#000 10%,transparent)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+/* company pages: vision and mission, values, approach steps, standards (home, about, contact) */
+.vm{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:900px){.vm{grid-template-columns:1fr}}
+.vmc{padding:26px;border-left:4px solid var(--brand)}
+.vml{display:block;font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--brand-ink);margin-bottom:10px}
+.vmc p{margin:0;font-size:18px;line-height:1.5;letter-spacing:-.005em;color:var(--text)}
+.values{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+@media (max-width:900px){.values{grid-template-columns:1fr}}
+.values div{display:flex;flex-direction:column;gap:4px;padding:4px 2px 4px 14px;border-left:2px solid var(--border)}
+.values b{font-size:14.5px}
+.values span{color:var(--text2)}
+/* approach */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media (max-width:1100px){.steps{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.steps{grid-template-columns:1fr}}
+.step{padding:22px}
+.step .n{display:inline-flex;width:28px;height:28px;border-radius:7px;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;background:var(--brand);margin-bottom:12px}
+.step h3{margin:0 0 6px;font-size:16px;color:var(--text);text-transform:none;letter-spacing:-.01em}
+.step p{margin:0;color:var(--text2)}
+/* standards */
+.stds{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.std{padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+.std .h{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.std b{font-size:14.5px}
+.std p{margin:0;color:var(--text2);font-size:13px}
+.std .tag{margin-left:0;white-space:nowrap}
+/* goals */
+.goals{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media (max-width:1000px){.goals{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.goals{grid-template-columns:1fr}}
+.goal{padding:22px;position:relative;overflow:hidden}
+.goal::before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:var(--brand);transform:scaleX(.18);transform-origin:left;transition:transform .3s ease}
+.goal:hover::before{transform:scaleX(1)}
+.goal .gn{display:block;font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--brand-ink);margin-bottom:10px;font-variant-numeric:tabular-nums}
+.goal h3{margin:0 0 6px;font-size:18px;letter-spacing:-.01em;color:var(--text);text-transform:none}
+.goal p{margin:0;color:var(--text2)}
+.toolsnote{margin-top:16px;padding:14px 18px;border-radius:10px;border:1px dashed color-mix(in srgb,var(--brand) 45%,var(--border));background:color-mix(in srgb,var(--brand) 6%,var(--bg));color:var(--text2)}
+.toolsnote b{color:var(--text)}
+.toolsnote a{color:var(--brand-ink);font-weight:600}
+/* top-bar tagline: quiet grey text right next to the logo (page links are in the footer) */
+.sitebar-in{justify-content:flex-start}
+.slogan{margin:0;padding-left:14px;border-left:1px solid var(--border);display:flex;flex-wrap:wrap;gap:0 6px;font-size:13.5px;font-weight:400;color:var(--muted);line-height:1.3}
+@media (max-width:700px){.slogan{font-size:12.5px;padding-left:10px}}
+@media (max-width:380px){.slogan span:last-child{display:none}}
+/* phones: keep the brand name; the tagline wraps into two small lines beside it */
+@media (max-width:560px){.brand .bn{display:inline}.slogan{font-size:11.5px;max-width:150px;padding-left:10px}.slogan span:last-child{display:inline}}
+/* tool pages on phones and tablets: button that jumps between the inputs and the results */
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:30;display:none;align-items:center;gap:6px;
+  padding:10px 18px;border-radius:999px;border:0;background:var(--brand);color:#fff;font:inherit;font-weight:650;font-size:14px;cursor:pointer;
+  box-shadow:0 6px 20px color-mix(in srgb,#000 28%,transparent)}
+@media (max-width:900px){.fab{display:inline-flex}main.layout{padding-bottom:84px}}
+.results,.incol{scroll-margin-top:calc(var(--navh) + 12px)}
+
+/* tool pages: static "how it works" and FAQ (readable without JavaScript, for search and AI crawlers) */
+.toolinfo{max-width:var(--maxw);margin:8px auto 24px;padding:0 28px}
+.toolinfo .card{padding:22px 26px}
+.toolinfo h2{font-size:20px;margin:0 0 8px}
+.toolinfo h3{font-size:15px;margin:16px 0 4px}
+.toolinfo p,.toolinfo li{font-size:14px;line-height:1.55;color:var(--text2)}
+.toolinfo ul{padding-left:18px;margin:6px 0}
+@media (max-width:700px){.toolinfo{padding:0 16px}}
+
+/* top bar: main page links */
+.sitebar .topnav{margin-left:auto;flex-shrink:0;font-size:14px}
+@media (max-width:860px){.slogan{display:none}}
+@media (max-width:560px){.sitebar .topnav{font-size:13px}.sitebar .topnav a{padding:6px 7px}}
+@media (max-width:430px){.brand .bn{display:none}.sitebar .topnav{font-size:12.5px}.sitebar .topnav a{padding:6px 5px}}
+@media (max-width:370px){.brand svg{width:22px;height:22px}.sitebar .topnav a{padding:6px 4px}}
+
+/* tool cards with preview (home and Data Centers pages) */
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.tcard{display:flex;flex-direction:column;padding:0;overflow:hidden;color:inherit;text-decoration:none}
+a.tcard:hover{transform:translateY(-3px);box-shadow:0 12px 28px color-mix(in srgb,var(--text) 11%,transparent);border-color:var(--brand)}
+.thumb{border-bottom:1px solid var(--border)}
+.thumb svg{display:block;width:100%;height:auto}
+.thumb .tbg{fill:color-mix(in srgb,var(--brand) 9%,var(--surface))}
+.thumb .win{fill:var(--surface);stroke:var(--border);stroke-width:1.5}
+.thumb .win.dashed{fill:none;stroke-dasharray:6 6;stroke:color-mix(in srgb,var(--brand) 40%,var(--border))}
+.thumb .dot{fill:var(--grey)}
+.thumb .sep{stroke:var(--border);stroke-width:1.2}
+.thumb .tt{fill:var(--text2);font-size:12px;font-weight:600}
+.thumb .fc{fill:var(--s3)}.thumb .pt{fill:var(--s1)}.thumb .ch{fill:var(--s2)}
+.thumb .m rect{transform-box:fill-box;transform-origin:bottom;transition:transform .35s ease}
+.thumb .lab{fill:var(--grey)}
+.thumb .bar{fill:var(--grey2)}
+.thumb .best{fill:var(--brand)}
+.thumb .ok{fill:var(--surface)}
+.thumb .rk rect{transform-box:fill-box;transform-origin:left;transition:transform .35s ease}
+a.tcard:hover .thumb .m rect{transform:scaleY(1.06)}
+a.tcard:hover .thumb .rk .best{transform:scaleX(1.04)}
+.thumb .plusc{fill:none;stroke:color-mix(in srgb,var(--brand) 45%,var(--border));stroke-width:2}
+.thumb .plus{stroke:var(--brand-ink);stroke-width:3;stroke-linecap:round}
+.tbody{display:flex;flex-direction:column;gap:8px;padding:20px 22px 22px;flex:1}
+.tmeta{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.tmeta .tag{margin-left:0}
+.tbody h3{margin:0;font-size:19px;letter-spacing:-.01em;color:var(--text);text-transform:none}
+.tbody p{margin:0;color:var(--text2)}
+.tbody .chips{margin-top:auto;padding-top:4px}
+.tbody .open{padding-top:4px;color:var(--brand-ink);font-weight:600;font-size:13.5px}
+.soon2 .tbody h3{color:var(--text2)}
+.thumb .orig{fill:none;stroke:var(--grey2);stroke-width:2.5;stroke-dasharray:5 4}
+.thumb .cut{fill:none;stroke:var(--brand);stroke-width:3}
+.thumb .cap{stroke:var(--brand);stroke-width:1;stroke-dasharray:4 4;opacity:.6}
+.thumb .shave{fill:color-mix(in srgb,var(--s2) 35%,transparent)}
+.thumb .rech{fill:color-mix(in srgb,var(--s1) 30%,transparent)}
+.thumb .tk rect{fill:var(--surface);stroke:var(--text2);stroke-width:1.5}
+.thumb .tk .lvl{fill:color-mix(in srgb,var(--s1) 45%,transparent);stroke:none;transform-box:fill-box;transform-origin:bottom;transition:transform .35s ease}
+a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
+</style>
+<style>
+/* Result pages (Ride-Through Tank, Peak Shaving Tank, Liquid Rack Cooling): shared result styles (load after base.css) */
+/* layout */
+.layout[hidden]{display:none}
+.incol{display:grid;gap:10px;min-width:0}
+.colhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;min-height:22px}
+.colhead b{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--brand-ink)}
+.colhead span{font-size:12.5px;color:var(--muted)}
+.results{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;min-width:0;align-content:start}
+.results>.colhead{margin-bottom:-6px}
+/* the important results */
+.hero{display:grid;gap:16px;border-left:4px solid var(--brand)}
+.hero .for{font-size:13.5px;color:var(--text2)}
+.big4{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.bn{padding:14px 16px;border-radius:12px;background:var(--bg);border:1px solid var(--border)}
+.bn .v{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
+.bn .v.good{color:var(--brand-ink)}
+.bn .v.bad{color:var(--bad)}
+.bn .v small{font-size:15px;font-weight:600;color:var(--text2);letter-spacing:0}
+.bn .l{font-size:13px;color:var(--text2);margin-top:4px}
+.verdict{font-size:16px;line-height:1.5;padding:12px 16px;border-radius:10px;background:color-mix(in srgb,var(--brand) 9%,var(--surface))}
+.verdict.warn{background:color-mix(in srgb,var(--warn) 12%,var(--surface))}
+.uses{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.uses>div{padding:12px 14px;border-radius:10px;border:1px dashed color-mix(in srgb,var(--brand) 45%,var(--border));font-size:13px;color:var(--text2);line-height:1.45}
+.uses b{display:block;font-size:17px;color:var(--brand-ink);margin-bottom:2px}
+.tankrow{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+@media (max-width:560px){.tankrow{grid-template-columns:1fr}}
+.tanksvg{width:150px;height:auto}
+.tanksvg .shell{fill:var(--surface);stroke:var(--text2);stroke-width:1.5}
+.tanksvg .dim{stroke:var(--muted);stroke-width:1}
+.tanksvg text{fill:var(--text2);font-size:11px}
+/* curves */
+.legend .sw{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.legend .sw.shave{background:color-mix(in srgb,var(--s2) 35%,transparent);border:1px solid var(--s2)}
+.legend .sw.rech{background:color-mix(in srgb,var(--s1) 25%,transparent);border:1px solid var(--s1)}
+/* details */
+.more summary{margin:0;font-weight:600;color:var(--text)}
+.more[open] summary{margin-bottom:12px}
+.more h3{font-size:12px;margin:16px 0 6px}
+.more td.l{white-space:normal}
+tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transparent)}
+.ok{color:var(--brand-ink);font-weight:600}
+.no{color:var(--bad);font-weight:600}
+.method{font-size:12.5px;color:var(--text2);padding-left:18px}
+.method li{margin:4px 0}
+.bn .pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.bn .pair .v{display:block;font-size:24px}
+.bn .pair .v.bad{color:var(--bad)}
+.bn .pair .l{display:block;margin-top:2px}
+/* phones: two result cards per row; a card with two values takes the full row */
+@media (max-width:560px){.big4{grid-template-columns:1fr 1fr;gap:10px}.big4 .bn:has(.pair){grid-column:1/-1}.bn{padding:12px}.bn .v{font-size:24px}.bn .v small{font-size:13px}.verdict{font-size:15px}.tankrow{justify-items:center}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<meta name="author" content="Mutaz Othman">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Cooling CO₂ Calculator","url":"https://www.oenergylab.com/data-centers/cooling-co2/","description":"Calculate the annual CO₂ of a data center cooling system: electricity, water supply and refrigerant leakage, with official grid factors for 33 cities. Compare five cooling plants or enter your own numbers. By Othman Energy Lab.","applicationCategory":"BusinessApplication","operatingSystem":"Any (web browser)","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"author":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"publisher":{"@id":"https://www.oenergylab.com/#org"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.oenergylab.com/"},{"@type":"ListItem","position":2,"name":"Data Centers","item":"https://www.oenergylab.com/data-centers/"},{"@type":"ListItem","position":3,"name":"Cooling CO₂ Calculator","item":"https://www.oenergylab.com/data-centers/cooling-co2/"}]}]}</script>
+<script type="application/ld+json" id="faq">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Which part of a cooling system's CO₂ is largest?","acceptedAnswer":{"@type":"Answer","text":"Electricity, in almost every case: usually 85–99% of the total. Refrigerant leakage can matter with high-GWP refrigerants such as R-134a, and water matters in the Gulf, where desalinated water takes about 3.5 kWh per m³."}},{"@type":"Question","name":"Where do the grid factors come from?","acceptedAnswer":{"@type":"Answer","text":"US cities use the EPA eGRID2023 subregion rates; Sydney uses the Australian National Greenhouse Accounts factors (NSW 2025–26); other countries use Our World in Data / Ember, latest year. You can type your own factor, for example a green-power contract."}},{"@type":"Question","name":"Does it include the IT equipment?","acceptedAnswer":{"@type":"Answer","text":"No. Only the cooling system: chillers, heat-rejection fans, pumps, CRAH, fan walls and CDUs. IT electricity and UPS losses are not included."}}]}</script>
+<style>
+.mode{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:4px}
+.eqs{display:grid;gap:8px}
+.eqs div{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;padding:10px 14px;border-radius:10px;background:var(--bg);border:1px solid var(--border);font-size:14px}
+.eqs .f{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:var(--text2)}
+.eqs b{font-variant-numeric:tabular-nums}
+.eqs .tot{background:color-mix(in srgb,var(--brand) 9%,var(--surface));border-color:color-mix(in srgb,var(--brand) 35%,var(--border))}
+#inGrid [hidden]{display:none!important}
+#cTab td.sys{white-space:nowrap}
+tr.best td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transparent)}
+.tag{display:inline-block;margin-left:6px;font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;background:var(--bg);border:1px solid var(--border);color:var(--text2)}
+.tag.ok{color:var(--brand-ink);border-color:color-mix(in srgb,var(--brand) 40%,var(--border))}
+</style>
+</head>
+<body class="wide" style="--navh:0px">
+<div class="pagehead">
+  <h1>Cooling CO₂ Calculator</h1>
+  <p class="sub">How much CO₂ does the cooling system emit each year? Three sources: the electricity it uses, the energy to supply its water, and the refrigerant that leaks from the chillers. Compare five cooling plants hour by hour for a city, or enter your own system's numbers.</p>
+</div>
+
+<main class="layout">
+<div class="incol">
+<div class="colhead"><b>Inputs</b><span>Results update as you type</span></div>
+<aside class="card inputs" id="inGrid">
+  <h2>Location</h2>
+  <label for="cCity">City</label><select id="cCity"></select>
+  <div class="row">
+    <div><label for="cEF">Grid factor (kg CO₂/kWh)</label><input type="number" id="cEF" step="0.01" min="0" placeholder="auto"></div>
+    <div><label for="cWk">Water supply energy (kWh/m³)</label><input type="number" id="cWk" step="0.1" min="0" placeholder="auto"></div>
+  </div>
+  <div class="note" id="cEFNote">Leave blank for the city's official value.</div>
+
+  <h2 style="margin-top:18px">Cooling system</h2>
+  <div class="tabs mode"><button id="mEst" class="on" type="button">Compare systems</button><button id="mOwn" type="button">My own numbers</button></div>
+  <div id="estPane">
+    <div class="row">
+      <div><label for="cQ">Cooling load (MW)</label><input type="number" id="cQ" value="20" min="0.1" step="1"></div>
+      <div><label for="cLf">Average load (%)</label><input type="number" id="cLf" value="80" min="10" max="100" step="5"></div>
+    </div>
+    <label for="cLcp">Liquid-cooled share of the load (%)</label><input type="number" id="cLcp" value="80" min="0" max="100" step="5">
+    <div class="note">Measured hourly weather for the city, 8,760 hours. Same model as the Cooling Plant Selector.</div>
+    <details>
+      <summary>Water temperatures</summary>
+      <div class="row">
+        <div><label for="cLs">Liquid supply (°C)</label><input type="number" id="cLs" value="30" step="1"></div>
+        <div><label for="cLr">Liquid return (°C)</label><input type="number" id="cLr" value="40" step="1"></div>
+      </div>
+      <div class="row">
+        <div><label for="cAs">Air loop supply (°C)</label><input type="number" id="cAs" value="20" step="1"></div>
+        <div><label for="cAr">Air loop return (°C)</label><input type="number" id="cAr" value="30" step="1"></div>
+      </div>
+    </details>
+  </div>
+  <div id="ownPane" hidden>
+    <label for="oSys">System (for the label only)</label><select id="oSys"></select>
+    <label for="oE">Cooling electricity (MWh per year)</label><input type="number" id="oE" value="12000" min="0" step="100">
+    <label for="oW">Water use (m³ per year)</label><input type="number" id="oW" value="150000" min="0" step="1000">
+    <label for="oCh">Refrigerant charge, all chillers (kg)</label><input type="number" id="oCh" value="8000" min="0" step="100">
+    <label for="oIT">IT energy (MWh per year, optional)</label><input type="number" id="oIT" min="0" step="1000" placeholder="for kg CO₂ per MWh IT">
+    <div class="note">From the design, a utility bill or the BMS. Cooling only: chillers, fans, pumps, CRAH / CDU.</div>
+  </div>
+
+  <h2 style="margin-top:18px">Refrigerant</h2>
+  <div class="row">
+    <div><label for="cRef">Refrigerant</label><select id="cRef"></select></div>
+    <div><label for="cLeak">Leak (% of charge per year)</label><input type="number" id="cLeak" value="2" min="0" step="0.5"></div>
+  </div>
+  <div class="row" id="chRow">
+    <div><label for="cChW">Charge, water-cooled (kg/kW)</label><input type="number" id="cChW" value="0.3" min="0" step="0.05"></div>
+    <div><label for="cChA">Charge, air-cooled (kg/kW)</label><input type="number" id="cChA" value="0.4" min="0" step="0.05"></div>
+  </div>
+  <label for="cYrs">Period for the total (years)</label><input type="number" id="cYrs" value="15" min="1" max="40" step="1">
+</aside>
+</div>
+<section class="results">
+  <div class="colhead"><b>Results</b><span id="cStatus">Loading weather…</span></div>
+  <div class="card hero" id="cRes"><div class="note">Calculating…</div></div>
+  <div class="card" id="cChartCard">
+    <div class="ctitle" id="cChartTitle">Annual CO₂ by source</div>
+    <div class="legend"><span><i style="background:var(--s1)"></i>Electricity</span><span><i style="background:var(--s3)"></i>Water supply</span><span><i style="background:var(--s2)"></i>Refrigerant leakage</span></div>
+    <div class="chartbox" id="cBox" style="height:260px"><canvas id="cChart"></canvas></div>
+  </div>
+  <div class="card" id="cTabCard"><div class="ctitle" id="cTabTitle">How it is calculated</div><div id="cTab"></div></div>
+  <details class="card more"><summary>Sources and assumptions</summary><div id="cDet"></div></details>
+</section>
+</main>
+
+<section class="toolinfo" aria-labelledby="ti-h">
+  <div class="card">
+  <h2 id="ti-h">How the Cooling CO₂ Calculator works</h2>
+  <p>The Cooling CO₂ Calculator gives the yearly carbon emissions of a data center cooling system in tonnes of CO₂ equivalent. It adds three sources: the electricity the cooling plant uses, the energy needed to supply its make-up water, and the refrigerant that leaks from the chillers each year.</p>
+  <h3>Method</h3>
+  <ul>
+    <li><b>Electricity:</b> annual cooling energy (MWh) × grid emission factor (t CO₂ per MWh).</li>
+    <li><b>Water:</b> annual water use (m³) × energy to supply 1 m³ (kWh) × grid emission factor.</li>
+    <li><b>Refrigerant:</b> chiller charge (kg) × leak rate per year × global warming potential (GWP) of the refrigerant.</li>
+    <li>In <b>Compare systems</b>, energy and water come from an 8,760-hour simulation with the city's measured weather, the same model as the Cooling Plant Selector. In <b>My own numbers</b>, you enter them.</li>
+  </ul>
+  <h2 style="margin-top:20px">Frequently asked questions</h2>
+  <h3>Which part of a cooling system's CO₂ is largest?</h3>
+  <p>Electricity, in almost every case: usually 85–99% of the total. Refrigerant leakage can matter with high-GWP refrigerants such as R-134a, and water matters in the Gulf, where desalinated water takes about 3.5 kWh per m³.</p>
+  <h3>Where do the grid factors come from?</h3>
+  <p>US cities use the EPA eGRID2023 subregion rates; Sydney uses the Australian National Greenhouse Accounts factors (NSW 2025–26); other countries use Our World in Data / Ember, latest year. You can type your own factor, for example a green-power contract.</p>
+  <h3>Does it include the IT equipment?</h3>
+  <p>No. Only the cooling system: chillers, heat-rejection fans, pumps, CRAH, fan walls and CDUs. IT electricity and UPS losses are not included.</p>
+  <p style="margin-top:16px">By <a href="../../about/index.html#founder">Eng. Mutaz Othman</a>, Othman Energy Lab. Screening-level results; confirm with a detailed design and the local grid data.</p>
+  </div>
+</section>
+<script>
+// ---------- shared UI helpers for all calculators (load after Chart.js, before the calculator scripts) ----------
+const $=id=>document.getElementById(id);
+const fmt=(v,d=0)=>(+v).toLocaleString('en-US',{maximumFractionDigits:d,minimumFractionDigits:d});
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function pct(arr,q){ const s=[...arr].sort((a,b)=>a-b); return s[Math.min(s.length-1,Math.floor(q*s.length))]; }
+const kpis=k=>k.map(([v,l])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+function table(head,rows){ return `<div style="overflow-x:auto"><table><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`; }
+
+// ---------- charts (Chart.js); every chart is skipped when Chart.js is unavailable ----------
+const charts={};
+function baseOpts(){
+  const tx=css('--text2'), gr=css('--border');
+  return {responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{intersect:false}},
+    scales:{x:{grid:{display:false},ticks:{color:tx}},y:{grid:{color:gr},border:{display:false},ticks:{color:tx}}}};
+}
+function mk(id,cfg){ if(!window.Chart) return; if(charts[id]) charts[id].destroy(); charts[id]=new Chart($(id),cfg); }
+function hbar(id,labels,data,unit,d){
+  const o=baseOpts(); o.indexAxis='y';
+  o.scales.x={grid:{color:css('--border')},border:{display:false},ticks:{color:css('--text2')},title:{display:true,text:unit,color:css('--text2')},beginAtZero:true};
+  o.scales.y={grid:{display:false},ticks:{color:css('--text')}};
+  o.plugins.tooltip={callbacks:{label:c=>`${fmt(c.raw,d)} ${unit}`}};
+  mk(id,{type:'bar',data:{labels,datasets:[{data,backgroundColor:labels.map((l,i)=>i===0?css('--s1'):css('--grey')),borderRadius:4,barThickness:16}]},options:o});
+}
+// ---------- city library: 1991–2020 monthly normals (climate-zone.com: NOAA/national-met station temperatures, NASA POWER humidity) ----------
+const F=f=>Math.round((f-32)/1.8*10)/10, fa=a=>a.map(F);
+const CITIES=[
+ {g:'Middle East & Africa',id:'dubai',name:'Dubai, UAE',elev:10,sig:1.4,hi:[24.4,26.7,30.0,35.0,39.4,42.2,42.8,42.8,40.6,37.2,31.7,27.2],lo:[12.2,13.3,16.1,19.4,23.3,26.1,28.9,28.9,25.6,22.2,17.8,14.4],rh:[62,61,59,53,50,51,50,49,52,53,55,60]},
+ {g:'Middle East & Africa',id:'abudhabi',name:'Abu Dhabi, UAE',elev:27,sig:1.4,hi:fa([76,79,86,94,103,107,108,110,105,98,88,79]),lo:fa([56,59,63,69,76,80,85,86,81,74,66,60]),rh:[66,64,63,58,59,62,60,57,57,57,59,65]},
+ {g:'Middle East & Africa',id:'riyadh',name:'Riyadh, Saudi Arabia',elev:612,sig:1.6,hi:[20.0,23.9,27.8,33.9,39.4,42.8,43.3,43.9,40.6,35.0,27.8,22.2],lo:[8.9,11.1,15.0,20.6,26.1,28.3,29.4,29.4,26.1,21.1,15.6,10.6],rh:[42,34,29,25,17,11,12,14,15,21,36,44]},
+ {g:'Middle East & Africa',id:'jeddah',name:'Jeddah, Saudi Arabia',elev:15,sig:1.2,hi:fa([84,86,89,94,99,101,103,102,100,98,92,88]),lo:fa([65,66,67,72,76,78,81,83,80,76,73,68]),rh:[54,52,46,41,37,36,39,46,46,45,52,54]},
+ {g:'Middle East & Africa',id:'dammam',name:'Dammam, Saudi Arabia',elev:10,sig:1.6,hi:fa([71,74,82,92,103,110,112,110,106,98,85,75]),lo:fa([51,54,59,68,77,82,85,85,79,73,63,54]),rh:[62,61,55,49,40,37,40,46,49,53,57,63]},
+ {g:'Middle East & Africa',id:'manama',name:'Manama, Bahrain',elev:2,sig:1.3,hi:fa([69,71,78,87,97,101,103,103,100,93,82,73]),lo:fa([58,60,65,73,81,86,89,89,85,80,71,63]),rh:[69,71,72,70,66,65,67,69,66,65,64,68]},
+ {g:'Middle East & Africa',id:'cairo',name:'Cairo, Egypt',elev:75,sig:1.6,hi:fa([66,69,75,83,90,94,95,95,92,86,77,69]),lo:fa([49,51,55,60,66,72,75,75,73,68,60,52]),rh:[62,57,52,44,40,40,42,45,50,55,60,63]},
+ {g:'Americas',id:'nova',name:'Northern Virginia, USA',elev:50,sig:3.0,hi:fa([44,48,56,67,76,84,88,87,80,68,57,48]),lo:fa([27,28,35,45,55,64,69,67,61,48,39,31]),rh:[83,81,79,77,77,74,68,69,71,75,78,83]},
+ {g:'Americas',id:'dallas',name:'Dallas–Fort Worth, USA',elev:170,sig:3.0,hi:fa([54.1,58.9,67.8,76.3,82.9,91.9,96.5,96.2,87.8,78.5,66.8,57.5]),lo:fa([32.7,36.9,45.6,54.7,62.6,70.0,74.1,73.6,66.9,55.8,45.4,36.3]),rh:[58,70,69,70,72,74,69,66,68,70,69,69]},
+ {g:'Americas',id:'phoenix',name:'Phoenix, USA',elev:331,sig:2.0,hi:fa([68,71,78,86,95,104,107,105,100,89,77,66]),lo:fa([46,49,55,61,70,79,85,84,78,66,54,45]),rh:[47,45,40,31,23,16,29,35,32,30,35,45]},
+ {g:'Americas',id:'chicago',name:'Chicago, USA',elev:230,sig:3.5,hi:fa([31,35,47,60,71,81,84,82,76,63,48,36]),lo:fa([16,20,29,39,50,60,65,63,55,43,32,22]),rh:[88,85,80,76,75,74,73,73,73,76,81,87]},
+ {g:'Americas',id:'atlanta',name:'Atlanta, USA',elev:308,sig:3.9,hi:[11.5,16.4,19.4,22.8,27.9,30.9,32.1,30.7,28.6,23.6,18.3,14.5],lo:[1.4,4.5,8,11.9,18,21.7,23,22.6,19.2,12.8,7.4,4.6],rh:[66,61,60,58,65,68,70,74,66,71,75,70]},
+ {g:'Americas',id:'columbus',name:'Columbus (New Albany), USA',elev:254,sig:4.4,hi:[2.3,4.8,12.7,17.1,24,28,28.6,28.4,26.2,18.2,12.2,6.3],lo:[-5.3,-4.2,1.9,6.3,13.4,16.9,19.1,18.4,15.2,7.5,2.4,-0.7],rh:[70,67,63,62,72,64,72,72,69,67,65,74]},
+ {g:'Americas',id:'sanjose',name:'Silicon Valley (San Jose), USA',elev:16,sig:2.2,hi:[16.9,17.7,18.1,20.8,23.9,26,27,27.2,26.9,24.2,20.1,15.4],lo:[5.6,6.3,8.2,9.3,11.7,14.1,14.7,16.3,14.7,12,8.2,6.7],rh:[73,62,68,65,63,64,68,62,61,63,60,74]},
+ {g:'Americas',id:'hillsboro',name:'Hillsboro (Portland), USA',elev:62,sig:2.7,hi:[9.4,9.5,13.2,16.3,20.8,23.6,29.2,28.7,24.3,18.4,11.4,8.4],lo:[2.6,2.7,4.4,5.3,8.4,9.9,13,12.3,10.3,7.1,3.5,2.7],rh:[82,80,80,69,73,65,60,59,67,75,85,85]},
+ {g:'Americas',id:'reno',name:'Reno, USA',elev:1344,sig:3.5,hi:[8.6,8.2,10.5,17.1,23,30.7,35.6,32.9,28.9,20.8,11.9,5.3],lo:[-3.6,-1,0.5,2.6,6.5,10.8,16.1,12.3,9.7,4.7,-0.4,-1.8],rh:[57,63,63,50,37,30,28,34,32,47,55,70]},
+ {g:'Americas',id:'saltlake',name:'Salt Lake City, USA',elev:1288,sig:3.6,hi:[1.9,7,12.4,16.2,21.6,30.7,34.6,33.6,27.2,16.5,10.4,2.3],lo:[-3.8,-1.3,1.8,3.4,8,14.2,18.8,17.2,13,5.2,1.1,-3.2],rh:[75,58,56,51,53,37,36,41,48,58,68,76]},
+ {g:'Americas',id:'abilene',name:'Abilene, USA',elev:546,sig:3.8,hi:[13.9,14.9,21.9,25.2,29.5,34,35.8,35.4,31.9,27.3,21.1,17.1],lo:[1.1,2.5,8.7,12.9,16.2,21.7,23.2,23.1,19.8,14,7.7,3],rh:[61,62,56,57,55,53,46,48,55,55,54,52]},
+ {g:'Americas',id:'sanantonio',name:'San Antonio, USA',elev:241,sig:4.1,hi:[18,20.3,23.3,26.6,32,33.7,35.6,36.7,32.5,28.9,24.7,18],lo:[5.4,8,13.2,14.8,19.2,22.9,25,24.9,22.8,16.1,13.4,7.9],rh:[62,64,69,68,63,66,64,57,71,62,67,67]},
+ {g:'Americas',id:'desmoines',name:'Des Moines, USA',elev:294,sig:4.5,hi:[-0.8,2.1,12.9,17.1,23.2,28.7,30.6,29.7,25.1,17.8,13,3.8],lo:[-8.5,-7,0.7,5.9,11.6,18.6,20.8,19,14.1,6.7,1.4,-4.8],rh:[70,66,55,55,63,67,71,69,66,64,67,80]},
+ {g:'Americas',id:'newark',name:'New York / New Jersey (Newark), USA',elev:9,sig:4.2,hi:[4.4,7.2,8.8,16.9,23.6,27.4,31,29.6,26,19.4,15.1,7.2],lo:[-1.8,-2.9,0.8,7,14.2,17.7,21.9,20.7,17.2,10.7,5.8,0.7],rh:[61,62,56,55,64,63,64,67,68,70,61,68]},
+ {g:'Americas',id:'charlotte',name:'Charlotte, USA',elev:222,sig:3.9,hi:[11.7,15.3,18,22.6,27.7,29.7,32.7,31.5,28.4,24,17.3,14.2],lo:[1.2,3.1,6.1,10.9,16.7,20.1,22.1,21.4,16.9,11.9,5.3,3.9],rh:[63,63,51,53,63,65,66,76,70,75,70,67]},
+ {g:'Americas',id:'monroela',name:'Northern Louisiana (Monroe), USA',elev:24,sig:3.9,hi:[13.5,17,22.3,25.3,28,31.9,34.2,33.8,32.9,26.5,22.3,16.7],lo:[4.3,6.6,10.3,12.8,16.8,22.3,23.4,23.5,19.2,13.2,8.5,5.7],rh:[73,73,68,65,70,77,73,78,61,69,74,76]},
+ {g:'Americas',id:'saopaulo',name:'São Paulo, Brazil',elev:760,sig:1.8,hi:fa([83,84,82,80,74,73,73,76,77,80,80,83]),lo:fa([67,67,66,64,58,56,55,56,59,62,63,66]),rh:[84,84,86,85,85,83,80,76,75,77,79,81]},
+ {g:'Europe',id:'frankfurt',name:'Frankfurt, Germany',elev:110,sig:2.8,hi:fa([41,44,52,62,69,75,79,78,69,59,48,42]),lo:fa([31,31,36,42,49,55,59,58,51,44,38,33]),rh:[93,89,83,76,73,67,62,62,70,82,91,93]},
+ {g:'Europe',id:'london',name:'London, UK',elev:40,sig:2.5,hi:fa([47,48,53,59,64,70,74,73,68,60,52,47]),lo:fa([36,36,38,41,47,52,56,55,51,46,40,36]),rh:[93,90,86,82,79,78,76,77,81,87,92,94]},
+ {g:'Europe',id:'dublin',name:'Dublin, Ireland',elev:20,sig:2.0,hi:fa([47,48,51,56,61,65,68,68,64,57,51,48]),lo:fa([36,36,38,40,44,49,53,52,49,45,40,37]),rh:[91,90,88,86,84,84,85,86,87,88,91,91]},
+ {g:'Europe',id:'madrid',name:'Madrid, Spain',elev:620,sig:2.5,hi:fa([51,55,62,67,75,86,92,91,82,70,58,52]),lo:fa([35,37,42,46,53,61,67,66,59,51,42,37]),rh:[84,78,71,67,59,47,36,36,49,66,79,84]},
+ {g:'Europe',id:'stockholm',name:'Stockholm, Sweden',elev:30,sig:2.8,hi:fa([34,34,40,51,62,69,75,72,62,50,42,36]),lo:fa([27,26,30,37,45,53,59,58,50,42,35,30]),rh:[96,95,89,82,77,75,73,77,82,89,95,97]},
+ {g:'Asia-Pacific',id:'singapore',name:'Singapore',elev:15,sig:0.8,hi:fa([87,89,90,90,90,89,89,88,89,89,88,87]),lo:fa([75,76,76,77,78,77,77,77,77,76,76,75]),rh:[88,86,84,82,83,84,85,85,84,83,85,88]},
+ {g:'Asia-Pacific',id:'mumbai',name:'Mumbai, India',elev:14,sig:1.0,hi:fa([89,89,92,92,92,91,87,87,88,93,93,91]),lo:fa([62,64,69,75,80,80,78,77,76,74,70,64]),rh:[51,45,44,53,61,79,89,90,88,78,69,59]},
+ {g:'Asia-Pacific',id:'tokyo',name:'Tokyo, Japan',elev:25,sig:2.0,hi:fa([50,52,58,67,74,79,86,88,82,72,62,54]),lo:fa([34,36,41,50,58,65,72,74,69,59,48,39]),rh:[75,74,75,77,79,82,83,81,82,82,80,77]},
+ {g:'Asia-Pacific',id:'sydney',name:'Sydney, Australia',elev:40,sig:2.0,hi:fa([81,80,78,74,70,65,64,67,71,74,76,78]),lo:fa([68,68,65,60,54,50,48,49,54,58,62,65]),rh:[75,76,75,73,72,75,73,70,69,70,73,73]},
+];
+// ---------- psychrometrics (ASHRAE Fundamentals Ch.1, Hyland–Wexler) ----------
+function pws(t){ // Pa
+  const T=t+273.15;
+  if(t>=0) return Math.exp(-5.8002206e3/T+1.3914993-4.8640239e-2*T+4.1764768e-5*T*T-1.4452093e-8*T*T*T+6.5459673*Math.log(T));
+  return Math.exp(-5.6745359e3/T+6.3925247-9.677843e-3*T+6.2215701e-7*T*T+2.0747825e-9*T*T*T-9.484024e-13*T*T*T*T+4.1635019*Math.log(T));
+}
+const Wfrom=(pw,P)=>0.621945*pw/(P-pw);
+const pAtm=z=>101325*Math.pow(1-2.25577e-5*z,5.2559);
+function dewFromRH(T,rh){ const pw=Math.max(rh,1)/100*pws(T); let lo=-60,hi=T; for(let i=0;i<40;i++){const m=(lo+hi)/2; if(pws(m)>pw) hi=m; else lo=m;} return (lo+hi)/2; }
+function wetBulb(t,td,P){
+  if(td>=t) return t;
+  const W=Wfrom(pws(td),P); let lo=td-1, hi=t;
+  for(let i=0;i<32;i++){ const m=(lo+hi)/2, Ws=Wfrom(pws(m),P);
+    const Wm=((2501-2.326*m)*Ws-1.006*(t-m))/(2501+1.86*t-4.186*m);
+    if(Wm>W) hi=m; else lo=m; }
+  return (lo+hi)/2;
+}
+// ---------- synthetic hourly year from monthly normals ----------
+function rng(seed){ let s=seed>>>0; return ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
+function gauss(r){ let u=0,v=0; while(u===0)u=r(); while(v===0)v=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+const MDAYS=[31,28,31,30,31,30,31,31,30,31,30,31];
+function interpMonthly(arr,doy){
+  let c=0; const cent=MDAYS.map(d=>{const x=c+d/2; c+=d; return x;});
+  let i=0; while(i<12 && doy>=cent[i]) i++;
+  const i1=(i-1+12)%12, i2=i%12; let x1=cent[i1], x2=cent[i2];
+  if(i===0) x1-=365; if(i===12) x2+=365;
+  return arr[i1]+(arr[i2]-arr[i1])*(doy-x1)/(x2-x1);
+}
+function synthYear(c){
+  const r=rng(12345+c.id.length*977), T=[], Td=[], mon=[];
+  const tdM=c.hi.map((h,i)=>dewFromRH((h+c.lo[i])/2,c.rh[i]));
+  let a=0,b=0;
+  for(let d=0;d<365;d++){
+    a=0.7*a+c.sig*0.714*gauss(r); b=0.6*b+0.96*gauss(r);
+    const hi=interpMonthly(c.hi,d)+a, lo=interpMonthly(c.lo,d)+a*0.8, td=interpMonthly(tdM,d)+b;
+    let m=0,acc=0; while(d>=acc+MDAYS[m]){acc+=MDAYS[m];m++;}
+    for(let h=0;h<24;h++){
+      let s; if(h>=5&&h<=15) s=-Math.cos(Math.PI*(h-5)/10); else { const x=(h<5?h+24:h)-15; s=Math.cos(Math.PI*x/14); }
+      const t=(hi+lo)/2+(hi-lo)/2*s; T.push(t); Td.push(Math.min(td,t-0.3)); mon.push(m);
+    }
+  }
+  const P=pAtm(c.elev);
+  return {name:c.name, T, Twb:T.map((t,i)=>wetBulb(t,Td[i],P)), mon, synthetic:true};
+}
+
+// ---------- weather files ----------
+function parseEPW(text){
+  const lines=text.split(/\r?\n/), loc=lines[0].split(',');
+  const name=[loc[1],loc[3]].filter(Boolean).join(', ')+(loc[5]?` (WMO ${loc[5]})`:'');
+  const elev=parseFloat(loc[9]); const T=[],Twb=[],mon=[];
+  for(let i=8;i<lines.length;i++){
+    const f=lines[i].split(','); if(f.length<10) continue;
+    const m=+f[1]-1, db=+f[6], dp=+f[7]; let P=+f[9]; if(!(P>50000&&P<120000)) P=pAtm(isNaN(elev)?0:elev);
+    if(isNaN(db)||db>70||db<-70) continue;
+    T.push(db); Twb.push(wetBulb(db,(isNaN(dp)||dp>70)?db-10:dp,P)); mon.push(m);
+  }
+  if(T.length<8000) throw new Error(`Only ${T.length} hourly rows found; expected 8,760.`);
+  return {name,T,Twb,mon,synthetic:false};
+}
+function parseCSV(text){
+  const rows=text.trim().split(/\r?\n/).map(l=>l.split(/[,;\t]/)), head=rows[0].map(h=>h.toLowerCase());
+  const find=re=>head.findIndex(h=>re.test(h));
+  let iT=find(/dry|db/); if(iT<0) iT=head.findIndex(h=>/temp/.test(h)&&!/dew|wet|wb/.test(h));
+  const iRH=find(/rh|humid/), iDP=find(/dew/), iWB=find(/wet|wb/), iM=find(/^month|^mon/), iP=find(/press/);
+  if(iT<0) throw new Error('No dry-bulb column found (header containing "dry", "db" or "temp").');
+  if(iRH<0&&iDP<0&&iWB<0) throw new Error('Need a relative humidity, dew point or wet-bulb column.');
+  // optional station pressure, in Pa, hPa/mbar or kPa; sea level when absent
+  const pres=r=>{ const v=iP>=0?+r[iP]:NaN; return !(v>0)?101325:v>20000?v:v>200?v*100:v*1000; };
+  const T=[],Twb=[],mon=[];
+  rows.slice(1).forEach((r,k)=>{ const t=+r[iT]; if(isNaN(t)) return; const P=pres(r);
+    let wb; if(iWB>=0&&!isNaN(+r[iWB])) wb=+r[iWB]; else if(iDP>=0) wb=wetBulb(t,+r[iDP],P); else wb=wetBulb(t,dewFromRH(t,+r[iRH]),P);
+    T.push(t); Twb.push(wb); mon.push(iM>=0?(+r[iM]-1):Math.min(11,Math.floor(k/730))); });
+  if(T.length<8000) throw new Error(`Only ${T.length} rows found; expected 8,760.`);
+  return {name:'Uploaded CSV',T,Twb,mon,synthetic:false};
+}
+
+// ---------- sample CSV in the upload format: one row per hour, Jan 1 00:00 to Dec 31 23:00 ----------
+function rhFromWB(t,wb,P){   // % RH from dry-bulb, wet-bulb and pressure (inverse of wetBulb)
+  const Ws=Wfrom(pws(wb),P), W=((2501-2.326*wb)*Ws-1.006*(t-wb))/(2501+1.86*t-4.186*wb), pw=W*P/(0.621945+W);
+  return Math.max(1,Math.min(100,100*pw/pws(t)));
+}
+// y: a loaded weather year for city c (station data when available); defaults to the generated year
+function sampleCSV(c,y){
+  y=y||synthYear(c);
+  const P=Math.round(pAtm(y.station&&y.station.elev!=null?y.station.elev:c.elev)), out=['Month,Day,Hour,DryBulb_C,RH_pct,Pressure_Pa'];
+  let d=0,m=0,acc=0;
+  y.T.forEach((t,h)=>{ const day=Math.floor(h/24); while(day>=acc+MDAYS[m]){acc+=MDAYS[m];m++;} d=day-acc+1;
+    out.push(`${m+1},${d},${h%24},${t.toFixed(1)},${rhFromWB(t,y.Twb[h],P).toFixed(1)},${P}`); });
+  return out.join('\r\n')+'\r\n';
+}
+
+// ---------- station weather for built-in cities: measured hourly year + ASHRAE design conditions ----------
+// Each city has shared/data/weather/<id>.js (TMYx hourly dry-bulb / wet-bulb and ASHRAE 2025 Fundamentals values,
+// from climate.onebuilding.org). It is loaded only when the city is picked; if it cannot load (e.g. in a
+// standalone file), the caller falls back to synthYear().
+const WX_BASE=(typeof document!=='undefined'&&document.currentScript&&/shared\/js\/weather\.js/.test(document.currentScript.src))
+  ? document.currentScript.src.replace(/js\/weather\.js.*$/,'data/weather/') : null;
+function decodeWx(s){ const b=atob(s), u=new Uint8Array(b.length); for(let i=0;i<b.length;i++) u[i]=b.charCodeAt(i); return Array.from(new Int16Array(u.buffer),v=>v/10); }
+function stationYear(c){
+  return new Promise((ok,fail)=>{
+    const take=()=>{ const r=(window.WX_DATA||{})[c.id]; if(!r) return false;
+      const T=decodeWx(r.db), Twb=decodeWx(r.wb), mon=[]; let m=0,acc=0;
+      for(let h=0;h<T.length;h++){ const d=Math.floor(h/24); while(d>=acc+MDAYS[m]){acc+=MDAYS[m];m++;} mon.push(m); }
+      ok({name:c.name,T,Twb,mon,synthetic:false,station:r}); return true; };
+    if(take()) return;
+    if(!WX_BASE) return fail(new Error('station data not available'));
+    const s=document.createElement('script'); s.src=WX_BASE+c.id+'.js';
+    s.onload=()=>{ if(!take()) fail(new Error('no station data for '+c.id)); };
+    s.onerror=()=>fail(new Error('station data failed to load'));
+    document.head.appendChild(s);
+  });
+}
+// ---------- shared cooling plant model (Cooling Plant Selector, Peak Shaving Tank) ----------
+// Basis: "Cooling Plant Calculation Basis", Part A. ASHRAE 90.1-2025 Path B chillers, AHRI 551/591 rating points,
+// ASHRAE 90.1-2025 heat-rejection approaches, pump and fan power from head equations, two coincident design cases.
+const OPTIONS=[
+ {id:'acc',  name:'Air-cooled chillers',                     short:'Air-cooled chillers',  water:false, comp:['acch']},
+ {id:'accfc',name:'Air-cooled chillers + free-cooling dry coolers', short:'Chillers + dry coolers', water:false, comp:['acch','dc']},
+ {id:'adia', name:'Water-cooled chillers + adiabatic coolers + free cooling', short:'Chillers + adiabatic + free cooling', water:true, comp:['wcch','adc','hx']},
+ {id:'wcc',  name:'Water-cooled chillers + cooling towers + free cooling', short:'Chillers + towers + free cooling',     water:true, comp:['wcch','ct','hx']},
+ {id:'hyb',  name:'Water-cooled chillers + hybrid dry coolers and cooling towers + free cooling', short:'Chillers + hybrid + free cooling', water:true, comp:['wcch','dc','ct','hx']},
+];
+const RATES=[
+ {id:'acch',l:'Air-cooled chillers',lo:180,hi:280},
+ {id:'wcch',l:'Water-cooled chillers',lo:120,hi:200},
+ {id:'dc',  l:'Dry coolers',lo:60,hi:110},
+ {id:'adc', l:'Adiabatic coolers',lo:90,hi:150},
+ {id:'ct',  l:'Cooling towers + CW pumps + treatment',lo:50,hi:90},
+ {id:'hx',  l:'Economiser plate HX',lo:15,hi:30},
+];
+// fixed weights for the recommendation score
+const WEIGHTS=[{id:'w_energy',l:'Energy',v:4},{id:'w_water',l:'Water',v:3},{id:'w_peak',l:'Peak power (grid)',v:3},{id:'w_capex',l:'Initial cost',v:2},{id:'w_carbon',l:'Carbon',v:3}];
+
+// ---------- environmental impact ----------
+// grid emission factor, t CO2 per MWh (= kg/kWh). Countries: Our World in Data / Ember, carbon intensity of electricity, latest year (2024–2025).
+// US cities: EPA eGRID2023 (rev 2) subregion total output CO2e rates, lb/MWh × 0.4536/1000: SRVC 596.3 (N. Virginia), ERCT 736.6 (Dallas),
+// AZNM 706.2 (Phoenix), RFCW 916.1 (Chicago, Columbus), SRSO 846.0 (Atlanta), CAMX 430.0 (San Jose), NWPP 635.3 (Hillsboro, Reno,
+// Salt Lake City), ERCT 736.6 (Abilene, San Antonio), MROW 926.6 (Des Moines), RFCE 599.2 (Newark), SRVC 596.3 (Charlotte), SRMV 741.7 (Monroe). Sydney: Australian NGA / Clean Energy Regulator scope 2 location-based factor, NSW 2025–26.
+const GRID_EF={dubai:.468,abudhabi:.468,riyadh:.692,jeddah:.692,dammam:.692,manama:.902,cairo:.563,nova:.2705,dallas:.3341,phoenix:.3203,chicago:.4155,
+  atlanta:0.3837,columbus:0.4155,sanjose:0.1950,hillsboro:0.2882,reno:0.2882,saltlake:0.2882,abilene:0.3341,sanantonio:0.3341,desmoines:0.4203,newark:0.2718,charlotte:0.2705,monroela:0.3364,
+  saopaulo:.110,frankfurt:.330,london:.217,dublin:.257,madrid:.154,stockholm:.035,singapore:.497,mumbai:.670,tokyo:.477,sydney:.64};
+// energy to supply 1 m³ of water, kWh: seawater desalination (Gulf) about 3.5, conventional treated supply about 0.5 (IEA World Energy Outlook 2016, Water-Energy Nexus)
+const WATER_KWH={dubai:3.5,abudhabi:3.5,riyadh:3.5,jeddah:3.5,dammam:3.5,manama:3.5};
+const waterKwh=id=>WATER_KWH[id]??0.5;
+// refrigerants, 100-year GWP (IPCC AR4, as used by the EU F-gas Regulation)
+const REFRIGERANTS={r513a:{name:'R-513A',gwp:631},r134a:{name:'R-134a',gwp:1430},r1234ze:{name:'R-1234ze(E)',gwp:1}};
+
+// default basis values (inputs override them in the Cooling Plant Selector)
+const BASIS={
+  copA:2.866, copW:6.018, copMax:14,          // ASHRAE 90.1-2025 Table 6.8.1-3, Path B full load; COPmax = assumption
+  unitWL:7000, unitWA:5500, unitA:1500, derA:0.0135,   // chiller unit sizes (kW): water-cooled liquid / air loop, air-cooled; air-cooled capacity loss per K above 35 °C (Trane RTAC public data)
+  stage:0.90, acMax:52, wcMax:43,             // next chiller above 90% PLR; air-cooled max ambient; condenser-water warning limit
+  acApp:15, wcApp:7,                          // condensing: ambient + 15 K; condenser water + 5 K range (AHRI) + 2 K
+  aCT:5.56, aDC:5.56, aAD:11.1, aHX:1.5, rangeCW:5.56,   // ASHRAE 90.1-2025 Table 6.8.1-7 rating approaches; plate HX
+  swAD:24, swHY:24, eAD:0.85, coc:4,          // adiabatic / hybrid switch; pad effectiveness (water use only); cycles of concentration
+  kCT:0.012, kDC:0.030, kAD:0.030,            // fan kW per kW rejected at full speed: towers ASHRAE 2025 minimum; dry / adiabatic public data sheets
+  dpCDU:320, dtCDU:10, dpPri:200, dpSec:400, dpCW:211, etaP:0.70,   // pump heads (kPa), CDU coolant ΔT, pump × motor × VFD efficiency
+  dpFWU:0.30, dtAir:12, etaF:0.65,            // fan wall units: static pressure (kPa), air rise across IT (K), fan efficiency
+  minPump:0.5, minFan:0.3,                    // VFD minimum speed
+  ef:0.45, wkwh:0.5, refr:'r513a', chW:0.3, chA:0.4, leak:0.02,   // grid t CO2/MWh; water kWh/m³; refrigerant; charge kg per kW (water-cooled / air-cooled); leak per year
+};
+
+// ---------- ASHRAE 90.4-2025 Table 6.5: maximum annualized MLC by climate zone, [ITE > 300 kW, ITE ≤ 300 kW] ----------
+const MLC_MAX={'0A':[.29,.37],'0B':[.32,.41],'1A':[.30,.37],'1B':[.31,.39],'2A':[.27,.35],'2B':[.20,.33],'3A':[.24,.33],'3B':[.20,.33],'3C':[.17,.27],
+  '4A':[.21,.33],'4B':[.17,.29],'4C':[.17,.27],'5A':[.19,.34],'5B':[.17,.30],'5C':[.17,.29],'6A':[.19,.31],'6B':[.17,.31],'7':[.17,.31],'8':[.15,.32]};
+const mlcMax=(zone,itKW)=>{ const v=MLC_MAX[String(zone||'').toUpperCase()]; return v?v[itKW>300?0:1]:null; };
+
+// ---------- equations ----------
+// pump or fan power as a share of the heat carried: P / Q = ΔP / (ρ · cp · ΔT · η)
+const pumpK=(dpKPa,dT,eta)=>dpKPa/(1000*4.18*Math.max(dT,0.5)*eta);
+const airFanK=(dpKPa,dT,eta)=>dpKPa/(1.2*1.006*Math.max(dT,0.5)*eta);
+// VFD affinity law: power ∝ speed³, speed ∝ flow, held at the minimum speed
+const affinity=(x,minSpeed)=>Math.pow(Math.max(minSpeed,Math.min(x,1.2)),3);
+// chiller COP at the hour's lift (constant Carnot fraction) from the rated point; AHRI 551/591: 7 °C chilled water,
+// 35 °C air + 15 K = 50 °C condensing, 30 °C condenser water + 7 K = 37 °C condensing; evaporating = supply − 2 K
+const CH_REF={ac:{Te:5,Tc:50}, wc:{Te:5,Tc:37}};
+function copAt(kind,Ts,Tc,p){
+  const Te=Ts-2, lift=Math.max(Tc-Te,3), r=CH_REF[kind];
+  return Math.min(p.copMax,(kind==='ac'?p.copA:p.copW)*((Te+273.15)/lift)/((r.Te+273.15)/(r.Tc-r.Te)));
+}
+// VSD part-load factor, calibrated to ASHRAE 90.1-2025 Path B full-load COP and IPLV (EnergyPlus VSD shape, scaled)
+const PL_CURVE={wc:[0.1969,0.1318,0.6713], ac:[0.1752,0.1354,0.6895]};
+const partLoad=(kind,x)=>{ const c=PL_CURVE[kind]; return Math.max(0.05,c[0]+c[1]*x+c[2]*x*x); };
+// air-cooled unit capacity at a dry-bulb (rated at 35 °C)
+const acCap=(p,db)=>p.unitA*Math.max(0.3,1-p.derA*Math.max(0,db-35));
+
+// terminal units (heat added to their loop): CDU pumps on the liquid loop, fan wall units on the air loop
+const termShare=(L,p)=>L.name==='LC'?pumpK(p.dpCDU,p.dtCDU,p.etaP):L.name==='Air'?airFanK(p.dpFWU,p.dtAir,p.etaF):0;
+const loopPumpShare=(L,p)=>pumpK(p.dpPri+p.dpSec,L.Tr-L.Ts,p.etaP);   // primary + secondary pumps on the loop ΔT
+
+// one hour of one option on one loop at dry-bulb db / wet-bulb wb
+function hourModel(o,L,db,wb,p){
+  let Tout,ecw=null,kind,wet=0,dShare=0;
+  if(o.id==='acc'){ Tout=Infinity; kind='ac'; }
+  else if(o.id==='accfc'){ Tout=db+p.aDC; kind='ac'; }                     // dry coolers directly on the loop
+  else if(o.id==='adia'){ wet=db>p.swAD?1:0; ecw=wet?wb+p.aAD:db+p.aDC; Tout=ecw+p.aHX; kind='wc'; }
+  else if(o.id==='wcc'){ wet=1; ecw=wb+p.aCT; Tout=ecw+p.aHX; kind='wc'; }
+  else { // hybrid: dry coolers in series ahead of the towers on the condenser water
+    if(db<=p.swHY){ ecw=db+p.aDC; dShare=1; wet=0; }
+    else { ecw=wb+p.aCT; dShare=Math.max(0,Math.min(1,(ecw+p.rangeCW-(db+p.aDC))/p.rangeCW)); wet=1-dShare; }
+    Tout=ecw+p.aHX; kind='wc';
+  }
+  const Tc=kind==='ac'?db+p.acApp:ecw+p.wcApp;
+  const ff=Tout<=L.Ts?1:Math.max(0,Math.min(1,(L.Tr-Tout)/(L.Tr-L.Ts)));
+  const term=termShare(L,p), pk=loopPumpShare(L,p), qLdes=L.Qd*(1+term+pk);
+  // installed duty units: water-cooled at rated capacity; air-cooled sized at the Case A dry-bulb (derated)
+  let unit,N;
+  const unitW=L.name==='Air'?p.unitWA:p.unitWL;
+  if(kind==='wc'&&unitW){ unit=unitW; N=Math.max(1,Math.ceil(qLdes/unit-1e-9)); }
+  else if(kind==='ac'&&p.unitA){ unit=p.unitA; N=Math.max(1,Math.ceil(qLdes/acCap(p,p.dbA??35)-1e-9)); }
+  else { N=p.nCh||4; unit=qLdes/N; }
+  const capH=kind==='ac'&&p.unitA?acCap(p,db):unit;                       // capacity of one unit this hour
+  const cop=copAt(kind,L.Ts,Tc,p);
+  const des=p.des&&p.des[o.id]&&p.des[o.id][L.name];                       // design heat rejected (fan and condenser-pump speed)
+  const minT=L.name==='Air'?p.minFan:p.minPump;
+  const calc=q=>{
+    const x=L.Qd>0?q/L.Qd:0;
+    const Pt=term*L.Qd*affinity(x,minT), Pl=pk*L.Qd*affinity(x,p.minPump);
+    const qL=q+Pt+Pl, Qch=qL*(1-ff);
+    let Pc=0,nOn=0,plr=0;
+    if(Qch>0){ nOn=Math.min(N,Math.max(1,Math.ceil(Qch/(p.stage*capH)-1e-9))); plr=Qch/(nOn*capH); Pc=nOn*capH/cop*partLoad(kind,Math.min(plr,1.2)); }
+    const Qr=qL+Pc, QrRef=des?des.Qr:Qr, f=(share,k)=>share>0?k*QrRef*affinity(Qr*share/QrRef,p.minFan):0;
+    let Pf=0;
+    if(o.id==='accfc') Pf=ff>0?p.kDC*qLdes*affinity(qL*ff/qLdes,p.minFan):0;
+    else if(o.id==='adia') Pf=f(1,p.kAD);
+    else if(o.id==='wcc') Pf=f(1,p.kCT);
+    else if(o.id==='hyb') Pf=f(wet,p.kCT)+f(dShare,p.kDC);
+    const Pcw=kind==='wc'?pumpK(p.dpCW,p.rangeCW,p.etaP)*QrRef*affinity(Qr/QrRef,p.minPump):0;
+    return {Pc,Pf,Pp:Pl+Pcw,Pt,Qr,qL,Qch,nOn,plr,cop:Qch>0?Qch/Pc:null,P:Pc+Pf+Pl+Pcw+Pt};
+  };
+  // limits: air-cooled max ambient fails the design; condenser water above the standard range only warns
+  const limit=kind==='ac'&&db>p.acMax?`ambient ${db.toFixed(1)} °C > air-cooled chiller limit ${p.acMax} °C`:null;
+  const warn=kind==='wc'&&ecw>p.wcMax?`entering condenser water ${ecw.toFixed(1)} °C is above the standard chiller range (${p.wcMax} °C): a chiller rated for more than ${p.wcMax} °C entering condenser water is needed`:null;
+  return {Tout,Tc,ecw,kind,ff,wet,dShare,N,unit,cop,calc,limit,warn};
+}
+
+// make-up water, kg/h: towers 0.00153 × flow × range (ASHRAE) + blowdown at CoC; hybrid on the towers' share; adiabatic pads (air-side balance)
+function waterKgH(o,Qr,db,wb,p,wet){
+  if(o.id==='wcc'||o.id==='hyb') return wet*Qr*0.00153/4.18*3600*(p.coc/(p.coc-1));
+  if(o.id==='adia'&&wet){ const Tpad=db-p.eAD*(db-wb); return Qr*(db-Tpad)/(12*2430)*1.15*3600; }
+  return 0;
+}
+
+// two coincident design cases: A = extreme dry-bulb + the wet-bulb of the hottest hour; B = extreme wet-bulb + the dry-bulb of the most humid hour
+function designCases(wx,A,dbIn,wbIn){
+  let hA=0,hB=0; wx.T.forEach((t,h)=>{ if(t>wx.T[hA]) hA=h; if(wx.Twb[h]>wx.Twb[hB]) hB=h; });
+  const dbA=isNaN(dbIn)?(A?A.extDB:wx.T[hA]):dbIn, wbB=isNaN(wbIn)?(A?A.extWB:wx.Twb[hB]):wbIn;
+  return {A:{db:dbA,wb:Math.min(wx.Twb[hA],dbA)}, B:{db:Math.max(wx.T[hB],wbB),wb:wbB}};
+}
+
+// design check at both cases, 100% load; also records each option's design heat rejected (sets fan / pump speeds hourly)
+function designCheck(p){
+  const out={}, des={}; p.des=null;   // design cases at full fan / pump speed
+  for(const o of OPTIONS){
+    const cs={}, issues=[], warns=[], units=[]; des[o.id]={};
+    for(const k of ['A','B']){ const {db,wb}=p.cases[k]; let P=0,Qr=0,W=0;
+      p.loops.forEach(L=>{ if(L.Qd<=0) return; const hm=hourModel(o,L,db,wb,p), d=hm.calc(L.Qd);
+        P+=d.P; Qr+=d.Qr; W+=waterKgH(o,d.Qr,db,wb,p,hm.wet)/1000;
+        des[o.id][L.name]={Qr:Math.max(d.Qr,(des[o.id][L.name]||{}).Qr||0)};
+        if(hm.limit&&hm.ff<1) issues.push(hm.limit); if(hm.warn&&hm.ff<1) warns.push(hm.warn);
+        if(k==='A') units.push({loop:L.name,N:hm.N,unit:hm.unit,kind:hm.kind});
+      });
+      cs[k]={P,Qr,W};
+    }
+    const worst=cs.A.P>=cs.B.P?'A':'B';
+    out[o.id]={cases:cs,worst,P:cs[worst].P,Qr:Math.max(cs.A.Qr,cs.B.Qr),W:Math.max(cs.A.W,cs.B.W),units,
+      ok:issues.length===0,issues:[...new Set(issues)],warns:[...new Set(warns)],ratio:cs[worst].P/p.Qd};
+  }
+  p.des=des;
+  return out;
+}
+
+// 8,760-hour simulation; call designCheck first (design heat rejected, design peak)
+function simulate(wx,p,des){
+  const n=wx.T.length, hs=8760/n, loops=p.loops, out={};
+  for(const o of OPTIONS){
+    const r={o,E:0,Ec:0,Ef:0,Ep:0,Et:0,W:0,free:[0,0],part:[0,0],mech:[0,0],hotCW:0,
+      mFree:[new Array(12).fill(0),new Array(12).fill(0)],mPart:[new Array(12).fill(0),new Array(12).fill(0)],mMech:[new Array(12).fill(0),new Array(12).fill(0)],copSum:0,copN:0};
+    for(let h=0;h<n;h++){
+      const db=wx.T[h], wb=wx.Twb[h], m=wx.mon[h];
+      loops.forEach((L,li)=>{
+        if(L.Q<=0) return;
+        const hm=hourModel(o,L,db,wb,p), a=hm.calc(L.Q), ff=hm.ff;
+        r.E+=a.P; r.Ec+=a.Pc; r.Ef+=a.Pf; r.Ep+=a.Pp; r.Et+=a.Pt;
+        if(a.cop){r.copSum+=a.cop; r.copN++;}
+        r.W+=waterKgH(o,a.Qr,db,wb,p,hm.wet);
+        if(hm.warn&&ff<1&&li===0) r.hotCW++;
+        if(ff>=1){r.free[li]++; r.mFree[li][m]++;} else if(ff>0){r.part[li]++; r.mPart[li][m]++;} else {r.mech[li]++; r.mMech[li][m]++;}
+      });
+    }
+    const Qyr=loops.reduce((s,L)=>s+L.Q,0)*n, d=des[o.id];
+    ['E','Ec','Ef','Ep','Et'].forEach(k=>r[k]*=hs/1000);   // MWh
+    r.W*=hs/1000;                                     // m3
+    r.hotCW*=hs;                                      // h/yr above the condenser-water limit
+    r.peak=d.P; r.Wpeak=d.W;                          // design peak: the higher of Case A and Case B, 100% load
+    ['free','part','mech'].forEach(k=>r[k]=r[k].map(v=>v*hs));
+    r.mlc=r.E*1000/(Qyr*hs);
+    r.cop=r.copN?r.copSum/r.copN:null;
+    r.peakRatio=r.peak/loops.reduce((s,L)=>s+L.Qd,0);
+    // electrical losses for the annual PUE only (peaks are cooling plant only): UPS on the IT load; transformers + distribution on IT + cooling
+    const fac=(it,cool)=>(it/p.ups+cool)/(1-p.dloss);
+    r.Eit=Qyr*hs/1000;                                // MWh, IT energy = cooling load
+    r.Efac=fac(r.Eit,r.E); r.Eloss=r.Efac-r.Eit-r.E;  // MWh
+    r.pue=r.Efac/r.Eit;
+    // annual running cost of cooling, $: electricity + water + demand charge (cooling peak, every month)
+    r.costE=r.E*1000*p.tE; r.costW=r.W*p.tW; r.costD=r.peak*12*p.tD;
+    r.run=r.costE+r.costW+r.costD;
+    // initial cost
+    const cap=p.Qd*(1+p.red);
+    r.capLo=0; r.capHi=0; r.capParts=[];
+    for(const c of o.comp){ const rt=p.rates[c]; r.capLo+=cap*rt.lo; r.capHi+=cap*rt.hi; r.capParts.push(c); }
+    // carbon, t CO2e per year: electricity × grid factor; water × supply energy × grid factor; refrigerant charge (duty + 1 standby per loop) × leak × GWP
+    r.chCap=d.units.reduce((s,u)=>s+(u.N+1)*u.unit,0);
+    r.charge=r.chCap*(d.units.some(u=>u.kind==='ac')?p.chA:p.chW);
+    r.co2E=r.E*p.ef; r.co2W=r.W*p.wkwh/1000*p.ef; r.co2R=r.charge*p.leak*(REFRIGERANTS[p.refr]||REFRIGERANTS.r513a).gwp/1000;
+    r.co2=r.co2E+r.co2W+r.co2R; r.co2IT=r.co2*1000/r.Eit;   // kg CO2e per MWh of IT
+    out[o.id]=r;
+  }
+  return out;
+}
+
+function score(res,p,des){
+  const ids=OPTIONS.map(o=>o.id);
+  ids.forEach(id=>{ const r=res[id]; r.excluded=null;
+    if(r.o.water&&p.water==='none') r.excluded='Needs water';
+    if(!r.excluded && des && !des[id].ok) r.excluded='Fails design day';
+    r.capMid=(r.capLo+r.capHi)/2;
+  });
+  const ok=ids.filter(id=>!res[id].excluded);
+  const norm=(k,id)=>{ const v=ok.map(i=>res[i][k]); const mn=Math.min(...v), mx=Math.max(...v); return mx-mn<1e-9?0:(res[id][k]-mn)/(mx-mn); };
+  const wW=p.water==='limited'?p.w_water*2:p.w_water, wC=p.w_carbon||0, tot=(p.w_energy+wW+p.w_peak+p.w_capex+wC)||1;
+  ok.forEach(id=>{ res[id].score=100*(1-(p.w_energy*norm('E',id)+wW*norm('W',id)+p.w_peak*norm('peak',id)+p.w_capex*norm('capMid',id)+wC*norm('co2',id))/tot); });
+  ok.sort((a,b)=>res[b].score-res[a].score);
+  return ok;
+}
+// ---------- Cooling CO2 Calculator: page logic ----------
+// Compare systems: 8,760-hour model (shared/js/cooling-model.js), carbon = electricity + water supply + refrigerant leakage.
+// My own numbers: the same three terms from the user's annual figures.
+const num=(id,d)=>{ const v=parseFloat($(id).value); return isNaN(v)?d:v; };
+const lim=(v,a,b)=>Math.min(b,Math.max(a,v));
+const CAR=4.6;   // t CO2 per typical passenger car per year (US EPA, Greenhouse Gas Emissions from a Typical Passenger Vehicle)
+
+let WX=null, RES=null, DES=null, P=null, MODE='est', timer=null, req=0;
+[...new Set(CITIES.map(c=>c.g))].forEach(g=>{ const og=document.createElement('optgroup'); og.label=g;
+  CITIES.filter(c=>c.g===g).forEach(c=>{ const o=document.createElement('option'); o.value=c.id; o.textContent=c.name; og.appendChild(o); }); $('cCity').appendChild(og); });
+Object.entries(REFRIGERANTS).forEach(([k,r])=>{ const o=document.createElement('option'); o.value=k; o.textContent=`${r.name} (GWP ${fmt(r.gwp)})`; $('cRef').appendChild(o); });
+[...OPTIONS.map(o=>[o.id,o.name]),['other','Other cooling system']].forEach(([v,t])=>{ const o=document.createElement('option'); o.value=v; o.textContent=t; $('oSys').appendChild(o); });
+
+// ---------- location factors ----------
+const city=()=>CITIES.find(c=>c.id===$('cCity').value);
+const efSrc=id=>{ const c=CITIES.find(x=>x.id===id);
+  if(id==='sydney') return 'Australian National Greenhouse Accounts factors, NSW 2025–26';
+  if(c&&c.g==='Americas'&&id!=='saopaulo') return 'US EPA eGRID2023 subregion rate';
+  return 'Our World in Data / Ember, latest year'; };
+function factors(){
+  const id=$('cCity').value, ef0=GRID_EF[id]??0.45, w0=waterKwh(id);
+  const efIn=parseFloat($('cEF').value), wIn=parseFloat($('cWk').value);
+  $('cEF').placeholder=ef0.toFixed(3); $('cWk').placeholder=fmt(w0,1);
+  return {ef:isNaN(efIn)?ef0:Math.max(0,efIn), wkwh:isNaN(wIn)?w0:Math.max(0,wIn), efOwn:!isNaN(efIn), wOwn:!isNaN(wIn), src:efSrc(id)};
+}
+function refr(){ return {k:$('cRef').value, r:REFRIGERANTS[$('cRef').value], leak:Math.max(0,num('cLeak',2))/100}; }
+
+// ---------- weather (Compare systems) ----------
+function loadCity(){ const c=city(), n=++req; if(MODE==='est'){ $('cStatus').textContent='Loading weather…'; }
+  stationYear(c).catch(()=>synthYear(c)).then(w=>{ if(n===req){ WX=w; schedule(0); } }); }
+$('cCity').onchange=()=>{ WX=null; loadCity(); if(MODE==='own') schedule(0); };
+
+function params(){
+  const f=factors(), R=refr(), Qd=Math.max(0.1,num('cQ',20))*1000, lf=lim(num('cLf',80),10,100)/100, lcp=lim(num('cLcp',80),0,100)/100;
+  const ls=num('cLs',30), as=num('cAs',20);
+  const loops=[
+    {name:'LC',Ts:ls,Tr:Math.max(num('cLr',40),ls+1),Qd:Qd*lcp,Q:Qd*lcp*lf},
+    {name:'Air',Ts:as,Tr:Math.max(num('cAr',30),as+1),Qd:Qd*(1-lcp),Q:Qd*(1-lcp)*lf}];
+  const rates={}; RATES.forEach(r=>rates[r.id]={lo:r.lo,hi:r.hi});
+  return {...BASIS,Qd,lf,loops,water:'plenty',dbIn:NaN,wbIn:NaN,ef:f.ef,wkwh:f.wkwh,refr:R.k,leak:R.leak,
+    chW:Math.max(0,num('cChW',0.3)),chA:Math.max(0,num('cChA',0.4)),tE:0.1,tW:2.5,tD:0,red:0.25,ups:0.96,dloss:0.02,rates,
+    ...Object.fromEntries(WEIGHTS.map(w=>[w.id,w.v]))};
+}
+
+// ---------- run ----------
+function schedule(ms){ clearTimeout(timer); timer=setTimeout(run,ms??300); }
+function run(){
+  const f=factors();
+  $('cEFNote').innerHTML=`${f.efOwn?'Your grid factor':`Grid factor ${f.ef.toFixed(3)} kg CO₂/kWh: ${f.src}`}. ${f.wOwn?'Your water supply energy':`Water supply ${fmt(f.wkwh,1)} kWh/m³: ${f.wkwh>=3?'Gulf seawater desalination':'conventional treated supply'} (IEA WEO 2016)`}. Leave blank for the city's value.`;
+  if(MODE==='own') return renderOwn(f);
+  if(!WX){ $('cStatus').textContent='Loading weather…'; return; }
+  P=params(); P.cases=designCases(WX,WX.station&&WX.station.ashrae,P.dbIn,P.wbIn); P.dbA=P.cases.A.db; P.dbD=P.cases.A.db; P.wbD=P.cases.B.wb;
+  DES=designCheck(P); RES=simulate(WX,P,DES);
+  renderEst(f);
+}
+
+// ---------- results: Compare systems ----------
+const yrs=()=>lim(Math.round(num('cYrs',15)),1,40);
+const t=v=>fmt(v,v<10?1:0);
+function renderEst(f){
+  const R=refr(), Y=yrs();
+  const all=OPTIONS.map(o=>RES[o.id]), ok=all.filter(r=>DES[r.o.id].ok);
+  const ids=[...ok.sort((a,b)=>a.co2-b.co2),...all.filter(r=>!DES[r.o.id].ok)].map(r=>r.o.id);
+  const best=RES[ids[0]], base=RES.acc, save=base.co2-best.co2;
+  $('cStatus').textContent=`${WX.name} · ${fmt(P.Qd/1000,1)} MW at ${fmt(P.lf*100)}% load`;
+  $('cRes').innerHTML=`
+    <div class="big4">
+      <div class="bn"><div class="v good">${t(best.co2)} <small>t CO₂e/yr</small></div><div class="l">Lowest: ${best.o.short}</div></div>
+      <div class="bn"><div class="v">${t(base.co2)} <small>t CO₂e/yr</small></div><div class="l">Air-cooled chillers (baseline)</div></div>
+      <div class="bn"><div class="v good">${t(Math.max(0,save))} <small>t/yr</small></div><div class="l">Saved by the lowest system against air-cooled · ${fmt(save*Y)} t over ${Y} years</div></div>
+      <div class="bn"><div class="v">${fmt(best.co2IT,1)} <small>kg/MWh</small></div><div class="l">CO₂e per MWh of IT energy (lowest system)</div></div>
+    </div>
+    <div class="verdict">Lowest carbon here: <b>${best.o.name}</b>, ${t(best.co2)} t CO₂e per year. ${save>0.5?`Against air-cooled chillers it saves <b>${t(save)} t a year</b>, about the yearly emissions of <b>${fmt(save/CAR)} passenger cars</b>.`:'It is close to air-cooled chillers in this climate.'} Electricity is ${fmt(100*best.co2E/best.co2)}% of its total.</div>`;
+  chart(ids.map(id=>RES[id].o.short),ids.map(id=>RES[id]));
+  const rows=ids.map((id,i)=>{ const r=RES[id], bad=!DES[id].ok;
+    return `<tr class="${i===0&&!bad?'best':''}"><td class="sys">${r.o.short}${i===0&&!bad?'<span class="tag ok">Lowest</span>':''}${bad?'<span class="tag">Fails design day</span>':''}</td><td>${fmt(r.E)}</td><td>${fmt(r.W)}</td><td>${fmt(r.charge)}</td><td>${t(r.co2E)}</td><td>${t(r.co2W)}</td><td>${t(r.co2R)}</td><td><b>${t(r.co2)}</b></td><td>${fmt(r.co2IT,1)}</td><td>${fmt(r.co2*Y)}</td></tr>`; });
+  $('cTabTitle').textContent='Every system';
+  $('cTab').innerHTML=table(['System','Electricity MWh/yr','Water m³/yr','Charge kg','Electricity t/yr','Water t/yr','Refrigerant t/yr','Total t CO₂e/yr','kg per MWh IT',`Total over ${Y} yr (t)`],rows);
+  details(f,R,true);
+}
+
+// ---------- results: My own numbers ----------
+function renderOwn(f){
+  const R=refr(), Y=yrs(), E=Math.max(0,num('oE',0)), W=Math.max(0,num('oW',0)), ch=Math.max(0,num('oCh',0)), IT=num('oIT',NaN);
+  const cE=E*f.ef, cW=W*f.wkwh/1000*f.ef, cR=ch*R.leak*R.r.gwp/1000, tot=cE+cW+cR;
+  const name=$('oSys').selectedOptions[0].textContent, sh=v=>tot>0?fmt(100*v/tot):'0';
+  $('cStatus').textContent=`${city().name} · ${name}`;
+  $('cRes').innerHTML=`
+    <div class="big4">
+      <div class="bn"><div class="v good">${t(tot)} <small>t CO₂e/yr</small></div><div class="l">Total, cooling system</div></div>
+      <div class="bn"><div class="v">${fmt(tot*Y)} <small>t</small></div><div class="l">Over ${Y} years</div></div>
+      <div class="bn"><div class="v">${fmt(tot/CAR)}</div><div class="l">Passenger cars a year, same CO₂</div></div>
+      <div class="bn"><div class="v">${IT>0?`${fmt(tot*1000/IT,1)} <small>kg/MWh</small>`:'–'}</div><div class="l">${IT>0?'CO₂e per MWh of IT energy':'Enter the IT energy for kg per MWh IT'}</div></div>
+    </div>
+    <div class="verdict">Electricity <b>${sh(cE)}%</b>, water supply <b>${sh(cW)}%</b>, refrigerant leakage <b>${sh(cR)}%</b> of the total.${cR>0.1*tot&&R.r.gwp>100?` Refrigerant is a large share: a low-GWP refrigerant such as R-1234ze(E) (GWP 1) would remove most of it.`:''}</div>`;
+  chart([name],[{co2E:cE,co2W:cW,co2R:cR}]);
+  $('cTabTitle').textContent='How it is calculated';
+  $('cTab').innerHTML=`<div class="eqs">
+    <div><span>Electricity</span><span class="f">${fmt(E)} MWh × ${f.ef.toFixed(3)} t/MWh</span><b>${t(cE)} t</b></div>
+    <div><span>Water supply</span><span class="f">${fmt(W)} m³ × ${fmt(f.wkwh,1)} kWh/m³ ÷ 1,000 × ${f.ef.toFixed(3)} t/MWh</span><b>${t(cW)} t</b></div>
+    <div><span>Refrigerant</span><span class="f">${fmt(ch)} kg × ${fmt(R.leak*100,1)}% × GWP ${fmt(R.r.gwp)} ÷ 1,000</span><b>${t(cR)} t</b></div>
+    <div class="tot"><span><b>Total per year</b></span><span class="f">CO₂ equivalent</span><b>${t(tot)} t</b></div></div>`;
+  details(f,R,false);
+}
+
+// ---------- chart: stacked bars by source ----------
+function chart(labels,rs){
+  $('cBox').style.height=`${Math.max(110,labels.length*46+60)}px`;
+  $('cChartTitle').textContent='Annual CO₂ by source, t CO₂e per year';
+  const o=baseOpts(); o.indexAxis='y';
+  o.scales.x={stacked:true,grid:{color:css('--border')},border:{display:false},ticks:{color:css('--text2')},title:{display:true,text:'t CO₂e/yr',color:css('--text2')},beginAtZero:true};
+  o.scales.y={stacked:true,grid:{display:false},ticks:{color:css('--text')}};
+  o.plugins.tooltip={mode:'index',intersect:false,callbacks:{label:c=>`${c.dataset.label}: ${t(c.raw)} t`}};
+  const ds=(lab,k,col,last)=>({label:lab,data:rs.map(r=>r[k]),backgroundColor:col,borderColor:css('--surface'),borderWidth:{right:2},barThickness:20,borderRadius:last?{topRight:4,bottomRight:4}:0});
+  mk('cChart',{type:'bar',data:{labels,datasets:[ds('Electricity','co2E',css('--s1')),ds('Water supply','co2W',css('--s3')),ds('Refrigerant leakage','co2R',css('--s2'),true)]},options:o});
+}
+
+function details(f,R,est){
+  const st=WX&&WX.station;
+  $('cDet').innerHTML=`<ul class="method">
+    <li><b>Grid factor:</b> ${f.ef.toFixed(3)} kg CO₂ per kWh (= t per MWh), ${f.efOwn?'your value':f.src}. Location-based: the average of the local grid.</li>
+    <li><b>Water supply energy:</b> ${fmt(f.wkwh,1)} kWh per m³, ${f.wOwn?'your value':'IEA World Energy Outlook 2016 (Water-Energy Nexus): about 3.5 kWh/m³ for Gulf seawater desalination, 0.5 for conventional treated water'}.</li>
+    <li><b>Refrigerant:</b> ${R.r.name}, GWP ${fmt(R.r.gwp)} (100-year, IPCC AR4, as used by the EU F-gas Regulation); leak ${fmt(R.leak*100,1)}% of the charge per year.${est?` Charge ${fmt(num('cChW',0.3),2)} kg/kW for water-cooled and ${fmt(num('cChA',0.4),2)} kg/kW for air-cooled chillers, on the duty chillers + 1 standby per loop. Charge and leak rate are assumptions: use the chiller data where known.`:''}</li>
+    ${est?`<li><b>Energy and water:</b> 8,760-hour simulation, ${st?`${esc(st.station)}, measured typical year TMYx ${esc(st.period)}`:'generated typical year'}; ASHRAE 90.1-2025 chillers, heat-rejection approaches, pump and fan power, free cooling. Same model as the <a href="../cooling-plant/index.html">Cooling Plant Selector</a>, which also gives cost and peak power. A system that cannot meet the design day is listed last.</li>`:''}
+    <li><b>Cars:</b> ${CAR} t CO₂ per typical passenger car per year (US EPA).</li>
+    <li>Cooling system only: IT electricity and UPS losses are not included. Screening-level estimate.</li></ul>`;
+}
+
+// ---------- mode tabs and inputs ----------
+function setMode(m){ MODE=m; $('mEst').classList.toggle('on',m==='est'); $('mOwn').classList.toggle('on',m==='own');
+  $('estPane').hidden=m!=='est'; $('ownPane').hidden=m!=='own'; $('chRow').hidden=m!=='est'; schedule(0); }
+$('mEst').onclick=()=>setMode('est'); $('mOwn').onclick=()=>setMode('own');
+document.querySelectorAll('#inGrid input, #inGrid select:not(#cCity)').forEach(el=>el.addEventListener('input',()=>schedule()));
+loadCity();
+</script>
+</body>
+</html>

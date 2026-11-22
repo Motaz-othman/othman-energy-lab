@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=GTM-WMV8R23W"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FSNWF5QMP9');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cooling CO₂ Calculator · Othman Energy Lab</title>
+<meta name="description" content="Calculate the annual CO₂ of a data center cooling system: electricity, water supply and refrigerant leakage, with official grid factors for 33 cities. Compare five cooling plants or enter your own numbers. By Othman Energy Lab.">
+<link rel="icon" href="../../shared/img/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../shared/img/apple-touch-icon.png">
+<meta name="theme-color" content="#0e7c57">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Othman Energy Lab">
+<meta property="og:title" content="Cooling CO₂ Calculator · Othman Energy Lab">
+<meta property="og:description" content="Calculate the annual CO₂ of a data center cooling system: electricity, water supply and refrigerant leakage, with official grid factors for 33 cities. Compare five cooling plants or enter your own numbers. By Othman Energy Lab.">
+<meta property="og:url" content="https://www.oenergylab.com/data-centers/cooling-co2/">
+<meta property="og:image" content="https://www.oenergylab.com/shared/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="canonical" href="https://www.oenergylab.com/data-centers/cooling-co2/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../shared/css/base.css">
+<link rel="stylesheet" href="../../shared/css/results.css">
+<!-- Chart.js: local copy in shared/lib/ (works offline); CDN fallback -->
+<script src="../../shared/lib/chart.umd.min.js"></script>
+<script>window.Chart||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"><\/script>')</script>
+<meta name="author" content="Mutaz Othman">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Cooling CO₂ Calculator","url":"https://www.oenergylab.com/data-centers/cooling-co2/","description":"Calculate the annual CO₂ of a data center cooling system: electricity, water supply and refrigerant leakage, with official grid factors for 33 cities. Compare five cooling plants or enter your own numbers. By Othman Energy Lab.","applicationCategory":"BusinessApplication","operatingSystem":"Any (web browser)","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"author":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"publisher":{"@id":"https://www.oenergylab.com/#org"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.oenergylab.com/"},{"@type":"ListItem","position":2,"name":"Data Centers","item":"https://www.oenergylab.com/data-centers/"},{"@type":"ListItem","position":3,"name":"Cooling CO₂ Calculator","item":"https://www.oenergylab.com/data-centers/cooling-co2/"}]}]}</script>
+<script type="application/ld+json" id="faq">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Which part of a cooling system's CO₂ is largest?","acceptedAnswer":{"@type":"Answer","text":"Electricity, in almost every case: usually 85–99% of the total. Refrigerant leakage can matter with high-GWP refrigerants such as R-134a, and water matters in the Gulf, where desalinated water takes about 3.5 kWh per m³."}},{"@type":"Question","name":"Where do the grid factors come from?","acceptedAnswer":{"@type":"Answer","text":"US cities use the EPA eGRID2023 subregion rates; Sydney uses the Australian National Greenhouse Accounts factors (NSW 2025–26); other countries use Our World in Data / Ember, latest year. You can type your own factor, for example a green-power contract."}},{"@type":"Question","name":"Does it include the IT equipment?","acceptedAnswer":{"@type":"Answer","text":"No. Only the cooling system: chillers, heat-rejection fans, pumps, CRAH, fan walls and CDUs. IT electricity and UPS losses are not included."}}]}</script>
+<style>
+.mode{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:4px}
+.eqs{display:grid;gap:8px}
+.eqs div{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;padding:10px 14px;border-radius:10px;background:var(--bg);border:1px solid var(--border);font-size:14px}
+.eqs .f{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:var(--text2)}
+.eqs b{font-variant-numeric:tabular-nums}
+.eqs .tot{background:color-mix(in srgb,var(--brand) 9%,var(--surface));border-color:color-mix(in srgb,var(--brand) 35%,var(--border))}
+#inGrid [hidden]{display:none!important}
+#cTab td.sys{white-space:nowrap}
+tr.best td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transparent)}
+.tag{display:inline-block;margin-left:6px;font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;background:var(--bg);border:1px solid var(--border);color:var(--text2)}
+.tag.ok{color:var(--brand-ink);border-color:color-mix(in srgb,var(--brand) 40%,var(--border))}
+</style>
+</head>
+<body class="wide">
+<header class="sitebar" data-root="../../" data-page="data-centers"></header>
+<div class="pagehead">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a> / <a href="../index.html">Data Centers</a> / Cooling CO₂ Calculator</nav>
+  <h1>Cooling CO₂ Calculator</h1>
+  <p class="sub">How much CO₂ does the cooling system emit each year? Three sources: the electricity it uses, the energy to supply its water, and the refrigerant that leaks from the chillers. Compare five cooling plants hour by hour for a city, or enter your own system's numbers.</p>
+</div>
+
+<main class="layout">
+<div class="incol">
+<div class="colhead"><b>Inputs</b><span>Results update as you type</span></div>
+<aside class="card inputs" id="inGrid">
+  <h2>Location</h2>
+  <label for="cCity">City</label><select id="cCity"></select>
+  <div class="row">
+    <div><label for="cEF">Grid factor (kg CO₂/kWh)</label><input type="number" id="cEF" step="0.01" min="0" placeholder="auto"></div>
+    <div><label for="cWk">Water supply energy (kWh/m³)</label><input type="number" id="cWk" step="0.1" min="0" placeholder="auto"></div>
+  </div>
+  <div class="note" id="cEFNote">Leave blank for the city's official value.</div>
+
+  <h2 style="margin-top:18px">Cooling system</h2>
+  <div class="tabs mode"><button id="mEst" class="on" type="button">Compare systems</button><button id="mOwn" type="button">My own numbers</button></div>
+  <div id="estPane">
+    <div class="row">
+      <div><label for="cQ">Cooling load (MW)</label><input type="number" id="cQ" value="20" min="0.1" step="1"></div>
+      <div><label for="cLf">Average load (%)</label><input type="number" id="cLf" value="80" min="10" max="100" step="5"></div>
+    </div>
+    <label for="cLcp">Liquid-cooled share of the load (%)</label><input type="number" id="cLcp" value="80" min="0" max="100" step="5">
+    <div class="note">Measured hourly weather for the city, 8,760 hours. Same model as the Cooling Plant Selector.</div>
+    <details>
+      <summary>Water temperatures</summary>
+      <div class="row">
+        <div><label for="cLs">Liquid supply (°C)</label><input type="number" id="cLs" value="30" step="1"></div>
+        <div><label for="cLr">Liquid return (°C)</label><input type="number" id="cLr" value="40" step="1"></div>
+      </div>
+      <div class="row">
+        <div><label for="cAs">Air loop supply (°C)</label><input type="number" id="cAs" value="20" step="1"></div>
+        <div><label for="cAr">Air loop return (°C)</label><input type="number" id="cAr" value="30" step="1"></div>
+      </div>
+    </details>
+  </div>
+  <div id="ownPane" hidden>
+    <label for="oSys">System (for the label only)</label><select id="oSys"></select>
+    <label for="oE">Cooling electricity (MWh per year)</label><input type="number" id="oE" value="12000" min="0" step="100">
+    <label for="oW">Water use (m³ per year)</label><input type="number" id="oW" value="150000" min="0" step="1000">
+    <label for="oCh">Refrigerant charge, all chillers (kg)</label><input type="number" id="oCh" value="8000" min="0" step="100">
+    <label for="oIT">IT energy (MWh per year, optional)</label><input type="number" id="oIT" min="0" step="1000" placeholder="for kg CO₂ per MWh IT">
+    <div class="note">From the design, a utility bill or the BMS. Cooling only: chillers, fans, pumps, CRAH / CDU.</div>
+  </div>
+
+  <h2 style="margin-top:18px">Refrigerant</h2>
+  <div class="row">
+    <div><label for="cRef">Refrigerant</label><select id="cRef"></select></div>
+    <div><label for="cLeak">Leak (% of charge per year)</label><input type="number" id="cLeak" value="2" min="0" step="0.5"></div>
+  </div>
+  <div class="row" id="chRow">
+    <div><label for="cChW">Charge, water-cooled (kg/kW)</label><input type="number" id="cChW" value="0.3" min="0" step="0.05"></div>
+    <div><label for="cChA">Charge, air-cooled (kg/kW)</label><input type="number" id="cChA" value="0.4" min="0" step="0.05"></div>
+  </div>
+  <label for="cYrs">Period for the total (years)</label><input type="number" id="cYrs" value="15" min="1" max="40" step="1">
+</aside>
+</div>
+<section class="results">
+  <div class="colhead"><b>Results</b><span id="cStatus">Loading weather…</span></div>
+  <div class="card hero" id="cRes"><div class="note">Calculating…</div></div>
+  <div class="card" id="cChartCard">
+    <div class="ctitle" id="cChartTitle">Annual CO₂ by source</div>
+    <div class="legend"><span><i style="background:var(--s1)"></i>Electricity</span><span><i style="background:var(--s3)"></i>Water supply</span><span><i style="background:var(--s2)"></i>Refrigerant leakage</span></div>
+    <div class="chartbox" id="cBox" style="height:260px"><canvas id="cChart"></canvas></div>
+  </div>
+  <div class="card" id="cTabCard"><div class="ctitle" id="cTabTitle">How it is calculated</div><div id="cTab"></div></div>
+  <details class="card more"><summary>Sources and assumptions</summary><div id="cDet"></div></details>
+</section>
+</main>
+
+<section class="toolinfo" aria-labelledby="ti-h">
+  <div class="card">
+  <h2 id="ti-h">How the Cooling CO₂ Calculator works</h2>
+  <p>The Cooling CO₂ Calculator gives the yearly carbon emissions of a data center cooling system in tonnes of CO₂ equivalent. It adds three sources: the electricity the cooling plant uses, the energy needed to supply its make-up water, and the refrigerant that leaks from the chillers each year.</p>
+  <h3>Method</h3>
+  <ul>
+    <li><b>Electricity:</b> annual cooling energy (MWh) × grid emission factor (t CO₂ per MWh).</li>
+    <li><b>Water:</b> annual water use (m³) × energy to supply 1 m³ (kWh) × grid emission factor.</li>
+    <li><b>Refrigerant:</b> chiller charge (kg) × leak rate per year × global warming potential (GWP) of the refrigerant.</li>
+    <li>In <b>Compare systems</b>, energy and water come from an 8,760-hour simulation with the city's measured weather, the same model as the Cooling Plant Selector. In <b>My own numbers</b>, you enter them.</li>
+  </ul>
+  <h2 style="margin-top:20px">Frequently asked questions</h2>
+  <h3>Which part of a cooling system's CO₂ is largest?</h3>
+  <p>Electricity, in almost every case: usually 85–99% of the total. Refrigerant leakage can matter with high-GWP refrigerants such as R-134a, and water matters in the Gulf, where desalinated water takes about 3.5 kWh per m³.</p>
+  <h3>Where do the grid factors come from?</h3>
+  <p>US cities use the EPA eGRID2023 subregion rates; Sydney uses the Australian National Greenhouse Accounts factors (NSW 2025–26); other countries use Our World in Data / Ember, latest year. You can type your own factor, for example a green-power contract.</p>
+  <h3>Does it include the IT equipment?</h3>
+  <p>No. Only the cooling system: chillers, heat-rejection fans, pumps, CRAH, fan walls and CDUs. IT electricity and UPS losses are not included.</p>
+  <p style="margin-top:16px">By <a href="../../about/index.html#founder">Eng. Mutaz Othman</a>, Othman Energy Lab. Screening-level results; confirm with a detailed design and the local grid data.</p>
+  </div>
+</section>
+
+<footer class="sitefoot" data-root="../../"></footer>
+<script src="../../shared/js/site.js"></script>
+<script src="../../shared/js/ui.js"></script>
+<script src="../../shared/js/cities.js"></script>
+<script src="../../shared/js/psychro.js"></script>
+<script src="../../shared/js/weather.js"></script>
+<script src="../../shared/js/cooling-model.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
