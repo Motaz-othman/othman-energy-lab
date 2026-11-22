@@ -72,7 +72,10 @@ function renderEst(f){
     </div>
     <div class="verdict">Lowest carbon here: <b>${best.o.name}</b>, ${t(best.co2)} t CO₂e per year. ${save>0.5?`Against air-cooled chillers it saves <b>${t(save)} t a year</b>, about the yearly emissions of <b>${fmt(save/CAR)} passenger cars</b>.`:'It is close to air-cooled chillers in this climate.'} Electricity is ${fmt(100*best.co2E/best.co2)}% of its total.</div>`;
   chart(ids.map(id=>RES[id].o.short),ids.map(id=>RES[id]));
-  $('cTabCard').hidden=true;
+  const rows=ids.map((id,i)=>{ const r=RES[id], bad=!DES[id].ok;
+    return `<tr class="${i===0&&!bad?'best':''}"><td class="sys">${r.o.short}${i===0&&!bad?'<span class="tag ok">Lowest</span>':''}${bad?'<span class="tag">Fails design day</span>':''}</td><td>${fmt(r.E)}</td><td>${fmt(r.W)}</td><td>${fmt(r.charge)}</td><td>${t(r.co2E)}</td><td>${t(r.co2W)}</td><td>${t(r.co2R)}</td><td><b>${t(r.co2)}</b></td><td>${fmt(r.co2IT,1)}</td><td>${fmt(r.co2*Y)}</td></tr>`; });
+  $('cTabTitle').textContent='Every system';
+  $('cTab').innerHTML=table(['System','Electricity MWh/yr','Water m³/yr','Charge kg','Electricity t/yr','Water t/yr','Refrigerant t/yr','Total t CO₂e/yr','kg per MWh IT',`Total over ${Y} yr (t)`],rows);
   details(f,R,true);
 }
 
@@ -91,7 +94,7 @@ function renderOwn(f){
     </div>
     <div class="verdict">Electricity <b>${sh(cE)}%</b>, water supply <b>${sh(cW)}%</b>, refrigerant leakage <b>${sh(cR)}%</b> of the total.${cR>0.1*tot&&R.r.gwp>100?` Refrigerant is a large share: a low-GWP refrigerant such as R-1234ze(E) (GWP 1) would remove most of it.`:''}</div>`;
   chart([name],[{co2E:cE,co2W:cW,co2R:cR}]);
-  $('cTabCard').hidden=false; $('cTabTitle').textContent='How it is calculated';
+  $('cTabTitle').textContent='How it is calculated';
   $('cTab').innerHTML=`<div class="eqs">
     <div><span>Electricity</span><span class="f">${fmt(E)} MWh × ${f.ef.toFixed(3)} t/MWh</span><b>${t(cE)} t</b></div>
     <div><span>Water supply</span><span class="f">${fmt(W)} m³ × ${fmt(f.wkwh,1)} kWh/m³ ÷ 1,000 × ${f.ef.toFixed(3)} t/MWh</span><b>${t(cW)} t</b></div>
