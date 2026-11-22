@@ -20,7 +20,7 @@ const MARK=`<svg viewBox="0 0 26 26" aria-hidden="true"><rect width="26" height=
   const bar=document.querySelector('header.sitebar');
   if(bar){ const r=bar.dataset.root||'';
     // top bar: logo, the Lab's message and the main pages (also in the footer)
-    const TOP=[['data-centers','Data Centers','data-centers/index.html'],['articles','Articles','articles/index.html'],['about','About','about/index.html'],['contact','Contact','contact/index.html']], cur=bar.dataset.page;
+    const TOP=[['home','Home','index.html'],['data-centers','Data Centers','data-centers/index.html'],['articles','Articles','articles/index.html'],['about','About','about/index.html'],['contact','Contact','contact/index.html']], cur=bar.dataset.page;
     bar.innerHTML=`<div class="sitebar-in"><a class="brand" href="${r}index.html" aria-label="${SITE.name} home">${MARK}<span class="bn">Othman Energy <b>Lab</b></span></a>
       <p class="slogan">${SITE.slogan.map(s=>`<span>${s}</span>`).join('')}</p>
       <nav class="topnav" aria-label="Main">${TOP.map(([id,l,h])=>`<a href="${r}${h}"${id===cur?' aria-current="page"':''}>${l}</a>`).join('')}</nav></div>`;
