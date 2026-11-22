@@ -1,4 +1,4 @@
-// ---------- Cooling CO2 Calculator: page logic ----------
+// ---------- Low-Carbon Cooling Selector: page logic ----------
 // Compare systems: 8,760-hour model (shared/js/cooling-model.js), carbon = electricity + water supply + refrigerant leakage.
 // My own numbers: the same three terms from the user's annual figures.
 const num=(id,d)=>{ const v=parseFloat($(id).value); return isNaN(v)?d:v; };

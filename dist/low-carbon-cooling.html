@@ -11,17 +11,17 @@
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cooling CO₂ Calculator · Othman Energy Lab</title>
-<meta name="description" content="Calculate the annual CO₂ of a data center cooling system: electricity, water supply and refrigerant leakage, with official grid factors for 33 cities. Compare five cooling plants or enter your own numbers. By Othman Energy Lab.">
+<title>Low-Carbon Cooling Selector · Othman Energy Lab</title>
+<meta name="description" content="Find the data center cooling system with the lowest CO₂: five cooling plants compared hour by hour for 33 cities, counting electricity, water supply and refrigerant leakage with official grid factors. Or enter your own numbers. By Othman Energy Lab.">
 <meta name="theme-color" content="#0e7c57">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Othman Energy Lab">
-<meta property="og:title" content="Cooling CO₂ Calculator · Othman Energy Lab">
-<meta property="og:description" content="Calculate the annual CO₂ of a data center cooling system: electricity, water supply and refrigerant leakage, with official grid factors for 33 cities. Compare five cooling plants or enter your own numbers. By Othman Energy Lab.">
-<meta property="og:url" content="https://www.oenergylab.com/data-centers/cooling-co2/">
+<meta property="og:title" content="Low-Carbon Cooling Selector · Othman Energy Lab">
+<meta property="og:description" content="Find the data center cooling system with the lowest CO₂: five cooling plants compared hour by hour for 33 cities, counting electricity, water supply and refrigerant leakage with official grid factors. Or enter your own numbers. By Othman Energy Lab.">
+<meta property="og:url" content="https://www.oenergylab.com/data-centers/low-carbon-cooling/">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<link rel="canonical" href="https://www.oenergylab.com/data-centers/cooling-co2/">
+<link rel="canonical" href="https://www.oenergylab.com/data-centers/low-carbon-cooling/">
 <meta name="twitter:card" content="summary_large_image">
 <style>
 /* Shared styles for all calculators: theme tokens, layout, inputs, cards, tables, tabs */
@@ -342,7 +342,7 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <meta name="author" content="Mutaz Othman">
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Cooling CO₂ Calculator","url":"https://www.oenergylab.com/data-centers/cooling-co2/","description":"Calculate the annual CO₂ of a data center cooling system: electricity, water supply and refrigerant leakage, with official grid factors for 33 cities. Compare five cooling plants or enter your own numbers. By Othman Energy Lab.","applicationCategory":"BusinessApplication","operatingSystem":"Any (web browser)","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"author":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"publisher":{"@id":"https://www.oenergylab.com/#org"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.oenergylab.com/"},{"@type":"ListItem","position":2,"name":"Data Centers","item":"https://www.oenergylab.com/data-centers/"},{"@type":"ListItem","position":3,"name":"Cooling CO₂ Calculator","item":"https://www.oenergylab.com/data-centers/cooling-co2/"}]}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Low-Carbon Cooling Selector","url":"https://www.oenergylab.com/data-centers/low-carbon-cooling/","description":"Find the data center cooling system with the lowest CO₂: five cooling plants compared hour by hour for 33 cities, counting electricity, water supply and refrigerant leakage with official grid factors. Or enter your own numbers. By Othman Energy Lab.","applicationCategory":"BusinessApplication","operatingSystem":"Any (web browser)","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"author":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"publisher":{"@id":"https://www.oenergylab.com/#org"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.oenergylab.com/"},{"@type":"ListItem","position":2,"name":"Data Centers","item":"https://www.oenergylab.com/data-centers/"},{"@type":"ListItem","position":3,"name":"Low-Carbon Cooling Selector","item":"https://www.oenergylab.com/data-centers/low-carbon-cooling/"}]}]}</script>
 <script type="application/ld+json" id="faq">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Which part of a cooling system's CO₂ is largest?","acceptedAnswer":{"@type":"Answer","text":"Electricity, in almost every case: usually 85–99% of the total. Refrigerant leakage can matter with high-GWP refrigerants such as R-134a, and water matters in the Gulf, where desalinated water takes about 3.5 kWh per m³."}},{"@type":"Question","name":"Where do the grid factors come from?","acceptedAnswer":{"@type":"Answer","text":"US cities use the EPA eGRID2023 subregion rates; Sydney uses the Australian National Greenhouse Accounts factors (NSW 2025–26); other countries use Our World in Data / Ember, latest year. You can type your own factor, for example a green-power contract."}},{"@type":"Question","name":"Does it include the IT equipment?","acceptedAnswer":{"@type":"Answer","text":"No. Only the cooling system: chillers, heat-rejection fans, pumps, CRAH, fan walls and CDUs. IT electricity and UPS losses are not included."}}]}</script>
 <style>
 .mode{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:4px}
@@ -360,8 +360,8 @@ tr.best td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpa
 </head>
 <body class="wide" style="--navh:0px">
 <div class="pagehead">
-  <h1>Cooling CO₂ Calculator</h1>
-  <p class="sub">How much CO₂ does the cooling system emit each year? Three sources: the electricity it uses, the energy to supply its water, and the refrigerant that leaks from the chillers. Compare five cooling plants hour by hour for a city, or enter your own system's numbers.</p>
+  <h1>Low-Carbon Cooling Selector</h1>
+  <p class="sub">Which cooling system emits the least CO₂, and how much does it emit each year? Three sources: the electricity it uses, the energy to supply its water, and the refrigerant that leaks from the chillers. Compare five cooling plants hour by hour for a city, or enter your own system's numbers.</p>
 </div>
 
 <main class="layout">
@@ -433,8 +433,8 @@ tr.best td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpa
 
 <section class="toolinfo" aria-labelledby="ti-h">
   <div class="card">
-  <h2 id="ti-h">How the Cooling CO₂ Calculator works</h2>
-  <p>The Cooling CO₂ Calculator gives the yearly carbon emissions of a data center cooling system in tonnes of CO₂ equivalent. It adds three sources: the electricity the cooling plant uses, the energy needed to supply its make-up water, and the refrigerant that leaks from the chillers each year.</p>
+  <h2 id="ti-h">How the Low-Carbon Cooling Selector works</h2>
+  <p>The Low-Carbon Cooling Selector finds the data center cooling system with the lowest carbon, and gives its yearly emissions of a data center cooling system in tonnes of CO₂ equivalent. It adds three sources: the electricity the cooling plant uses, the energy needed to supply its make-up water, and the refrigerant that leaks from the chillers each year.</p>
   <h3>Method</h3>
   <ul>
     <li><b>Electricity:</b> annual cooling energy (MWh) × grid emission factor (t CO₂ per MWh).</li>
@@ -849,7 +849,7 @@ function score(res,p,des){
   ok.sort((a,b)=>res[b].score-res[a].score);
   return ok;
 }
-// ---------- Cooling CO2 Calculator: page logic ----------
+// ---------- Low-Carbon Cooling Selector: page logic ----------
 // Compare systems: 8,760-hour model (shared/js/cooling-model.js), carbon = electricity + water supply + refrigerant leakage.
 // My own numbers: the same three terms from the user's annual figures.
 const num=(id,d)=>{ const v=parseFloat($(id).value); return isNaN(v)?d:v; };
