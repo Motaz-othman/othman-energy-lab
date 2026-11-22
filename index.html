@@ -81,6 +81,13 @@ a.fc:hover{transform:translateY(-2px);box-shadow:0 8px 22px color-mix(in srgb,va
 @keyframes rise{0%{opacity:0;transform:translateY(8px)}40%{opacity:.85}100%{opacity:0;transform:translateY(-14px)}}
 /* recent tools: cards with a preview image */
 #tools{padding-top:40px}
+.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.acard{display:flex;flex-direction:column;gap:8px;padding:20px 22px;text-decoration:none;color:inherit}
+.acard .atag{font-size:12px;color:var(--muted)}
+.acard h3{font-size:17px;line-height:1.3;margin:0;color:var(--text);text-transform:none;letter-spacing:-.01em}
+.acard p{margin:0;font-size:14px;line-height:1.55;color:var(--text2);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.acard .open{margin-top:auto;padding-top:4px;font-weight:600;color:var(--brand-ink);font-size:14px}
+.allart{display:inline-block;margin-top:16px;font-weight:600;color:var(--brand-ink);text-decoration:none}
 </style>
 <meta name="author" content="Mutaz Othman">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://www.oenergylab.com/#org","name":"Othman Energy Lab","url":"https://www.oenergylab.com/","logo":"https://www.oenergylab.com/shared/img/apple-touch-icon.png","email":"Mutaz.othman@outlook.com","slogan":"Code-based. Beyond the minimum.","founder":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"description":"Engineering tools and analysis that guide engineers and clients to the right cooling and energy system for critical and high-demand buildings: less energy, lower cost and a cleaner planet."},{"@type":"WebSite","@id":"https://www.oenergylab.com/#website","name":"Othman Energy Lab","url":"https://www.oenergylab.com/","publisher":{"@id":"https://www.oenergylab.com/#org"},"inLanguage":"en"},{"@type":"Person","@id":"https://www.oenergylab.com/about/#mutaz-othman","name":"Mutaz Othman","honorificPrefix":"Eng.","jobTitle":"Mechanical Design Engineer, Mission-Critical and High-Demand Buildings","description":"Mechanical design engineer with 11 years of experience in the GCC, designing HVAC and cooling systems for mission-critical facilities (data centers, healthcare) and high-demand buildings such as malls and high-rise towers. Founder of Othman Energy Lab.","url":"https://www.oenergylab.com/about/","sameAs":["https://www.linkedin.com/in/mutaz-othman-48aa1556/"],"worksFor":{"@id":"https://www.oenergylab.com/#org"},"knowsAbout":["Data center cooling","HVAC design","Chilled water plants","Liquid cooling","Thermal energy storage","ASHRAE 90.1","ASHRAE 90.4","Energy efficiency","Healthcare HVAC","High-rise building HVAC"]}]}</script>
@@ -249,6 +256,20 @@ a.fc:hover{transform:translateY(-2px);box-shadow:0 8px 22px color-mix(in srgb,va
         </div>
       </a>
     </div>
+  </section>
+
+  <section id="articles">
+    <div class="shead">
+      <p class="eyebrow">Articles</p>
+      <h2>Guides on data center cooling</h2>
+      <p>Practical, code-based guides by Eng. Mutaz Othman, each linked to a free tool.</p>
+    </div>
+    <div class="agrid">
+      <a class="card acard" href="articles/how-to-use-cooling-plant-selector/index.html"><span class="atag">Cooling Plant Selector</span><h3>How to use the Cooling Plant Selector</h3><p>Step-by-step guide to the free Cooling Plant Selector: choose the city, enter the IT load and loop temperatures, read the ranked cooling plants, the design cases, energy, water, carbon and cost, and export a PDF or Excel report.</p><span class="open">Read article →</span></a>
+      <a class="card acard" href="articles/ride-through-tank-sizing/index.html"><span class="atag">Ride-Through Tank</span><h3>How to size a chilled-water ride-through tank for a data center</h3><p>How to size a chilled-water tank that keeps a data center cooled while the generators start and the chillers restart: the equation, a worked 20 MW example, recommended ride-through times and what must be on UPS.</p><span class="open">Read article →</span></a>
+      <a class="card acard" href="articles/ashrae-90-4-mlc/index.html"><span class="atag">Cooling Plant Selector</span><h3>ASHRAE 90.4 MLC explained, with the limits by climate zone</h3><p>What the ASHRAE 90.4 mechanical load component (MLC) is, how to calculate it, the maximum annualized MLC for every climate zone from ASHRAE 90.4-2025 Table 6.5, and typical values for real cooling plants.</p><span class="open">Read article →</span></a>
+    </div>
+    <a class="allart" href="articles/index.html">All articles →</a>
   </section>
 
   <section id="focus">
