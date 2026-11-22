@@ -78,8 +78,6 @@ function renderEst(f){
       <div class="sn">${r.o.short}${low?'<span class="tag ok">Lowest</span>':''}${bad?'<span class="tag">Fails design day</span>':''}</div>
       <div class="sv">${t(r.co2)} <small>t CO₂e/yr</small></div>
       <div class="sbar"><i style="width:${w(r.co2E)};background:var(--s1)"></i><i style="width:${w(r.co2W)};background:var(--s3)"></i><i style="width:${w(r.co2R)};background:var(--s2)"></i></div>
-      <div class="ss"><span>Electricity <b>${t(r.co2E)}</b></span><span>Water <b>${t(r.co2W)}</b></span><span>Refrigerant <b>${t(r.co2R)}</b></span></div>
-      <div class="sf">${id==='acc'?'Baseline':d>0.5?`<b class="ok">−${t(d)} t/yr</b> vs air-cooled`:'About the same as air-cooled'} · ${fmt(r.co2*Y)} t over ${Y} yr</div>
     </div>`; });
   $('cTabTitle').textContent='Each system, CO₂ only';
   $('cTab').innerHTML=`<div class="sgrid">${cards.join('')}</div>`;

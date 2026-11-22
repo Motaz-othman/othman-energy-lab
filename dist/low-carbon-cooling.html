@@ -353,7 +353,7 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
 .eqs .tot{background:color-mix(in srgb,var(--brand) 9%,var(--surface));border-color:color-mix(in srgb,var(--brand) 35%,var(--border))}
 #inGrid [hidden]{display:none!important}
 #cTab td.sys{white-space:nowrap}
-.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
 .sc{display:flex;flex-direction:column;gap:8px;padding:14px 16px;border-radius:12px;background:var(--bg);border:1px solid var(--border)}
 .sc.low{border-color:color-mix(in srgb,var(--brand) 45%,var(--border));background:color-mix(in srgb,var(--brand) 7%,var(--surface))}
 .sc .sn{font-size:14px;font-weight:700;line-height:1.3}
@@ -433,12 +433,12 @@ tr.best td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpa
 <section class="results">
   <div class="colhead"><b>Results</b><span id="cStatus">Loading weather…</span></div>
   <div class="card hero" id="cRes"><div class="note">Calculating…</div></div>
+  <div class="card" id="cTabCard"><div class="ctitle" id="cTabTitle">How it is calculated</div><div id="cTab"></div></div>
   <div class="card" id="cChartCard">
     <div class="ctitle" id="cChartTitle">Annual CO₂ by source</div>
     <div class="legend"><span><i style="background:var(--s1)"></i>Electricity</span><span><i style="background:var(--s3)"></i>Water supply</span><span><i style="background:var(--s2)"></i>Refrigerant leakage</span></div>
     <div class="chartbox" id="cBox" style="height:260px"><canvas id="cChart"></canvas></div>
   </div>
-  <div class="card" id="cTabCard"><div class="ctitle" id="cTabTitle">How it is calculated</div><div id="cTab"></div></div>
   <details class="card more"><summary>Sources and assumptions</summary><div id="cDet"></div></details>
 </section>
 </main>
@@ -941,8 +941,6 @@ function renderEst(f){
       <div class="sn">${r.o.short}${low?'<span class="tag ok">Lowest</span>':''}${bad?'<span class="tag">Fails design day</span>':''}</div>
       <div class="sv">${t(r.co2)} <small>t CO₂e/yr</small></div>
       <div class="sbar"><i style="width:${w(r.co2E)};background:var(--s1)"></i><i style="width:${w(r.co2W)};background:var(--s3)"></i><i style="width:${w(r.co2R)};background:var(--s2)"></i></div>
-      <div class="ss"><span>Electricity <b>${t(r.co2E)}</b></span><span>Water <b>${t(r.co2W)}</b></span><span>Refrigerant <b>${t(r.co2R)}</b></span></div>
-      <div class="sf">${id==='acc'?'Baseline':d>0.5?`<b class="ok">−${t(d)} t/yr</b> vs air-cooled`:'About the same as air-cooled'} · ${fmt(r.co2*Y)} t over ${Y} yr</div>
     </div>`; });
   $('cTabTitle').textContent='Each system, CO₂ only';
   $('cTab').innerHTML=`<div class="sgrid">${cards.join('')}</div>`;
