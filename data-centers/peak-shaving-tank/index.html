@@ -60,7 +60,7 @@
   <label for="gNight">Average IT load over the 12-hour night (%)</label><input type="number" id="gNight" value="80" min="10" max="100" step="5">
   <div class="note">The tank recharges at night, 19:00 to 07:00, with the chiller capacity the IT load leaves free. The lower the night load, the faster it recharges. By day the IT load is taken at 100%.</div>
   <label for="gSys">Cooling system</label><select id="gSys"></select>
-  <div class="note">Air-cooled chillers are the usual case: their power peaks hardest in the extreme hours.</div>
+  <div class="note">Air-cooled systems, whose power peaks hardest in the hottest hours. The heatwave here is built from dry-bulb; water-cooled plants peak in humid hours instead, so the method does not apply to them. Every result is checked against the whole measured year.</div>
   <div class="row">
     <div><label for="gTs">Supply (°C)</label><input type="number" id="gTs" value="30" step="1"></div>
     <div><label for="gTr">Return (°C)</label><input type="number" id="gTr" value="40" step="1"></div>

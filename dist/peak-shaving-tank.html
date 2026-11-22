@@ -368,7 +368,7 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
   <label for="gNight">Average IT load over the 12-hour night (%)</label><input type="number" id="gNight" value="80" min="10" max="100" step="5">
   <div class="note">The tank recharges at night, 19:00 to 07:00, with the chiller capacity the IT load leaves free. The lower the night load, the faster it recharges. By day the IT load is taken at 100%.</div>
   <label for="gSys">Cooling system</label><select id="gSys"></select>
-  <div class="note">Air-cooled chillers are the usual case: their power peaks hardest in the extreme hours.</div>
+  <div class="note">Air-cooled systems, whose power peaks hardest in the hottest hours. The heatwave here is built from dry-bulb; water-cooled plants peak in humid hours instead, so the method does not apply to them. Every result is checked against the whole measured year.</div>
   <div class="row">
     <div><label for="gTs">Supply (°C)</label><input type="number" id="gTs" value="30" step="1"></div>
     <div><label for="gTr">Return (°C)</label><input type="number" id="gTr" value="40" step="1"></div>
@@ -639,7 +639,7 @@ const waterKwh=id=>WATER_KWH[id]??0.5;
 // Phoenix: low = City of Phoenix 2022 GHG inventory, Table 1: Water Services electricity 92,848 t CO2e for 98.71 billion gallons treated
 // (0.25 kg/m³, treatment + distribution); high = + Central Arizona Project conveyance 1.4 kWh/m³ (2.8 million MWh for 1.6 million
 // acre-feet) × AZNM 0.3203 = 0.70 kg/m³; central = midpoint
-const WATER_CO2={phoenix:[0.25,0.47,0.70]};
+const WATER_CO2={phoenix:[0.25,0.48,0.70]};
 const waterCo2=id=>WATER_CO2[id]||null;
 // U.S. cities: county climate zone (IECC 2021 / ASHRAE 169 county assignment, PNNL county data files) for the ASHRAE 90.4 MLC check;
 // other cities use the station zone. Columbus: Franklin County (station); New Albany's Licking County is 5A.
@@ -711,8 +711,8 @@ function hourModel(o,L,db,wb,p){
     const dryOut=db+p.aDC, twr=wb+p.aCT, fc=twr+p.aHX<L.Tr;
     const target=fc?L.Ts-p.aHX:p.cwSet;
     if(dryOut<=target){ ecw=dryOut; dShare=1; wet=0; }                     // dry section alone reaches the target: towers off
-    else { ecw=twr;                                                          // towers on, as cold as they can make it
-      const Tin=fc?L.Tr-p.aHX:twr+p.rangeCW, Treq=fc?Math.max(L.Ts-p.aHX,twr):twr;
+    else { ecw=fc?twr:Math.max(twr,p.cwSet);                                // towers on: as cold as they can in free cooling; with chillers only they hold the setpoint
+      const Tin=fc?L.Tr-p.aHX:ecw+p.rangeCW, Treq=fc?Math.max(L.Ts-p.aHX,twr):ecw;   // chillers only: dry share = (max(30, wb + 5.56) − db) / 5.56
       dShare=Tin>dryOut&&Tin>Treq?Math.max(0,Math.min(1,(Tin-Math.max(dryOut,Treq))/(Tin-Treq))):0;
       wet=1-dShare; }
     Tout=ecw+p.aHX; kind='wc';
@@ -982,6 +982,16 @@ function studyCase(o,L,i,base,DR,Td,k,yr){
     graph:{orig:orig.prof.slice(6,30),tank:r.prof.slice(6,30),E}};
 }
 
+// typical-year check: the whole measured year at the same day / night load, with the usable tank and the new power limit.
+// The tank covers the year when its deepest draw stays within the usable storage (the reserve is never used).
+function yearCheck(st,i,wx,k,c){
+  const o=st.sys, L={name:'CHW',Ts:i.Ts,Tr:i.Tr}, yr=wx.T.map((t,h)=>({db:t,wb:wx.Twb[h]}));
+  const load=h=>{ const t=h%24; return t>=DAY0&&t<NIGHT0?i.Q:i.Q*i.night; };
+  const r=runPlant(o,L,yr,c.capT,k,c.E,load,c.Prated);
+  const hours=r.prof.filter(x=>x.dis>1e-6).length, draw=c.E-Math.min(...r.prof.map(x=>x.soc));
+  return {hours,draw,share:c.E>0?draw/c.E:0,ok:draw<=c.E*1.001};
+}
+
 // study every design temperature from the extreme down to 3 K below the ASHRAE 0.4% level, then recommend:
 // the lowest design temperature whose tank recharges within the safe time (default 4 h),
 // plus an optional extra margin (default 0 K)
@@ -1000,10 +1010,11 @@ const num=(id,d)=>{ const v=parseFloat($(id).value); return isNaN(v)?d:v; };
 const rgba=(hex,a)=>{ const h=hex.replace('#',''), n=parseInt(h.length===3?h.split('').map(c=>c+c).join(''):h,16); return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`; };
 const MW=kw=>fmt(kw/1000,2);
 
-let WX=null, ST=null, I=null, timer=null, req=0;
+let WX=null, ST=null, I=null, YC=null, timer=null, req=0;
 [...new Set(CITIES.map(c=>c.g))].forEach(g=>{ const og=document.createElement('optgroup'); og.label=g;
   CITIES.filter(c=>c.g===g).forEach(c=>{ const o=document.createElement('option'); o.value=c.id; o.textContent=c.name; og.appendChild(o); }); $('gCity').appendChild(og); });
-OPTIONS.forEach(o=>{ const e=document.createElement('option'); e.value=o.id; e.textContent=o.name; $('gSys').appendChild(e); });
+// the method's heatwave is built from dry-bulb, so it applies to air-cooled systems; wet systems peak in humid hours
+OPTIONS.filter(o=>o.id==='acc'||o.id==='accfc').forEach(o=>{ const e=document.createElement('option'); e.value=o.id; e.textContent=o.name; $('gSys').appendChild(e); });
 
 // ---------- weather ----------
 function loadCity(){ const c=CITIES.find(x=>x.id===$('gCity').value), n=++req; $('gStatus').textContent='Loading weather…';
@@ -1066,6 +1077,8 @@ function render(){
     </div>
     <div class="verdict${c.safe?'':' warn'}">${msg}${c.cut<0.03*c.Prated0?` <span class="note">The cut is small: with this system and water temperature the plant draws little extra power in the hottest hours, so a tank adds little here.</span>`:''}</div>${uses}${safeNote}`;
   charts_(c);
+  const yc=yearCheck(ST,I,WX,{a:num('gKa',1.35)/100,w:num('gKw',0)/100},c); YC=yc;
+  if(c.cut>0) $('gRes').insertAdjacentHTML('beforeend',`<div class="note">Typical-year check: over the measured year at the same loads the tank works in ${fmt(yc.hours)} h, and its deepest draw is ${fmt(yc.share*100)}% of the usable storage${yc.ok?', so it covers the whole year with the reserve untouched':': <b>more than the tank holds</b>; raise the design temperature'}.</div>`);
   details(c,b);
 }
 function charts_(c){

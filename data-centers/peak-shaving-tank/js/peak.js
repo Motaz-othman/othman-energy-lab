@@ -84,6 +84,16 @@ function studyCase(o,L,i,base,DR,Td,k,yr){
     graph:{orig:orig.prof.slice(6,30),tank:r.prof.slice(6,30),E}};
 }
 
+// typical-year check: the whole measured year at the same day / night load, with the usable tank and the new power limit.
+// The tank covers the year when its deepest draw stays within the usable storage (the reserve is never used).
+function yearCheck(st,i,wx,k,c){
+  const o=st.sys, L={name:'CHW',Ts:i.Ts,Tr:i.Tr}, yr=wx.T.map((t,h)=>({db:t,wb:wx.Twb[h]}));
+  const load=h=>{ const t=h%24; return t>=DAY0&&t<NIGHT0?i.Q:i.Q*i.night; };
+  const r=runPlant(o,L,yr,c.capT,k,c.E,load,c.Prated);
+  const hours=r.prof.filter(x=>x.dis>1e-6).length, draw=c.E-Math.min(...r.prof.map(x=>x.soc));
+  return {hours,draw,share:c.E>0?draw/c.E:0,ok:draw<=c.E*1.001};
+}
+
 // study every design temperature from the extreme down to 3 K below the ASHRAE 0.4% level, then recommend:
 // the lowest design temperature whose tank recharges within the safe time (default 4 h),
 // plus an optional extra margin (default 0 K)

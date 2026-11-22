@@ -34,7 +34,7 @@ const waterKwh=id=>WATER_KWH[id]??0.5;
 // Phoenix: low = City of Phoenix 2022 GHG inventory, Table 1: Water Services electricity 92,848 t CO2e for 98.71 billion gallons treated
 // (0.25 kg/m³, treatment + distribution); high = + Central Arizona Project conveyance 1.4 kWh/m³ (2.8 million MWh for 1.6 million
 // acre-feet) × AZNM 0.3203 = 0.70 kg/m³; central = midpoint
-const WATER_CO2={phoenix:[0.25,0.47,0.70]};
+const WATER_CO2={phoenix:[0.25,0.48,0.70]};
 const waterCo2=id=>WATER_CO2[id]||null;
 // U.S. cities: county climate zone (IECC 2021 / ASHRAE 169 county assignment, PNNL county data files) for the ASHRAE 90.4 MLC check;
 // other cities use the station zone. Columbus: Franklin County (station); New Albany's Licking County is 5A.
@@ -106,8 +106,8 @@ function hourModel(o,L,db,wb,p){
     const dryOut=db+p.aDC, twr=wb+p.aCT, fc=twr+p.aHX<L.Tr;
     const target=fc?L.Ts-p.aHX:p.cwSet;
     if(dryOut<=target){ ecw=dryOut; dShare=1; wet=0; }                     // dry section alone reaches the target: towers off
-    else { ecw=twr;                                                          // towers on, as cold as they can make it
-      const Tin=fc?L.Tr-p.aHX:twr+p.rangeCW, Treq=fc?Math.max(L.Ts-p.aHX,twr):twr;
+    else { ecw=fc?twr:Math.max(twr,p.cwSet);                                // towers on: as cold as they can in free cooling; with chillers only they hold the setpoint
+      const Tin=fc?L.Tr-p.aHX:ecw+p.rangeCW, Treq=fc?Math.max(L.Ts-p.aHX,twr):ecw;   // chillers only: dry share = (max(30, wb + 5.56) − db) / 5.56
       dShare=Tin>dryOut&&Tin>Treq?Math.max(0,Math.min(1,(Tin-Math.max(dryOut,Treq))/(Tin-Treq))):0;
       wet=1-dShare; }
     Tout=ecw+p.aHX; kind='wc';

@@ -3,10 +3,11 @@ const num=(id,d)=>{ const v=parseFloat($(id).value); return isNaN(v)?d:v; };
 const rgba=(hex,a)=>{ const h=hex.replace('#',''), n=parseInt(h.length===3?h.split('').map(c=>c+c).join(''):h,16); return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`; };
 const MW=kw=>fmt(kw/1000,2);
 
-let WX=null, ST=null, I=null, timer=null, req=0;
+let WX=null, ST=null, I=null, YC=null, timer=null, req=0;
 [...new Set(CITIES.map(c=>c.g))].forEach(g=>{ const og=document.createElement('optgroup'); og.label=g;
   CITIES.filter(c=>c.g===g).forEach(c=>{ const o=document.createElement('option'); o.value=c.id; o.textContent=c.name; og.appendChild(o); }); $('gCity').appendChild(og); });
-OPTIONS.forEach(o=>{ const e=document.createElement('option'); e.value=o.id; e.textContent=o.name; $('gSys').appendChild(e); });
+// the method's heatwave is built from dry-bulb, so it applies to air-cooled systems; wet systems peak in humid hours
+OPTIONS.filter(o=>o.id==='acc'||o.id==='accfc').forEach(o=>{ const e=document.createElement('option'); e.value=o.id; e.textContent=o.name; $('gSys').appendChild(e); });
 
 // ---------- weather ----------
 function loadCity(){ const c=CITIES.find(x=>x.id===$('gCity').value), n=++req; $('gStatus').textContent='Loading weather…';
@@ -69,6 +70,8 @@ function render(){
     </div>
     <div class="verdict${c.safe?'':' warn'}">${msg}${c.cut<0.03*c.Prated0?` <span class="note">The cut is small: with this system and water temperature the plant draws little extra power in the hottest hours, so a tank adds little here.</span>`:''}</div>${uses}${safeNote}`;
   charts_(c);
+  const yc=yearCheck(ST,I,WX,{a:num('gKa',1.35)/100,w:num('gKw',0)/100},c); YC=yc;
+  if(c.cut>0) $('gRes').insertAdjacentHTML('beforeend',`<div class="note">Typical-year check: over the measured year at the same loads the tank works in ${fmt(yc.hours)} h, and its deepest draw is ${fmt(yc.share*100)}% of the usable storage${yc.ok?', so it covers the whole year with the reserve untouched':': <b>more than the tank holds</b>; raise the design temperature'}.</div>`);
   details(c,b);
 }
 function charts_(c){
