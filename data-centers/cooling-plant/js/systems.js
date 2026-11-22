@@ -24,9 +24,9 @@ const SYS={
 const ROLE={
  acch:o=>o.id==='acc'?'HT and LT chillers cool each loop; reject heat through built-in condenser fans':'HT and LT chillers trim each loop to setpoint when free cooling is not enough',
  wcch:()=>'HT and LT chillers trim each loop to setpoint; reject heat to condenser water',
- dc:o=>o.id==='hyb'?`Cools the condenser water dry up to ${P.swHY} °C; pre-cools it ahead of the towers above`:'Pre-cools the return water with outdoor air',
+ dc:o=>o.id==='hyb'?'Runs alone when it reaches the target; otherwise pre-cools the water ahead of the towers':'Pre-cools the return water with outdoor air',
  adc:()=>'Cools the condenser water; pads wetted on hot hours',
- ct:o=>o.id==='hyb'?`Cools the condenser water by evaporation above ${P.swHY} °C`:'Cools the condenser water by evaporation',
+ ct:o=>o.id==='hyb'?'Cools the condenser water by evaporation when the dry coolers alone cannot reach the target':'Cools the condenser water by evaporation',
  hx:()=>'Pre-cools the return water with condenser water (economiser)',
 };
 
@@ -80,7 +80,7 @@ function schematic(id){
     } else {
       // outdoor heat rejection (hybrid: dry coolers then towers, in series)
       if(id==='hyb'){
-        g+=box(20,58,180,48,['Dry coolers',`dry only up to ${P.swHY} °C`])+box(230,58,180,48,['Cooling towers',`wb + ${P.aCT} K above ${P.swHY} °C`]);
+        g+=box(20,58,180,48,['Dry coolers','alone when they reach the target'])+box(230,58,180,48,['Cooling towers',`wb + ${P.aCT} K, when needed`]);
         g+=pipe('M200 82H228','cw')+line('M8 50H422','cwr')+pipe('M110 50V56','cwr')+line('M320 106V128','cw')+pmp(320,117)+t(332,121,`CW pumps ${fmt(kCW)} kW`,'t2','start');
       } else {
         const hr=heatRej[id]; g+=box(20,58,390,48,hr);

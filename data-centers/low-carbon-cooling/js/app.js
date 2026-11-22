@@ -21,7 +21,7 @@ function factors(){
   const id=$('cCity').value, ef0=GRID_EF[id]??0.45, w0=waterKwh(id);
   const efIn=parseFloat($('cEF').value), wIn=parseFloat($('cWk').value);
   $('cEF').placeholder=ef0.toFixed(3); $('cWk').placeholder=fmt(w0,1);
-  return {ef:isNaN(efIn)?ef0:Math.max(0,efIn), wkwh:isNaN(wIn)?w0:Math.max(0,wIn), efOwn:!isNaN(efIn), wOwn:!isNaN(wIn), src:efSrc(id)};
+  return {ef:isNaN(efIn)?ef0:Math.max(0,efIn), wkwh:isNaN(wIn)?w0:Math.max(0,wIn), efOwn:!isNaN(efIn), wOwn:!isNaN(wIn), src:efSrc(id), wco2:isNaN(wIn)?waterCo2(id):null};
 }
 function refr(){ return {k:$('cRef').value, r:REFRIGERANTS[$('cRef').value], leak:Math.max(0,num('cLeak',2))/100}; }
 
@@ -37,7 +37,7 @@ function params(){
     {name:'LC',Ts:ls,Tr:Math.max(num('cLr',40),ls+1),Qd:Qd*lcp,Q:Qd*lcp*lf},
     {name:'Air',Ts:as,Tr:Math.max(num('cAr',30),as+1),Qd:Qd*(1-lcp),Q:Qd*(1-lcp)*lf}];
   const rates={}; RATES.forEach(r=>rates[r.id]={lo:r.lo,hi:r.hi});
-  return {...BASIS,Qd,lf,loops,water:'plenty',dbIn:NaN,wbIn:NaN,ef:f.ef,wkwh:f.wkwh,wkwhBand:f.wOwn?null:waterKwhBand($('cCity').value),refr:R.k,leak:R.leak,
+  return {...BASIS,Qd,lf,loops,water:'plenty',dbIn:NaN,wbIn:NaN,ef:f.ef,wkwh:f.wkwh,wco2:f.wco2,refr:R.k,leak:R.leak,
     chW:Math.max(0,num('cChW',0.3)),chA:Math.max(0,num('cChA',0.4)),tE:0.1,tW:2.5,tD:0,red:0.25,ups:0.96,dloss:0.02,rates,
     ...Object.fromEntries(WEIGHTS.map(w=>[w.id,w.v]))};
 }
@@ -46,7 +46,7 @@ function params(){
 function schedule(ms){ clearTimeout(timer); timer=setTimeout(run,ms??300); }
 function run(){
   const f=factors();
-  $('cEFNote').innerHTML=`${f.efOwn?'Your grid factor':`Grid factor ${f.ef.toFixed(3)} kg CO₂/kWh: ${f.src}`}. ${f.wOwn?'Your water supply energy':`Water supply ${fmt(f.wkwh,1)} kWh/m³: ${f.wkwh>=3?'Gulf seawater desalination':'conventional treated supply'} (IEA WEO 2016)`}. Leave blank for the city's value.`;
+  $('cEFNote').innerHTML=`${f.efOwn?'Your grid factor':`Grid factor ${f.ef.toFixed(3)} kg CO₂/kWh: ${f.src}`}. ${f.wOwn?'Your water supply energy':(f.wco2?`Water supply ${fmt(f.wco2[1],2)} kg CO₂e/m³ (band ${fmt(f.wco2[0],2)}–${fmt(f.wco2[2],2)}): City of Phoenix 2022 GHG inventory + Central Arizona Project`:`Water supply ${fmt(f.wkwh,1)} kWh/m³: ${f.wkwh>=3?'Gulf seawater desalination':'conventional treated supply'} (IEA WEO 2016)`)}. Leave blank for the city's value.`;
   if(MODE==='own') return renderOwn(f);
   if(!WX){ $('cStatus').textContent='Loading weather…'; return; }
   P=params(); P.cases=designCases(WX,WX.station&&WX.station.ashrae,P.dbIn,P.wbIn); P.dbA=P.cases.A.db; P.dbD=P.cases.A.db; P.wbD=P.cases.B.wb;
@@ -91,7 +91,7 @@ function renderEst(f){
 // ---------- results: My own numbers ----------
 function renderOwn(f){
   const R=refr(), Y=yrs(), E=Math.max(0,num('oE',0)), W=Math.max(0,num('oW',0)), ch=Math.max(0,num('oCh',0)), IT=num('oIT',NaN);
-  const cE=E*f.ef, cW=W*f.wkwh/1000*f.ef, cR=ch*R.leak*R.r.gwp/1000, tot=cE+cW+cR;
+  const wkg=f.wco2?f.wco2[1]:f.wkwh*f.ef, cE=E*f.ef, cW=W*wkg/1000, cR=ch*R.leak*R.r.gwp/1000, tot=cE+cW+cR;
   const name=$('oSys').selectedOptions[0].textContent, sh=v=>tot>0?fmt(100*v/tot):'0';
   $('cStatus').textContent=`${city().name} · ${name}`;
   $('cRes').hidden=false; $('cRes').innerHTML=`
@@ -106,7 +106,7 @@ function renderOwn(f){
   $('cAllCard').hidden=true; $('cTabTitle').textContent='How it is calculated';
   $('cTab').innerHTML=`<div class="eqs">
     <div><span>Electricity</span><span class="f">${fmt(E)} MWh × ${f.ef.toFixed(3)} t/MWh</span><b>${t(cE)} t</b></div>
-    <div><span>Water supply</span><span class="f">${fmt(W)} m³ × ${fmt(f.wkwh,1)} kWh/m³ ÷ 1,000 × ${f.ef.toFixed(3)} t/MWh</span><b>${t(cW)} t</b></div>
+    <div><span>Water supply</span><span class="f">${f.wco2?`${fmt(W)} m³ × ${fmt(wkg,2)} kg CO₂e/m³ ÷ 1,000`:`${fmt(W)} m³ × ${fmt(f.wkwh,1)} kWh/m³ ÷ 1,000 × ${f.ef.toFixed(3)} t/MWh`}</span><b>${t(cW)} t</b></div>
     <div><span>Refrigerant</span><span class="f">${fmt(ch)} kg × ${fmt(R.leak*100,1)}% × GWP ${fmt(R.r.gwp,R.r.gwp<10?2:0)} ÷ 1,000</span><b>${t(cR)} t</b></div>
     <div class="tot"><span><b>Total per year</b></span><span class="f">CO₂ equivalent</span><b>${t(tot)} t</b></div></div>`;
   details(f,R,false);
@@ -128,7 +128,7 @@ function details(f,R,est){
   const st=WX&&WX.station;
   $('cDet').innerHTML=`<ul class="method">
     <li><b>Grid factor:</b> ${f.ef.toFixed(3)} kg CO₂ per kWh (= t per MWh), ${f.efOwn?'your value':f.src}. Location-based: the average of the local grid.</li>
-    <li><b>Water supply energy:</b> ${fmt(f.wkwh,1)} kWh per m³, ${f.wOwn?'your value':'IEA World Energy Outlook 2016 (Water-Energy Nexus): about 3.5 kWh/m³ for Gulf seawater desalination, 0.5 for conventional treated water'}${!f.wOwn&&waterKwhBand($('cCity').value)?`; band ${waterKwhBand($('cCity').value).join('–')} kWh/m³ (Central Arizona Project conveyance + treatment at the top)`:''}. Tower water in the table is the central value with the evaporation band 0.15–0.27 %/K (EnergyPlus default 0.20) in brackets.</li>
+    <li><b>Water supply energy:</b> ${fmt(f.wkwh,1)} kWh per m³, ${f.wOwn?'your value':'IEA World Energy Outlook 2016 (Water-Energy Nexus): about 3.5 kWh/m³ for Gulf seawater desalination, 0.5 for conventional treated water'}${f.wco2?`; this city uses its utility's own figure instead: ${fmt(f.wco2[1],2)} kg CO₂e/m³ (band ${fmt(f.wco2[0],2)}–${fmt(f.wco2[2],2)}: City of Phoenix 2022 GHG inventory, Table 1, for treatment and distribution, plus Central Arizona Project conveyance at 1.4 kWh/m³ at the top)`:''}. Tower water in the table is the central value with the evaporation band 0.15–0.27 %/K (EnergyPlus default 0.20) in brackets.</li>
     <li><b>Refrigerant:</b> ${R.r.name}, GWP ${fmt(R.r.gwp,R.r.gwp<10?2:0)} (100-year; R-134a and R-513A IPCC AR4 as used by the U.S. EPA under the AIM Act, R-1234ze(E) EU F-gas Regulation 2024/573); leak ${fmt(R.leak*100,1)}% of the charge per year.${est?` Charge ${fmt(num('cChW',0.3),2)} kg/kW for water-cooled and ${fmt(num('cChA',0.4),2)} kg/kW for air-cooled chillers, on the duty chillers + 1 standby per loop. Charge and leak rate are assumptions: use the chiller data where known.`:''}</li>
     ${est?`<li><b>Energy and water:</b> 8,760-hour simulation, ${st?`${esc(st.station)}, measured typical year TMYx ${esc(st.period)}`:'generated typical year'}; ASHRAE 90.1-2025 chillers, heat-rejection approaches, pump and fan power, free cooling. Same model as the <a href="../cooling-plant/index.html">Cooling Plant Selector</a>, which also gives cost and peak power. A system that cannot meet the design day is listed last.</li>`:''}
     <li><b>Cars:</b> ${CAR} t CO₂ per typical passenger car per year (US EPA).</li>

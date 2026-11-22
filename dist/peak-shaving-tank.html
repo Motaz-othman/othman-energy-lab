@@ -635,10 +635,19 @@ const GRID_EF={dubai:.468,abudhabi:.468,riyadh:.692,jeddah:.692,dammam:.692,mana
 // energy to supply 1 m³ of water, kWh: seawater desalination (Gulf) about 3.5, conventional treated supply about 0.5 (IEA World Energy Outlook 2016, Water-Energy Nexus)
 const WATER_KWH={dubai:3.5,abudhabi:3.5,riyadh:3.5,jeddah:3.5,dammam:3.5,manama:3.5};
 const waterKwh=id=>WATER_KWH[id]??0.5;
-// band where the supply mix is known to vary: Phoenix = local surface water (0.5) to Central Arizona Project conveyance + treatment (about 1.6;
-// CAP: 2.8 million MWh for 1.6 million acre-feet = 1.4 kWh/m³ conveyance alone)
-const WATER_KWH_BAND={phoenix:[0.5,1.6]};
-const waterKwhBand=id=>WATER_KWH_BAND[id]||null;
+// water-supply carbon given directly, kg CO2e per m³ [low, central, high], where the utility publishes it.
+// Phoenix: low = City of Phoenix 2022 GHG inventory, Table 1: Water Services electricity 92,848 t CO2e for 98.71 billion gallons treated
+// (0.25 kg/m³, treatment + distribution); high = + Central Arizona Project conveyance 1.4 kWh/m³ (2.8 million MWh for 1.6 million
+// acre-feet) × AZNM 0.3203 = 0.70 kg/m³; central = midpoint
+const WATER_CO2={phoenix:[0.25,0.47,0.70]};
+const waterCo2=id=>WATER_CO2[id]||null;
+// U.S. cities: county climate zone (IECC 2021 / ASHRAE 169 county assignment, PNNL county data files) for the ASHRAE 90.4 MLC check;
+// other cities use the station zone. Columbus: Franklin County (station); New Albany's Licking County is 5A.
+const COUNTY_ZONE={nova:['4A','Loudoun County, VA'],dallas:['2A','Dallas County, TX'],phoenix:['2B','Maricopa County, AZ'],chicago:['5A','Cook County, IL'],
+  atlanta:['3A','Fulton County, GA'],columbus:['4A','Franklin County, OH'],sanjose:['3C','Santa Clara County, CA'],hillsboro:['4C','Washington County, OR'],
+  reno:['5B','Washoe County, NV'],saltlake:['5B','Salt Lake County, UT'],abilene:['3B','Taylor County, TX'],sanantonio:['2A','Bexar County, TX'],
+  desmoines:['5A','Polk County, IA'],newark:['4A','Essex County, NJ'],charlotte:['3A','Mecklenburg County, NC'],monroela:['3A','Ouachita Parish, LA']};
+const countyZone=id=>COUNTY_ZONE[id]||null;
 // refrigerants, 100-year GWP: R-134a and R-513A IPCC AR4 (as used by the U.S. EPA under the AIM Act); R-1234ze(E) EU F-gas Regulation 2024/573
 const REFRIGERANTS={r513a:{name:'R-513A',gwp:631},r134a:{name:'R-134a',gwp:1430},r1234ze:{name:'R-1234ze(E)',gwp:1.37}};
 
@@ -650,7 +659,7 @@ const BASIS={
   acApp:15, wcApp:7,                          // condensing: ambient + 15 K; condenser water + 5 K range (AHRI) + 2 K
   aCT:5.56, aDC:5.56, aAD:9.4, aHX:1.5, rangeCW:5.56,   // ASHRAE 90.1-2025 Table 6.8.1-7 rating approaches; adiabatic: coil approach above the air after the pads
                                               // (rating 95 °F leaving water, 95 / 75 °F air: pad air 78 °F, so 17 °F = 9.4 K); plate HX
-  swAD:24, swHY:24, eAD:0.85, coc:4,          // adiabatic / hybrid switch; pad effectiveness; cycles of concentration
+  swAD:24, cwSet:30, eAD:0.85, coc:4,         // adiabatic pads allowed above (°C); hybrid condenser-water setpoint (AHRI 30 °C); pad effectiveness; cycles of concentration
   evapK:0.0020, evapLo:0.0015, evapHi:0.0027, // tower evaporation per kg circulated per K of range: EnergyPlus default 0.2 %/K, band 0.15–0.27 %/K
   kCT:0.012, kDC:0.030, kAD:0.030,            // fan kW per kW rejected at full speed: towers ASHRAE 2025 minimum; dry / adiabatic public data sheets
   dpCDU:320, dtCDU:10, dpPri:200, dpSec:400, dpCW:211, etaP:0.70,   // pump heads (kPa), CDU coolant ΔT, pump × motor × VFD efficiency
@@ -696,13 +705,15 @@ function hourModel(o,L,db,wb,p){
     const dry=db+p.aDC, padAir=db-p.eAD*(db-wb), wetOut=padAir+p.aAD;
     wet=db>p.swAD&&wetOut<dry?1:0; ecw=wet?wetOut:dry; Tout=ecw+p.aHX; kind='wc'; }
   else if(o.id==='wcc'){ wet=1; ecw=wb+p.aCT; Tout=ecw+p.aHX; kind='wc'; }
-  else { // hybrid: dry coolers in series ahead of the towers on the condenser water
-    if(db<=p.swHY){ ecw=db+p.aDC; dShare=1; wet=0; }
-    else { ecw=wb+p.aCT;
-      const fc=ecw+p.aHX<L.Tr;   // free cooling (full or partial): loop water from the plate HX passes the dry coolers first
-      if(fc){ const Tin=L.Tr-p.aHX, Treq=Math.max(L.Ts-p.aHX,ecw), Tdry=Math.max(db+p.aDC,Treq);
-        dShare=Tin>Treq?Math.max(0,Math.min(1,(Tin-Tdry)/(Tin-Treq))):1; }
-      else dShare=Math.max(0,Math.min(1,(ecw+p.rangeCW-(db+p.aDC))/p.rangeCW));   // chillers only: condenser water over its 5.56 K range
+  else { // hybrid, capability rule: dry coolers in series ahead of the towers; the dry section runs when the water entering is above
+         // db + 5.56, the towers only when the dry section alone cannot reach the target (free cooling: supply − 1.5; chillers only:
+         // condenser-water setpoint, 30 °C AHRI)
+    const dryOut=db+p.aDC, twr=wb+p.aCT, fc=twr+p.aHX<L.Tr;
+    const target=fc?L.Ts-p.aHX:p.cwSet;
+    if(dryOut<=target){ ecw=dryOut; dShare=1; wet=0; }                     // dry section alone reaches the target: towers off
+    else { ecw=twr;                                                          // towers on, as cold as they can make it
+      const Tin=fc?L.Tr-p.aHX:twr+p.rangeCW, Treq=fc?Math.max(L.Ts-p.aHX,twr):twr;
+      dShare=Tin>dryOut&&Tin>Treq?Math.max(0,Math.min(1,(Tin-Math.max(dryOut,Treq))/(Tin-Treq))):0;
       wet=1-dShare; }
     Tout=ecw+p.aHX; kind='wc';
   }
@@ -833,8 +844,9 @@ function simulate(wx,p,des){
     // carbon, t CO2e per year: electricity × grid factor; water × supply energy × grid factor; refrigerant charge (duty + 1 standby per loop) × leak × GWP
     r.chCap=d.units.reduce((s,u)=>s+(u.N+1)*u.unit,0);
     r.charge=r.chCap*(d.units.some(u=>u.kind==='ac')?p.chA:p.chW);
-    const wk=p.wkwhBand||[p.wkwh,p.wkwh];
-    r.co2E=r.E*p.ef; r.co2W=r.W*p.wkwh/1000*p.ef; r.co2Wlo=r.Wlo*wk[0]/1000*p.ef; r.co2Whi=r.Whi*wk[1]/1000*p.ef; r.co2R=r.charge*p.leak*(REFRIGERANTS[p.refr]||REFRIGERANTS.r513a).gwp/1000;
+    // water carbon, kg/m³: the utility's own figure where given (band low–high), else supply energy × grid factor
+    const wc=p.wco2||[p.wkwh*p.ef,p.wkwh*p.ef,p.wkwh*p.ef];
+    r.co2E=r.E*p.ef; r.co2W=r.W*wc[1]/1000; r.co2Wlo=r.Wlo*wc[0]/1000; r.co2Whi=r.Whi*wc[2]/1000; r.co2R=r.charge*p.leak*(REFRIGERANTS[p.refr]||REFRIGERANTS.r513a).gwp/1000;
     r.co2=r.co2E+r.co2W+r.co2R; r.co2Lo=r.co2E+r.co2Wlo+r.co2R; r.co2Hi=r.co2E+r.co2Whi+r.co2R; r.co2IT=r.co2*1000/r.Eit;   // kg CO2e per MWh of IT
     out[o.id]=r;
   }

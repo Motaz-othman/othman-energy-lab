@@ -19,9 +19,9 @@ function params(){
   const rates={}; RATES.forEach(r=>rates[r.id]={lo:g('rl_'+r.id),hi:g('rh_'+r.id)});
   return {...BASIS,Qd,lf,loops,water:$('water').value,dbIn:g('dbD'),wbIn:g('wbD'),
     copA:g('copA'),copW:g('copW'),copMax:g('copMax'),unitWL:Math.max(100,g('unitWL')),unitWA:Math.max(100,g('unitWA')),unitA:Math.max(50,g('unitA')),derA:Math.max(0,g('derA'))/100,
-    acMax:g('acMax'),wcMax:g('wcMax'),aCT:g('aCT'),aDC:g('aDC'),aAD:g('aAD'),aHX:g('aHX'),swAD:g('swAD'),swHY:g('swHY'),eAD:g('eAD'),coc:Math.max(1.5,g('coc')),
+    acMax:g('acMax'),wcMax:g('wcMax'),aCT:g('aCT'),aDC:g('aDC'),aAD:g('aAD'),aHX:g('aHX'),swAD:g('swAD'),cwSet:g('cwSet'),eAD:g('eAD'),coc:Math.max(1.5,g('coc')),
     kCT:g('kCT')/100,kDC:g('kDC')/100,kAD:g('kAD')/100,dpCDU:g('dpCDU'),dpPri:g('dpPri'),dpSec:g('dpSec'),dpCW:g('dpCW'),etaP:Math.min(1,Math.max(0.2,g('etaP')/100)),
-    ef:isNaN(g('envEF'))?cityEF():g('envEF'),wkwh:isNaN(g('envW'))?waterKwh(cityId()):g('envW'),wkwhBand:isNaN(g('envW'))&&cityId()?waterKwhBand(cityId()):null,refr:$('refr').value,chW:Math.max(0,g('chW')),chA:Math.max(0,g('chA')),leak:Math.max(0,g('leak'))/100,
+    ef:isNaN(g('envEF'))?cityEF():g('envEF'),wkwh:isNaN(g('envW'))?waterKwh(cityId()):g('envW'),wco2:isNaN(g('envW'))&&cityId()?waterCo2(cityId()):null,refr:$('refr').value,chW:Math.max(0,g('chW')),chA:Math.max(0,g('chA')),leak:Math.max(0,g('leak'))/100,
     dpFWU:g('dpFWU')/1000,dtAir:Math.max(2,g('dtAir')),etaF:Math.min(1,Math.max(0.2,g('etaF')/100)),
     tE:g('tE'),tW:g('tW'),tD:g('tD'),
     red:g('red')/100,ups:Math.min(1,Math.max(0.5,g('ups')/100)),dloss:Math.min(0.3,Math.max(0,g('dloss')/100)),rates,...Object.fromEntries(WEIGHTS.map(w=>[w.id,w.v]))};
@@ -33,8 +33,9 @@ function loadCity(){
   stationYear(c).catch(()=>synthYear(c)).then(w=>{ if(n===cityReq){ WX=w; run(); } });
 }
 const ashrae=()=>WX&&WX.station&&WX.station.ashrae;
-// ASHRAE 90.4 maximum annualized MLC for the station's climate zone (none for an uploaded file)
-const mlcLim=()=>WX&&WX.station?mlcMax(WX.station.zone,P.Qd):null;
+// ASHRAE 90.4 maximum annualized MLC: U.S. cities use the county climate zone (code compliance), others the station zone; none for an uploaded file
+const mlcZone=()=>WX&&WX.station?((cityId()&&countyZone(cityId()))?countyZone(cityId())[0]:WX.station.zone):null;
+const mlcLim=()=>mlcZone()?mlcMax(mlcZone(),P.Qd):null;
 const mlcTxt=r=>{ const m=mlcLim(); return m==null?'':(r.mlc<=m?`Meets ASHRAE 90.4 MLC (${r.mlc.toFixed(3)} ≤ ${m.toFixed(2)})`:`Exceeds ASHRAE 90.4 MLC (${r.mlc.toFixed(3)} > ${m.toFixed(2)})`); };
 
 function run(){
@@ -70,7 +71,7 @@ function renderReco(){
     +(window.Chart?'':'<div class="banner">Charts could not load (no internet connection). Tables and results below are complete.</div>');
   const st=WX.station;
   const head=`<div class="sub">For <b>${esc(WX.name)}</b>: ${fmt(P.Qd/1000,1)} MW hall, liquid loop ${P.loops[0].Ts}/${P.loops[0].Tr} °C, air loop ${P.loops[1].Ts}/${P.loops[1].Tr} °C</div>`
-    +(st?`<div class="wxsrc">Weather: ${esc(st.station)} (WMO ${esc(st.wmo)}), measured hourly year TMYx ${esc(st.period)} · ASHRAE climate zone ${esc(st.zone)} · climate.onebuilding.org</div>`:'');
+    +(st?`<div class="wxsrc">Weather: ${esc(st.station)} (WMO ${esc(st.wmo)}), measured hourly year TMYx ${esc(st.period)} · ${esc((cityId()&&countyZone(cityId())?`county zone ${countyZone(cityId())[0]} (${countyZone(cityId())[1]}, IECC 2021 / ASHRAE 169) for the 90.4 check; station zone ${st.zone}`:`ASHRAE climate zone ${st.zone}`))} · climate.onebuilding.org</div>`:'');
   // extreme ambient: the design condition every system is checked against
   const src=isNaN(P.dbIn)||isNaN(P.wbIn)?(ashrae()?'ASHRAE extreme annual values (2025 Fundamentals)':'hottest hours in the weather data'):'entered design values';
   const C=P.cases, amb=`<div class="amb"><span class="al">Design cases</span>
@@ -156,7 +157,7 @@ function renderSystem(){
 }
 
 function renderEff(){
-  const m=mlcLim(), zone=WX.station&&WX.station.zone;
+  const m=mlcLim(), zone=mlcZone();
   const res=r=>m==null?'–':(r.mlc<=m?'<span class="tag ok">Meets</span>':'<span class="tag x">Exceeds</span>');
   const rows=order().map((id,i)=>{ const r=RES[id]; return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td>${r.mlc.toFixed(3)}</td><td>${m==null?'–':m.toFixed(2)}</td><td>${res(r)}</td><td>${r.peakRatio.toFixed(3)}</td><td>${r.cop?r.cop.toFixed(1):'–'}</td><td>${loopTxt(r.free)}</td><td>${loopTxt(r.mech)}</td></tr>`; });
   $('tEff').innerHTML=table(['Option','Annual MLC',`ASHRAE 90.4 max MLC${zone?' (zone '+esc(zone)+')':''}`,'90.4 result','Peak kW/kW','Avg chiller COP','Free-cooling h (LC / air)','Chiller-only h (LC / air)'],rows);
@@ -169,7 +170,7 @@ function renderCarbon(){
   const b=RES.acc, rows=order().map((id,i)=>{ const r=RES[id]; return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td>${fmt(r.co2E)}</td><td>${fmt(r.co2W)}${band(r.co2W,r.co2Wlo,r.co2Whi)}</td><td>${fmt(r.co2R)}</td><td>${fmt(r.co2)}${band(r.co2,r.co2Lo,r.co2Hi)}</td><td>${fmt(r.co2IT,1)}</td><td>${id==='acc'?'–':fmt(b.co2-r.co2)}</td></tr>`; });
   $('tCO2').innerHTML=table(['Option','Electricity t CO₂/yr','Water supply t CO₂/yr','Refrigerant t CO₂e/yr','Total t CO₂e/yr','kg CO₂e per MWh IT','Saving vs air-cooled t/yr'],rows);
   const rf=REFRIGERANTS[P.refr];
-  $('co2Note').textContent=`Grid factor ${P.ef.toFixed(3)} kg CO₂/kWh${isNaN(parseFloat($('envEF').value))?(cityId()?((CITIES.find(c=>c.id===cityId())||{}).g==='Americas'&&cityId()!=='saopaulo'?' (EPA eGRID2023 rev 2 subregion)':cityId()==='sydney'?' (Australian NGA factors, NSW 2025–26)':' (Our World in Data / Ember, latest year)'):' (world average; enter the local grid)'):''}; water supply ${fmt(P.wkwh,1)} kWh/m³${P.wkwhBand?` (band ${fmt(P.wkwhBand[0],1)}–${fmt(P.wkwhBand[1],1)}: Central Arizona Project)`:''}; tower water band 0.15–0.27 %/K evaporation; ${rf.name} GWP ${fmt(rf.gwp,rf.gwp<10?2:0)}, charge ${P.chW} / ${P.chA} kg/kW (water / air-cooled), leak ${fmt(P.leak*100,1)}%/yr on duty + 1 standby chillers. Cooling plant only; IT electricity not included.`;
+  $('co2Note').textContent=`Grid factor ${P.ef.toFixed(3)} kg CO₂/kWh${isNaN(parseFloat($('envEF').value))?(cityId()?((CITIES.find(c=>c.id===cityId())||{}).g==='Americas'&&cityId()!=='saopaulo'?' (EPA eGRID2023 rev 2 subregion)':cityId()==='sydney'?' (Australian NGA factors, NSW 2025–26)':' (Our World in Data / Ember, latest year)'):' (world average; enter the local grid)'):''}; ${P.wco2?`water supply ${fmt(P.wco2[1],2)} kg CO₂e/m³ (band ${fmt(P.wco2[0],2)}–${fmt(P.wco2[2],2)}: City of Phoenix 2022 GHG inventory, plus Central Arizona Project conveyance at the top)`:`water supply ${fmt(P.wkwh,1)} kWh/m³`}; tower water band 0.15–0.27 %/K evaporation; ${rf.name} GWP ${fmt(rf.gwp,rf.gwp<10?2:0)}, charge ${P.chW} / ${P.chA} kg/kW (water / air-cooled), leak ${fmt(P.leak*100,1)}%/yr on duty + 1 standby chillers. Cooling plant only; IT electricity not included.`;
   const ids=RANK, labels=ids.map(id=>RES[id].o.short);
   const o=baseOpts(); o.indexAxis='y'; o.scales.x={stacked:true,grid:{color:css('--border')},border:{display:false},ticks:{color:css('--text2')},title:{display:true,text:'t CO₂e/yr',color:css('--text2')},beginAtZero:true};
   o.scales.y={stacked:true,grid:{display:false},ticks:{color:css('--text')}};
@@ -317,7 +318,7 @@ function exportReport(){
     [],
     [B('Site and weather')],
     ['Location',WX.name],
-    ...(st?[['Station',`${st.station} (WMO ${st.wmo})`],['Weather year',`TMYx ${st.period}, climate.onebuilding.org`],['ASHRAE climate zone',st.zone]]:[['Weather',WX.synthetic?'generated from monthly normals':'uploaded file']]),
+    ...(st?[['Station',`${st.station} (WMO ${st.wmo})`],['Weather year',`TMYx ${st.period}, climate.onebuilding.org`],['ASHRAE climate zone',(cityId()&&countyZone(cityId())?`county zone ${countyZone(cityId())[0]} (${countyZone(cityId())[1]}, IECC 2021 / ASHRAE 169) for the 90.4 check; station zone ${st.zone}`:`ASHRAE climate zone ${st.zone}`)]]:[['Weather',WX.synthetic?'generated from monthly normals':'uploaded file']]),
     ['Case A: dry-bulb / coincident wet-bulb (°C)',+P.cases.A.db.toFixed(1),+P.cases.A.wb.toFixed(1)],['Case B: wet-bulb / coincident dry-bulb (°C)',+P.cases.B.wb.toFixed(1),+P.cases.B.db.toFixed(1)],
     [],
     [B('Load')],
