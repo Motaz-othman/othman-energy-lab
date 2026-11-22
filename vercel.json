@@ -1,5 +1,6 @@
 {
   "redirects": [
+    { "source": "/data-centers/cooling-co2/", "destination": "/data-centers/low-carbon-cooling/", "permanent": true },
     { "source": "/data-centers/cooling-co2/:path*", "destination": "/data-centers/low-carbon-cooling/:path*", "permanent": true }
   ]
 }
