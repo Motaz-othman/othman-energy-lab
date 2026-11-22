@@ -11,6 +11,14 @@ Every result traces back to a published standard: ASHRAE 90.1-2025, ASHRAE 90.4-
 - [Ride-Through Tank](https://www.oenergylab.com/data-centers/ride-through-tank/): The Ride-Through Tank sizes a chilled-water tank that keeps a data center cooled while the generators start and the chillers restart after a power failure. Enter the cooling load and the ride-through time; it returns the tank volume, the number and shape of tanks, and an indicative cost.
 - [Liquid Rack Cooling](https://www.oenergylab.com/data-centers/rack-cooling/): Liquid Rack Cooling shows what a liquid-cooled GPU or CPU rack needs: the maximum coolant supply temperature, the cooling and flow per rack, the safe minimum flow for variable-flow control, the minimum buffer tank on the CDU loop, and how the CDU pump and control valve respond to a load jump or a pump trip. Platforms include NVIDIA GB300 and GB200 NVL72, Vera Rubin, HGX B200, AMD Instinct MI355X, Helios and MI300A, and Lenovo Neptune CPU racks.
 
+## Articles
+
+- [How to use the Cooling Plant Selector](https://www.oenergylab.com/articles/how-to-use-cooling-plant-selector/): Step-by-step guide to the free Cooling Plant Selector: choose the city, enter the IT load and loop temperatures, read the ranked cooling plants, the design cases, energy, water, carbon and cost, and export a PDF or Excel report.
+- [How to size a chilled-water ride-through tank for a data center](https://www.oenergylab.com/articles/ride-through-tank-sizing/): How to size a chilled-water tank that keeps a data center cooled while the generators start and the chillers restart: the equation, a worked 20 MW example, recommended ride-through times and what must be on UPS.
+- [ASHRAE 90.4 MLC explained, with the limits by climate zone](https://www.oenergylab.com/articles/ashrae-90-4-mlc/): What the ASHRAE 90.4 mechanical load component (MLC) is, how to calculate it, the maximum annualized MLC for every climate zone from ASHRAE 90.4-2025 Table 6.5, and typical values for real cooling plants.
+- [Cooling towers vs adiabatic coolers vs dry coolers for data centers in hot climates](https://www.oenergylab.com/articles/cooling-towers-vs-adiabatic-vs-dry-coolers/): How cooling towers, adiabatic coolers, dry coolers and hybrid plants compare for data centers in hot climates: approaches, free cooling, electrical peak, energy, water and carbon, with a 100 MW Dubai example.
+- [NVIDIA GB300 NVL72 liquid cooling: coolant flow, supply temperature and minimum flow](https://www.oenergylab.com/articles/gb300-nvl72-liquid-cooling/): What an NVIDIA GB300 NVL72 rack needs from the liquid cooling system: about 135 kW, 90% to liquid, 25–45 °C supply, 59–177 L/min of coolant, the safe minimum flow and why the CDU response matters.
+
 ## About
 
 - [About and founder](https://www.oenergylab.com/about/): Eng. Mutaz Othman, Mechanical Design Engineer, mission-critical and high-demand buildings. LinkedIn: https://www.linkedin.com/in/mutaz-othman-48aa1556/

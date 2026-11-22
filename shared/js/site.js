@@ -9,6 +9,7 @@ const SITE={name:'Othman Energy Lab', tagline:'Code-based. Beyond the minimum.',
 const NAV=[
   {id:'about',l:'About',href:'about/index.html'},
   {id:'data-centers',l:'Data Centers',href:'data-centers/index.html'},
+  {id:'articles',l:'Articles',href:'articles/index.html'},
   {id:'contact',l:'Contact',href:'contact/index.html'},
 ];
 // mark: an "O" for Othman with an energy bolt breaking through it, the bolt in brand green

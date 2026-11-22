@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=GTM-WMV8R23W"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FSNWF5QMP9');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NVIDIA GB300 NVL72 liquid cooling: coolant flow, supply temperature and minimum flow · Othman Energy Lab</title>
+<meta name="description" content="What an NVIDIA GB300 NVL72 rack needs from the liquid cooling system: about 135 kW, 90% to liquid, 25–45 °C supply, 59–177 L/min of coolant, the safe minimum flow and why the CDU response matters.">
+<link rel="icon" href="../../shared/img/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../shared/img/apple-touch-icon.png">
+<meta name="theme-color" content="#0e7c57">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Othman Energy Lab">
+<meta property="og:title" content="NVIDIA GB300 NVL72 liquid cooling: coolant flow, supply temperature and minimum flow">
+<meta property="og:description" content="What an NVIDIA GB300 NVL72 rack needs from the liquid cooling system: about 135 kW, 90% to liquid, 25–45 °C supply, 59–177 L/min of coolant, the safe minimum flow and why the CDU response matters.">
+<meta property="og:url" content="https://www.oenergylab.com/articles/gb300-nvl72-liquid-cooling/">
+<meta property="og:image" content="https://www.oenergylab.com/shared/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="canonical" href="https://www.oenergylab.com/articles/gb300-nvl72-liquid-cooling/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../shared/css/base.css">
+<style>
+.art{max-width:76ch;padding:36px 0 24px}
+.art h1{font-size:clamp(26px,3.4vw,38px);line-height:1.15;letter-spacing:-.02em;margin:6px 0 10px}
+.art .meta{font-size:13px;color:var(--muted);margin:0 0 22px}
+.art h2{font-size:21px;margin:28px 0 8px}
+.art p,.art li{font-size:16px;line-height:1.65;color:var(--text2)}
+.art ul{padding-left:20px}
+.art .eq{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14.5px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text)}
+.art .tw{overflow-x:auto;margin:10px 0}
+.art table{border-collapse:collapse;width:100%;font-size:14px}
+.art th,.art td{border-bottom:1px solid var(--border);padding:7px 8px;text-align:left;vertical-align:top}
+.art th{background:var(--surface)}
+.art .cta{margin:28px 0 8px}
+.art a:not(.btn),.alist a{color:var(--brand-ink)}
+.art a:not(.btn):hover{text-decoration-thickness:2px}
+.alist{display:grid;gap:14px;padding:8px 0 40px;max-width:80ch}
+.alist .card{padding:18px 22px;text-decoration:none;display:block}
+.alist h2{font-size:19px;margin:0 0 6px;color:var(--text)}
+.alist p{margin:0;color:var(--text2);font-size:14.5px;line-height:1.55}
+</style>
+<meta name="author" content="Mutaz Othman">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"NVIDIA GB300 NVL72 liquid cooling: coolant flow, supply temperature and minimum flow","description":"What an NVIDIA GB300 NVL72 rack needs from the liquid cooling system: about 135 kW, 90% to liquid, 25–45 °C supply, 59–177 L/min of coolant, the safe minimum flow and why the CDU response matters.","url":"https://www.oenergylab.com/articles/gb300-nvl72-liquid-cooling/","mainEntityOfPage":"https://www.oenergylab.com/articles/gb300-nvl72-liquid-cooling/","datePublished":"2026-11-22","dateModified":"2026-11-22","inLanguage":"en","author":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"publisher":{"@id":"https://www.oenergylab.com/#org"},"image":"https://www.oenergylab.com/shared/img/og-image.png","about":{"@type":"WebApplication","name":"Liquid Rack Cooling","url":"https://www.oenergylab.com/data-centers/rack-cooling/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.oenergylab.com/"},{"@type":"ListItem","position":2,"name":"Articles","item":"https://www.oenergylab.com/articles/"},{"@type":"ListItem","position":3,"name":"NVIDIA GB300 NVL72 liquid cooling: coolant flow, supply temperature and minimum flow","item":"https://www.oenergylab.com/articles/gb300-nvl72-liquid-cooling/"}]}]}</script>
+</head>
+<body>
+<header class="sitebar" data-root="../../" data-page="articles"></header>
+<main class="wrap">
+<article class="art">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a> / <a href="../index.html">Articles</a></nav>
+  <h1>NVIDIA GB300 NVL72 liquid cooling: coolant flow, supply temperature and minimum flow</h1>
+  <p class="meta">By <a href="../../about/index.html#founder">Eng. Mutaz Othman</a> · 22 November 2026</p>
+<p>The NVIDIA GB300 NVL72 is a rack-scale system of 72 GPUs cooled directly by liquid. Designing the facility water and the CDU loop starts from what one rack needs.</p>
+<h2>Key figures per rack</h2>
+<div class="tw"><table><thead><tr><th>Item</th><th>Value</th></tr></thead><tbody><tr><td>Thermal design power</td><td>135 kW, up to about 155 kW peak</td></tr><tr><td>Heat to liquid</td><td>about 90%; the rest to air</td></tr><tr><td>Coolant supply temperature</td><td>25–45 °C (ASHRAE W45 class)</td></tr><tr><td>Coolant flow</td><td>about 59 L/min at 25 °C supply up to 177 L/min at 45 °C supply</td></tr><tr><td>Coolant return</td><td>held at about 55 °C</td></tr></tbody></table></div>
+<p>Source: <a href="https://lenovopress.lenovo.com/lp2357-lenovo-nvidia-gb300-nvl72-rack-scale-ai" rel="noopener">Lenovo GB300 NVL72 product guide</a>.</p>
+<h2>Why the flow rises with supply temperature</h2>
+<p>The required flow follows the heat balance: flow = heat to liquid ÷ (density × specific heat × (maximum return − supply)). With the return held near 55 °C, a 45 °C supply leaves only a 10 K rise, so the flow is three times that at 25 °C. A warmer supply saves energy at the plant (more free cooling, lower chiller lift) at the cost of more pumping.</p>
+<h2>Minimum flow and the CDU response</h2>
+<p>Variable-flow control saves pump energy at idle, but the racks hold very little coolant. If the load jumps from idle to full power, the coolant heats up until the CDU pump ramps up and its control valve opens. The safe minimum flow is the lowest idle flow from which that jump does not push the return past its limit, and never below the vendor minimum. A small buffer tank on the CDU loop can cover the response gap; beyond that, a bigger tank only lowers the supply temperature rise.</p>
+<h2>Pump trip</h2>
+<p>If the CDU pump stops, the coolant reaches its limit within seconds. Run the standby CDU pump in parallel with automatic changeover, and keep the CDUs and facility pumps on UPS.</p>
+<p>The <a href="../../data-centers/rack-cooling/index.html">Liquid Rack Cooling</a> tool calculates the flow, safe minimum flow, minimum buffer tank and pump-trip time for the GB300 NVL72 and other GPU and CPU platforms.</p>
+  <p class="cta"><a class="btn primary" href="../../data-centers/rack-cooling/index.html">Open the Liquid Rack Cooling →</a></p>
+</article>
+</main>
+<footer class="sitefoot" data-root="../../"></footer>
+<script src="../../shared/js/site.js"></script>
+</body>
+</html>

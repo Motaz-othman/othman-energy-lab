@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=GTM-WMV8R23W"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FSNWF5QMP9');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASHRAE 90.4 MLC explained, with the limits by climate zone · Othman Energy Lab</title>
+<meta name="description" content="What the ASHRAE 90.4 mechanical load component (MLC) is, how to calculate it, the maximum annualized MLC for every climate zone from ASHRAE 90.4-2025 Table 6.5, and typical values for real cooling plants.">
+<link rel="icon" href="../../shared/img/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../shared/img/apple-touch-icon.png">
+<meta name="theme-color" content="#0e7c57">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Othman Energy Lab">
+<meta property="og:title" content="ASHRAE 90.4 MLC explained, with the limits by climate zone">
+<meta property="og:description" content="What the ASHRAE 90.4 mechanical load component (MLC) is, how to calculate it, the maximum annualized MLC for every climate zone from ASHRAE 90.4-2025 Table 6.5, and typical values for real cooling plants.">
+<meta property="og:url" content="https://www.oenergylab.com/articles/ashrae-90-4-mlc/">
+<meta property="og:image" content="https://www.oenergylab.com/shared/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="canonical" href="https://www.oenergylab.com/articles/ashrae-90-4-mlc/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../shared/css/base.css">
+<style>
+.art{max-width:76ch;padding:36px 0 24px}
+.art h1{font-size:clamp(26px,3.4vw,38px);line-height:1.15;letter-spacing:-.02em;margin:6px 0 10px}
+.art .meta{font-size:13px;color:var(--muted);margin:0 0 22px}
+.art h2{font-size:21px;margin:28px 0 8px}
+.art p,.art li{font-size:16px;line-height:1.65;color:var(--text2)}
+.art ul{padding-left:20px}
+.art .eq{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14.5px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text)}
+.art .tw{overflow-x:auto;margin:10px 0}
+.art table{border-collapse:collapse;width:100%;font-size:14px}
+.art th,.art td{border-bottom:1px solid var(--border);padding:7px 8px;text-align:left;vertical-align:top}
+.art th{background:var(--surface)}
+.art .cta{margin:28px 0 8px}
+.art a:not(.btn),.alist a{color:var(--brand-ink)}
+.art a:not(.btn):hover{text-decoration-thickness:2px}
+.alist{display:grid;gap:14px;padding:8px 0 40px;max-width:80ch}
+.alist .card{padding:18px 22px;text-decoration:none;display:block}
+.alist h2{font-size:19px;margin:0 0 6px;color:var(--text)}
+.alist p{margin:0;color:var(--text2);font-size:14.5px;line-height:1.55}
+</style>
+<meta name="author" content="Mutaz Othman">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"ASHRAE 90.4 MLC explained, with the limits by climate zone","description":"What the ASHRAE 90.4 mechanical load component (MLC) is, how to calculate it, the maximum annualized MLC for every climate zone from ASHRAE 90.4-2025 Table 6.5, and typical values for real cooling plants.","url":"https://www.oenergylab.com/articles/ashrae-90-4-mlc/","mainEntityOfPage":"https://www.oenergylab.com/articles/ashrae-90-4-mlc/","datePublished":"2026-11-22","dateModified":"2026-11-22","inLanguage":"en","author":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"publisher":{"@id":"https://www.oenergylab.com/#org"},"image":"https://www.oenergylab.com/shared/img/og-image.png","about":{"@type":"WebApplication","name":"Cooling Plant Selector","url":"https://www.oenergylab.com/data-centers/cooling-plant/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.oenergylab.com/"},{"@type":"ListItem","position":2,"name":"Articles","item":"https://www.oenergylab.com/articles/"},{"@type":"ListItem","position":3,"name":"ASHRAE 90.4 MLC explained, with the limits by climate zone","item":"https://www.oenergylab.com/articles/ashrae-90-4-mlc/"}]}]}</script>
+</head>
+<body>
+<header class="sitebar" data-root="../../" data-page="articles"></header>
+<main class="wrap">
+<article class="art">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a> / <a href="../index.html">Articles</a></nav>
+  <h1>ASHRAE 90.4 MLC explained, with the limits by climate zone</h1>
+  <p class="meta">By <a href="../../about/index.html#founder">Eng. Mutaz Othman</a> · 22 November 2026</p>
+<p>ASHRAE Standard 90.4, the energy standard for data centers, limits how much energy the cooling plant may use per unit of IT energy. That ratio is the <b>mechanical load component (MLC)</b>.</p>
+<h2>Definition</h2>
+<p class="eq">Annualized MLC = annual mechanical (cooling) energy ÷ annual IT energy</p>
+<p>Mechanical energy covers the chiller compressors, heat-rejection fans, pumps and the air handlers or CDUs. An MLC of 0.06 means 0.06 kWh of cooling energy per kWh of IT energy.</p>
+<h2>Maximum annualized MLC (ASHRAE 90.4-2025, Table 6.5)</h2>
+<div class="tw"><table><thead><tr><th>Climate zone</th><th>ITE > 300 kW</th><th>ITE ≤ 300 kW</th></tr></thead><tbody><tr><td>0A</td><td>0.29</td><td>0.37</td></tr><tr><td>0B</td><td>0.32</td><td>0.41</td></tr><tr><td>1A</td><td>0.30</td><td>0.37</td></tr><tr><td>1B</td><td>0.31</td><td>0.39</td></tr><tr><td>2A</td><td>0.27</td><td>0.35</td></tr><tr><td>2B</td><td>0.20</td><td>0.33</td></tr><tr><td>3A</td><td>0.24</td><td>0.33</td></tr><tr><td>3B</td><td>0.20</td><td>0.33</td></tr><tr><td>3C</td><td>0.17</td><td>0.27</td></tr><tr><td>4A</td><td>0.21</td><td>0.33</td></tr><tr><td>4B</td><td>0.17</td><td>0.29</td></tr><tr><td>4C</td><td>0.17</td><td>0.27</td></tr><tr><td>5A</td><td>0.19</td><td>0.34</td></tr><tr><td>5B</td><td>0.17</td><td>0.30</td></tr><tr><td>5C</td><td>0.17</td><td>0.29</td></tr><tr><td>6A</td><td>0.19</td><td>0.31</td></tr><tr><td>6B</td><td>0.17</td><td>0.31</td></tr><tr><td>7</td><td>0.17</td><td>0.31</td></tr><tr><td>8</td><td>0.15</td><td>0.32</td></tr></tbody></table></div>
+<p>Climate zones follow ASHRAE Standard 169. Dubai and Riyadh are hot-dry zones (0B and 1B); Mumbai and Singapore are hot-humid (0A).</p>
+<h2>Typical values</h2>
+<p>For a 20 MW hall with a 30 / 40 °C liquid loop, water-cooled chillers with cooling towers and free cooling reach an annual MLC of about 0.04–0.07 across hot and temperate cities: well under the limits. Air-cooled chillers without free cooling in a hot climate are typically 0.15–0.17. Liquid cooling at warm supply temperatures is what makes low MLC possible: more free-cooling hours and a smaller chiller lift.</p>
+<h2>Screening versus compliance</h2>
+<p>The <a href="../../data-centers/cooling-plant/index.html">Cooling Plant Selector</a> checks the annual MLC of every option against the limit for the city's climate zone. It is a screening check; a formal compliance calculation follows the 90.4 procedure for load points and weather data.</p>
+  <p class="cta"><a class="btn primary" href="../../data-centers/cooling-plant/index.html">Open the Cooling Plant Selector →</a></p>
+</article>
+</main>
+<footer class="sitefoot" data-root="../../"></footer>
+<script src="../../shared/js/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=GTM-WMV8R23W"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FSNWF5QMP9');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to use the Cooling Plant Selector · Othman Energy Lab</title>
+<meta name="description" content="Step-by-step guide to the free Cooling Plant Selector: choose the city, enter the IT load and loop temperatures, read the ranked cooling plants, the design cases, energy, water, carbon and cost, and export a PDF or Excel report.">
+<link rel="icon" href="../../shared/img/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../shared/img/apple-touch-icon.png">
+<meta name="theme-color" content="#0e7c57">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Othman Energy Lab">
+<meta property="og:title" content="How to use the Cooling Plant Selector">
+<meta property="og:description" content="Step-by-step guide to the free Cooling Plant Selector: choose the city, enter the IT load and loop temperatures, read the ranked cooling plants, the design cases, energy, water, carbon and cost, and export a PDF or Excel report.">
+<meta property="og:url" content="https://www.oenergylab.com/articles/how-to-use-cooling-plant-selector/">
+<meta property="og:image" content="https://www.oenergylab.com/shared/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="canonical" href="https://www.oenergylab.com/articles/how-to-use-cooling-plant-selector/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../shared/css/base.css">
+<style>
+.art{max-width:76ch;padding:36px 0 24px}
+.art h1{font-size:clamp(26px,3.4vw,38px);line-height:1.15;letter-spacing:-.02em;margin:6px 0 10px}
+.art .meta{font-size:13px;color:var(--muted);margin:0 0 22px}
+.art h2{font-size:21px;margin:28px 0 8px}
+.art p,.art li{font-size:16px;line-height:1.65;color:var(--text2)}
+.art ul{padding-left:20px}
+.art .eq{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14.5px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text)}
+.art .tw{overflow-x:auto;margin:10px 0}
+.art table{border-collapse:collapse;width:100%;font-size:14px}
+.art th,.art td{border-bottom:1px solid var(--border);padding:7px 8px;text-align:left;vertical-align:top}
+.art th{background:var(--surface)}
+.art .cta{margin:28px 0 8px}
+.art a:not(.btn),.alist a{color:var(--brand-ink)}
+.art a:not(.btn):hover{text-decoration-thickness:2px}
+.alist{display:grid;gap:14px;padding:8px 0 40px;max-width:80ch}
+.alist .card{padding:18px 22px;text-decoration:none;display:block}
+.alist h2{font-size:19px;margin:0 0 6px;color:var(--text)}
+.alist p{margin:0;color:var(--text2);font-size:14.5px;line-height:1.55}
+</style>
+<meta name="author" content="Mutaz Othman">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"How to use the Cooling Plant Selector","description":"Step-by-step guide to the free Cooling Plant Selector: choose the city, enter the IT load and loop temperatures, read the ranked cooling plants, the design cases, energy, water, carbon and cost, and export a PDF or Excel report.","url":"https://www.oenergylab.com/articles/how-to-use-cooling-plant-selector/","mainEntityOfPage":"https://www.oenergylab.com/articles/how-to-use-cooling-plant-selector/","datePublished":"2026-11-22","dateModified":"2026-11-22","inLanguage":"en","author":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"publisher":{"@id":"https://www.oenergylab.com/#org"},"image":"https://www.oenergylab.com/shared/img/og-image.png","about":{"@type":"WebApplication","name":"Cooling Plant Selector","url":"https://www.oenergylab.com/data-centers/cooling-plant/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.oenergylab.com/"},{"@type":"ListItem","position":2,"name":"Articles","item":"https://www.oenergylab.com/articles/"},{"@type":"ListItem","position":3,"name":"How to use the Cooling Plant Selector","item":"https://www.oenergylab.com/articles/how-to-use-cooling-plant-selector/"}]}]}</script>
+</head>
+<body>
+<header class="sitebar" data-root="../../" data-page="articles"></header>
+<main class="wrap">
+<article class="art">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a> / <a href="../index.html">Articles</a></nav>
+  <h1>How to use the Cooling Plant Selector</h1>
+  <p class="meta">By <a href="../../about/index.html#founder">Eng. Mutaz Othman</a> · 22 November 2026</p>
+<p>The <a href="../../data-centers/cooling-plant/index.html">Cooling Plant Selector</a> compares five cooling plants for a data hall with a liquid cooling loop and an air cooling loop, hour by hour over a full weather year, and recommends the right one for the site. This guide walks through the inputs and how to read the results.</p>
+<h2>1. Choose the weather</h2>
+<p>Pick one of the 33 built-in data center cities in the <b>City</b> tab: Gulf cities (Dubai, Abu Dhabi, Riyadh, Jeddah, Dammam, Manama), major US markets (Northern Virginia, Dallas, Phoenix, Atlanta, Columbus, Silicon Valley, Hillsboro, Reno and others), Europe and Asia-Pacific. Each city loads its airport station's measured typical year (TMYx 2011–2025, 8,760 hours) and its ASHRAE 2025 design conditions. For another site, use the <b>Weather file</b> tab to upload an EPW file or a CSV with hourly dry-bulb and humidity; a sample CSV shows the format.</p>
+<h2>2. Enter the data hall load</h2>
+<ul><li><b>Cooling load (MW)</b>: the IT load at full output.</li>
+<li><b>Frequent load (%)</b>: the load the hall runs at most of the time; annual energy, water and cost use it. Peaks always use 100%.</li>
+<li><b>Liquid cooling loop</b>: its share of the load and its supply / return temperatures (default 30 / 40 °C for direct-to-chip cooling).</li>
+<li><b>Air cooling loop</b>: supply / return for the fan wall units (default 20 / 30 °C).</li></ul>
+<h2>3. Set the site conditions</h2>
+<p><b>Water availability</b> can be Available, Limited (water counts double in the ranking) or None (systems that need water are excluded). The <b>design dry-bulb and wet-bulb</b> are blank by default: the tool then checks two coincident design cases from the ASHRAE extremes, Case A with the extreme dry-bulb and Case B with the extreme wet-bulb. Enter a stricter value, such as an ASHRAE 20-year return period, to replace the extreme.</p>
+<h2>4. Adjust the engineering inputs (optional)</h2>
+<p>The collapsed sections hold the full basis, all with standard defaults you can override: utility tariffs; chillers (ASHRAE 90.1-2025 Path B COP, unit sizes, the condenser-water warning limit); heat rejection (ASHRAE approaches, fan power); pump heads and fan wall units; environmental impact (grid emission factor, refrigerant); electrical losses; and initial cost rates.</p>
+<h2>5. Read the results</h2>
+<p>The top of the results shows the two design cases and one card per system, the recommended one first: electricity, annual PUE, electrical peak, water, carbon, running and initial cost, with notes on free-cooling hours, savings against air-cooled chillers and the ASHRAE 90.4 MLC check. The tabs go deeper:</p>
+<ul><li><b>Overview</b>: all options side by side and the design-day check at both cases, with the number of chillers.</li>
+<li><b>Systems</b>: the schematic of each plant with every pump, its equipment, operating modes and monthly free-cooling hours.</li>
+<li><b>Energy &amp; water</b>: MLC against ASHRAE 90.4-2025, carbon by source, and electricity and water by component.</li>
+<li><b>Cost</b>: running cost, payback against air-cooled chillers, and the initial cost range.</li>
+<li><b>Climate</b> and <b>Method</b>: free-cooling potential by month, and every equation and source.</li></ul>
+<h2>6. Export the report</h2>
+<p><b>PDF report</b> opens a print-ready A4 report (save it with the browser's Save as PDF). <b>Excel tables</b> downloads every results table as a workbook.</p>
+<h2>Example: a 100 MW data center in Dubai</h2>
+<p>At 100% load all year, with 80 MW on the liquid loop and 20 MW on the air loop:</p>
+<div class="tw"><table><thead><tr><th>System</th><th>Design peak (MW)</th><th>Electricity (GWh/yr)</th><th>Water (m³/yr)</th><th>Carbon (t CO₂e/yr)</th></tr></thead><tbody><tr><td>Water-cooled chillers + cooling towers + free cooling</td><td>14.2</td><td>72.7</td><td>1,629,980</td><td>37,142</td></tr><tr><td>Hybrid dry coolers and towers + free cooling</td><td>14.2</td><td>77.9</td><td>1,138,317</td><td>38,784</td></tr><tr><td>Adiabatic coolers + free cooling</td><td>20.3</td><td>113.4</td><td>747,562</td><td>54,724</td></tr><tr><td>Air-cooled chillers + dry coolers</td><td>29.8</td><td>127.9</td><td>0</td><td>60,492</td></tr><tr><td>Air-cooled chillers</td><td>29.8</td><td>150.2</td><td>0</td><td>70,920</td></tr></tbody></table></div>
+<p>Cooling towers rank first: half the electrical peak of air-cooled chillers and about half the carbon, at the cost of the most water. Where water is limited, the hybrid plant saves about 30% of the water for 7% more electricity.</p>
+  <p class="cta"><a class="btn primary" href="../../data-centers/cooling-plant/index.html">Open the Cooling Plant Selector →</a></p>
+</article>
+</main>
+<footer class="sitefoot" data-root="../../"></footer>
+<script src="../../shared/js/site.js"></script>
+</body>
+</html>

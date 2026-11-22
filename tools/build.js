@@ -4,7 +4,7 @@
 //        node tools/build.js cooling-plant
 // Local stylesheets and scripts are inlined; Chart.js loads from the CDN.
 const fs=require('fs'), path=require('path');
-const ROOT=path.join(__dirname,'..'), DIST=path.join(ROOT,'dist'), NOT_AREAS=['shared','dist','tools','node_modules'];
+const ROOT=path.join(__dirname,'..'), DIST=path.join(ROOT,'dist'), NOT_AREAS=['shared','dist','tools','node_modules','articles'];
 const CHART_CDN='<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>';
 
 function build(rel){
@@ -39,7 +39,8 @@ list.forEach(build);
 // sitemap.xml: every public page, last-modified = the latest commit touching the page (tools: their whole folder)
 (function sitemap(){
   const {execSync}=require('child_process'), B='https://www.oenergylab.com/';
-  const pages=[['',['index.html']],['about/',['about']],['contact/',['contact']],['data-centers/',['data-centers/index.html']],...all.map(r=>[r+'/',[r]])];
+  const pages=[['',['index.html']],['about/',['about']],['contact/',['contact']],['data-centers/',['data-centers/index.html']],...all.map(r=>[r+'/',[r]]),['articles/',['articles/index.html']],
+    ...fs.readdirSync(path.join(ROOT,'articles')).filter(d=>fs.existsSync(path.join(ROOT,'articles',d,'index.html'))).map(d=>['articles/'+d+'/',['articles/'+d]])];
   const day=paths=>{ try{ return execSync(`git log -1 --format=%cs -- ${paths.join(' ')}`,{cwd:ROOT}).toString().trim(); }catch(e){ return ''; } };
   const today=new Date().toISOString().slice(0,10);
   const xml=`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`+
