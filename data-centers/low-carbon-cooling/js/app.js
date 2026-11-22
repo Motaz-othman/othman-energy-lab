@@ -63,7 +63,7 @@ function renderEst(f){
   const ids=[...ok.sort((a,b)=>a.co2-b.co2),...all.filter(r=>!DES[r.o.id].ok)].map(r=>r.o.id);
   const best=RES[ids[0]], base=RES.acc, save=base.co2-best.co2;
   $('cStatus').textContent=`${WX.name} · ${fmt(P.Qd/1000,1)} MW at ${fmt(P.lf*100)}% load`;
-  $('cRes').innerHTML=`
+  $('cRes').hidden=true; $('cRes').innerHTML=`
     <div class="big4">
       <div class="bn"><div class="v good">${t(best.co2)} <small>t CO₂e/yr</small></div><div class="l">Lowest: ${best.o.short}</div></div>
       <div class="bn"><div class="v">${t(base.co2)} <small>t CO₂e/yr</small></div><div class="l">Air-cooled chillers (baseline)</div></div>
@@ -90,7 +90,7 @@ function renderOwn(f){
   const cE=E*f.ef, cW=W*f.wkwh/1000*f.ef, cR=ch*R.leak*R.r.gwp/1000, tot=cE+cW+cR;
   const name=$('oSys').selectedOptions[0].textContent, sh=v=>tot>0?fmt(100*v/tot):'0';
   $('cStatus').textContent=`${city().name} · ${name}`;
-  $('cRes').innerHTML=`
+  $('cRes').hidden=false; $('cRes').innerHTML=`
     <div class="big4">
       <div class="bn"><div class="v good">${t(tot)} <small>t CO₂e/yr</small></div><div class="l">Total, cooling system</div></div>
       <div class="bn"><div class="v">${fmt(tot*Y)} <small>t</small></div><div class="l">Over ${Y} years</div></div>
@@ -133,7 +133,7 @@ function details(f,R,est){
 
 // ---------- mode tabs and inputs ----------
 function setMode(m){ MODE=m; $('mEst').classList.toggle('on',m==='est'); $('mOwn').classList.toggle('on',m==='own');
-  $('estPane').hidden=m!=='est'; $('ownPane').hidden=m!=='own'; $('chRow').hidden=m!=='est'; schedule(0); }
+  $('estPane').hidden=m!=='est'; $('ownPane').hidden=m!=='own'; $('chRow').hidden=m!=='est'; $('yrsRow').hidden=m==='est'; schedule(0); }
 $('mEst').onclick=()=>setMode('est'); $('mOwn').onclick=()=>setMode('own');
 document.querySelectorAll('#inGrid input, #inGrid select:not(#cCity)').forEach(el=>el.addEventListener('input',()=>schedule()));
 loadCity();

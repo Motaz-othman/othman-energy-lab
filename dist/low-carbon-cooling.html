@@ -351,7 +351,7 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
 .eqs .f{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:var(--text2)}
 .eqs b{font-variant-numeric:tabular-nums}
 .eqs .tot{background:color-mix(in srgb,var(--brand) 9%,var(--surface));border-color:color-mix(in srgb,var(--brand) 35%,var(--border))}
-#inGrid [hidden]{display:none!important}
+#inGrid [hidden],#cRes[hidden]{display:none!important}
 #cTab td.sys{white-space:nowrap}
 .sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
 .sc{display:flex;flex-direction:column;gap:8px;padding:14px 16px;border-radius:12px;background:var(--bg);border:1px solid var(--border)}
@@ -427,7 +427,7 @@ tr.best td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpa
     <div><label for="cChW">Charge, water-cooled (kg/kW)</label><input type="number" id="cChW" value="0.3" min="0" step="0.05"></div>
     <div><label for="cChA">Charge, air-cooled (kg/kW)</label><input type="number" id="cChA" value="0.4" min="0" step="0.05"></div>
   </div>
-  <label for="cYrs">Period for the total (years)</label><input type="number" id="cYrs" value="15" min="1" max="40" step="1">
+  <div id="yrsRow" hidden><label for="cYrs">Period for the total (years)</label><input type="number" id="cYrs" value="15" min="1" max="40" step="1"></div>
 </aside>
 </div>
 <section class="results">
@@ -926,7 +926,7 @@ function renderEst(f){
   const ids=[...ok.sort((a,b)=>a.co2-b.co2),...all.filter(r=>!DES[r.o.id].ok)].map(r=>r.o.id);
   const best=RES[ids[0]], base=RES.acc, save=base.co2-best.co2;
   $('cStatus').textContent=`${WX.name} · ${fmt(P.Qd/1000,1)} MW at ${fmt(P.lf*100)}% load`;
-  $('cRes').innerHTML=`
+  $('cRes').hidden=true; $('cRes').innerHTML=`
     <div class="big4">
       <div class="bn"><div class="v good">${t(best.co2)} <small>t CO₂e/yr</small></div><div class="l">Lowest: ${best.o.short}</div></div>
       <div class="bn"><div class="v">${t(base.co2)} <small>t CO₂e/yr</small></div><div class="l">Air-cooled chillers (baseline)</div></div>
@@ -953,7 +953,7 @@ function renderOwn(f){
   const cE=E*f.ef, cW=W*f.wkwh/1000*f.ef, cR=ch*R.leak*R.r.gwp/1000, tot=cE+cW+cR;
   const name=$('oSys').selectedOptions[0].textContent, sh=v=>tot>0?fmt(100*v/tot):'0';
   $('cStatus').textContent=`${city().name} · ${name}`;
-  $('cRes').innerHTML=`
+  $('cRes').hidden=false; $('cRes').innerHTML=`
     <div class="big4">
       <div class="bn"><div class="v good">${t(tot)} <small>t CO₂e/yr</small></div><div class="l">Total, cooling system</div></div>
       <div class="bn"><div class="v">${fmt(tot*Y)} <small>t</small></div><div class="l">Over ${Y} years</div></div>
@@ -996,7 +996,7 @@ function details(f,R,est){
 
 // ---------- mode tabs and inputs ----------
 function setMode(m){ MODE=m; $('mEst').classList.toggle('on',m==='est'); $('mOwn').classList.toggle('on',m==='own');
-  $('estPane').hidden=m!=='est'; $('ownPane').hidden=m!=='own'; $('chRow').hidden=m!=='est'; schedule(0); }
+  $('estPane').hidden=m!=='est'; $('ownPane').hidden=m!=='own'; $('chRow').hidden=m!=='est'; $('yrsRow').hidden=m==='est'; schedule(0); }
 $('mEst').onclick=()=>setMode('est'); $('mOwn').onclick=()=>setMode('own');
 document.querySelectorAll('#inGrid input, #inGrid select:not(#cCity)').forEach(el=>el.addEventListener('input',()=>schedule()));
 loadCity();
