@@ -119,7 +119,7 @@ td.hi{background:color-mix(in srgb,var(--brand) 13%,transparent);font-weight:650
 .sitebar-in{max-width:var(--maxw);margin:0 auto;height:var(--navh);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 28px}
 .brand{display:flex;align-items:center;gap:9px;color:var(--text);text-decoration:none;font-weight:650;font-size:15.5px;letter-spacing:-.015em;white-space:nowrap}
 .brand b{color:var(--brand-ink);font-weight:750}
-.brand svg{width:31px;height:42px;display:block}
+.brand .mark{width:40px;height:40px;display:block}
 .sitebar nav{display:flex;gap:2px;overflow-x:auto}
 .sitebar nav a{color:var(--text2);text-decoration:none;padding:7px 11px;border-radius:7px;font-weight:500;white-space:nowrap}
 .sitebar nav a:hover{color:var(--text);background:var(--bg)}
@@ -127,7 +127,7 @@ td.hi{background:color-mix(in srgb,var(--brand) 13%,transparent);font-weight:650
 .sitefoot{border-top:1px solid var(--border);margin-top:32px;color:var(--muted);font-size:12.5px}
 .sitefoot-in{max-width:var(--maxw);margin:0 auto;padding:28px 28px calc(28px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:16px 32px}
 .sitefoot .fb{display:flex;align-items:center;gap:8px;color:var(--text);font-weight:650;font-size:14px}
-.sitefoot .fb svg{width:21px;height:28px}
+.sitefoot .fb .mark{width:26px;height:26px}
 .sitefoot .ft{margin-top:4px;color:var(--text2)}
 .sitefoot nav{display:flex;flex-wrap:wrap;gap:6px 18px}
 .sitefoot .fn{flex-basis:100%;padding-top:14px;border-top:1px solid var(--border)}
@@ -246,7 +246,7 @@ details[open]>:not(summary){animation:fadeUp .2s ease both}
 @media (max-width:860px){.slogan{display:none}}
 @media (max-width:560px){.sitebar .topnav{font-size:13px}.sitebar .topnav a{padding:6px 7px}}
 @media (max-width:430px){.brand .bn{display:none}.sitebar .topnav{font-size:12.5px}.sitebar .topnav a{padding:6px 5px}}
-@media (max-width:370px){.brand svg{width:22px;height:22px}.sitebar .topnav a{padding:6px 4px}}
+@media (max-width:370px){.brand .mark{width:32px;height:32px}.sitebar .topnav a{padding:6px 4px}}
 
 /* tool cards with preview (home and Data Centers pages) */
 .tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
