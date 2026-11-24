@@ -24,9 +24,11 @@
 <link rel="canonical" href="https://www.oenergylab.com/data-centers/peak-shaving-tank/">
 <meta name="twitter:card" content="summary_large_image">
 <style>
+@import url("https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&display=swap");
 /* Shared styles for all calculators: theme tokens, layout, inputs, cards, tables, tabs */
 :root{
   color-scheme: light;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Inter","Helvetica Neue","Segoe UI",Roboto,sans-serif;
   --bg:#f6f6f4; --surface:#fcfcfb; --border:#e3e2de; --text:#0b0b0b; --text2:#52514e; --muted:#6f6e69;
   --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --grey:#c9c8c3; --grey2:#9f9e99;
   --good:#1a7f37; --warn:#b26b00; --bad:#c62828;
@@ -44,7 +46,8 @@
 *{box-sizing:border-box}
 :root{--navh:58px;--maxw:1180px}
 html{scroll-padding-top:calc(var(--navh) + 12px)}
-body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 var(--font);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;font-feature-settings:"cv11","ss01"}
+h1,h2,h3{letter-spacing:-.02em}
 .pagehead{padding:20px 28px 8px}
 .pagehead h1{font-size:24px;margin:2px 0 4px;letter-spacing:-.01em}
 .crumbs{font-size:12.5px;color:var(--muted)}
