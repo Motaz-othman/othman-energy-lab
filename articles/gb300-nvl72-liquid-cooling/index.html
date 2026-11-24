@@ -42,8 +42,11 @@
 .art .cta{margin:28px 0 8px}
 .art a:not(.btn),.alist a{color:var(--brand-ink)}
 .art a:not(.btn):hover{text-decoration-thickness:2px}
-.alist{display:grid;gap:14px;padding:8px 0 40px;max-width:80ch}
-.alist .card{padding:18px 22px;text-decoration:none;display:block}
+.alist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;padding:8px 0 40px}
+.artpic{margin:18px 0 8px;border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.alist .acard2{padding:0;overflow:hidden;display:flex;flex-direction:column}.alist .acard2 .ab{padding:16px 20px 20px}
+.alist a.acard2:hover{transform:translateY(-3px);border-color:var(--brand)}
+.alist .card{text-decoration:none;display:block}
 .alist h2{font-size:19px;margin:0 0 6px;color:var(--text)}
 .alist p{margin:0;color:var(--text2);font-size:14.5px;line-height:1.55}
 </style>
@@ -57,6 +60,17 @@
   <nav class="crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a> / <a href="../index.html">Articles</a></nav>
   <h1>NVIDIA GB300 NVL72 liquid cooling: coolant flow, supply temperature and minimum flow</h1>
   <p class="meta">By <a href="../../about/index.html#founder">Eng. Mutaz Othman</a> · 22 November 2026</p>
+  <figure class="thumb artpic" aria-hidden="true"><svg viewBox="0 0 400 210">
+            <rect class="tbg" width="400" height="210"/>
+            <rect class="win" x="18" y="16" width="364" height="178" rx="10"/>
+            <circle class="dot" cx="34" cy="31" r="3.5"/><circle class="dot" cx="46" cy="31" r="3.5"/><circle class="dot" cx="58" cy="31" r="3.5"/>
+            <path class="sep" d="M18 44H382"/>
+            <text class="tt" x="34" y="64">Load jump: coolant return</text>
+            <g class="tk"><rect x="34" y="78" width="46" height="96" rx="4"/><rect class="lvl" x="40" y="86" width="34" height="10" rx="2"/><rect class="lvl" x="40" y="102" width="34" height="10" rx="2"/><rect class="lvl" x="40" y="118" width="34" height="10" rx="2"/><rect class="lvl" x="40" y="134" width="34" height="10" rx="2"/><rect class="lvl" x="40" y="150" width="34" height="10" rx="2"/></g>
+            <path class="cap" d="M100 96H366" style="stroke:var(--bad)"/>
+            <path class="orig" d="M100 150C130 150 140 80 170 84S210 130 260 138 340 140 366 140"/>
+            <path class="cut" d="M100 156C130 156 145 98 175 100S215 134 260 140 340 142 366 142"/>
+          </svg></figure>
 <p>The NVIDIA GB300 NVL72 is a rack-scale system of 72 GPUs cooled directly by liquid. Designing the facility water and the CDU loop starts from what one rack needs.</p>
 <h2>Key figures per rack</h2>
 <div class="tw"><table><thead><tr><th>Item</th><th>Value</th></tr></thead><tbody><tr><td>Thermal design power</td><td>135 kW, up to about 155 kW peak</td></tr><tr><td>Heat to liquid</td><td>about 90%; the rest to air</td></tr><tr><td>Coolant supply temperature</td><td>25–45 °C (ASHRAE W45 class)</td></tr><tr><td>Coolant flow</td><td>about 59 L/min at 25 °C supply up to 177 L/min at 45 °C supply</td></tr><tr><td>Coolant return</td><td>held at about 55 °C</td></tr></tbody></table></div>

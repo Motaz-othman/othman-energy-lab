@@ -42,8 +42,11 @@
 .art .cta{margin:28px 0 8px}
 .art a:not(.btn),.alist a{color:var(--brand-ink)}
 .art a:not(.btn):hover{text-decoration-thickness:2px}
-.alist{display:grid;gap:14px;padding:8px 0 40px;max-width:80ch}
-.alist .card{padding:18px 22px;text-decoration:none;display:block}
+.alist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;padding:8px 0 40px}
+.artpic{margin:18px 0 8px;border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.alist .acard2{padding:0;overflow:hidden;display:flex;flex-direction:column}.alist .acard2 .ab{padding:16px 20px 20px}
+.alist a.acard2:hover{transform:translateY(-3px);border-color:var(--brand)}
+.alist .card{text-decoration:none;display:block}
 .alist h2{font-size:19px;margin:0 0 6px;color:var(--text)}
 .alist p{margin:0;color:var(--text2);font-size:14.5px;line-height:1.55}
 </style>
@@ -57,6 +60,17 @@
   <nav class="crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a> / <a href="../index.html">Articles</a></nav>
   <h1>How to size a chilled-water ride-through tank for a data center</h1>
   <p class="meta">By <a href="../../about/index.html#founder">Eng. Mutaz Othman</a> · 22 November 2026</p>
+  <figure class="thumb artpic" aria-hidden="true"><svg viewBox="0 0 400 210">
+            <rect class="tbg" width="400" height="210"/>
+            <rect class="win" x="18" y="16" width="364" height="178" rx="10"/>
+            <circle class="dot" cx="34" cy="31" r="3.5"/><circle class="dot" cx="46" cy="31" r="3.5"/><circle class="dot" cx="58" cy="31" r="3.5"/>
+            <path class="sep" d="M18 44H382"/>
+            <text class="tt" x="34" y="64">Power cut: cooling keeps running</text>
+            <path class="cap" d="M40 120H360"/>
+            <path class="orig" d="M40 100H150V170H230V100H360"/>
+            <path class="cut" d="M40 100H360"/>
+            <g class="tk"><rect x="180" y="76" width="40" height="80" rx="6"/><rect class="lvl" x="180" y="116" width="40" height="40" rx="6"/></g>
+          </svg></figure>
 <p>When the grid fails, the generators start within seconds, but the chillers need minutes to restart and reach full capacity. A chilled-water ride-through tank carries the cooling load through that gap. This article shows how to size it; the free <a href="../../data-centers/ride-through-tank/index.html">Ride-Through Tank</a> tool does the calculation for any load.</p>
 <h2>The equation</h2>
 <p>The tank stores cooling as the temperature difference between the chilled-water supply and return:</p>

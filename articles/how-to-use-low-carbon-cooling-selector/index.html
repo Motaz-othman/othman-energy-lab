@@ -42,8 +42,11 @@
 .art .cta{margin:28px 0 8px}
 .art a:not(.btn),.alist a{color:var(--brand-ink)}
 .art a:not(.btn):hover{text-decoration-thickness:2px}
-.alist{display:grid;gap:14px;padding:8px 0 40px;max-width:80ch}
-.alist .card{padding:18px 22px;text-decoration:none;display:block}
+.alist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;padding:8px 0 40px}
+.artpic{margin:18px 0 8px;border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.alist .acard2{padding:0;overflow:hidden;display:flex;flex-direction:column}.alist .acard2 .ab{padding:16px 20px 20px}
+.alist a.acard2:hover{transform:translateY(-3px);border-color:var(--brand)}
+.alist .card{text-decoration:none;display:block}
 .alist h2{font-size:19px;margin:0 0 6px;color:var(--text)}
 .alist p{margin:0;color:var(--text2);font-size:14.5px;line-height:1.55}
 </style>
@@ -57,6 +60,20 @@
   <nav class="crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a> / <a href="../index.html">Articles</a></nav>
   <h1>How to use the Low-Carbon Cooling Selector</h1>
   <p class="meta">By <a href="../../about/index.html#founder">Eng. Mutaz Othman</a> · 24 November 2026</p>
+  <figure class="thumb artpic" aria-hidden="true"><svg viewBox="0 0 400 210">
+            <rect class="tbg" width="400" height="210"/>
+            <rect class="win" x="18" y="16" width="364" height="178" rx="10"/>
+            <circle class="dot" cx="34" cy="31" r="3.5"/><circle class="dot" cx="46" cy="31" r="3.5"/><circle class="dot" cx="58" cy="31" r="3.5"/>
+            <path class="sep" d="M18 44H382"/>
+            <text class="tt" x="34" y="64">Annual CO₂ by source</text>
+            <g class="rk">
+              <rect class="lab" x="34" y="80" width="44" height="10" rx="5"/><rect class="pt" x="90" y="78" width="250" height="14" rx="3"/><rect class="fc" x="340" y="78" width="10" height="14"/><rect class="ch" x="350" y="78" width="8" height="14" rx="2"/>
+              <rect class="lab" x="34" y="106" width="44" height="10" rx="5"/><rect class="pt" x="90" y="104" width="196" height="14" rx="3"/><rect class="ch" x="286" y="104" width="8" height="14" rx="2"/>
+              <rect class="lab" x="34" y="132" width="44" height="10" rx="5"/><rect class="pt" x="90" y="130" width="122" height="14" rx="3"/><rect class="fc" x="212" y="130" width="8" height="14"/><rect class="ch" x="220" y="130" width="7" height="14" rx="2"/>
+              <rect class="lab" x="34" y="158" width="44" height="10" rx="5"/><rect class="pt" x="90" y="156" width="88" height="14" rx="3"/><rect class="fc" x="178" y="156" width="12" height="14"/><rect class="ch" x="190" y="156" width="7" height="14" rx="2"/>
+            </g>
+            <text class="tt" x="262" y="168" style="fill:var(--brand-ink);font-size:15px;font-weight:800">−56% CO₂</text>
+          </svg></figure>
 <p>The <a href="../../data-centers/low-carbon-cooling/index.html">Low-Carbon Cooling Selector</a> finds the data center cooling system with the lowest carbon and gives its yearly emissions in tonnes of CO₂ equivalent. It adds three sources: the electricity the cooling plant uses, the energy needed to supply its water, and the refrigerant that leaks from the chillers.</p>
 <h2>1. Choose the location</h2>
 <p>Pick the city. Its grid emission factor and water supply energy fill in automatically: US cities use the EPA eGRID subregion rates, Sydney the Australian National Greenhouse Accounts factors, other countries Our World in Data / Ember. Type your own values to replace them, for example a green-power contract.</p>

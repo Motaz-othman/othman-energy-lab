@@ -42,8 +42,11 @@
 .art .cta{margin:28px 0 8px}
 .art a:not(.btn),.alist a{color:var(--brand-ink)}
 .art a:not(.btn):hover{text-decoration-thickness:2px}
-.alist{display:grid;gap:14px;padding:8px 0 40px;max-width:80ch}
-.alist .card{padding:18px 22px;text-decoration:none;display:block}
+.alist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;padding:8px 0 40px}
+.artpic{margin:18px 0 8px;border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.alist .acard2{padding:0;overflow:hidden;display:flex;flex-direction:column}.alist .acard2 .ab{padding:16px 20px 20px}
+.alist a.acard2:hover{transform:translateY(-3px);border-color:var(--brand)}
+.alist .card{text-decoration:none;display:block}
 .alist h2{font-size:19px;margin:0 0 6px;color:var(--text)}
 .alist p{margin:0;color:var(--text2);font-size:14.5px;line-height:1.55}
 </style>
@@ -59,13 +62,85 @@
   <p>Practical, code-based guides on data center cooling, each linked to a free tool. By <a href="../about/index.html#founder">Eng. Mutaz Othman</a>.</p>
 </div>
 <div class="alist">
-  <a class="card" href="how-to-use-cooling-plant-selector/index.html"><h2>How to use the Cooling Plant Selector</h2><p>Step-by-step guide to the free Cooling Plant Selector: choose the city, enter the IT load and loop temperatures, read the ranked cooling plants, the design cases, energy, water, carbon and cost, and export a PDF or Excel report.</p></a>
-  <a class="card" href="how-to-use-low-carbon-cooling-selector/index.html"><h2>How to use the Low-Carbon Cooling Selector</h2><p>Step-by-step guide to the free Low-Carbon Cooling Selector: pick the city, compare five data center cooling plants or enter your own numbers, and read the yearly CO2 from electricity, water supply and refrigerant leakage.</p></a>
-  <a class="card" href="how-to-use-peak-shaving-tank/index.html"><h2>How to use the Peak Shaving Tank</h2><p>Step-by-step guide to the free Peak Shaving Tank: size a chilled-water tank that covers the rare hottest hours, so the cooling plant and its electrical supply can be rated for a lower design temperature.</p></a>
-  <a class="card" href="ride-through-tank-sizing/index.html"><h2>How to size a chilled-water ride-through tank for a data center</h2><p>How to size a chilled-water tank that keeps a data center cooled while the generators start and the chillers restart: the equation, a worked 20 MW example, recommended ride-through times and what must be on UPS.</p></a>
-  <a class="card" href="ashrae-90-4-mlc/index.html"><h2>ASHRAE 90.4 MLC explained, with the limits by climate zone</h2><p>What the ASHRAE 90.4 mechanical load component (MLC) is, how to calculate it, the maximum annualized MLC for every climate zone from ASHRAE 90.4-2025 Table 6.5, and typical values for real cooling plants.</p></a>
-  <a class="card" href="cooling-towers-vs-adiabatic-vs-dry-coolers/index.html"><h2>Cooling towers vs adiabatic coolers vs dry coolers for data centers in hot climates</h2><p>How cooling towers, adiabatic coolers, dry coolers and hybrid plants compare for data centers in hot climates: approaches, free cooling, electrical peak, energy, water and carbon, with a 100 MW Dubai example.</p></a>
-  <a class="card" href="gb300-nvl72-liquid-cooling/index.html"><h2>NVIDIA GB300 NVL72 liquid cooling: coolant flow, supply temperature and minimum flow</h2><p>What an NVIDIA GB300 NVL72 rack needs from the liquid cooling system: about 135 kW, 90% to liquid, 25–45 °C supply, 59–177 L/min of coolant, the safe minimum flow and why the CDU response matters.</p></a>
+  <a class="card acard2" href="how-to-use-cooling-plant-selector/index.html"><div class="thumb" aria-hidden="true"><svg viewBox="0 0 400 210">
+            <rect class="tbg" width="400" height="210"/>
+            <rect class="win" x="18" y="16" width="364" height="178" rx="10"/>
+            <circle class="dot" cx="34" cy="31" r="3.5"/><circle class="dot" cx="46" cy="31" r="3.5"/><circle class="dot" cx="58" cy="31" r="3.5"/>
+            <path class="sep" d="M18 44H382M206 44V194"/>
+            <text class="tt" x="34" y="64">Monthly operation</text>
+            <text class="tt" x="222" y="64">Ranking</text>
+            <g class="m">
+              <rect class="fc" x="34" y="78" width="9" height="96"/><rect class="pt" x="34" y="174" width="9" height="0"/>
+              <rect class="fc" x="47" y="96" width="9" height="78"/><rect class="pt" x="47" y="78" width="9" height="18"/>
+              <rect class="fc" x="60" y="110" width="9" height="64"/><rect class="pt" x="60" y="78" width="9" height="32"/>
+              <rect class="fc" x="73" y="134" width="9" height="40"/><rect class="pt" x="73" y="96" width="9" height="38"/><rect class="ch" x="73" y="78" width="9" height="18"/>
+              <rect class="fc" x="86" y="162" width="9" height="12"/><rect class="pt" x="86" y="112" width="9" height="50"/><rect class="ch" x="86" y="78" width="9" height="34"/>
+              <rect class="pt" x="99" y="128" width="9" height="46"/><rect class="ch" x="99" y="78" width="9" height="50"/>
+              <rect class="pt" x="112" y="132" width="9" height="42"/><rect class="ch" x="112" y="78" width="9" height="54"/>
+              <rect class="pt" x="125" y="132" width="9" height="42"/><rect class="ch" x="125" y="78" width="9" height="54"/>
+              <rect class="pt" x="138" y="124" width="9" height="50"/><rect class="ch" x="138" y="78" width="9" height="46"/>
+              <rect class="fc" x="151" y="150" width="9" height="24"/><rect class="pt" x="151" y="104" width="9" height="46"/><rect class="ch" x="151" y="78" width="9" height="26"/>
+              <rect class="fc" x="164" y="118" width="9" height="56"/><rect class="pt" x="164" y="82" width="9" height="36"/>
+              <rect class="fc" x="177" y="88" width="9" height="86"/><rect class="pt" x="177" y="78" width="9" height="10"/>
+            </g>
+            <g class="rk">
+              <rect class="lab" x="222" y="80" width="40" height="9" rx="4.5"/><rect class="best" x="270" y="78" width="94" height="13" rx="4"/><circle class="ok" cx="356" cy="84.5" r="4"/>
+              <rect class="lab" x="222" y="106" width="40" height="9" rx="4.5"/><rect class="bar" x="270" y="104" width="74" height="13" rx="4"/>
+              <rect class="lab" x="222" y="132" width="40" height="9" rx="4.5"/><rect class="bar" x="270" y="130" width="54" height="13" rx="4"/>
+              <rect class="lab" x="222" y="158" width="40" height="9" rx="4.5"/><rect class="bar" x="270" y="156" width="42" height="13" rx="4"/>
+            </g>
+          </svg></div><div class="ab"><h2>How to use the Cooling Plant Selector</h2><p>Step-by-step guide to the free Cooling Plant Selector: choose the city, enter the IT load and loop temperatures, read the ranked cooling plants, the design cases, energy, water, carbon and cost, and export a PDF or Excel report.</p></div></a>
+  <a class="card acard2" href="how-to-use-low-carbon-cooling-selector/index.html"><div class="thumb" aria-hidden="true"><svg viewBox="0 0 400 210">
+            <rect class="tbg" width="400" height="210"/>
+            <rect class="win" x="18" y="16" width="364" height="178" rx="10"/>
+            <circle class="dot" cx="34" cy="31" r="3.5"/><circle class="dot" cx="46" cy="31" r="3.5"/><circle class="dot" cx="58" cy="31" r="3.5"/>
+            <path class="sep" d="M18 44H382"/>
+            <text class="tt" x="34" y="64">Annual CO₂ by source</text>
+            <g class="rk">
+              <rect class="lab" x="34" y="80" width="44" height="10" rx="5"/><rect class="pt" x="90" y="78" width="250" height="14" rx="3"/><rect class="fc" x="340" y="78" width="10" height="14"/><rect class="ch" x="350" y="78" width="8" height="14" rx="2"/>
+              <rect class="lab" x="34" y="106" width="44" height="10" rx="5"/><rect class="pt" x="90" y="104" width="196" height="14" rx="3"/><rect class="ch" x="286" y="104" width="8" height="14" rx="2"/>
+              <rect class="lab" x="34" y="132" width="44" height="10" rx="5"/><rect class="pt" x="90" y="130" width="122" height="14" rx="3"/><rect class="fc" x="212" y="130" width="8" height="14"/><rect class="ch" x="220" y="130" width="7" height="14" rx="2"/>
+              <rect class="lab" x="34" y="158" width="44" height="10" rx="5"/><rect class="pt" x="90" y="156" width="88" height="14" rx="3"/><rect class="fc" x="178" y="156" width="12" height="14"/><rect class="ch" x="190" y="156" width="7" height="14" rx="2"/>
+            </g>
+            <text class="tt" x="262" y="168" style="fill:var(--brand-ink);font-size:15px;font-weight:800">−56% CO₂</text>
+          </svg></div><div class="ab"><h2>How to use the Low-Carbon Cooling Selector</h2><p>Step-by-step guide to the free Low-Carbon Cooling Selector: pick the city, compare five data center cooling plants or enter your own numbers, and read the yearly CO2 from electricity, water supply and refrigerant leakage.</p></div></a>
+  <a class="card acard2" href="how-to-use-peak-shaving-tank/index.html"><div class="thumb" aria-hidden="true"><svg viewBox="0 0 400 210">
+            <rect class="tbg" width="400" height="210"/>
+            <rect class="win" x="18" y="16" width="364" height="178" rx="10"/>
+            <circle class="dot" cx="34" cy="31" r="3.5"/><circle class="dot" cx="46" cy="31" r="3.5"/><circle class="dot" cx="58" cy="31" r="3.5"/>
+            <path class="sep" d="M18 44H382"/>
+            <text class="tt" x="34" y="64">Hottest day: plant power</text>
+            <path class="shave" d="M120 106C150 62 210 58 240 106Z"/>
+            <path class="rech" d="M240 106C252 106 262 150 278 158C268 158 258 150 246 148Z"/>
+            <path class="orig" d="M34 172C70 150 100 120 120 106C150 62 210 58 240 106C246 120 252 148 262 152C300 160 340 166 366 170"/>
+            <path class="cut" d="M34 172C70 150 100 120 120 106H240C252 106 262 150 278 158C310 162 340 166 366 170"/>
+            <path class="cap" d="M34 106H366"/>
+            <g class="tk"><rect x="318" y="58" width="34" height="40" rx="5"/><rect class="lvl" x="318" y="76" width="34" height="22" rx="5"/></g>
+          </svg></div><div class="ab"><h2>How to use the Peak Shaving Tank</h2><p>Step-by-step guide to the free Peak Shaving Tank: size a chilled-water tank that covers the rare hottest hours, so the cooling plant and its electrical supply can be rated for a lower design temperature.</p></div></a>
+  <a class="card acard2" href="ride-through-tank-sizing/index.html"><div class="thumb" aria-hidden="true"><svg viewBox="0 0 400 210">
+            <rect class="tbg" width="400" height="210"/>
+            <rect class="win" x="18" y="16" width="364" height="178" rx="10"/>
+            <circle class="dot" cx="34" cy="31" r="3.5"/><circle class="dot" cx="46" cy="31" r="3.5"/><circle class="dot" cx="58" cy="31" r="3.5"/>
+            <path class="sep" d="M18 44H382"/>
+            <text class="tt" x="34" y="64">Power cut: cooling keeps running</text>
+            <path class="cap" d="M40 120H360"/>
+            <path class="orig" d="M40 100H150V170H230V100H360"/>
+            <path class="cut" d="M40 100H360"/>
+            <g class="tk"><rect x="180" y="76" width="40" height="80" rx="6"/><rect class="lvl" x="180" y="116" width="40" height="40" rx="6"/></g>
+          </svg></div><div class="ab"><h2>How to size a chilled-water ride-through tank for a data center</h2><p>How to size a chilled-water tank that keeps a data center cooled while the generators start and the chillers restart: the equation, a worked 20 MW example, recommended ride-through times and what must be on UPS.</p></div></a>
+  <a class="card acard2" href="ashrae-90-4-mlc/index.html"><div class="thumb" aria-hidden="true"><svg viewBox="0 0 400 210"><rect class="tbg" width="400" height="210"/><rect class="win" x="18" y="16" width="364" height="178" rx="10"/><circle class="dot" cx="34" cy="31" r="3.5"/><circle class="dot" cx="46" cy="31" r="3.5"/><circle class="dot" cx="58" cy="31" r="3.5"/><path class="sep" d="M18 44H382"/><text class="tt" x="34" y="64">Annual MLC against the limit</text><rect class="lab" x="34" y="92" width="330" height="16" rx="8"/><rect class="pt" x="34" y="92" width="150" height="16" rx="8"/><path d="M262 80V122" style="stroke:var(--brand);stroke-width:2.5;stroke-dasharray:5 4"/><text class="tt" x="268" y="84" style="fill:var(--brand-ink)">90.4 max</text><path d="M184 116l-7 12h14z" style="fill:var(--text)"/><text class="tt" x="166" y="146">design</text><rect class="lab" x="34" y="160" width="60" height="10" rx="5"/><rect class="lab" x="104" y="160" width="40" height="10" rx="5"/></svg></div><div class="ab"><h2>ASHRAE 90.4 MLC explained, with the limits by climate zone</h2><p>What the ASHRAE 90.4 mechanical load component (MLC) is, how to calculate it, the maximum annualized MLC for every climate zone from ASHRAE 90.4-2025 Table 6.5, and typical values for real cooling plants.</p></div></a>
+  <a class="card acard2" href="cooling-towers-vs-adiabatic-vs-dry-coolers/index.html"><div class="thumb" aria-hidden="true"><svg viewBox="0 0 400 210"><rect class="tbg" width="400" height="210"/><rect class="win" x="18" y="16" width="364" height="178" rx="10"/><circle class="dot" cx="34" cy="31" r="3.5"/><circle class="dot" cx="46" cy="31" r="3.5"/><circle class="dot" cx="58" cy="31" r="3.5"/><path class="sep" d="M18 44H382"/><text class="tt" x="34" y="64">Heat rejection</text><path d="M50 172L62 92H118L130 172Z" style="fill:var(--bg);stroke:var(--text2);stroke-width:1.5"/><ellipse cx="90" cy="92" rx="24" ry="5" style="fill:var(--surface);stroke:var(--text2);stroke-width:1.5"/><path class="drift" d="M80 82c-4-6 4-9 0-15M100 82c-4-6 4-9 0-15" style="fill:none;stroke:var(--s1);stroke-width:2;stroke-linecap:round;opacity:.7"/><rect x="160" y="100" width="80" height="72" rx="6" style="fill:var(--surface);stroke:var(--text2);stroke-width:1.5"/><path d="M168 112v52M178 112v52M222 112v52M232 112v52" style="stroke:var(--s1);stroke-width:3;opacity:.55"/><circle cx="200" cy="124" r="13" style="fill:var(--bg);stroke:var(--text2);stroke-width:1.5"/><path d="M200 112v24M188 124h24" style="stroke:var(--text2);stroke-width:2"/><rect x="270" y="108" width="92" height="50" rx="6" style="fill:var(--surface);stroke:var(--text2);stroke-width:1.5"/><circle cx="294" cy="133" r="15" style="fill:var(--bg);stroke:var(--text2);stroke-width:1.5"/><circle cx="338" cy="133" r="15" style="fill:var(--bg);stroke:var(--text2);stroke-width:1.5"/><path d="M294 120v26M281 133h26M338 120v26M325 133h26" style="stroke:var(--text2);stroke-width:2"/><path d="M280 158v14M352 158v14" style="stroke:var(--text2);stroke-width:2.5"/></svg></div><div class="ab"><h2>Cooling towers vs adiabatic coolers vs dry coolers for data centers in hot climates</h2><p>How cooling towers, adiabatic coolers, dry coolers and hybrid plants compare for data centers in hot climates: approaches, free cooling, electrical peak, energy, water and carbon, with a 100 MW Dubai example.</p></div></a>
+  <a class="card acard2" href="gb300-nvl72-liquid-cooling/index.html"><div class="thumb" aria-hidden="true"><svg viewBox="0 0 400 210">
+            <rect class="tbg" width="400" height="210"/>
+            <rect class="win" x="18" y="16" width="364" height="178" rx="10"/>
+            <circle class="dot" cx="34" cy="31" r="3.5"/><circle class="dot" cx="46" cy="31" r="3.5"/><circle class="dot" cx="58" cy="31" r="3.5"/>
+            <path class="sep" d="M18 44H382"/>
+            <text class="tt" x="34" y="64">Load jump: coolant return</text>
+            <g class="tk"><rect x="34" y="78" width="46" height="96" rx="4"/><rect class="lvl" x="40" y="86" width="34" height="10" rx="2"/><rect class="lvl" x="40" y="102" width="34" height="10" rx="2"/><rect class="lvl" x="40" y="118" width="34" height="10" rx="2"/><rect class="lvl" x="40" y="134" width="34" height="10" rx="2"/><rect class="lvl" x="40" y="150" width="34" height="10" rx="2"/></g>
+            <path class="cap" d="M100 96H366" style="stroke:var(--bad)"/>
+            <path class="orig" d="M100 150C130 150 140 80 170 84S210 130 260 138 340 140 366 140"/>
+            <path class="cut" d="M100 156C130 156 145 98 175 100S215 134 260 140 340 142 366 142"/>
+          </svg></div><div class="ab"><h2>NVIDIA GB300 NVL72 liquid cooling: coolant flow, supply temperature and minimum flow</h2><p>What an NVIDIA GB300 NVL72 rack needs from the liquid cooling system: about 135 kW, 90% to liquid, 25–45 °C supply, 59–177 L/min of coolant, the safe minimum flow and why the CDU response matters.</p></div></a>
 </div>
 </main>
 <footer class="sitefoot" data-root="../"></footer>
