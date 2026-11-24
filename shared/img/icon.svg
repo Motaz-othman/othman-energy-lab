@@ -1,1 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 26"><rect width="26" height="26" rx="6" fill="#0b0b0b"/><ellipse cx="12.4" cy="13.4" rx="6.6" ry="7" fill="none" stroke="#fcfcfb" stroke-width="2.6"/><path d="M19.4 3 L11.4 13.6 H15.4 L9.6 22.8 L22 10.6 H18.6 L22.6 3 Z" fill="#d9739f" stroke="#0b0b0b" stroke-width="1.3" stroke-linejoin="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<defs>
+<linearGradient id="oelM" x1="8" y1="10" x2="54" y2="58" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fbfbfb"/><stop offset=".28" stop-color="#b9bcc0"/><stop offset=".5" stop-color="#eef0f2"/><stop offset=".72" stop-color="#8d9095"/><stop offset="1" stop-color="#d9dbde"/></linearGradient>
+<linearGradient id="oelB" x1="36" y1="2" x2="52" y2="52" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset=".35" stop-color="#c3c6ca"/><stop offset=".6" stop-color="#f1f2f4"/><stop offset="1" stop-color="#7f8388"/></linearGradient>
+<radialGradient id="oelG" cx="24" cy="27" r="22" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#c9ecff"/><stop offset=".35" stop-color="#5bb8f2"/><stop offset=".72" stop-color="#c7a7c9"/><stop offset="1" stop-color="#ff9e62"/></radialGradient>
+<filter id="oelS" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="1.6" stdDeviation="1.4" flood-color="#000" flood-opacity=".35"/></filter>
+</defs>
+<g filter="url(#oelS)">
+<circle cx="29" cy="35" r="16.6" fill="url(#oelG)"/>
+<ellipse cx="23.5" cy="28" rx="8.5" ry="4.6" fill="#fff" opacity=".38" transform="rotate(-25 23.5 28)"/>
+<circle cx="29" cy="35" r="20.6" fill="none" stroke="url(#oelM)" stroke-width="7.4" stroke-linecap="round" stroke-dasharray="104 25.4" transform="rotate(-38 29 35)"/>
+<circle cx="29" cy="35" r="24.2" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width=".6" stroke-dasharray="122 30" transform="rotate(-38 29 35)"/>
+<circle cx="29" cy="35" r="16.9" fill="none" stroke="#5f6368" stroke-opacity=".45" stroke-width=".8" stroke-dasharray="85 21" transform="rotate(-38 29 35)"/>
+<path d="M46 3 C41 12 35 22 31 31 H38.8 C35.5 38 31.5 45 28.5 52 C37 43 45.5 32.5 53 22 H45.6 C47.5 15.5 49.5 9 51.5 3 Z" fill="url(#oelB)" stroke="#8a8d92" stroke-width=".6" stroke-linejoin="round"/>
+<path d="M46.2 5 L33.5 29.5" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".8"/>
+</g>
+</svg>
