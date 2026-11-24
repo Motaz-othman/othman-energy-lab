@@ -89,7 +89,7 @@ function buildReport(){
   const date=now.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
   const loopTxt2=i=>`${i?'Air':'Liquid'} loop: ${fmt(P.loops[i].Qd/1000,1)} MW, supply ${P.loops[i].Ts} °C / return ${P.loops[i].Tr} °C`;
   const desSrc=isNaN(P.dbIn)||isNaN(P.wbIn)?(ashrae()?'ASHRAE 2025 extreme annual values':'hottest hours in the weather data'):'entered design values';
-  const waterTxt=$('water').selectedOptions[0].textContent;
+  const waterTxt='Compared for three cases: TSE available, water limited, no water';
   // ---- page 1: basis and recommendation
   let h=`<header class="top"><div class="logo">${RPT_LOGO}<span>Othman Energy <b>Lab</b></span></div><div class="meta">Cooling plant selection report<br>${date}</div></header>
   <h1>Cooling plant selection: ${esc(WX.name)}</h1>
@@ -107,7 +107,7 @@ function buildReport(){
   </div>`;
   if(rec){
     const pb=payback(rec), acc=RES.acc;
-    h+=`<div class="rec"><div class="tl">Recommended system · score ${fmt(rec.score)} of 100</div><div class="nm">${rec.o.name}</div>
+    h+=`<div class="rec"><div class="tl">Recommended if TSE is available · score ${fmt(rec.score)} of 100</div><div class="nm">${rec.o.name}</div><p class="why">If water is limited: <b>${SCEN.limited?RES[SCEN.limited].o.name:'–'}</b>. If there is no water: <b>${SCEN.none?RES[SCEN.none].o.name:'none meets the constraints'}</b>.</p>
       <div class="kpis">
         <div class="kpi"><div class="v">${fmt(rec.E/1000,1)} GWh/yr</div><div class="l">Cooling electricity</div></div>
         <div class="kpi"><div class="v">${rec.pue.toFixed(3)}</div><div class="l">Annual PUE</div></div>

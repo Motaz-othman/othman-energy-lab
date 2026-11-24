@@ -133,3 +133,5 @@
 .scard .kl{padding-right:0}
 .scard .kl .best{top:auto;bottom:10px;right:10px;width:20px;height:20px;font-size:12px}
 .scard .kl .best{top:40px;bottom:auto}
+.scard .stop{flex-wrap:wrap}
+.notrec{display:inline-flex;align-items:center;font-size:12px;font-weight:600;color:var(--text2);background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:2px 10px}

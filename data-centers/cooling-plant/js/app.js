@@ -1,5 +1,5 @@
 // ---------- Cooling Plant Selector: page logic ----------
-let WX=null,RES=null,DES=null,RANK=null,P=null,LOOP=0,PICK=null;
+let SCEN={},WX=null,RES=null,DES=null,RANK=null,P=null,LOOP=0,PICK=null;
 
 const groups=[...new Set(CITIES.map(c=>c.g))];
 groups.forEach(g=>{ const og=document.createElement('optgroup'); og.label=g; CITIES.filter(c=>c.g===g).forEach(c=>{const o=document.createElement('option'); o.value=c.id; o.textContent=c.name; og.appendChild(o);}); $('city').appendChild(og); });
@@ -44,6 +44,8 @@ function run(){
   const A=ashrae();
   P=params(); P.cases=designCases(WX,A,P.dbIn,P.wbIn); P.dbA=P.cases.A.db; P.dbD=P.cases.A.db; P.wbD=P.cases.B.wb;
   DES=designCheck(P); RES=simulate(WX,P,DES); RANK=score(RES,P,DES);
+  // the pick for each water case: TSE available, water limited, no water
+  SCEN={}; ['plenty','limited','none'].forEach(w=>{ const c=Object.fromEntries(Object.entries(RES).map(([k,v])=>[k,{...v}])); SCEN[w]=score(c,{...P,water:w},DES)[0]||null; });
   renderReco(); renderOverview(); renderDes(); renderSystem(); renderEff(); renderCarbon(); renderCons(); renderRun(); renderCap(); renderClimate();
 }
 const order=()=>[...RANK,...OPTIONS.map(o=>o.id).filter(id=>!RANK.includes(id))];
@@ -79,13 +81,16 @@ function renderReco(){
   const MK=['el','pk','w','co'];
   const key=[['Electricity',r=>r.E,r=>`${fmt(r.E/1000,1)}`,'GWh/yr'],['Peak',r=>r.peak,r=>`${fmt(r.peak/1000,1)}`,'MW'],['Water',r=>r.W,r=>r.W<1?'0':fmt(r.W/1000,0),'thousand m³/yr'],['CO₂',r=>r.co2,r=>fmt(r.co2/1000,1),'kt/yr']];
   const bestV=key.map(([,v])=>RANK.length?Math.min(...RANK.map(i=>v(RES[i]))):null);
-  const cards=order().map(id=>{ const r=RES[id], k=RANK.indexOf(id), d=DES[id];
-    const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="recb"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>Recommended</span>':`<span class="rank">${k+1}</span>`;
+  const WL={plenty:'if TSE is available',limited:'if water is limited',none:'if there is no water'};
+  const recs=id=>Object.keys(WL).filter(w=>SCEN[w]===id);
+  const cOrder=[...new Set([...Object.keys(WL).map(w=>SCEN[w]).filter(Boolean),...order()])];
+  const cards=cOrder.map(id=>{ const r=RES[id], k=RANK.indexOf(id), d=DES[id], rw=recs(id);
+    const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:rw.length?rw.map(w=>`<span class="recb"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>Recommended ${WL[w]}</span>`).join(''):'<span class="notrec">Not recommended</span>';
     const notes=[id==='acc'?'No free cooling':`Free cooling ${loopTxt(r.free)} h/yr (liquid / air)`];
     if(d.warns.length) notes.push(`<b style="color:var(--warn)">Condenser water above ${P.wcMax} °C at design: needs a chiller rated above ${P.wcMax} °C</b>`); else if(r.hotCW>0) notes.push(`Condenser water above ${P.wcMax} °C for ${fmt(r.hotCW)} h/yr`);
     if(mlcTxt(r)) notes.push(r.mlc<=mlcLim()?mlcTxt(r):`<b style="color:var(--bad)">${mlcTxt(r)}</b>`);
     const more=[['Annual PUE',r.pue.toFixed(3)],['Water',wTxt(r)],[`Water peak (${atPk})`,`${fmt(r.Wpeak,1)} m³/h`],['Facility peak (grid)',`${fmt(r.facPeak/1000,1)} MW`],['Running cost',runTxt(r)],['Initial cost',costTxt(r)],['Score',r.excluded?'–':`${fmt(r.score)} / 100`]];
-    return `<div class="scard${k===0?' rec':''}${r.excluded?' off':''}">
+    return `<div class="scard${rw.length?' rec':''}${r.excluded?' off':''}">
       <div class="stop">${status}</div>
       <div class="sname" title="${esc(r.o.name)}">${r.o.short}</div>
       <div class="kn">${key.map(([l,v,t,u],j)=>{ const hi=!r.excluded&&v(r)<=bestV[j]*(1+1e-6)+1e-9; return `<div class="m-${MK[j]}${hi?' hi':''}"><span class="kl"><i>${ic(MK[j])}</i>${l}${hi?'<b class="best" title="Best value">✓</b>':''}</span><span class="kv">${t(r)}</span><span class="ku">${u}</span></div>`; }).join('')}</div>
