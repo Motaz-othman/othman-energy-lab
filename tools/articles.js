@@ -206,7 +206,8 @@ ${GA}
 .art a:not(.btn),.alist a{color:var(--brand-ink)}
 .art a:not(.btn):hover{text-decoration-thickness:2px}
 .alist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;padding:8px 0 40px}
-.artpic{margin:18px 0 8px;border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.artpic{margin:18px 0 10px}.artpic img{display:block;width:100%;max-height:260px;object-fit:cover;border-radius:14px;filter:saturate(.85) brightness(1.03)}.artpic figcaption{font-size:11.5px;color:var(--muted);margin-top:6px}.artpic figcaption a{color:inherit}
+.photo{height:140px;overflow:hidden;background:var(--bg)}.photo img{display:block;width:100%;height:100%;object-fit:cover;filter:saturate(.85) brightness(1.04);transition:transform .4s ease}a:hover>.photo img{transform:scale(1.04)}
 .alist .acard2{padding:0;overflow:hidden;display:flex;flex-direction:column}.alist .acard2 .ab{padding:16px 20px 20px}
 .alist a.acard2:hover{transform:translateY(-3px);border-color:var(--brand)}
 .alist .card{text-decoration:none;display:block}
@@ -217,29 +218,10 @@ ${GA}
 <script type="application/ld+json">${JSON.stringify({'@context':'https://schema.org','@graph':ld})}</script>
 </head>`;
 
-// ---------- pictures: one per article, shown on the cards and at the top of the article ----------
-const HOME=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');
-const toolArt=href=>{ const i=HOME.indexOf('href="'+href+'index.html"'); if(i<0) return ''; const a=HOME.indexOf('<svg',i), b=HOME.indexOf('</svg>',a)+6; return HOME.slice(a,b); };
-const win=(title,inner)=>`<svg viewBox="0 0 400 210"><rect class="tbg" width="400" height="210"/><rect class="win" x="18" y="16" width="364" height="178" rx="10"/><circle class="dot" cx="34" cy="31" r="3.5"/><circle class="dot" cx="46" cy="31" r="3.5"/><circle class="dot" cx="58" cy="31" r="3.5"/><path class="sep" d="M18 44H382"/><text class="tt" x="34" y="64">${title}</text>${inner}</svg>`;
-const ART={
- 'ashrae-90-4-mlc':()=>win('Annual MLC against the limit',
-   '<rect class="lab" x="34" y="92" width="330" height="16" rx="8"/><rect class="pt" x="34" y="92" width="150" height="16" rx="8"/>'
-  +'<path d="M262 80V122" style="stroke:var(--brand);stroke-width:2.5;stroke-dasharray:5 4"/><text class="tt" x="268" y="84" style="fill:var(--brand-ink)">90.4 max</text>'
-  +'<path d="M184 116l-7 12h14z" style="fill:var(--text)"/><text class="tt" x="166" y="146">design</text>'
-  +'<rect class="lab" x="34" y="160" width="60" height="10" rx="5"/><rect class="lab" x="104" y="160" width="40" height="10" rx="5"/>'),
- 'cooling-towers-vs-adiabatic-vs-dry-coolers':()=>win('Heat rejection',
-   // cooling tower
-   '<path d="M50 172L62 92H118L130 172Z" style="fill:var(--bg);stroke:var(--text2);stroke-width:1.5"/><ellipse cx="90" cy="92" rx="24" ry="5" style="fill:var(--surface);stroke:var(--text2);stroke-width:1.5"/>'
-  +'<path class="drift" d="M80 82c-4-6 4-9 0-15M100 82c-4-6 4-9 0-15" style="fill:none;stroke:var(--s1);stroke-width:2;stroke-linecap:round;opacity:.7"/>'
-   // adiabatic
-  +'<rect x="160" y="100" width="80" height="72" rx="6" style="fill:var(--surface);stroke:var(--text2);stroke-width:1.5"/><path d="M168 112v52M178 112v52M222 112v52M232 112v52" style="stroke:var(--s1);stroke-width:3;opacity:.55"/>'
-  +'<circle cx="200" cy="124" r="13" style="fill:var(--bg);stroke:var(--text2);stroke-width:1.5"/><path d="M200 112v24M188 124h24" style="stroke:var(--text2);stroke-width:2"/>'
-   // dry cooler
-  +'<rect x="270" y="108" width="92" height="50" rx="6" style="fill:var(--surface);stroke:var(--text2);stroke-width:1.5"/><circle cx="294" cy="133" r="15" style="fill:var(--bg);stroke:var(--text2);stroke-width:1.5"/><circle cx="338" cy="133" r="15" style="fill:var(--bg);stroke:var(--text2);stroke-width:1.5"/>'
-  +'<path d="M294 120v26M281 133h26M338 120v26M325 133h26" style="stroke:var(--text2);stroke-width:2"/><path d="M280 158v14M352 158v14" style="stroke:var(--text2);stroke-width:2.5"/>'),
-};
-const TOOL_ART={'how-to-use-cooling-plant-selector':'data-centers/cooling-plant/','how-to-use-low-carbon-cooling-selector':'data-centers/low-carbon-cooling/','how-to-use-peak-shaving-tank':'data-centers/peak-shaving-tank/','ride-through-tank-sizing':'data-centers/ride-through-tank/','gb300-nvl72-liquid-cooling':'data-centers/rack-cooling/'};
-const pic=a=>ART[a.slug]?ART[a.slug]():toolArt(TOOL_ART[a.slug]||'');
+// ---------- photos: one per article (Wikimedia Commons; licence and author credited on the article) ----------
+const PHOTO={"how-to-use-cooling-plant-selector":{"src":"https://commons.wikimedia.org/wiki/File:Chiller_in_a_large_commercial_building,_Brisbane.jpg","lic":"CC BY-SA 4.0","artist":"Kgbo"},"how-to-use-low-carbon-cooling-selector":{"src":"https://commons.wikimedia.org/wiki/File:Power_County_Wind_Farm_002.jpg","lic":"Public domain","artist":"ENERGY.GOV"},"how-to-use-peak-shaving-tank":{"src":"https://commons.wikimedia.org/wiki/File:Thermal_Storage_Tanks_(9806162026).jpg","lic":"CC BY 2.0","artist":"NAVFAC"},"ride-through-tank-sizing":{"src":"https://commons.wikimedia.org/wiki/File:Power_generator_of_a_hospital_data_center.jpg","lic":"CC0","artist":"Mikael Häggström"},"ashrae-90-4-mlc":{"src":"https://commons.wikimedia.org/wiki/File:Datacenter_Server_Racks_(22370909788).jpg","lic":"CC BY 2.0","artist":"Carl Lender"},"cooling-towers-vs-adiabatic-vs-dry-coolers":{"src":"https://commons.wikimedia.org/wiki/File:Induced_Draft_Cooling_Tower_for_HVAC.jpg","lic":"CC BY-SA 4.0","artist":"Aloofmanish"},"gb300-nvl72-liquid-cooling":{"src":"https://commons.wikimedia.org/wiki/File:U.S._Department_of_Energy_-_Science_-_477_021_010_(9444538061).jpg","lic":"Public domain","artist":"U.S. Department of Energy"}};
+const pic=(a,root)=>`<img src="${root}shared/img/articles/${a.slug}.jpg" alt="" loading="lazy" decoding="async">`;
+const credit=a=>{ const p=PHOTO[a.slug]; return p?`Photo: <a href="${p.src}" rel="noopener">${p.artist}</a>, ${p.lic}, via Wikimedia Commons`:''; };
 const crumbs=list=>({'@type':'BreadcrumbList',itemListElement:list.map(([name,url],i)=>({'@type':'ListItem',position:i+1,name,item:B+url}))});
 
 for(const a of ARTICLES){
@@ -257,7 +239,7 @@ for(const a of ARTICLES){
   <nav class="crumbs" aria-label="Breadcrumb"><a href="${root}index.html">Home</a> / <a href="../index.html">Articles</a></nav>
   <h1>${a.title}</h1>
   <p class="meta">By <a href="${root}about/index.html#founder">Eng. Mutaz Othman</a> · ${new Date(a.date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</p>
-  <figure class="thumb artpic" aria-hidden="true">${pic(a)}</figure>
+  <figure class="artpic">${pic(a,root)}<figcaption>${credit(a)}</figcaption></figure>
 ${a.body}
 ${faqHtml}  <p class="cta"><a class="btn primary" href="${root}${a.tool[1]}index.html">Open the ${a.tool[0]} →</a></p>
 </article>
@@ -284,7 +266,7 @@ ${faqHtml}  <p class="cta"><a class="btn primary" href="${root}${a.tool[1]}index
   <p>Practical, code-based guides on data center cooling, each linked to a free tool. By <a href="${root}about/index.html#founder">Eng. Mutaz Othman</a>.</p>
 </div>
 <div class="alist">
-${ARTICLES.map(a=>`  <a class="card acard2" href="${a.slug}/index.html"><div class="thumb" aria-hidden="true">${pic(a)}</div><div class="ab"><h2>${a.title}</h2><p>${esc(a.desc)}</p></div></a>`).join('\n')}
+${ARTICLES.map(a=>`  <a class="card acard2" href="${a.slug}/index.html"><div class="photo" aria-hidden="true">${pic(a,'../')}</div><div class="ab"><h2>${a.title}</h2><p>${esc(a.desc)}</p></div></a>`).join('\n')}
 </div>
 </main>
 <footer class="sitefoot" data-root="${root}"></footer>
@@ -297,7 +279,7 @@ ${ARTICLES.map(a=>`  <a class="card acard2" href="${a.slug}/index.html"><div cla
 // home page articles: refresh the cards between the markers
 { const f=path.join(ROOT,'index.html'); let h=fs.readFileSync(f,'utf8');
   const cards=ARTICLES.map(a=>`
-      <a class="card acard" href="articles/${a.slug}/index.html"><div class="thumb" aria-hidden="true">${pic(a)}</div><span class="atag">${a.tool[0]}</span><h3>${a.title}</h3><p>${esc(a.desc)}</p><span class="open">Read article →</span></a>`).join('')+'\n    ';
+      <a class="card acard" href="articles/${a.slug}/index.html"><div class="photo" aria-hidden="true">${pic(a,'')}</div><span class="atag">${a.tool[0]}</span><h3>${a.title}</h3><p>${esc(a.desc)}</p><span class="open">Read article →</span></a>`).join('')+'\n    ';
   h=h.replace(/<div class="agrid">[\s\S]*?(?:<\/div>)+\n    <a class="allart"/,`<div class="agrid">${cards}</div></div>\n    <a class="allart"`);
   fs.writeFileSync(f,h); }
 module.exports=ARTICLES;

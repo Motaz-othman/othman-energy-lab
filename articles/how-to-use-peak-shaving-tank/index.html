@@ -43,7 +43,8 @@
 .art a:not(.btn),.alist a{color:var(--brand-ink)}
 .art a:not(.btn):hover{text-decoration-thickness:2px}
 .alist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;padding:8px 0 40px}
-.artpic{margin:18px 0 8px;border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.artpic{margin:18px 0 10px}.artpic img{display:block;width:100%;max-height:260px;object-fit:cover;border-radius:14px;filter:saturate(.85) brightness(1.03)}.artpic figcaption{font-size:11.5px;color:var(--muted);margin-top:6px}.artpic figcaption a{color:inherit}
+.photo{height:140px;overflow:hidden;background:var(--bg)}.photo img{display:block;width:100%;height:100%;object-fit:cover;filter:saturate(.85) brightness(1.04);transition:transform .4s ease}a:hover>.photo img{transform:scale(1.04)}
 .alist .acard2{padding:0;overflow:hidden;display:flex;flex-direction:column}.alist .acard2 .ab{padding:16px 20px 20px}
 .alist a.acard2:hover{transform:translateY(-3px);border-color:var(--brand)}
 .alist .card{text-decoration:none;display:block}
@@ -60,19 +61,7 @@
   <nav class="crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a> / <a href="../index.html">Articles</a></nav>
   <h1>How to use the Peak Shaving Tank</h1>
   <p class="meta">By <a href="../../about/index.html#founder">Eng. Mutaz Othman</a> · 24 November 2026</p>
-  <figure class="thumb artpic" aria-hidden="true"><svg viewBox="0 0 400 210">
-            <rect class="tbg" width="400" height="210"/>
-            <rect class="win" x="18" y="16" width="364" height="178" rx="10"/>
-            <circle class="dot" cx="34" cy="31" r="3.5"/><circle class="dot" cx="46" cy="31" r="3.5"/><circle class="dot" cx="58" cy="31" r="3.5"/>
-            <path class="sep" d="M18 44H382"/>
-            <text class="tt" x="34" y="64">Hottest day: plant power</text>
-            <path class="shave" d="M120 106C150 62 210 58 240 106Z"/>
-            <path class="rech" d="M240 106C252 106 262 150 278 158C268 158 258 150 246 148Z"/>
-            <path class="orig" d="M34 172C70 150 100 120 120 106C150 62 210 58 240 106C246 120 252 148 262 152C300 160 340 166 366 170"/>
-            <path class="cut" d="M34 172C70 150 100 120 120 106H240C252 106 262 150 278 158C310 162 340 166 366 170"/>
-            <path class="cap" d="M34 106H366"/>
-            <g class="tk"><rect x="318" y="58" width="34" height="40" rx="5"/><rect class="lvl" x="318" y="76" width="34" height="22" rx="5"/></g>
-          </svg></figure>
+  <figure class="artpic"><img src="../../shared/img/articles/how-to-use-peak-shaving-tank.jpg" alt="" loading="lazy" decoding="async"><figcaption>Photo: <a href="https://commons.wikimedia.org/wiki/File:Thermal_Storage_Tanks_(9806162026).jpg" rel="noopener">NAVFAC</a>, CC BY 2.0, via Wikimedia Commons</figcaption></figure>
 <p>A cooling plant is rated for the extreme hottest hour at full IT load, a condition that rarely happens. The <a href="../../data-centers/peak-shaving-tank/index.html">Peak Shaving Tank</a> sizes a chilled-water tank that covers those few hours, so the chillers and their electrical supply can be rated lower. The tank recharges during the night.</p>
 <h2>1. Choose the weather</h2>
 <p>Pick one of the built-in cities, which load the measured hourly year and the ASHRAE design conditions of the main airport, or upload an EPW or CSV weather file.</p>

@@ -43,7 +43,8 @@
 .art a:not(.btn),.alist a{color:var(--brand-ink)}
 .art a:not(.btn):hover{text-decoration-thickness:2px}
 .alist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;padding:8px 0 40px}
-.artpic{margin:18px 0 8px;border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.artpic{margin:18px 0 10px}.artpic img{display:block;width:100%;max-height:260px;object-fit:cover;border-radius:14px;filter:saturate(.85) brightness(1.03)}.artpic figcaption{font-size:11.5px;color:var(--muted);margin-top:6px}.artpic figcaption a{color:inherit}
+.photo{height:140px;overflow:hidden;background:var(--bg)}.photo img{display:block;width:100%;height:100%;object-fit:cover;filter:saturate(.85) brightness(1.04);transition:transform .4s ease}a:hover>.photo img{transform:scale(1.04)}
 .alist .acard2{padding:0;overflow:hidden;display:flex;flex-direction:column}.alist .acard2 .ab{padding:16px 20px 20px}
 .alist a.acard2:hover{transform:translateY(-3px);border-color:var(--brand)}
 .alist .card{text-decoration:none;display:block}
@@ -60,34 +61,7 @@
   <nav class="crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a> / <a href="../index.html">Articles</a></nav>
   <h1>How to use the Cooling Plant Selector</h1>
   <p class="meta">By <a href="../../about/index.html#founder">Eng. Mutaz Othman</a> · 22 November 2026</p>
-  <figure class="thumb artpic" aria-hidden="true"><svg viewBox="0 0 400 210">
-            <rect class="tbg" width="400" height="210"/>
-            <rect class="win" x="18" y="16" width="364" height="178" rx="10"/>
-            <circle class="dot" cx="34" cy="31" r="3.5"/><circle class="dot" cx="46" cy="31" r="3.5"/><circle class="dot" cx="58" cy="31" r="3.5"/>
-            <path class="sep" d="M18 44H382M206 44V194"/>
-            <text class="tt" x="34" y="64">Monthly operation</text>
-            <text class="tt" x="222" y="64">Ranking</text>
-            <g class="m">
-              <rect class="fc" x="34" y="78" width="9" height="96"/><rect class="pt" x="34" y="174" width="9" height="0"/>
-              <rect class="fc" x="47" y="96" width="9" height="78"/><rect class="pt" x="47" y="78" width="9" height="18"/>
-              <rect class="fc" x="60" y="110" width="9" height="64"/><rect class="pt" x="60" y="78" width="9" height="32"/>
-              <rect class="fc" x="73" y="134" width="9" height="40"/><rect class="pt" x="73" y="96" width="9" height="38"/><rect class="ch" x="73" y="78" width="9" height="18"/>
-              <rect class="fc" x="86" y="162" width="9" height="12"/><rect class="pt" x="86" y="112" width="9" height="50"/><rect class="ch" x="86" y="78" width="9" height="34"/>
-              <rect class="pt" x="99" y="128" width="9" height="46"/><rect class="ch" x="99" y="78" width="9" height="50"/>
-              <rect class="pt" x="112" y="132" width="9" height="42"/><rect class="ch" x="112" y="78" width="9" height="54"/>
-              <rect class="pt" x="125" y="132" width="9" height="42"/><rect class="ch" x="125" y="78" width="9" height="54"/>
-              <rect class="pt" x="138" y="124" width="9" height="50"/><rect class="ch" x="138" y="78" width="9" height="46"/>
-              <rect class="fc" x="151" y="150" width="9" height="24"/><rect class="pt" x="151" y="104" width="9" height="46"/><rect class="ch" x="151" y="78" width="9" height="26"/>
-              <rect class="fc" x="164" y="118" width="9" height="56"/><rect class="pt" x="164" y="82" width="9" height="36"/>
-              <rect class="fc" x="177" y="88" width="9" height="86"/><rect class="pt" x="177" y="78" width="9" height="10"/>
-            </g>
-            <g class="rk">
-              <rect class="lab" x="222" y="80" width="40" height="9" rx="4.5"/><rect class="best" x="270" y="78" width="94" height="13" rx="4"/><circle class="ok" cx="356" cy="84.5" r="4"/>
-              <rect class="lab" x="222" y="106" width="40" height="9" rx="4.5"/><rect class="bar" x="270" y="104" width="74" height="13" rx="4"/>
-              <rect class="lab" x="222" y="132" width="40" height="9" rx="4.5"/><rect class="bar" x="270" y="130" width="54" height="13" rx="4"/>
-              <rect class="lab" x="222" y="158" width="40" height="9" rx="4.5"/><rect class="bar" x="270" y="156" width="42" height="13" rx="4"/>
-            </g>
-          </svg></figure>
+  <figure class="artpic"><img src="../../shared/img/articles/how-to-use-cooling-plant-selector.jpg" alt="" loading="lazy" decoding="async"><figcaption>Photo: <a href="https://commons.wikimedia.org/wiki/File:Chiller_in_a_large_commercial_building,_Brisbane.jpg" rel="noopener">Kgbo</a>, CC BY-SA 4.0, via Wikimedia Commons</figcaption></figure>
 <p>The <a href="../../data-centers/cooling-plant/index.html">Cooling Plant Selector</a> compares five cooling plants for a data hall with a liquid cooling loop and an air cooling loop, hour by hour over a full weather year (8,760 hours): air-cooled chillers, air-cooled chillers with free-cooling dry coolers, and water-cooled chillers with cooling towers, adiabatic coolers or hybrid dry coolers and towers, each with plate heat exchanger free cooling. It reports cooling electricity, annual PUE and ASHRAE 90.4 MLC, the electrical peak, water use, carbon emissions, and running and initial cost, and recommends one system for each water case: TSE available, water limited and no water. This guide walks through the inputs and how to read the results.</p>
 <h2>1. Choose the weather</h2>
 <p>Pick one of the 33 built-in data center cities in the <b>City</b> tab: Gulf cities (Dubai, Abu Dhabi, Riyadh, Jeddah, Dammam, Manama), major US markets (Northern Virginia, Dallas, Phoenix, Atlanta, Columbus, Silicon Valley, Hillsboro, Reno and others), Europe and Asia-Pacific. Each city loads its airport station's measured typical year (TMYx 2011–2025, 8,760 hours) and its ASHRAE 2025 design conditions. For another site, use the <b>Weather file</b> tab to upload an EPW file or a CSV with hourly dry-bulb and humidity; a sample CSV shows the format.</p>
