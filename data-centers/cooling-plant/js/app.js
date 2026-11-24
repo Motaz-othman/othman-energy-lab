@@ -50,7 +50,7 @@ function run(){
 }
 const order=()=>[...RANK,...OPTIONS.map(o=>o.id).filter(id=>!RANK.includes(id))];
 const sel=()=>PICK||RANK[0]||OPTIONS[0].id;   // system shown in the Systems tab: user's pick, else the recommendation
-const tag=(id,i)=>RES[id].excluded?`<span class="tag x">${RES[id].excluded}</span>`:(i===0?'<span class="tag ok">Recommended</span>':'');
+const tag=(id,i)=>RES[id].excluded?`<span class="tag x">${RES[id].excluded}</span>`:'';
 const loopTxt=(arr)=>P.loops.map((L,i)=>L.Q>0?fmt(arr[i]):'–').join(' / ');
 // basis label for peaks (annual figures are at the frequent load, stated in the notes)
 const atPk='design case';
@@ -110,20 +110,20 @@ function renderOverview(){
     {h:'Electricity GWh/yr',v:r=>r.E/1000,d:1,lo:true},
     {h:'Annual MLC',v:r=>r.mlc,d:3,lo:true},
     {h:'Annual PUE',v:r=>r.pue,d:3,lo:true},
-    {h:`Electrical peak MW (cooling, ${atPk})`,v:r=>r.peak/1000,d:2,lo:true},
+    {h:`Peak power MW`,v:r=>r.peak/1000,d:2,lo:true},
     {h:'Water m³/yr',v:r=>r.W,d:0,lo:true},
-    {h:`Water peak m³/h (${atPk})`,v:r=>r.Wpeak,d:1,lo:true},
-    {h:'Carbon t CO₂/yr',v:r=>r.co2,d:0,lo:true},
+    {h:`Water peak m³/h`,v:r=>r.Wpeak,d:1,lo:true},
+    {h:'CO₂ t/yr',v:r=>r.co2,d:0,lo:true},
     {h:'Running cost M$/yr',v:r=>r.run/1e6,d:2,lo:true},
     {h:'Initial cost M$',v:r=>r.capMid,lo:true,txt:r=>`${fmt(r.capLo/1e6,1)}–${fmt(r.capHi/1e6,1)}`},
-    {h:'Free-cooling h (LC / air)',v:sumF,lo:false,txt:r=>loopTxt(r.free)}];
+    {h:'Free cooling h (liquid / air)',v:sumF,lo:false,txt:r=>loopTxt(r.free)}];
   const bestV=cols.map(c=>RANK.length?(c.lo?Math.min:Math.max)(...RANK.map(i=>c.v(RES[i]))):null);
   const rows=order().map(id=>{ const r=RES[id], k=RANK.indexOf(id);
-    return `<tr class="click${k===0?' best':''}" data-sys="${id}"><td>${k>=0?k+1:'–'}</td><td>${r.o.name}${tag(id,k)}</td>
-      <td>${r.excluded?'–':`<span class="sbar" style="width:${Math.max(2,r.score*0.5)}px"></span>${fmt(r.score)}`}</td>
+    const rc={plenty:'TSE available',limited:'Water limited',none:'No water'}, rw=Object.keys(rc).filter(w=>SCEN[w]===id).map(w=>rc[w]).join(', ');
+    return `<tr class="click" data-sys="${id}"><td>${r.o.name}${tag(id,k)}</td><td class="l">${rw||'–'}</td>
       ${cols.map((c,j)=>{ const v=c.v(r), hi=!r.excluded&&Math.abs(v-bestV[j])<=Math.abs(bestV[j])*1e-6+1e-9;
         return `<td class="${hi?'hi':''}">${c.txt?c.txt(r):fmt(v,c.d)}</td>`; }).join('')}</tr>`; });
-  $('tOv').innerHTML=table(['#','Option','Score (0–100)',...cols.map(c=>c.h)],rows);
+  $('tOv').innerHTML=table(['Option','Recommended if',...cols.map(c=>c.h)],rows);
 }
 
 function renderDes(){
@@ -132,21 +132,22 @@ function renderDes(){
     return `<tr><td>${r.o.name}</td><td>${res}</td><td>${fmt(d.cases.A.P/1000,2)}</td><td>${fmt(d.cases.B.P/1000,2)}</td><td>${fmt(d.P/1000,2)} (${d.worst})</td><td>${d.ratio.toFixed(3)}</td><td>${fmt(d.W,1)}</td><td>${fmt(d.Qr/1000,1)}</td><td class="l">${d.units.map(u=>`${u.N} × ${fmt(u.unit/1000,1)} MW`).join(' / ')}</td><td class="l">${[...d.issues,...d.warns].join('; ')||'–'}</td></tr>`; });
   $('tDes').innerHTML=table(['Option','Result','Case A MW','Case B MW','Design peak MW','kW/kW','Water m³/h','Heat rejection MW','Duty chillers (liquid / air loop)','Notes'],rows);
   const auto=isNaN(P.dbIn)||isNaN(P.wbIn);
-  $('desNote').textContent=`Checked at 100% load at Case A (${fmt(P.cases.A.db,1)} °C db / ${fmt(P.cases.A.wb,1)} °C wb) and Case B (${fmt(P.cases.B.db,1)} °C db / ${fmt(P.cases.B.wb,1)} °C wb)${auto?(ashrae()?', from the ASHRAE extreme annual values with coincident values from the hourly weather':', from the hottest and most humid hours in the weather data'):''}. Design peak = the higher of the two. Heat rejection = loop load + compressor power. Air-cooled chillers above ${P.acMax} °C fail and are excluded; condenser water above ${P.wcMax} °C gives a warning.`;
+  $('desNote').textContent=`Case A ${fmt(P.cases.A.db,1)} °C db / ${fmt(P.cases.A.wb,1)} °C wb · Case B ${fmt(P.cases.B.db,1)} °C db / ${fmt(P.cases.B.wb,1)} °C wb · 100% load.`;
 }
 
 function renderSystem(){
   const id=sel(), r=RES[id], d=DES[id], s=SYS[id], k=RANK.indexOf(id);
   $('sysSeg').innerHTML=OPTIONS.map(o=>{ const j=RANK.indexOf(o.id);
-    return `<button data-sys="${o.id}" class="${o.id===id?'on':''}"><span class="rk">${j>=0?j+1:'✕'}</span>${o.short}</button>`; }).join('');
-  const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="tag ok">Recommended</span>':`<span class="tag">Rank ${k+1} of ${RANK.length}</span>`;
-  $('sysHead').innerHTML=`<h2>${r.o.name}</h2>${status}${r.excluded?'':`<span class="note">score ${fmt(r.score)}</span>`}`;
+    return `<button data-sys="${o.id}" class="${o.id===id?'on':''}">${j>=0?'':'<span class="rk">✕</span>'}${o.short}</button>`; }).join('');
+  const WLs={plenty:'if TSE is available',limited:'if water is limited',none:'if there is no water'};
+  const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:Object.keys(WLs).filter(w=>SCEN[w]===id).map(w=>`<span class="tag ok">Recommended ${WLs[w]}</span>`).join('');
+  $('sysHead').innerHTML=`<h2>${r.o.name}</h2>${status}`;
   $('sysHow').textContent=s.how;
   $('sysSvg').innerHTML=schematic(id);
   $('sysKpi').innerHTML=kpis([[`${fmt(r.E/1000,1)} GWh`,'Cooling electricity per year'],[r.mlc.toFixed(3),'Annual MLC (kW/kW)'],[r.pue.toFixed(3),'Annual PUE (incl. losses)'],
     [`${fmt(r.peak/1000,2)} MW`,`Electrical peak, cooling plant (${atPk})`],[`${fmt(r.facPeak/1000,1)} MW`,`Facility peak, grid connection (cooling ${fmt(r.coolShare*100)}%)`],[`${fmt(r.Wpeak,1)} m³/h`,`Water peak, make-up (${atPk})`],
     [wTxt(r),'Water per year (evaporation band)'],[runTxt(r),'Running cost, cooling'],[costTxt(r),'Initial cost (estimate)'],[payback(r).txt,'Payback vs air-cooled chillers'],[`${fmt(d.Qr/1000,1)} MW`,'Heat rejection at design']]);
-  $('sysDes').innerHTML=(d.ok?`Design cases: Case A ${fmt(d.cases.A.P/1000,2)} MW, Case B ${fmt(d.cases.B.P/1000,2)} MW; typical-year maximum ${fmt(r.yMax/1000,2)} MW${r.yAbove?` (${fmt(r.yAbove)} h above Cases A/B, up to +${fmt(r.yExcess/1000,2)} MW)`:''}; design peak ${fmt(r.peak/1000,2)} MW (${r.peakCase==='year'?'typical-year hour':'Case '+r.peakCase}). Duty chillers ${d.units.map(u=>`${u.N} × ${fmt(u.unit/1000,1)} MW`).join(' (liquid) / ')} (air), plus 1 standby each.`
+  $('sysDes').innerHTML=(d.ok?`Case A ${fmt(d.cases.A.P/1000,2)} MW · Case B ${fmt(d.cases.B.P/1000,2)} MW · typical-year maximum ${fmt(r.yMax/1000,2)} MW. Duty chillers ${d.units.map(u=>`${u.N} × ${fmt(u.unit/1000,1)} MW`).join(' (liquid) / ')} (air) + 1 standby each.`
     :`<span class="tag x">Fails design day</span> ${d.issues.join('; ')}`)+(d.warns.length?` <span class="tag">Warning</span> ${d.warns[0]}.`:'');
   // annual operating mode per loop
   $('sysModes').innerHTML=P.loops.map((L,i)=>{ if(L.Q<=0) return '';
@@ -158,7 +159,7 @@ function renderSystem(){
   const cap=P.Qd*(1+P.red);
   $('sysComp').innerHTML=table(['Component','Role','Sized MW','Cost M$'],r.o.comp.map(c=>{ const rt=P.rates[c];
     return `<tr><td>${RATES.find(x=>x.id===c).l}</td><td class="l">${ROLE[c](r.o)}</td><td>${fmt(cap/1000,1)}</td><td>${fmt(cap*rt.lo/1e6,1)}–${fmt(cap*rt.hi/1e6,1)}</td></tr>`; }));
-  $('compNote').textContent=`Each component sized for ${fmt(P.Qd/1000,1)} MW load + ${fmt(P.red*100)}% redundancy. Pumps, CDUs, piping and controls are not included.`;
+  $('compNote').textContent=`Sized for ${fmt(P.Qd/1000,1)} MW + ${fmt(P.red*100)}% redundancy; pumps, CDUs, piping and controls not included.`;
   $('sysPros').innerHTML=`<h3>Strengths</h3><ul>${s.pros.map(x=>`<li>${x}</li>`).join('')}</ul><h3>Watch-outs</h3><ul>${s.cons.map(x=>`<li>${x}</li>`).join('')}</ul>`;
   renderMonthly();
 }
@@ -166,7 +167,7 @@ function renderSystem(){
 function renderEff(){
   const m=mlcLim(), zone=mlcZone();
   const res=r=>m==null?'–':(r.mlc<=m?'<span class="tag ok">Meets</span>':'<span class="tag x">Exceeds</span>');
-  const rows=order().map((id,i)=>{ const r=RES[id]; return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td>${r.mlc.toFixed(3)}</td><td>${m==null?'–':m.toFixed(2)}</td><td>${res(r)}</td><td>${r.peakRatio.toFixed(3)}</td><td>${r.cop?r.cop.toFixed(1):'–'}</td><td>${loopTxt(r.free)}</td><td>${loopTxt(r.mech)}</td></tr>`; });
+  const rows=order().map((id,i)=>{ const r=RES[id]; return `<tr ><td>${r.o.name}${tag(id,i)}</td><td>${r.mlc.toFixed(3)}</td><td>${m==null?'–':m.toFixed(2)}</td><td>${res(r)}</td><td>${r.peakRatio.toFixed(3)}</td><td>${r.cop?r.cop.toFixed(1):'–'}</td><td>${loopTxt(r.free)}</td><td>${loopTxt(r.mech)}</td></tr>`; });
   $('tEff').innerHTML=table(['Option','Annual MLC',`ASHRAE 90.4 max MLC${zone?' (zone '+esc(zone)+')':''}`,'90.4 result','Peak kW/kW','Avg chiller COP','Free-cooling h (LC / air)','Chiller-only h (LC / air)'],rows);
   const ids=RANK;
   $('effTitle').textContent=ids.length?`Annual MLC: ${RES[ids[0]].o.short} ${RES[ids[0]].mlc.toFixed(3)} kW/kW`:'Annual MLC';
@@ -174,10 +175,10 @@ function renderEff(){
 }
 
 function renderCarbon(){
-  const b=RES.acc, rows=order().map((id,i)=>{ const r=RES[id]; return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td>${fmt(r.co2E)}</td><td>${fmt(r.co2W)}${band(r.co2W,r.co2Wlo,r.co2Whi)}</td><td>${fmt(r.co2R)}</td><td>${fmt(r.co2)}${band(r.co2,r.co2Lo,r.co2Hi)}</td><td>${fmt(r.co2IT,1)}</td><td>${id==='acc'?'–':fmt(b.co2-r.co2)}</td></tr>`; });
+  const b=RES.acc, rows=order().map((id,i)=>{ const r=RES[id]; return `<tr ><td>${r.o.name}${tag(id,i)}</td><td>${fmt(r.co2E)}</td><td>${fmt(r.co2W)}${band(r.co2W,r.co2Wlo,r.co2Whi)}</td><td>${fmt(r.co2R)}</td><td>${fmt(r.co2)}${band(r.co2,r.co2Lo,r.co2Hi)}</td><td>${fmt(r.co2IT,1)}</td><td>${id==='acc'?'–':fmt(b.co2-r.co2)}</td></tr>`; });
   $('tCO2').innerHTML=table(['Option','Electricity t CO₂/yr','Water supply t CO₂/yr','Refrigerant t CO₂e/yr','Total t CO₂e/yr','kg CO₂e per MWh IT','Saving vs air-cooled t/yr'],rows);
   const rf=REFRIGERANTS[P.refr];
-  $('co2Note').textContent=`Grid factor ${P.ef.toFixed(3)} kg CO₂/kWh${isNaN(parseFloat($('envEF').value))?(cityId()?((CITIES.find(c=>c.id===cityId())||{}).g==='Americas'&&cityId()!=='saopaulo'?' (EPA eGRID2023 rev 2 subregion)':cityId()==='sydney'?' (Australian NGA factors, NSW 2025–26)':' (Our World in Data / Ember, latest year)'):' (world average; enter the local grid)'):''}; ${P.wco2?`water supply ${fmt(P.wco2[1],2)} kg CO₂e/m³ (band ${fmt(P.wco2[0],2)}–${fmt(P.wco2[2],2)}: City of Phoenix 2022 GHG inventory, plus Central Arizona Project conveyance at the top)`:`water supply ${fmt(P.wkwh,1)} kWh/m³`}; tower water band 0.15–0.27 %/K evaporation; ${rf.name} GWP ${fmt(rf.gwp,rf.gwp<10?2:0)}, charge ${P.chW} / ${P.chA} kg/kW (water / air-cooled), leak ${fmt(P.leak*100,1)}%/yr on duty + 1 standby chillers. Cooling plant only; IT electricity not included.`;
+  $('co2Note').textContent=`Grid ${P.ef.toFixed(3)} kg CO₂/kWh · water ${P.wco2?`${fmt(P.wco2[1],2)} kg CO₂e/m³`:`${fmt(P.wkwh,1)} kWh/m³`} · ${rf.name} GWP ${fmt(rf.gwp,rf.gwp<10?2:0)}, leak ${fmt(P.leak*100,1)}%/yr.`;
   const ids=RANK, labels=ids.map(id=>RES[id].o.short);
   const o=baseOpts(); o.indexAxis='y'; o.scales.x={stacked:true,grid:{color:css('--border')},border:{display:false},ticks:{color:css('--text2')},title:{display:true,text:'t CO₂e/yr',color:css('--text2')},beginAtZero:true};
   o.scales.y={stacked:true,grid:{display:false},ticks:{color:css('--text')}};
@@ -188,7 +189,7 @@ function renderCarbon(){
 }
 
 function renderCons(){
-  const rows=order().map((id,i)=>{ const r=RES[id]; return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td>${fmt(r.E)}</td><td>${fmt(r.Ec)}</td><td>${fmt(r.Ef)}</td><td>${fmt(r.Ep)}</td><td>${fmt(r.Et)}</td><td>${fmt(r.Eloss)}</td><td>${r.pue.toFixed(3)}</td><td>${fmt(r.peak/1000,2)}</td><td>${fmt(r.facPeak/1000,1)}</td><td>${fmt(r.coolShare*100)}%</td><td>${fmt(r.W)}${band(r.W,r.Wlo,r.Whi)}</td><td>${fmt(r.Wpeak,1)}${band(r.Wpeak,r.WpeakLo,r.WpeakHi,1)}</td></tr>`; });
+  const rows=order().map((id,i)=>{ const r=RES[id]; return `<tr ><td>${r.o.name}${tag(id,i)}</td><td>${fmt(r.E)}</td><td>${fmt(r.Ec)}</td><td>${fmt(r.Ef)}</td><td>${fmt(r.Ep)}</td><td>${fmt(r.Et)}</td><td>${fmt(r.Eloss)}</td><td>${r.pue.toFixed(3)}</td><td>${fmt(r.peak/1000,2)}</td><td>${fmt(r.facPeak/1000,1)}</td><td>${fmt(r.coolShare*100)}%</td><td>${fmt(r.W)}${band(r.W,r.Wlo,r.Whi)}</td><td>${fmt(r.Wpeak,1)}${band(r.Wpeak,r.WpeakLo,r.WpeakHi,1)}</td></tr>`; });
   $('tCons').innerHTML=table(['Option','Cooling MWh/yr','Chillers','Heat-rejection fans','Pumps','CRAH / FWU / CDU','Electrical losses MWh/yr','Annual PUE',`Electrical peak MW (cooling, ${atPk})`,'Facility peak MW (grid)','Cooling share of facility peak','Water m³/yr',`Water peak m³/h (${atPk})`],rows);
   const ids=RANK, labels=ids.map(id=>RES[id].o.short);
   const o=baseOpts(); o.indexAxis='y'; o.scales.x={stacked:true,grid:{color:css('--border')},border:{display:false},ticks:{color:css('--text2')},title:{display:true,text:'MWh/yr',color:css('--text2')}};
@@ -204,9 +205,9 @@ function renderCons(){
 
 function renderRun(){
   const rows=order().map((id,i)=>{ const r=RES[id], pb=payback(r);
-    return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td>${fmt(r.costE/1e3)}</td><td>${fmt(r.costW/1e3)}</td><td>${fmt(r.costD/1e3)}</td><td>${fmt(r.run/1e3)}</td><td>${id==='acc'?'–':fmt(pb.save/1e3)}</td><td>${pb.txt}</td></tr>`; });
+    return `<tr ><td>${r.o.name}${tag(id,i)}</td><td>${fmt(r.costE/1e3)}</td><td>${fmt(r.costW/1e3)}</td><td>${fmt(r.costD/1e3)}</td><td>${fmt(r.run/1e3)}</td><td>${id==='acc'?'–':fmt(pb.save/1e3)}</td><td>${pb.txt}</td></tr>`; });
   $('tRun').innerHTML=table(['Option','Electricity k$/yr','Water k$/yr','Demand k$/yr','Total k$/yr','Saving vs air-cooled k$/yr','Simple payback'],rows);
-  $('runNote').textContent=`Cooling only (not IT electricity), at the frequent load. Tariffs: electricity ${P.tE} $/kWh, water ${P.tW} $/m³, demand ${P.tD} $/kW per month on the cooling peak. Simple payback = extra initial cost (mid estimate) over air-cooled chillers ÷ running cost saved; no discounting, maintenance or tariff escalation.`;
+  $('runNote').textContent=`Electricity ${P.tE} $/kWh · water ${P.tW} $/m³ · demand ${P.tD} $/kW-month. Payback against air-cooled chillers, no discounting.`;
   const ids=RANK, labels=ids.map(id=>RES[id].o.short);
   const o=baseOpts(); o.indexAxis='y'; o.scales.x={stacked:true,grid:{color:css('--border')},border:{display:false},ticks:{color:css('--text2')},title:{display:true,text:'k$/yr',color:css('--text2')},beginAtZero:true};
   o.scales.y={stacked:true,grid:{display:false},ticks:{color:css('--text')}};
@@ -217,7 +218,7 @@ function renderRun(){
 }
 
 function renderCap(){
-  const rows=order().map((id,i)=>{ const r=RES[id]; return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td class="l">${r.capParts.map(c=>RATES.find(x=>x.id===c).l).join(' + ')}</td><td>${fmt(r.capLo/1e6,1)}–${fmt(r.capHi/1e6,1)}</td><td>${fmt(r.capLo/P.Qd)}–${fmt(r.capHi/P.Qd)}</td></tr>`; });
+  const rows=order().map((id,i)=>{ const r=RES[id]; return `<tr ><td>${r.o.name}${tag(id,i)}</td><td class="l">${r.capParts.map(c=>RATES.find(x=>x.id===c).l).join(' + ')}</td><td>${fmt(r.capLo/1e6,1)}–${fmt(r.capHi/1e6,1)}</td><td>${fmt(r.capLo/P.Qd)}–${fmt(r.capHi/P.Qd)}</td></tr>`; });
   $('tCap').innerHTML=table(['Option','Components','Estimate M$','$ per kW of load'],rows);
   const ids=RANK, labels=ids.map(id=>RES[id].o.short);
   const o=baseOpts(); o.indexAxis='y';
@@ -264,7 +265,7 @@ function renderClimate(){
       {label:'Partial',data:part,backgroundColor:css('--s1'),borderColor:css('--surface'),borderWidth:{top:2}},
       {label:'Chiller only',data:none,backgroundColor:css('--s2'),borderColor:css('--surface'),borderWidth:{top:2},borderRadius:{topLeft:4,topRight:4}}]},options:o});
   });
-  $('clNote').textContent=`Climate only, before choosing a system: hours each month when the outdoor ${dc?'dry-bulb':'wet-bulb'} + ${fmt(appr,1)} K approach (${dc?'dry cooler':'tower + plate HX'}) is below the loop supply temperature (free cooling) or below its return temperature (partial). Hover over a month for its temperatures. The Systems tab shows how each complete system actually runs.`;
+  $('clNote').textContent=`Climate only, before choosing a system. Hover over a month for its temperatures.`;
 }
 document.querySelectorAll('#climSeg button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#climSeg button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); CLDEV=b.dataset.dev; renderClimate(); });
 

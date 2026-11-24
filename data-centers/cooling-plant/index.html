@@ -81,7 +81,7 @@
   <details>
     <summary>Load and loop temperatures</summary>
     <label for="lf">Usual operating load (% of design)</label><input type="number" id="lf" value="80" min="10" max="100" step="5">
-    <div class="note">Annual energy, water and cost use this load; peak power always uses 100%.</div>
+    <div class="note">For annual results; peaks always use 100%.</div>
     <h3>Liquid cooling loop</h3>
     <div class="row">
       <div><label for="lcs">Supply (°C)</label><input type="number" id="lcs" value="30" min="5" max="50" step="1"></div>
@@ -99,7 +99,7 @@
       <div><label for="dbD">Design dry-bulb (°C)</label><input type="number" id="dbD" step="0.1" placeholder="auto"></div>
       <div><label for="wbD">Design wet-bulb (°C)</label><input type="number" id="wbD" step="0.1" placeholder="auto"></div>
     </div>
-    <div class="note">Blank = the ASHRAE extreme annual values for the station. Every system is checked at the hottest hour (Case A) and the most humid hour (Case B). Enter a stricter value to replace the extreme.</div>
+    <div class="note">Blank = the ASHRAE extreme values for the station.</div>
   </details>
 
 
@@ -111,7 +111,7 @@
       <div><label for="tW">Water incl. treatment ($/m³)</label><input type="number" id="tW" value="2.5" step="0.1" min="0"></div>
     </div>
     <div class="row"><div><label for="tD">Demand charge ($/kW per month)</label><input type="number" id="tD" value="0" step="1" min="0"></div><div></div></div>
-    <div class="note">Running cost of cooling only (not the IT load). The demand charge is applied to the cooling electrical peak every month. Indicative defaults; enter the local tariff.</div>
+    <div class="note">Indicative defaults; enter the local tariff.</div>
   </details>
   <details>
     <summary>Chillers (ASHRAE 90.1-2025 Path B / AHRI 551/591)</summary>
@@ -135,7 +135,7 @@
       <div><label for="wcMax">Condenser water warning above (°C)</label><input type="number" id="wcMax" value="43" step="1"></div>
       <div></div>
     </div>
-    <div class="note">Rated COP: ASHRAE 90.1-2025 Table 6.8.1-3, Path B full load, at AHRI 551/591 (7 °C chilled water; 35 °C air or 30 °C condenser water). Part load: VSD curve calibrated to the Path B IPLV. The number of duty units follows the unit size; units are staged by load (the next starts above 90% PLR), plus 1 standby per loop in the cost. Air-cooled capacity loss from public Trane RTAC data; units sized at Case A. Above the condenser-water limit a system is flagged, not excluded.</div>
+    <div class="note">Rated COP: ASHRAE 90.1-2025 Path B at AHRI 551/591.</div>
   </details>
   <details>
     <summary>Heat rejection</summary>
@@ -163,7 +163,7 @@
       <div><label for="eAD">Pad effectiveness (water use)</label><input type="number" id="eAD" value="0.85" step="0.05" min="0" max="1"></div>
       <div></div>
     </div>
-    <div class="note">Approaches: ASHRAE 90.1-2025 Table 6.8.1-7 rating points. Fan power at full speed: towers the ASHRAE 2025 minimum (3.56 L/s per kW); dry and adiabatic coolers 3% from public manufacturer data sheets. Fans on VFDs follow the affinity law (minimum speed 30%).</div>
+    <div class="note">Approaches: ASHRAE 90.1-2025 rating points.</div>
   </details>
   <details>
     <summary>Pumps and fan wall units</summary>
@@ -187,7 +187,7 @@
       <div><label for="etaF">Fan × motor × VFD efficiency (%)</label><input type="number" id="etaF" value="65" step="1" min="20" max="100"></div>
       <div></div>
     </div>
-    <div class="note">P = Q × ΔP / (ρ × cp × ΔT × η). CDU pumps on a 10 K coolant ΔT; primary and secondary pumps on each loop's ΔT; condenser pumps on 5.56 K (211 kPa ≈ ASHRAE 90.1 Appendix G, 19 W/gpm). All pump and fan heat is added to the chiller load. VFD affinity law at part load (minimum speed 50% pumps, 30% fans).</div>
+    <div class="note">Pump and fan heat is added to the chiller load.</div>
   </details>
   <details>
     <summary>Environmental impact (carbon)</summary>
@@ -203,7 +203,7 @@
       <div><label for="chW">Charge, water-cooled (kg/kW)</label><input type="number" id="chW" value="0.3" step="0.05" min="0"></div>
       <div><label for="chA">Charge, air-cooled (kg/kW)</label><input type="number" id="chA" value="0.4" step="0.05" min="0"></div>
     </div>
-    <div class="note" id="envNote">Leave blank for the city's values: grid factor from Our World in Data / Ember (latest year), US cities from EPA eGRID2023 subregions, Sydney from the Australian NGA factors (NSW 2025–26); water supply energy 3.5 kWh/m³ for Gulf desalination, 0.5 elsewhere (IEA WEO 2016), Phoenix given directly as 0.25–0.70 kg CO₂e/m³ (City of Phoenix 2022 GHG inventory, plus Central Arizona Project conveyance). GWP: R-134a and R-513A IPCC AR4 (as used by the U.S. EPA under the AIM Act), R-1234ze(E) EU F-gas Regulation 2024/573. Refrigerant charge and leak rate are assumptions; enter the selected chiller's data. Carbon counts in the recommendation (weight 3).</div>
+    <div class="note" id="envNote">Blank = the city's values. Refrigerant charge and leak rate are assumptions; enter the chiller's data.</div>
   </details>
   <details>
     <summary>Electrical losses</summary>
@@ -211,13 +211,13 @@
       <div><label for="ups">UPS efficiency (%)</label><input type="number" id="ups" value="96" step="0.5" min="80" max="100"></div>
       <div><label for="dloss">Transformer + distribution losses (%)</label><input type="number" id="dloss" value="2" step="0.5" min="0" max="10"></div>
     </div>
-    <div class="note">UPS losses apply to the IT load; transformer and distribution losses apply to the whole facility (IT + cooling). Used for the annual PUE only; electrical peaks are the cooling plant only. Cooling for electrical rooms is not included.</div>
+    <div class="note">Used for the annual PUE only.</div>
   </details>
   <details>
     <summary>Initial cost rates ($ per kW of capacity)</summary>
     <div id="rates"></div>
     <div class="row"><div><label for="red">Redundancy (%)</label><input type="number" id="red" value="25" step="5" min="0"></div><div></div></div>
-    <div class="note">Indicative installed rates for screening only. Replace with local quotes.</div>
+    <div class="note">Indicative; replace with local quotes.</div>
   </details>
 </aside>
 </div>
@@ -238,7 +238,7 @@
   <div class="pane" id="p-ov">
     <div class="card"><h2>All options side by side</h2>
       <div id="tOv"></div>
-      <div class="note">Highlighted cells are the best value among feasible options. Score weighs energy (4), water (3, doubled when water is limited), peak power (3) and initial cost (2). Click a row to see that system in full.</div></div>
+      <div class="note">Highlighted = best value. Click a row to open the system.</div></div>
     <div class="card"><h2>Design-day check</h2><div id="tDes"></div><div class="note" id="desNote"></div></div>
   </div>
 
@@ -267,7 +267,7 @@
 
   <div class="pane" id="p-en" hidden>
     <div class="card"><h2>Energy efficiency</h2><div class="split">
-      <div><div id="tEff"></div><div class="note">MLC = annual mechanical energy ÷ annual cooling load (ASHRAE 90.4 definition, cooling load taken as IT energy). Maximum: ASHRAE 90.4-2025 Table 6.5, for the county climate zone in U.S. cities (IECC 2021 / ASHRAE 169 county assignment, as for code compliance) and the station zone elsewhere and ITE above / at or below 300 kW. Screening check: a compliance calculation follows the 90.4 load points and TMY3 weather. Free-cooling hours: chiller fully off.</div></div>
+      <div><div id="tEff"></div><div class="note">Maximum MLC: ASHRAE 90.4-2025 Table 6.5 (screening check).</div></div>
       <div><div class="ctitle" id="effTitle">Annual MLC</div><div class="chartbox"><canvas id="cEff"></canvas></div></div>
     </div></div>
     <div class="card"><h2>Carbon emissions</h2><div class="split">
@@ -277,7 +277,7 @@
         <div class="chartbox" style="height:220px"><canvas id="cCO2"></canvas></div></div>
     </div></div>
     <div class="card"><h2>Electricity and water consumption</h2><div class="split">
-      <div><div id="tCons"></div><div class="note">Annual totals at the frequent load. Peaks are the design peak at 100% IT load: the highest of Case A, Case B and the typical-year maximum. Facility peak = (IT ÷ UPS efficiency + cooling peak) ÷ (1 − distribution losses), the grid connection. Water in brackets: tower evaporation band 0.15–0.27 %/K (central 0.20, EnergyPlus default). Electrical peak = cooling only: chillers + heat-rejection fans + pumps + CRAH / FWU fans + CDU pumps (no IT load, no electrical equipment or losses). Water peak = make-up water (evaporation, blowdown, pad water). PUE = (IT + cooling + losses) ÷ IT, annual. CRAH / fan-wall fans are not included.</div></div>
+      <div><div id="tCons"></div><div class="note">Annual totals at the frequent load; peaks at 100% IT load. Brackets: tower evaporation band.</div></div>
       <div>
         <div class="ctitle" id="elTitle">Annual electricity by component</div>
         <div class="legend"><span><i style="background:var(--s1)"></i>Chiller compressors</span><span><i style="background:var(--s4)"></i>Heat-rejection fans</span><span><i style="background:var(--grey2)"></i>Pumps</span><span><i style="background:var(--s2)"></i>CRAH / FWU fans + CDU pumps</span></div>
@@ -296,7 +296,7 @@
       <div class="chartbox" style="height:220px"><canvas id="cRun"></canvas></div>
     </div>
     <div class="card"><h2>Initial cost (estimated range)</h2><div class="split">
-      <div><div id="tCap"></div><div class="note">Rate-based estimate, not a quotation: capacity × redundancy × low/high rate for each component. Excludes building works, electrical and controls.</div></div>
+      <div><div id="tCap"></div><div class="note">Excludes building works, electrical and controls.</div></div>
       <div><div class="ctitle" id="capTitle">Estimated initial cost range</div><div class="chartbox"><canvas id="cCap"></canvas></div></div>
     </div></div>
   </div>
@@ -330,7 +330,7 @@
       <li><b>Electrical losses and PUE</b>: <code>PUE = (IT / η<sub>UPS</sub> + cooling) / (1 − losses) / IT</code>, UPS 96%, distribution 2%. Simplified, not the 90.4 ELC method.</li>
       <li><b>Running cost</b>: <code>electricity × tariff + water × tariff + cooling peak × demand charge × 12</code>. Simple payback against air-cooled chillers = extra initial cost (mid estimate) ÷ running cost saved.</li>
       <li><b>Carbon</b> (t CO₂e/yr): electricity × grid factor + water × supply energy (kWh/m³) × grid factor + refrigerant charge (duty + 1 standby per loop, kg/kW × capacity) × leak rate × GWP. Grid factors: EPA eGRID2023 rev 2 (US), Australian NGA (Sydney), Our World in Data / Ember (others); water energy: IEA WEO 2016 (Phoenix: City of Phoenix 2022 GHG inventory + CAP, in kg CO₂e/m³); GWP: IPCC AR4 via the EPA AIM Act, R-1234ze(E) EU 2024/573.</li>
-      <li><b>Recommendation</b>: energy 4, water 3 (doubled when water is limited), peak 3, initial cost 2, carbon 3, normalised across feasible options. Energy and carbon are both scored on purpose: energy is the plant's efficiency, carbon its environmental impact, so electricity carries about half the weight. Full basis: the Cooling Plant Calculation Basis. Screening-level; confirm with vendor selections.</li>
+      <li><b>Recommendation</b>: energy 4, water 3, peak 3, initial cost 2, carbon 3, normalised across feasible options, for three water cases: TSE available (as above), water limited (water weight doubled) and no water (water-using systems excluded). Screening-level; confirm with vendor selections.</li>
     </ul>
   </div>
   </div>
@@ -340,9 +340,7 @@
 <section class="toolinfo" aria-labelledby="ti-h">
   <div class="card">
   <h2 id="ti-h">How the Cooling Plant Selector works</h2>
-  <p>The Cooling Plant Selector compares five data center cooling plants hour by hour over a full weather year (8,760 hours) and recommends the right one for the site: air-cooled chillers, air-cooled chillers with free-cooling dry coolers, and water-cooled chillers with cooling towers, adiabatic coolers or hybrid dry coolers and towers, each with plate heat exchanger free cooling. It reports cooling electricity, annual PUE and ASHRAE 90.4 MLC, the electrical peak, water use, carbon emissions, running and initial cost, and a ranked recommendation.</p>
-  <h3>Method</h3>
-  <ul><li>Weather: measured typical-year hourly data (TMYx 2011–2025) and ASHRAE 2025 design conditions for 33 built-in data center cities, or your own EPW / CSV file.</li><li>Two coincident design cases: the extreme dry-bulb with the wet-bulb of the hottest hour, and the extreme wet-bulb with the dry-bulb of the most humid hour. The design peak is the higher.</li><li>Chillers: ASHRAE 90.1-2025 Path B efficiency at AHRI 551/591 rating conditions, adjusted every hour for the actual lift, with VSD part-load curves calibrated to the ASHRAE IPLV and staging by load.</li><li>Free cooling = (return − water from the outdoor equipment) / (return − supply). Approaches from the ASHRAE 90.1-2025 heat-rejection rating points.</li><li>Pumps and fans from P = Q × ΔP / (ρ × cp × ΔT × η); carbon from local grid factors (EPA eGRID, Our World in Data), water supply energy and refrigerant leakage.</li></ul>
+  <p>The Cooling Plant Selector compares five data center cooling plants hour by hour over a full weather year (8,760 hours) and recommends one for each water case (TSE available, water limited, no water): air-cooled chillers, air-cooled chillers with free-cooling dry coolers, and water-cooled chillers with cooling towers, adiabatic coolers or hybrid dry coolers and towers, each with plate heat exchanger free cooling. It reports cooling electricity, annual PUE and ASHRAE 90.4 MLC, the electrical peak, water use, carbon emissions, and running and initial cost.</p>
   <h2 style="margin-top:20px">Frequently asked questions</h2>
   <h3>Which cooling system is best for a data center in a hot climate such as Dubai or Riyadh?</h3>
   <p>For a liquid-cooled hall at 30/40 °C, water-cooled chillers with cooling towers and plate heat exchanger free cooling usually rank first: the lowest electricity, MLC and peak power. They use the most water, so where water is limited a hybrid dry cooler and tower plant or adiabatic coolers trade some energy for much less water. Air-cooled chillers have the highest electrical peak.</p>
