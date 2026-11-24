@@ -71,9 +71,8 @@ function renderReco(){
     +(window.Chart?'':'<div class="banner">Charts could not load (no internet connection). Tables and results below are complete.</div>');
   const st=WX.station, C=P.cases, best=RANK.length?RES[RANK[0]]:null, acc=RES.acc;
   // the answer first, in one sentence; the context in one quiet line
-  const verdict=best?`<div class="verdict-line">Best fit for <b>${esc(WX.name)}</b>: <b class="pick">${best.o.name}</b>.${best.o.id==='acc'?'':` Against air-cooled chillers it saves <b>${fmt(Math.max(0,acc.E-best.E)/1000,1)} GWh</b> of electricity a year and <b>${fmt(Math.max(0,acc.peak-best.peak)/1000,1)} MW</b> of peak power.`}</div>`
+  const verdict=best?''
     :'<div class="verdict-line"><b>No system meets every constraint.</b> Try allowing water, raising the loop supply temperatures, or checking the design conditions and chiller limits.</div>';
-  const ctx=`<div class="ctxline">${fmt(P.Qd/1000,1)} MW hall · liquid ${P.loops[0].Ts}/${P.loops[0].Tr} °C · air ${P.loops[1].Ts}/${P.loops[1].Tr} °C · design ${fmt(C.A.db,1)} °C dry-bulb / ${fmt(C.B.wb,1)} °C wet-bulb${st?` · ${esc(st.station)}, TMYx ${esc(st.period)}`:''}</div>`;
   // one card per system: four numbers that matter, the rest behind "More"
   const key=[['Electricity',r=>r.E,r=>`${fmt(r.E/1000,1)}`,'GWh/yr'],['Peak power',r=>r.peak,r=>`${fmt(r.peak/1000,1)}`,'MW'],['Water',r=>r.W,r=>r.W<1?'0':fmt(r.W/1000,0),'thousand m³/yr'],['CO₂',r=>r.co2,r=>fmt(r.co2/1000,1),'kt/yr']];
   const bestV=key.map(([,v])=>RANK.length?Math.min(...RANK.map(i=>v(RES[i]))):null);
@@ -92,7 +91,7 @@ function renderReco(){
         <ul>${notes.map(n=>`<li>${n}</li>`).join('')}</ul>
       </details>
       <button class="link" data-sys="${id}">See system →</button></div>`; });
-  $('reco').innerHTML=`${banners}${verdict}${ctx}<div class="scards">${cards.join('')}</div><div class="cardnote">Best value in each row highlighted. Full tables, charts and the design-day check are in the tabs below.</div>`;
+  $('reco').innerHTML=`${banners}${verdict}<div class="scards">${cards.join('')}</div>`;
 }
 
 function renderOverview(){

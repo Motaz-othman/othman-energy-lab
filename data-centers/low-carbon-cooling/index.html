@@ -65,12 +65,11 @@ tr.best td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpa
 <div class="pagehead">
   <nav class="crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a> / <a href="../index.html">Data Centers</a> / Low-Carbon Cooling Selector</nav>
   <h1>Low-Carbon Cooling Selector</h1>
-  <p class="sub">Which cooling system emits the least CO₂, and how much does it emit each year? Three sources: the electricity it uses, the energy to supply its water, and the refrigerant that leaks from the chillers. Compare five cooling plants hour by hour for a city, or enter your own system's numbers.</p>
 </div>
 
 <main class="layout">
 <div class="incol">
-<div class="colhead"><b>Inputs</b><span>Results update as you type</span></div>
+<div class="colhead"><b>Inputs</b></div>
 <aside class="card inputs" id="inGrid">
   <h2>Location</h2>
   <label for="cCity">City</label><select id="cCity"></select>
@@ -88,7 +87,6 @@ tr.best td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpa
       <div><label for="cLf">Average load (%)</label><input type="number" id="cLf" value="80" min="10" max="100" step="5"></div>
     </div>
     <label for="cLcp">Liquid-cooled share of the load (%)</label><input type="number" id="cLcp" value="80" min="0" max="100" step="5">
-    <div class="note">Measured hourly weather for the city, 8,760 hours. Same model as the Cooling Plant Selector.</div>
     <details>
       <summary>Water temperatures</summary>
       <div class="row">

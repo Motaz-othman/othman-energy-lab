@@ -32,7 +32,7 @@ function run(){
   const pair=(fn)=>withTank?fn(a,'no tank')+fn(b,`with ${tk}`):fn(a,'no tank');
   const over=r.Ts>p.TsMax+1e-9;
   $('rTsNote').innerHTML=over?`<span style="color:var(--bad)"><b>Above the ${fmt(p.TsMax)} °C maximum (ASHRAE ${p.cls}):</b> risky unless confirmed by the manufacturer.</span>`:`Default 40 °C. Maximum ${fmt(p.TsMax)} °C as per ASHRAE ${p.cls}; a higher supply saves more on the facility water. The flow follows the platform rule at the supply chosen.`;
-  $('rStatus').textContent=`Per rack · ${p.name}`;
+  $('rStatus').textContent='';
   $('rRes').innerHTML=`
     <div class="big4">
       <div class="bn"><div class="v">${fmt(r.Fop)} <small>L/min</small></div><div class="l">Operating flow · ${fmt(r.Ql,1)} kW to liquid, return ${fmt(r.TrOp,1)} °C (limit ${fmt(r.Tr)} °C) at ${fmt(r.Ts,r.Ts%1?1:0)} °C supply${r.Qa>0.05?` · ${fmt(r.Qa,1)} kW to air, ${fmt(r.air)} m³/h`:''}</div></div>

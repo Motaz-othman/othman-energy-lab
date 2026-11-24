@@ -40,19 +40,16 @@
 <div class="pagehead">
   <nav class="crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a> / <a href="../index.html">Data Centers</a> / Cooling Plant Selector</nav>
   <h1>Cooling Plant Selector</h1>
-  <p class="sub">Compare air-cooled chillers, free-cooling dry coolers, adiabatic coolers, cooling towers and hybrid dry coolers + towers for a data hall with liquid and air cooling loops, hour by hour over a full year.</p>
-  <div class="chips"><span>ASHRAE 90.4 MLC</span><span>ASHRAE 90.1 chiller minimums</span><span>AHRI 550/590</span><span>8,760-hour simulation</span></div>
 </div>
 <main class="layout">
 <div class="incol">
-<div class="colhead"><b>Inputs</b><span>Change any value; results update instantly</span></div>
+<div class="colhead"><b>Inputs</b></div>
 <aside class="card" id="inputs">
   <h2>1. Site</h2>
   <div class="tabs"><button id="tabCity" class="on">City</button><button id="tabFile">Weather file</button></div>
   <div id="cityPane">
     <label for="city">City</label>
     <select id="city"></select>
-    <div class="note">Measured hourly weather and ASHRAE 2025 design conditions for the main airport. Or upload your own weather file.</div>
   </div>
   <div id="filePane" hidden>
     <div class="drop" id="drop">Drop an <b>.epw</b> file (ASHRAE IWEC / TMY) or a CSV here, or click to choose<input type="file" id="file" accept=".epw,.csv,.txt" hidden></div>
@@ -84,7 +81,6 @@
     <div><label for="it">Cooling load (MW)</label><input type="number" id="it" value="20" min="0.1" step="0.5"></div>
     <div><label for="lcp">Liquid-cooled share (%)</label><input type="number" id="lcp" value="80" min="0" max="100" step="5"></div>
   </div>
-  <div class="note">The rest of the load is air-cooled (fan walls or CRAHs). Results update as you type.</div>
 
   <h2 class="more-h">More settings</h2>
   <details>
@@ -232,7 +228,7 @@
 </div>
 
 <section id="results">
-  <div class="colhead"><b>Results</b><span>Ranked systems, then details in the tabs below</span><span class="xports"><button type="button" class="link" id="xpdf" title="Open a print-ready report and save it as PDF">PDF report</button><button type="button" class="link" id="xport" title="Download every results table as an Excel workbook">Excel tables</button></span></div>
+  <div class="colhead"><b>Results</b><span class="xports"><button type="button" class="link" id="xpdf" title="Open a print-ready report and save it as PDF">PDF report</button><button type="button" class="link" id="xport" title="Download every results table as an Excel workbook">Excel tables</button></span></div>
   <div class="card reco" id="reco"></div>
 
   <nav class="rtabs" id="rtabs" role="tablist" aria-label="Results">

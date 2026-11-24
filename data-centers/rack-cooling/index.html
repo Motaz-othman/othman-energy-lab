@@ -40,12 +40,11 @@
 <div class="pagehead">
   <nav class="crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a> / <a href="../index.html">Data Centers</a> / Liquid Rack Cooling</nav>
   <h1>Liquid Rack Cooling</h1>
-  <p class="sub">Choose the GPU or CPU platform. See the maximum supply temperature, the cooling and flow each rack needs, the safe minimum flow for variable-flow control, and how the CDU pump and control valve respond to a load jump or a pump trip.</p>
 </div>
 
 <main class="layout">
 <div class="incol">
-<div class="colhead"><b>Inputs</b><span>Results update instantly</span></div>
+<div class="colhead"><b>Inputs</b></div>
 <aside class="card inputs" id="inRack">
   <h2>Platform</h2>
   <label for="rP">Liquid-cooled rack</label><select id="rP"></select>
@@ -88,7 +87,7 @@
 </aside>
 </div>
 <section class="results">
-  <div class="colhead"><b>Results</b><span id="rStatus">Per rack</span></div>
+  <div class="colhead"><b>Results</b><span id="rStatus"></span></div>
   <div class="card hero" id="rRes"></div>
   <div class="card">
     <div class="seg" id="rScen"><button data-s="jump" class="on">Load jump</button><button data-s="pump">Pump trip</button></div>

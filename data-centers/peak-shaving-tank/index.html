@@ -40,17 +40,15 @@
 <div class="pagehead">
   <nav class="crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a> / <a href="../index.html">Data Centers</a> / Peak Shaving Tank</nav>
   <h1>Peak Shaving Tank</h1>
-  <p class="sub">A cooling plant is rated for the extreme hottest hour at full IT load, a condition that rarely happens. A chilled-water tank covers those few hours, so the chillers and their electrical supply can be rated lower. The tank recharges during the 12-hour night.</p>
 </div>
 
 <main class="layout">
 <div class="incol">
-<div class="colhead"><b>Inputs</b><span>Results update a moment after you change a value</span></div>
+<div class="colhead"><b>Inputs</b></div>
 <aside class="card inputs" id="inGrid">
   <h2>Weather</h2>
   <div class="tabs"><button id="gTabCity" class="on">City</button><button id="gTabFile">Weather file</button></div>
-  <div id="gCityPane"><label for="gCity">City</label><select id="gCity"></select>
-    <div class="note">Measured hourly weather and ASHRAE 2025 design conditions for the main airport station.</div></div>
+  <div id="gCityPane"><label for="gCity">City</label><select id="gCity"></select></div>
   <div id="gFilePane" hidden>
     <label for="gFile">EPW or CSV weather file (8,760 hours)</label><input type="file" id="gFile" accept=".epw,.csv,.txt">
     <div class="note" id="gFileInfo">Same formats as the Cooling Plant Selector.</div>
@@ -92,7 +90,7 @@
 </aside>
 </div>
 <section class="results">
-  <div class="colhead"><b>Results</b><span id="gStatus">Peak shaving</span></div>
+  <div class="colhead"><b>Results</b><span id="gStatus"></span></div>
   <div class="card hero" id="gRes"><div class="note">Calculating…</div></div>
   <div class="card" id="gCurves">
     <div class="ctitle" id="gChartTitle">Hottest day: cooling plant power</div>

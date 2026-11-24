@@ -62,7 +62,7 @@ function renderEst(f){
   const all=OPTIONS.map(o=>RES[o.id]), ok=all.filter(r=>DES[r.o.id].ok);
   const ids=[...ok.sort((a,b)=>a.co2-b.co2),...all.filter(r=>!DES[r.o.id].ok)].map(r=>r.o.id);
   const best=RES[ids[0]], base=RES.acc, save=base.co2-best.co2;
-  $('cStatus').textContent=`${WX.name} · ${fmt(P.Qd/1000,1)} MW at ${fmt(P.lf*100)}% load`;
+  $('cStatus').textContent='';
   $('cRes').hidden=true; $('cRes').innerHTML=`
     <div class="big4">
       <div class="bn"><div class="v good">${t(best.co2)} <small>t CO₂e/yr</small></div><div class="l">Lowest: ${best.o.short}</div></div>
@@ -93,7 +93,7 @@ function renderOwn(f){
   const R=refr(), Y=yrs(), E=Math.max(0,num('oE',0)), W=Math.max(0,num('oW',0)), ch=Math.max(0,num('oCh',0)), IT=num('oIT',NaN);
   const wkg=f.wco2?f.wco2[1]:f.wkwh*f.ef, cE=E*f.ef, cW=W*wkg/1000, cR=ch*R.leak*R.r.gwp/1000, tot=cE+cW+cR;
   const name=$('oSys').selectedOptions[0].textContent, sh=v=>tot>0?fmt(100*v/tot):'0';
-  $('cStatus').textContent=`${city().name} · ${name}`;
+  $('cStatus').textContent='';
   $('cRes').hidden=false; $('cRes').innerHTML=`
     <div class="big4">
       <div class="bn"><div class="v good">${t(tot)} <small>t CO₂e/yr</small></div><div class="l">Total, cooling system</div></div>
