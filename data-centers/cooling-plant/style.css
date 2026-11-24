@@ -151,3 +151,10 @@
 .scard .ku{font-size:12px}
 .scard .kn>div.hi .kv{color:var(--m)}
 .scard .kl .best{position:static;width:16px;height:16px;font-size:10px;margin-left:2px}
+/* metrics stacked: one row each, name on the left, value on the right */
+.scard .kn{grid-template-columns:1fr;gap:0;padding:4px 0}
+.scard .kn>div,.scard .kn>div.hi{flex-direction:row;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.scard .kn>div:last-child{border-bottom:0}
+.scard .kl{font-size:13.5px;overflow:visible}
+.scard .kvr{flex-wrap:nowrap;justify-content:flex-end}
+.scard .kv,.scard.rec .kv{font-size:21px}
