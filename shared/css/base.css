@@ -261,3 +261,7 @@ a.tcard:hover .thumb .rk .best{transform:scaleX(1.04)}
 .thumb .tk rect{fill:var(--surface);stroke:var(--text2);stroke-width:1.5}
 .thumb .tk .lvl{fill:color-mix(in srgb,var(--s1) 45%,transparent);stroke:none;transform-box:fill-box;transform-origin:bottom;transition:transform .35s ease}
 a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
+/* brand gradient (pink to purple), used on the main accents */
+:root{--grad:linear-gradient(120deg,#e3246e 0%,#b5179e 55%,#7b2ff7 100%)}
+.tabs button.on,.seg button.on,.rtabs button.on,.btn.primary{background:var(--grad);border-color:transparent;color:#fff}
+.btn.primary:hover{background:var(--grad);filter:brightness(.94)}

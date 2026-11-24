@@ -287,6 +287,10 @@ a.tcard:hover .thumb .rk .best{transform:scaleX(1.04)}
 .thumb .tk rect{fill:var(--surface);stroke:var(--text2);stroke-width:1.5}
 .thumb .tk .lvl{fill:color-mix(in srgb,var(--s1) 45%,transparent);stroke:none;transform-box:fill-box;transform-origin:bottom;transition:transform .35s ease}
 a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
+/* brand gradient (pink to purple), used on the main accents */
+:root{--grad:linear-gradient(120deg,#e3246e 0%,#b5179e 55%,#7b2ff7 100%)}
+.tabs button.on,.seg button.on,.rtabs button.on,.btn.primary{background:var(--grad);border-color:transparent;color:#fff}
+.btn.primary:hover{background:var(--grad);filter:brightness(.94)}
 </style>
 <style>
 /* Cooling Plant Selector: page-specific styles (loads after shared/css/base.css) */
@@ -454,6 +458,17 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
 .artlink{margin:14px 0 0;font-size:13.5px;color:var(--text2)}
 .artlink a{color:var(--brand-ink);font-weight:600}
 .toolfoot{margin:24px 28px 0;font-size:13px;color:var(--text2)}.toolfoot a{color:var(--brand-ink);font-weight:600}@media (max-width:900px){.toolfoot{margin:20px 16px 0}}
+/* one colour family: brand gradient for labels, badges and buttons; metrics neutral */
+.wrec,.wrec.w-plenty,.wrec.w-limited,.wrec.w-none{--wc:var(--brand);background:color-mix(in srgb,var(--brand) 7%,var(--surface));border-color:color-mix(in srgb,var(--brand) 22%,transparent)}
+.wrec i{background:var(--grad)}
+.wrec small{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.scard .kn>div,.scard .kn>div.hi{--m:var(--text2)}
+.scard .kl i{background:var(--bg);color:var(--text2)}
+.scard .kl .best{background:var(--grad);color:#fff}
+.scard .kn>div.hi .kv{color:var(--text)}
+.scard.rec::before{background:var(--grad)}
+.scard.rec .link{background:var(--grad);border-color:transparent;color:#fff}
+#inputs h2.ih .n{background:var(--grad)}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <meta name="author" content="Mutaz Othman">
