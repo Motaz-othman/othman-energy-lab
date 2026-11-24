@@ -163,14 +163,14 @@
 .artlink{margin:14px 0 0;font-size:13.5px;color:var(--text2)}
 .artlink a{color:var(--brand-ink);font-weight:600}
 .toolfoot{margin:24px 28px 0;font-size:13px;color:var(--text2)}.toolfoot a{color:var(--brand-ink);font-weight:600}@media (max-width:900px){.toolfoot{margin:20px 16px 0}}
-/* one colour family: brand gradient for labels, badges and buttons; metrics neutral */
-.wrec,.wrec.w-plenty,.wrec.w-limited,.wrec.w-none{--wc:var(--brand);background:color-mix(in srgb,var(--brand) 7%,var(--surface));border-color:color-mix(in srgb,var(--brand) 22%,transparent)}
+/* calm look: white cards, one soft accent */
+.wrec,.wrec.w-plenty,.wrec.w-limited,.wrec.w-none{background:var(--bg);border-color:var(--border)}
 .wrec i{background:var(--grad)}
-.wrec small{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.wrec small{color:var(--brand-ink)}
 .scard .kn>div,.scard .kn>div.hi{--m:var(--text2)}
 .scard .kl i{background:var(--bg);color:var(--text2)}
-.scard .kl .best{background:var(--grad);color:#fff}
+.scard .kl .best{background:color-mix(in srgb,var(--brand) 12%,var(--surface));color:var(--brand-ink)}
 .scard .kn>div.hi .kv{color:var(--text)}
+.scard.rec{background:var(--surface);border:1.5px solid color-mix(in srgb,var(--brand) 35%,var(--border));box-shadow:0 4px 18px rgba(0,0,0,.05)}
 .scard.rec::before{background:var(--grad)}
-.scard.rec .link{background:var(--grad);border-color:transparent;color:#fff}
-#inputs h2.ih .n{background:var(--grad)}
+.scard.rec .link{background:var(--brand);border-color:var(--brand);color:#fff}

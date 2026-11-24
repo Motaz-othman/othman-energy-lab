@@ -13,7 +13,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Low-Carbon Cooling Selector · Othman Energy Lab</title>
 <meta name="description" content="Find the data center cooling system with the lowest CO₂: five cooling plants compared hour by hour for 33 cities, counting electricity, water supply and refrigerant leakage with official grid factors. Or enter your own numbers. By Othman Energy Lab.">
-<meta name="theme-color" content="#c2185b">
+<meta name="theme-color" content="#a8326e">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Othman Energy Lab">
 <meta property="og:title" content="Low-Carbon Cooling Selector · Othman Energy Lab">
@@ -30,7 +30,7 @@
   --bg:#f6f6f4; --surface:#fcfcfb; --border:#e3e2de; --text:#0b0b0b; --text2:#52514e; --muted:#6f6e69;
   --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --grey:#c9c8c3; --grey2:#9f9e99;
   --good:#1a7f37; --warn:#b26b00; --bad:#c62828;
-  --brand:#c2185b; --brand-ink:#a3134d;   /* Othman Energy Lab magenta: fills / text and links */
+  --brand:#a8326e; --brand-ink:#8e2a5d;   /* Othman Energy Lab magenta: fills / text and links */
 }
 @media (prefers-color-scheme: dark){
   :root:where(:not([data-theme="light"])){
@@ -38,7 +38,7 @@
     --bg:#121211; --surface:#1a1a19; --border:#2e2e2c; --text:#f0efec; --text2:#c3c2b7; --muted:#8f8e88;
     --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --grey:#4a4a47; --grey2:#6c6b67;
     --good:#4cc26a; --warn:#e0a03a; --bad:#ef6b6b;
-    --brand:#d63a7a; --brand-ink:#f48fb8;
+    --brand:#b9497f; --brand-ink:#e8a3c4;
   }
 }
 *{box-sizing:border-box}
@@ -288,9 +288,7 @@ a.tcard:hover .thumb .rk .best{transform:scaleX(1.04)}
 .thumb .tk .lvl{fill:color-mix(in srgb,var(--s1) 45%,transparent);stroke:none;transform-box:fill-box;transform-origin:bottom;transition:transform .35s ease}
 a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
 /* brand gradient (pink to purple), used on the main accents */
-:root{--grad:linear-gradient(120deg,#e3246e 0%,#b5179e 55%,#7b2ff7 100%)}
-.tabs button.on,.seg button.on,.rtabs button.on,.btn.primary{background:var(--grad);border-color:transparent;color:#fff}
-.btn.primary:hover{background:var(--grad);filter:brightness(.94)}
+:root{--grad:linear-gradient(120deg,#d9739f 0%,#a985d6 100%)}
 </style>
 <style>
 /* Result pages (Ride-Through Tank, Peak Shaving Tank, Liquid Rack Cooling): shared result styles (load after base.css) */
