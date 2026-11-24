@@ -227,78 +227,43 @@
   <div class="card reco" id="reco"></div>
 
   <nav class="rtabs" id="rtabs" role="tablist" aria-label="Results">
-    <button role="tab" data-p="ov" class="on" aria-selected="true">Overview</button>
-    <button role="tab" data-p="sys" aria-selected="false">Systems</button>
-    <button role="tab" data-p="en" aria-selected="false">Energy &amp; water</button>
+    <button role="tab" data-p="sys" class="on" aria-selected="true">Systems</button>
+    <button role="tab" data-p="en" aria-selected="false">Energy &amp; carbon</button>
     <button role="tab" data-p="cost" aria-selected="false">Cost</button>
     <button role="tab" data-p="clim" aria-selected="false">Climate</button>
-    <button role="tab" data-p="meth" aria-selected="false">Method</button>
   </nav>
 
-  <div class="pane" id="p-ov">
-    <div class="card"><h2>All options side by side</h2>
-      <div id="tOv"></div>
-      <div class="note">Highlighted = best value. Click a row to open the system.</div></div>
-    <div class="card"><h2>Design-day check</h2><div id="tDes"></div><div class="note" id="desNote"></div></div>
-  </div>
-
-  <div class="pane" id="p-sys" hidden>
+  <div class="pane" id="p-sys">
     <div class="seg sysseg" id="sysSeg"></div>
     <div class="card">
       <div class="syshead" id="sysHead"></div>
-      <p class="how" id="sysHow"></p>
-      <div class="ctitle">How it is connected</div>
       <div id="sysSvg"></div>
-      <div class="kpis k6" id="sysKpi"></div>
-      <div class="note" id="sysDes"></div>
-    </div>
-    <div class="card"><h2>How it runs over the year</h2>
-      <div class="legend"><span><i style="background:var(--s3)"></i>Free cooling (chiller off)</span><span><i style="background:var(--s1)"></i>Partial (pre-cooling + chiller)</span><span><i style="background:var(--s2)"></i>Chiller only</span></div>
-      <div id="sysModes"></div>
-      <div class="ctitle" id="mTitle" style="margin-top:16px">Monthly operating hours</div>
-      <div class="seg" id="loopSeg"><button data-l="0" class="on">Liquid loop</button><button data-l="1">Air loop</button></div>
+      <div class="ctitle" id="mTitle" style="margin-top:16px">Operation by month</div>
+      <div class="climbar"><div class="seg" id="loopSeg"><button data-l="0" class="on">Liquid loop</button><button data-l="1">Air loop</button></div>
+      <div class="legend"><span><i style="background:var(--s3)"></i>Free cooling</span><span><i style="background:var(--s1)"></i>Partial</span><span><i style="background:var(--s2)"></i>Chiller only</span></div></div>
       <div class="chartbox"><canvas id="cM"></canvas></div>
+      <p class="artlink">How each system works: <a href="../../articles/cooling-towers-vs-adiabatic-vs-dry-coolers/index.html">Cooling towers vs adiabatic vs dry coolers</a></p>
     </div>
-    <div class="card"><div class="grid2">
-      <div><h2>Equipment and cost</h2><div id="sysComp"></div><div class="note" id="compNote"></div></div>
-      <div class="pros"><h2>Strengths and watch-outs</h2><div id="sysPros"></div></div>
-    </div></div>
   </div>
 
   <div class="pane" id="p-en" hidden>
-    <div class="card"><h2>Energy efficiency</h2><div class="split">
-      <div><div id="tEff"></div><div class="note">Maximum MLC: ASHRAE 90.4-2025 Table 6.5 (screening check).</div></div>
-      <div><div class="ctitle" id="effTitle">Annual MLC</div><div class="chartbox"><canvas id="cEff"></canvas></div></div>
-    </div></div>
-    <div class="card"><h2>Carbon emissions</h2><div class="split">
-      <div><div id="tCO2"></div><div class="note" id="co2Note"></div></div>
-      <div><div class="ctitle" id="co2Title">Annual carbon by source</div>
-        <div class="legend"><span><i style="background:var(--s1)"></i>Electricity</span><span><i style="background:var(--s3)"></i>Water supply</span><span><i style="background:var(--s2)"></i>Refrigerant leakage</span></div>
-        <div class="chartbox" style="height:220px"><canvas id="cCO2"></canvas></div></div>
-    </div></div>
-    <div class="card"><h2>Electricity and water consumption</h2><div class="split">
-      <div><div id="tCons"></div><div class="note">Annual totals at the frequent load; peaks at 100% IT load. Brackets: tower evaporation band.</div></div>
-      <div>
-        <div class="ctitle" id="elTitle">Annual electricity by component</div>
-        <div class="legend"><span><i style="background:var(--s1)"></i>Chiller compressors</span><span><i style="background:var(--s4)"></i>Heat-rejection fans</span><span><i style="background:var(--grey2)"></i>Pumps</span><span><i style="background:var(--s2)"></i>CRAH / FWU fans + CDU pumps</span></div>
-        <div class="chartbox" style="height:220px"><canvas id="cEl"></canvas></div>
-        <div class="ctitle" id="wTitle" style="margin-top:14px">Annual water</div>
-        <div class="chartbox" style="height:200px"><canvas id="cW"></canvas></div>
-      </div>
+    <div class="card"><h2>Efficiency</h2><div id="tEff"></div></div>
+    <div class="card"><div class="grid2">
+      <div><div class="ctitle">Electricity by component, MWh/yr</div>
+        <div class="legend"><span><i style="background:var(--s1)"></i>Chillers</span><span><i style="background:var(--s4)"></i>Heat-rejection fans</span><span><i style="background:var(--grey2)"></i>Pumps</span><span><i style="background:var(--s2)"></i>CRAH / FWU / CDU</span></div>
+        <div class="chartbox" style="height:220px"><canvas id="cEl"></canvas></div></div>
+      <div><div class="ctitle">CO₂ by source, t/yr</div>
+        <div class="legend"><span><i style="background:var(--s1)"></i>Electricity</span><span><i style="background:var(--s3)"></i>Water supply</span><span><i style="background:var(--s2)"></i>Refrigerant</span></div>
+        <div class="chartbox" style="height:220px"><canvas id="cCO2"></canvas></div><div class="note" id="co2Note"></div></div>
     </div></div>
   </div>
 
   <div class="pane" id="p-cost" hidden>
-    <div class="card"><h2>Running cost (cooling)</h2>
-      <div id="tRun"></div><div class="note" id="runNote"></div>
-      <div class="ctitle" id="runTitle" style="margin-top:18px">Annual running cost</div>
+    <div class="card"><h2>Cost</h2><div id="tRun"></div><div class="note" id="runNote"></div>
+      <div class="ctitle" style="margin-top:18px">Running cost by item, k$/yr</div>
       <div class="legend"><span><i style="background:var(--s1)"></i>Electricity</span><span><i style="background:var(--s3)"></i>Water</span><span><i style="background:var(--s4)"></i>Demand charge</span></div>
       <div class="chartbox" style="height:220px"><canvas id="cRun"></canvas></div>
     </div>
-    <div class="card"><h2>Initial cost (estimated range)</h2><div class="split">
-      <div><div id="tCap"></div><div class="note">Excludes building works, electrical and controls.</div></div>
-      <div><div class="ctitle" id="capTitle">Estimated initial cost range</div><div class="chartbox"><canvas id="cCap"></canvas></div></div>
-    </div></div>
   </div>
 
   <div class="pane" id="p-clim" hidden>
@@ -306,33 +271,13 @@
       <div class="kpis" id="clKpi" style="margin:0 0 14px"></div>
       <div class="climbar">
         <div class="seg" id="climSeg"><button data-dev="dc" class="on">Dry coolers (dry-bulb)</button><button data-dev="ct">Cooling towers (wet-bulb)</button></div>
-        <div class="legend"><span><i style="background:var(--s3)"></i>Free cooling (outdoor air alone)</span><span><i style="background:var(--s1)"></i>Partial (pre-cooling + chiller)</span><span><i style="background:var(--s2)"></i>Chiller only</span></div>
+        <div class="legend"><span><i style="background:var(--s3)"></i>Free cooling</span><span><i style="background:var(--s1)"></i>Partial</span><span><i style="background:var(--s2)"></i>Chiller only</span></div>
       </div>
       <div class="grid2">
-        <div><div class="ctitle" id="clTitle0">Liquid cooling loop (LC)</div><div class="note" id="clSub0" style="margin:0 0 6px"></div><div class="chartbox" style="height:260px"><canvas id="cCl0"></canvas></div></div>
-        <div><div class="ctitle" id="clTitle1">Air cooling loop (AC)</div><div class="note" id="clSub1" style="margin:0 0 6px"></div><div class="chartbox" style="height:260px"><canvas id="cCl1"></canvas></div></div>
+        <div><div class="ctitle" id="clTitle0">Liquid cooling loop</div><div class="chartbox" style="height:260px"><canvas id="cCl0"></canvas></div></div>
+        <div><div class="ctitle" id="clTitle1">Air cooling loop</div><div class="chartbox" style="height:260px"><canvas id="cCl1"></canvas></div></div>
       </div>
       <div class="note" id="clNote"></div></div>
-  </div>
-
-  <div class="pane" id="p-meth" hidden>
-  <div class="card">
-    <h2>Method and equations</h2>
-    <ul class="method">
-      <li><b>Weather</b>: built-in cities use a measured typical year (TMYx 2011–2025) from the main airport station and ASHRAE 2025 Handbook of Fundamentals design conditions, both from climate.onebuilding.org. Hourly wet-bulb is limited to the ASHRAE extreme annual wet-bulb + 1 K. Psychrometrics per ASHRAE Fundamentals, Ch. 1.</li>
-      <li><b>Design cases</b>: Case A = extreme dry-bulb + the wet-bulb of the hottest hour; Case B = extreme wet-bulb + the dry-bulb of the most humid hour that was not capped. Every system is checked at both at 100% load. The design peak is the highest of Case A, Case B and the typical-year maximum at 100% load, so no hour in the weather file exceeds it.</li>
-      <li><b>Loads</b>: chiller load = IT load + CDU pumps or FWU fans + primary and secondary pumps. Pumps and fans: <code>P = Q·ΔP / (ρ·c<sub>p</sub>·ΔT·η)</code>; VFD part load <code>P = P<sub>full</sub>·(Q/Q<sub>design</sub>)³</code>, minimum speed 50% pumps, 30% fans.</li>
-      <li><b>Free cooling</b> = (T<sub>return</sub> − T<sub>out</sub>) / (T<sub>return</sub> − T<sub>supply</sub>), 0–1. T<sub>out</sub>: towers wb + 5.56 + 1.5 (plate HX); dry coolers db + 5.56 (direct on the loop); adiabatic above 24 °C: min(db + 5.56, T<sub>pad</sub> + 9.4) + 1.5, with T<sub>pad</sub> = db − 0.85 (db − wb); the pads run only when they give the colder water; db + 5.56 + 1.5 below 24 °C; hybrid (capability rule): dry coolers in series ahead of the towers; the dry section runs when the water entering is above db + 5.56, the towers only when the dry section alone cannot reach the target (supply − 1.5 in free cooling, the 30 °C condenser-water setpoint with chillers only); with both on, in free-cooling hours dry share = (T<sub>in</sub> − T<sub>dry,out</sub>) / (T<sub>in</sub> − T<sub>req</sub>), T<sub>in</sub> = return − 1.5, T<sub>req</sub> = max(supply − 1.5, wb + 5.56), T<sub>dry,out</sub> = max(db + 5.56, T<sub>req</sub>); with chillers only (wb + 5.56 − db) / 5.56. Approaches: ASHRAE 90.1-2025 Table 6.8.1-7 rating points (minimum efficiency, not design selections).</li>
-      <li><b>Chillers</b>: <code>COP = COP<sub>rated</sub> × [(T<sub>e</sub> + 273.15)/(T<sub>c</sub> − T<sub>e</sub>)] ÷ [(T<sub>e,ref</sub> + 273.15)/(T<sub>c,ref</sub> − T<sub>e,ref</sub>)]</code>, limited to 14 and a lift of at least 3 K (assumption: a constant Carnot fraction over-predicts at very small lifts; public low-lift data are scarce, so the limit is tested by sensitivity). T<sub>e</sub> = supply − 2; T<sub>c</sub> = db + 15 (air-cooled) or condenser water + 7 (water-cooled). Rated COP: ASHRAE 90.1-2025 Path B (2.866 air-cooled, 6.018 water-cooled) at AHRI 551/591 (T<sub>e,ref</sub> 5 °C; T<sub>c,ref</sub> 50 / 37 °C). Part load: <code>PLF = a + b·PLR + c·PLR²</code> = k × EnergyPlus variable-speed shape + (1 − k), k solved so the AHRI points, each at its own condenser temperature, reproduce the Path B IPLV (k = 0.867 water-cooled, 0.890 air-cooled; coefficients 0.1969 / 0.1318 / 0.6713 and 0.1752 / 0.1354 / 0.6895). The temperature benefit sits only in the Carnot term. Units staged by load, the next above 90% PLR. Air-cooled capacity −1.35% per K above 35 °C.</li>
-      <li><b>Heat rejection</b>: Q<sub>r</sub> = chiller load + chiller power. Fans at full speed: towers 1.2%, dry and adiabatic coolers 3% of the heat (ASHRAE 2025 minimum / public data sheets); condenser pumps 211 kPa on 5.56 K. Condenser water above 43 °C gives a warning (a chiller rated above 43 °C is needed).</li>
-      <li><b>Water</b>: towers <code>0.0020 × flow × range</code> evaporation (EnergyPlus default 0.2 %/K; band 0.15–0.27 %/K) plus blowdown at CoC 4 = 2.3 L/h per kW rejected (1.7–3.1); hybrid on the towers' share; adiabatic <code>Q<sub>r</sub> × (db − T<sub>pad</sub>) / (12 × 2,430) × 1.15</code> in wet-mode hours only.</li>
-      <li><b>MLC</b> (ASHRAE 90.4): annual mechanical energy ÷ annual IT energy; checked against ASHRAE 90.4-2025 Table 6.5 for the climate zone.</li>
-      <li><b>Electrical losses and PUE</b>: <code>PUE = (IT / η<sub>UPS</sub> + cooling) / (1 − losses) / IT</code>, UPS 96%, distribution 2%. Simplified, not the 90.4 ELC method.</li>
-      <li><b>Running cost</b>: <code>electricity × tariff + water × tariff + cooling peak × demand charge × 12</code>. Simple payback against air-cooled chillers = extra initial cost (mid estimate) ÷ running cost saved.</li>
-      <li><b>Carbon</b> (t CO₂e/yr): electricity × grid factor + water × supply energy (kWh/m³) × grid factor + refrigerant charge (duty + 1 standby per loop, kg/kW × capacity) × leak rate × GWP. Grid factors: EPA eGRID2023 rev 2 (US), Australian NGA (Sydney), Our World in Data / Ember (others); water energy: IEA WEO 2016 (Phoenix: City of Phoenix 2022 GHG inventory + CAP, in kg CO₂e/m³); GWP: IPCC AR4 via the EPA AIM Act, R-1234ze(E) EU 2024/573.</li>
-      <li><b>Recommendation</b>: energy 4, water 3, peak 3, initial cost 2, carbon 3, normalised across feasible options, for three water cases: TSE available (as above), water limited (water weight doubled) and no water (water-using systems excluded). Screening-level; confirm with vendor selections.</li>
-    </ul>
-  </div>
   </div>
 </section>
 </main>

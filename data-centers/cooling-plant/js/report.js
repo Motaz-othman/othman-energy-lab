@@ -105,61 +105,28 @@ function buildReport(){
       <dt>Air loop</dt><dd>${fmt(P.loops[1].Qd/1000,1)} MW · ${P.loops[1].Ts}/${P.loops[1].Tr} °C</dd>
       <dt>Water</dt><dd>${esc(waterTxt)}</dd><dt>Tariffs</dt><dd>${P.tE} $/kWh · ${P.tW} $/m³ · ${P.tD} $/kW-month</dd></dl></div>
   </div>`;
-  if(rec){
-    const pb=payback(rec), acc=RES.acc;
-    h+=`<div class="rec"><div class="tl">Recommended if TSE is available · score ${fmt(rec.score)} of 100</div><div class="nm">${rec.o.name}</div><p class="why">If water is limited: <b>${SCEN.limited?RES[SCEN.limited].o.name:'–'}</b>. If there is no water: <b>${SCEN.none?RES[SCEN.none].o.name:'none meets the constraints'}</b>.</p>
-      <div class="kpis">
-        <div class="kpi"><div class="v">${fmt(rec.E/1000,1)} GWh/yr</div><div class="l">Cooling electricity</div></div>
-        <div class="kpi"><div class="v">${rec.pue.toFixed(3)}</div><div class="l">Annual PUE</div></div>
-        <div class="kpi"><div class="v">${fmt(rec.peak/1000,2)} MW</div><div class="l">Electrical peak, cooling (100% load)</div></div>
-        <div class="kpi"><div class="v">${fmt(rec.W)} m³/yr</div><div class="l">Water</div></div>
-        <div class="kpi"><div class="v">${fmt(rec.run/1e6,2)} M$/yr</div><div class="l">Running cost, cooling</div></div>
-        <div class="kpi"><div class="v">${fmt(rec.capLo/1e6,1)}–${fmt(rec.capHi/1e6,1)} M$</div><div class="l">Initial cost (estimate)</div></div>
-        <div class="kpi"><div class="v">${pb.txt}</div><div class="l">Payback vs air-cooled chillers</div></div>
-        <div class="kpi"><div class="v">${fmt(rec.mlc,3)}</div><div class="l">Annual MLC, kW/kW${mlcLim()!=null?` · ASHRAE 90.4 max ${mlcLim().toFixed(2)}: ${rec.mlc<=mlcLim()?'meets':'<b style="color:#c62828">exceeds</b>'}`:' (ASHRAE 90.4)'}</div></div>
-      </div>
-      <p class="why">${rec.o.id==='acc'?'':`Against air-cooled chillers it saves <b>${fmt(Math.max(0,acc.E-rec.E)/1000,1)} GWh/yr</b> of electricity and <b>${fmt(Math.max(0,acc.peak-rec.peak)/1000,2)} MW</b> of peak cooling power. `}Free cooling covers ${fmt(rec.free[0])} h/yr on the liquid loop and ${fmt(rec.free[1])} h/yr on the air loop. ${DES[rec.o.id].ok?`It holds the supply temperatures at the design condition (${fmt(P.dbD,1)} °C dry-bulb / ${fmt(P.wbD,1)} °C wet-bulb).`:''}</p></div>`;
-  } else h+=`<div class="rec"><div class="nm">No system meets every constraint</div><p class="why">Allow water, raise the loop supply temperatures, or check the design conditions and chiller limits.</p></div>`;
-  h+=`<h2>Ranking</h2><table><thead><tr><th>#</th><th class="l">System</th><th>Score</th><th>Electricity GWh/yr</th><th>Peak MW</th><th>Water m³/yr</th><th>Carbon t CO₂/yr</th><th>Running M$/yr</th><th>Initial M$</th></tr></thead><tbody>${ids.map(id=>{ const r=RES[id], k=RANK.indexOf(id);
-    return `<tr class="${k===0?'best':''}"><td>${k>=0?k+1:'–'}</td><td class="l">${r.o.name}${r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="tag ok">Recommended</span>':''}</td><td>${r.excluded?'–':fmt(r.score)}</td><td>${fmt(r.E/1000,1)}</td><td>${fmt(r.peak/1000,2)}</td><td>${fmt(r.W)}</td><td>${fmt(r.co2)}</td><td>${fmt(r.run/1e6,2)}</td><td>${fmt(r.capLo/1e6,1)}–${fmt(r.capHi/1e6,1)}</td></tr>`; }).join('')}</tbody></table>
-  <div class="note">Score: energy, water, peak power, initial cost and carbon normalised across the feasible options and weighted 4 / 3 / 3 / 2 / 3 (water doubled when limited). Annual figures at the frequent load; peaks at 100% load on the worst hour of the year.</div>`;
+  const WLr={plenty:'If TSE is available',limited:'If water is limited',none:'If there is no water'};
+  h+=`<div class="rec"><div class="tl">Recommended</div><dl class="kv">${Object.keys(WLr).map(w=>`<dt>${WLr[w]}</dt><dd><b>${SCEN[w]?RES[SCEN[w]].o.name:'No system meets the constraints'}</b></dd>`).join('')}</dl></div>`;
+  h+=`<h2>Results</h2><table><thead><tr><th class="l">System</th><th>Electricity GWh/yr</th><th>Peak MW</th><th>PUE</th><th>Water m³/yr</th><th>CO₂ t/yr</th><th>Running k$/yr</th><th>Initial M$</th></tr></thead><tbody>${ids.map(id=>{ const r=RES[id]; return `<tr><td class="l">${r.o.name}${r.excluded?`<span class="tag x">${r.excluded}</span>`:''}</td><td>${fmt(r.E/1000,1)}</td><td>${fmt(r.peak/1000,2)}</td><td>${r.pue.toFixed(3)}</td><td>${fmt(r.W)}</td><td>${fmt(r.co2)}</td><td>${fmt(r.run/1e3)}</td><td>${fmt(r.capLo/1e6,1)}–${fmt(r.capHi/1e6,1)}</td></tr>`; }).join('')}</tbody></table>`;
   // ---- page 2: comparison charts
-  const lab=id=>({label:RES[id].o.short,bold:id===RANK[0]});
+  const lab=id=>({label:RES[id].o.short});
   h+=`<section class="sec"><h2>Comparison</h2>
    <div class="chart"><div class="ct">Annual cooling electricity, MWh/yr</div>${rptLegend([['Chiller compressors',RPT_C.s1],['Heat-rejection fans',RPT_C.s4],['Pumps',RPT_C.grey2],['CRAH / FWU fans + CDU pumps',RPT_C.s2]])}
     ${rptBars(ids.map(id=>({...lab(id),segs:[[RES[id].Ec,RPT_C.s1],[RES[id].Ef,RPT_C.s4],[RES[id].Ep,RPT_C.grey2],[RES[id].Et,RPT_C.s2]]})),'MWh',0)}</div>
-   <div class="chart"><div class="ct">Electrical peak of the cooling plant, MW (100% load, worst hour)</div>${rptBars(ids.map(id=>({...lab(id),segs:[[RES[id].peak/1000,RPT_C.s2]]})),'MW',2)}</div>
-   <div class="chart"><div class="ct">Annual water, m³/yr</div>${rptBars(ids.map(id=>({...lab(id),segs:[[RES[id].W,RPT_C.s1]]})),'m³',0)}</div>
    <div class="chart"><div class="ct">Annual running cost of cooling, k$/yr</div>${rptLegend([['Electricity',RPT_C.s1],['Water',RPT_C.s3],['Demand charge',RPT_C.s4]])}
     ${rptBars(ids.map(id=>({...lab(id),segs:[[RES[id].costE/1e3,RPT_C.s1],[RES[id].costW/1e3,RPT_C.s3],[RES[id].costD/1e3,RPT_C.s4]]})),'k$',0)}</div>
-   <div class="chart"><div class="ct">Estimated initial cost, M$ (low – high)</div>${rptBars(ids.map(id=>({...lab(id),lo:RES[id].capLo/1e6,hi:RES[id].capHi/1e6})),'M$',1,true)}</div>
   </section>`;
   // ---- recommended system (and the one picked in the Systems tab, if different)
-  const shown=[...new Set([RANK[0],PICK].filter(Boolean))];
-  shown.forEach(id=>{ const r=RES[id], s=SYS[id], d=DES[id], k=RANK.indexOf(id), cap=P.Qd*(1+P.red);
-    h+=`<section class="sec"><h2>${k===0?'Recommended system':'Selected system'}: ${r.o.name}</h2><p>${s.how}</p>${schematic(id).replace(/<div class="note">/,'<div class="note">')}
-     <h3>Equipment and cost</h3><table><thead><tr><th class="l">Component</th><th class="l">Role</th><th>Sized MW</th><th>Cost M$</th></tr></thead><tbody>${r.o.comp.map(c=>{ const rt=P.rates[c];
-       return `<tr><td class="l">${RATES.find(x=>x.id===c).l}</td><td class="l">${ROLE[c](r.o)}</td><td>${fmt(cap/1000,1)}</td><td>${fmt(cap*rt.lo/1e6,1)}–${fmt(cap*rt.hi/1e6,1)}</td></tr>`; }).join('')}</tbody></table>
-     <div class="note">Each component sized for ${fmt(P.Qd/1000,1)} MW + ${fmt(P.red*100)}% redundancy. Pumps, CDUs, piping and controls not included.</div>
-     <div class="cols2"><div><h3>Strengths</h3><ul>${s.pros.map(x=>`<li>${x}</li>`).join('')}</ul></div><div><h3>Watch-outs</h3><ul>${s.cons.map(x=>`<li>${x}</li>`).join('')}</ul></div></div>
-     <h3>Design cases</h3><p>${d.ok?`At 100% load: Case A (db ${fmt(P.cases.A.db,1)} °C / wb ${fmt(P.cases.A.wb,1)} °C) ${fmt(d.cases.A.P/1000,2)} MW; Case B (wb ${fmt(P.cases.B.wb,1)} °C / db ${fmt(P.cases.B.db,1)} °C) ${fmt(d.cases.B.P/1000,2)} MW. Design peak ${fmt(d.P/1000,2)} MW (Case ${d.worst}), heat rejection ${fmt(d.Qr/1000,1)} MW. Duty chillers ${d.units.map(u=>u.N+" × "+fmt(u.unit/1000,1)+" MW").join(" / ")}, plus 1 standby per loop.${d.warns.length?" Warning: "+d.warns[0]+".":""}`:`<span class="tag x">Fails design day</span> ${d.issues.join("; ")}`}</p>
-     <h3>Operating modes over the year</h3>${rptLegend([['Free cooling (chillers off)',RPT_C.s3],['Partial free cooling',RPT_C.s1],['Chillers only',RPT_C.s2]])}
-     ${P.loops.map((L,i)=>L.Q>0?`<div class="chart"><div class="ct">${i?'Air':'Liquid'} loop ${L.Ts}/${L.Tr} °C: free ${fmt(r.free[i])} h · partial ${fmt(r.part[i])} h · chillers only ${fmt(r.mech[i])} h per year</div>${rptMonthly(r,i)}</div>`:'').join('')}
+  const shown=[...new Set([SCEN.plenty,SCEN.limited,SCEN.none,PICK].filter(Boolean))];
+  shown.forEach(id=>{ const r=RES[id];
+    h+=`<section class="sec"><h2>${r.o.name}</h2>${schematic(id)}
+     <h3>Operation by month</h3>${rptLegend([['Free cooling',RPT_C.s3],['Partial',RPT_C.s1],['Chiller only',RPT_C.s2]])}
+     ${P.loops.map((L,i)=>L.Q>0?`<div class="chart"><div class="ct">${i?'Air':'Liquid'} loop</div>${rptMonthly(r,i)}</div>`:'').join('')}
     </section>`; });
-  // ---- detailed tables
-  h+=`<section class="sec"><h2>Detailed results</h2>
-   <h3>Design-day check</h3>${rptTable('tDes')}<div class="note">${esc($('desNote').textContent)}</div>
-   <h3>Efficiency</h3>${rptTable('tEff')}
-   <h3>Energy and water</h3>${rptTable('tCons')}
-   <h3>Carbon emissions</h3>${rptTable('tCO2')}<div class="note">${esc($('co2Note').textContent)}</div>
-   <h3>Running cost</h3>${rptTable('tRun')}<div class="note">${esc($('runNote').textContent)}</div>
-   <h3>Initial cost</h3>${rptTable('tCap')}<div class="note">Rate-based estimate, not a quotation: capacity × redundancy × low/high rate for each component. Excludes building works, electrical and controls.</div></section>`;
   // ---- inputs and method
   const inp=inputRows(document.querySelector('aside.inputs')||document,INPUT_NAMES), half=Math.ceil(inp.length/2);
   const it=a=>`<table><thead><tr><th class="l">Input</th><th>Value</th></tr></thead><tbody>${a.map(([l,v])=>`<tr><td class="l">${esc(l)}</td><td>${esc(v)}</td></tr>`).join('')}</tbody></table>`;
-  const meth=$('p-meth')?$('p-meth').querySelector('ul.method'):null;
   h+=`<section class="sec"><h2>Inputs</h2><div class="cols2"><div>${it(inp.slice(0,half))}</div><div>${it(inp.slice(half))}</div></div>
-   ${meth?`<h2>Method and assumptions</h2><ul class="method">${meth.innerHTML}</ul>`:''}
    <div class="disc">Screening-level study made with the Othman Energy Lab Cooling Plant Selector (oenergylab.com). Results depend on the inputs listed and on typical equipment performance; confirm with vendor selections and a detailed design before procurement.</div></section>`;
   const title=`Cooling plant report – ${WX.name} – ${now.toISOString().slice(0,10)}`;
   return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${esc(title)}</title><style>${RPT_CSS}</style></head>
