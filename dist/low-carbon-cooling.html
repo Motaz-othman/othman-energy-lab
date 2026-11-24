@@ -13,7 +13,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Low-Carbon Cooling Selector · Othman Energy Lab</title>
 <meta name="description" content="Find the data center cooling system with the lowest CO₂: five cooling plants compared hour by hour for 33 cities, counting electricity, water supply and refrigerant leakage with official grid factors. Or enter your own numbers. By Othman Energy Lab.">
-<meta name="theme-color" content="#0e7c57">
+<meta name="theme-color" content="#c2185b">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Othman Energy Lab">
 <meta property="og:title" content="Low-Carbon Cooling Selector · Othman Energy Lab">
@@ -30,7 +30,7 @@
   --bg:#f6f6f4; --surface:#fcfcfb; --border:#e3e2de; --text:#0b0b0b; --text2:#52514e; --muted:#6f6e69;
   --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --grey:#c9c8c3; --grey2:#9f9e99;
   --good:#1a7f37; --warn:#b26b00; --bad:#c62828;
-  --brand:#0e7c57; --brand-ink:#0b6b4a;   /* Othman Energy Lab green: fills / text and links */
+  --brand:#c2185b; --brand-ink:#a3134d;   /* Othman Energy Lab magenta: fills / text and links */
 }
 @media (prefers-color-scheme: dark){
   :root:where(:not([data-theme="light"])){
@@ -38,7 +38,7 @@
     --bg:#121211; --surface:#1a1a19; --border:#2e2e2c; --text:#f0efec; --text2:#c3c2b7; --muted:#8f8e88;
     --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --grey:#4a4a47; --grey2:#6c6b67;
     --good:#4cc26a; --warn:#e0a03a; --bad:#ef6b6b;
-    --brand:#17855e; --brand-ink:#4cc99a;
+    --brand:#d63a7a; --brand-ink:#f48fb8;
   }
 }
 *{box-sizing:border-box}
@@ -373,12 +373,11 @@ tr.best td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpa
 <body class="wide" style="--navh:0px">
 <div class="pagehead">
   <h1>Low-Carbon Cooling Selector</h1>
-  <p class="sub">Which cooling system emits the least CO₂, and how much does it emit each year? Three sources: the electricity it uses, the energy to supply its water, and the refrigerant that leaks from the chillers. Compare five cooling plants hour by hour for a city, or enter your own system's numbers.</p>
 </div>
 
 <main class="layout">
 <div class="incol">
-<div class="colhead"><b>Inputs</b><span>Results update as you type</span></div>
+<div class="colhead"><b>Inputs</b></div>
 <aside class="card inputs" id="inGrid">
   <h2>Location</h2>
   <label for="cCity">City</label><select id="cCity"></select>
@@ -396,7 +395,6 @@ tr.best td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpa
       <div><label for="cLf">Average load (%)</label><input type="number" id="cLf" value="80" min="10" max="100" step="5"></div>
     </div>
     <label for="cLcp">Liquid-cooled share of the load (%)</label><input type="number" id="cLcp" value="80" min="0" max="100" step="5">
-    <div class="note">Measured hourly weather for the city, 8,760 hours. Same model as the Cooling Plant Selector.</div>
     <details>
       <summary>Water temperatures</summary>
       <div class="row">
@@ -967,7 +965,7 @@ function renderEst(f){
   const all=OPTIONS.map(o=>RES[o.id]), ok=all.filter(r=>DES[r.o.id].ok);
   const ids=[...ok.sort((a,b)=>a.co2-b.co2),...all.filter(r=>!DES[r.o.id].ok)].map(r=>r.o.id);
   const best=RES[ids[0]], base=RES.acc, save=base.co2-best.co2;
-  $('cStatus').textContent=`${WX.name} · ${fmt(P.Qd/1000,1)} MW at ${fmt(P.lf*100)}% load`;
+  $('cStatus').textContent='';
   $('cRes').hidden=true; $('cRes').innerHTML=`
     <div class="big4">
       <div class="bn"><div class="v good">${t(best.co2)} <small>t CO₂e/yr</small></div><div class="l">Lowest: ${best.o.short}</div></div>
@@ -998,7 +996,7 @@ function renderOwn(f){
   const R=refr(), Y=yrs(), E=Math.max(0,num('oE',0)), W=Math.max(0,num('oW',0)), ch=Math.max(0,num('oCh',0)), IT=num('oIT',NaN);
   const wkg=f.wco2?f.wco2[1]:f.wkwh*f.ef, cE=E*f.ef, cW=W*wkg/1000, cR=ch*R.leak*R.r.gwp/1000, tot=cE+cW+cR;
   const name=$('oSys').selectedOptions[0].textContent, sh=v=>tot>0?fmt(100*v/tot):'0';
-  $('cStatus').textContent=`${city().name} · ${name}`;
+  $('cStatus').textContent='';
   $('cRes').hidden=false; $('cRes').innerHTML=`
     <div class="big4">
       <div class="bn"><div class="v good">${t(tot)} <small>t CO₂e/yr</small></div><div class="l">Total, cooling system</div></div>

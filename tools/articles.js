@@ -132,7 +132,7 @@ ${GA}
 <meta name="description" content="${esc(desc)}">
 <link rel="icon" href="${root}shared/img/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="${root}shared/img/apple-touch-icon.png">
-<meta name="theme-color" content="#0e7c57">
+<meta name="theme-color" content="#c2185b">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Othman Energy Lab">
 <meta property="og:title" content="${esc(title)}">

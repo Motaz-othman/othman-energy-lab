@@ -13,7 +13,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Peak Shaving Tank · Othman Energy Lab</title>
 <meta name="description" content="Size a chilled-water tank that shaves the rare extreme-hour peak of a data center cooling plant, so the plant and its electrical supply need less rated power. By Othman Energy Lab.">
-<meta name="theme-color" content="#0e7c57">
+<meta name="theme-color" content="#c2185b">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Othman Energy Lab">
 <meta property="og:title" content="Peak Shaving Tank · Othman Energy Lab">
@@ -30,7 +30,7 @@
   --bg:#f6f6f4; --surface:#fcfcfb; --border:#e3e2de; --text:#0b0b0b; --text2:#52514e; --muted:#6f6e69;
   --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --grey:#c9c8c3; --grey2:#9f9e99;
   --good:#1a7f37; --warn:#b26b00; --bad:#c62828;
-  --brand:#0e7c57; --brand-ink:#0b6b4a;   /* Othman Energy Lab green: fills / text and links */
+  --brand:#c2185b; --brand-ink:#a3134d;   /* Othman Energy Lab magenta: fills / text and links */
 }
 @media (prefers-color-scheme: dark){
   :root:where(:not([data-theme="light"])){
@@ -38,7 +38,7 @@
     --bg:#121211; --surface:#1a1a19; --border:#2e2e2c; --text:#f0efec; --text2:#c3c2b7; --muted:#8f8e88;
     --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --grey:#4a4a47; --grey2:#6c6b67;
     --good:#4cc26a; --warn:#e0a03a; --bad:#ef6b6b;
-    --brand:#17855e; --brand-ink:#4cc99a;
+    --brand:#d63a7a; --brand-ink:#f48fb8;
   }
 }
 *{box-sizing:border-box}
@@ -348,17 +348,15 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
 <body class="wide" style="--navh:0px">
 <div class="pagehead">
   <h1>Peak Shaving Tank</h1>
-  <p class="sub">A cooling plant is rated for the extreme hottest hour at full IT load, a condition that rarely happens. A chilled-water tank covers those few hours, so the chillers and their electrical supply can be rated lower. The tank recharges during the 12-hour night.</p>
 </div>
 
 <main class="layout">
 <div class="incol">
-<div class="colhead"><b>Inputs</b><span>Results update a moment after you change a value</span></div>
+<div class="colhead"><b>Inputs</b></div>
 <aside class="card inputs" id="inGrid">
   <h2>Weather</h2>
   <div class="tabs"><button id="gTabCity" class="on">City</button><button id="gTabFile">Weather file</button></div>
-  <div id="gCityPane"><label for="gCity">City</label><select id="gCity"></select>
-    <div class="note">Measured hourly weather and ASHRAE 2025 design conditions for the main airport station.</div></div>
+  <div id="gCityPane"><label for="gCity">City</label><select id="gCity"></select></div>
   <div id="gFilePane" hidden>
     <label for="gFile">EPW or CSV weather file (8,760 hours)</label><input type="file" id="gFile" accept=".epw,.csv,.txt">
     <div class="note" id="gFileInfo">Same formats as the Cooling Plant Selector.</div>
@@ -400,7 +398,7 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
 </aside>
 </div>
 <section class="results">
-  <div class="colhead"><b>Results</b><span id="gStatus">Peak shaving</span></div>
+  <div class="colhead"><b>Results</b><span id="gStatus"></span></div>
   <div class="card hero" id="gRes"><div class="note">Calculating…</div></div>
   <div class="card" id="gCurves">
     <div class="ctitle" id="gChartTitle">Hottest day: cooling plant power</div>
@@ -1055,7 +1053,7 @@ function render(){
     ? `Recommended: <b>${fmt(rec,1)} °C</b>. Type your own temperature to test it.`
     : `Recommended: <b>${fmt(rec,1)} °C</b> · <a href="#" id="gTdReset">use it</a>`;
   if($('gTdReset')) $('gTdReset').onclick=e=>{ e.preventDefault(); userTd=null; render(); };
-  $('gStatus').textContent=`${WX.name} · ${ST.sys.name}`;
+  $('gStatus').textContent='';
   const chCut=Math.max(0,c.cap0-c.capT), night=`${fmt(I.night*100)}% IT load`, lim=`${fmt(I.rechMax,1)} h`;
   const rech=isFinite(c.rechH)?{v:`${fmt(c.rechH)} <small>h</small>`,l:`to recharge at ${night} over the 12-hour night`}:{v:'No',l:`full recharge before morning at ${night}`};
   const save=`This saves <b>${MW(c.cut)} MW</b> of electrical supply (transformer, generator, grid connection) and <b>${MW(chCut)} MW</b> of chiller capacity.`;

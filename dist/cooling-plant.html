@@ -13,7 +13,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cooling Plant Selector · Othman Energy Lab</title>
 <meta name="description" content="Compare complete cooling plants for a data hall with liquid and air cooling, hour by hour over a full year: energy, water, peak demand and cost. By Othman Energy Lab.">
-<meta name="theme-color" content="#0e7c57">
+<meta name="theme-color" content="#c2185b">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Othman Energy Lab">
 <meta property="og:title" content="Cooling Plant Selector · Othman Energy Lab">
@@ -30,7 +30,7 @@
   --bg:#f6f6f4; --surface:#fcfcfb; --border:#e3e2de; --text:#0b0b0b; --text2:#52514e; --muted:#6f6e69;
   --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --grey:#c9c8c3; --grey2:#9f9e99;
   --good:#1a7f37; --warn:#b26b00; --bad:#c62828;
-  --brand:#0e7c57; --brand-ink:#0b6b4a;   /* Othman Energy Lab green: fills / text and links */
+  --brand:#c2185b; --brand-ink:#a3134d;   /* Othman Energy Lab magenta: fills / text and links */
 }
 @media (prefers-color-scheme: dark){
   :root:where(:not([data-theme="light"])){
@@ -38,7 +38,7 @@
     --bg:#121211; --surface:#1a1a19; --border:#2e2e2c; --text:#f0efec; --text2:#c3c2b7; --muted:#8f8e88;
     --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --grey:#4a4a47; --grey2:#6c6b67;
     --good:#4cc26a; --warn:#e0a03a; --bad:#ef6b6b;
-    --brand:#17855e; --brand-ink:#4cc99a;
+    --brand:#d63a7a; --brand-ink:#f48fb8;
   }
 }
 *{box-sizing:border-box}
@@ -326,8 +326,8 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
 @media (max-width:600px){.mode{grid-template-columns:1fr}.mode .mv{grid-column:1}}
 .pros ul{margin:4px 0 0 18px;padding:0}
 .pros li{margin:3px 0}
-#tOv th:nth-child(2),#tOv td:nth-child(2){text-align:left;white-space:normal;min-width:220px}
-#tOv td:first-child{color:var(--text2)}
+#tOv th:nth-child(-n+2),#tOv td:nth-child(-n+2){text-align:left;white-space:normal}
+#tOv td:first-child{min-width:200px}
 /* system summary cards (top) */
 .scards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:14px}
 @media (max-width:1100px){.scards{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -388,28 +388,90 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
 .climbar .seg,.climbar .legend{margin:0}
 .wxsrc{font-size:12.5px;color:var(--muted);margin-top:2px}
 .colhead .xports{margin-left:auto;display:flex;gap:6px}.colhead .xports button{padding:4px 10px;font-size:13px}
+
+/* friendlier look: metric colours and icons */
+:root{--m-el:#d99100;--m-pk:#e0582a;--m-w:#2a78d6;--m-co:#5f6f86}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--m-el:#f0b429;--m-pk:#f07a4a;--m-w:#5aa2f0;--m-co:#9fb0c8}}
+:root[data-theme=dark]{--m-el:#f0b429;--m-pk:#f07a4a;--m-w:#5aa2f0;--m-co:#9fb0c8}
+.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.scard .kn>div{border:1px solid transparent;position:relative}
+.scard .kn>div.m-el{--m:var(--m-el)}.scard .kn>div.m-pk{--m:var(--m-pk)}.scard .kn>div.m-w{--m:var(--m-w)}.scard .kn>div.m-co{--m:var(--m-co)}
+.scard .kn>div{background:color-mix(in srgb,var(--m) 7%,var(--surface))}
+.scard .kn>div.hi{background:color-mix(in srgb,var(--m) 14%,var(--surface));border-color:color-mix(in srgb,var(--m) 45%,transparent)}
+.scard .kl{display:flex;align-items:center;gap:6px}
+.scard .kl i{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:color-mix(in srgb,var(--m) 18%,transparent);color:var(--m)}
+.scard .kl i .ic{width:13px;height:13px}
+.scard .kl .best{margin-left:auto;font-size:10.5px;font-weight:700;color:#fff;background:var(--m);border-radius:8px;padding:1px 6px;letter-spacing:.02em}
+.scard .kv,.scard.rec .kv{color:var(--text)}
+.scard .kn>div.hi .kv{color:color-mix(in srgb,var(--m) 75%,var(--text))}
+.scard .rank{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--bg);border:1px solid var(--border);color:var(--text2);font-size:12px}
+.recb{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:#fff;background:var(--brand);border-radius:12px;padding:3px 10px 3px 8px}
+.recb svg{width:13px;height:13px;fill:#ffd24a}
+.scard.rec{box-shadow:0 6px 22px color-mix(in srgb,var(--brand) 18%,transparent)}
+.scard.rec::before{content:"";display:block;height:4px;margin:-15px -15px 0;border-radius:10px 10px 0 0;background:linear-gradient(90deg,var(--brand),#9c27b0)}
+.scard .link{display:inline-flex;align-items:center;gap:6px;border-radius:8px}
+.scard.rec .link{background:var(--brand);color:#fff;border-color:var(--brand)}
+#inputs h2.ih{display:flex;align-items:center;gap:8px}
+#inputs h2.ih .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--brand);color:#fff;font-size:12px}
+#inputs h2.ih .ic{color:var(--brand-ink)}
+#inputs .more-h{display:flex;align-items:center;gap:8px}
+.colhead .xports button{display:inline-flex;align-items:center;gap:6px}
+.scard .kn{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.scard .kn>div{min-width:0}
+.scard .kl{white-space:nowrap;overflow:hidden;gap:5px;padding-right:20px}
+.scard .kl i{flex:none}
+.scard .kl .best{position:absolute;top:7px;right:7px;margin:0;padding:0;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:11px;line-height:1}
+.scard .kl{padding-right:0}
+.scard .kl .best{top:auto;bottom:10px;right:10px;width:20px;height:20px;font-size:12px}
+.scard .kl .best{top:40px;bottom:auto}
+.scard .stop{flex-wrap:wrap}
+.notrec{display:inline-flex;align-items:center;font-size:12px;font-weight:600;color:var(--text2);background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:2px 10px}
+.wrec{display:inline-flex;align-items:center;gap:9px;padding:6px 12px 6px 6px;border-radius:12px;background:color-mix(in srgb,var(--wc) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--wc) 30%,transparent)}
+.wrec.w-plenty{--wc:var(--m-w)}.wrec.w-limited{--wc:var(--m-el)}.wrec.w-none{--wc:var(--brand)}
+.wrec i{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--wc);color:#fff;flex:none}
+.wrec svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.wrec>span{display:flex;flex-direction:column;line-height:1.2;font-size:13.5px;font-weight:700;color:var(--text)}
+.wrec small{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--wc) 80%,var(--text))}
+.scard .stop{gap:6px;min-height:0}
+/* metric rows: label line, then value + unit on one line; no boxes */
+.scard .kn{gap:14px 16px;padding:12px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.scard .kn>div,.scard .kn>div.hi{background:none;border:0;padding:0;gap:4px}
+.scard .kl{padding:0;font-size:12.5px}
+.scard .kvr{display:flex;align-items:baseline;gap:5px;flex-wrap:wrap}
+.scard .kv,.scard.rec .kv{font-size:24px}
+.scard .ku{font-size:12px}
+.scard .kn>div.hi .kv{color:var(--m)}
+.scard .kl .best{position:static;width:16px;height:16px;font-size:10px;margin-left:2px}
+/* metrics stacked: one row each, name on the left, value on the right */
+.scard .kn{grid-template-columns:1fr;gap:0;padding:4px 0}
+.scard .kn>div,.scard .kn>div.hi{flex-direction:row;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.scard .kn>div:last-child{border-bottom:0}
+.scard .kl{font-size:13.5px;overflow:visible}
+.scard .kvr{flex-wrap:nowrap;justify-content:flex-end}
+.scard .kv,.scard.rec .kv{font-size:21px}
+.scard .kl .best{width:auto;height:auto;border-radius:6px;padding:1px 5px;font-size:9.5px;font-weight:700;letter-spacing:.03em;line-height:1.4;text-transform:uppercase;margin-left:3px}
+.scard .cwarn{font-size:12.5px;font-weight:600;color:var(--warn)}
+.artlink{margin:14px 0 0;font-size:13.5px;color:var(--text2)}
+.artlink a{color:var(--brand-ink);font-weight:600}
+.toolfoot{margin:24px 28px 0;font-size:13px;color:var(--text2)}.toolfoot a{color:var(--brand-ink);font-weight:600}@media (max-width:900px){.toolfoot{margin:20px 16px 0}}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <meta name="author" content="Mutaz Othman">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Cooling Plant Selector","url":"https://www.oenergylab.com/data-centers/cooling-plant/","description":"Compare complete cooling plants for a data hall with liquid and air cooling, hour by hour over a full year: energy, water, peak demand and cost. By Othman Energy Lab.","applicationCategory":"BusinessApplication","operatingSystem":"Any (web browser)","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"author":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"publisher":{"@id":"https://www.oenergylab.com/#org"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.oenergylab.com/"},{"@type":"ListItem","position":2,"name":"Data Centers","item":"https://www.oenergylab.com/data-centers/"},{"@type":"ListItem","position":3,"name":"Cooling Plant Selector","item":"https://www.oenergylab.com/data-centers/cooling-plant/"}]}]}</script>
-<script type="application/ld+json" id="faq">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Which cooling system is best for a data center in a hot climate such as Dubai or Riyadh?","acceptedAnswer":{"@type":"Answer","text":"For a liquid-cooled hall at 30/40 °C, water-cooled chillers with cooling towers and plate heat exchanger free cooling usually rank first: the lowest electricity, MLC and peak power. They use the most water, so where water is limited a hybrid dry cooler and tower plant or adiabatic coolers trade some energy for much less water. Air-cooled chillers have the highest electrical peak."}},{"@type":"Question","name":"How is the ASHRAE 90.4 MLC checked?","acceptedAnswer":{"@type":"Answer","text":"The annual mechanical load component (cooling energy ÷ IT energy) is compared with the maximum annualized MLC in ASHRAE 90.4-2025 Table 6.5 for the site climate zone and IT size."}},{"@type":"Question","name":"Why does a humid city use more cooling energy than a hotter dry one?","acceptedAnswer":{"@type":"Answer","text":"Cooling towers and their free cooling depend on the wet-bulb temperature, not the dry-bulb. A humid city such as Mumbai keeps a high wet-bulb all year, so it gets fewer free-cooling hours than Dubai with its dry winters."}},{"@type":"Question","name":"How are the carbon emissions calculated?","acceptedAnswer":{"@type":"Answer","text":"Annual cooling electricity × the local grid emission factor, plus water × the energy to supply it (3.5 kWh/m³ for Gulf desalination) × the grid factor, plus refrigerant leakage × its GWP."}}]}</script>
 </head>
 <body class="wide" style="--navh:0px">
 <div class="pagehead">
   <h1>Cooling Plant Selector</h1>
-  <p class="sub">Compare air-cooled chillers, free-cooling dry coolers, adiabatic coolers, cooling towers and hybrid dry coolers + towers for a data hall with liquid and air cooling loops, hour by hour over a full year.</p>
-  <div class="chips"><span>ASHRAE 90.4 MLC</span><span>ASHRAE 90.1 chiller minimums</span><span>AHRI 550/590</span><span>8,760-hour simulation</span></div>
 </div>
 <main class="layout">
 <div class="incol">
-<div class="colhead"><b>Inputs</b><span>Change any value; results update instantly</span></div>
+<div class="colhead"><b>Inputs</b></div>
 <aside class="card" id="inputs">
-  <h2>1. Site</h2>
+  <h2 class="ih"><span class="n">1</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>Site</h2>
   <div class="tabs"><button id="tabCity" class="on">City</button><button id="tabFile">Weather file</button></div>
   <div id="cityPane">
     <label for="city">City</label>
     <select id="city"></select>
-    <div class="note">Measured hourly weather and ASHRAE 2025 design conditions for the main airport. Or upload your own weather file.</div>
   </div>
   <div id="filePane" hidden>
     <div class="drop" id="drop">Drop an <b>.epw</b> file (ASHRAE IWEC / TMY) or a CSV here, or click to choose<input type="file" id="file" accept=".epw,.csv,.txt" hidden></div>
@@ -429,25 +491,19 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
     <div class="note">EPW files for most locations are free at climate.onebuilding.org.</div>
   </div>
 
-  <label for="water">Water for cooling</label>
-  <select id="water">
-    <option value="plenty">Available (potable or TSE)</option>
-    <option value="limited">Limited</option>
-    <option value="none">None (zero-water design)</option>
-  </select>
+  <input type="hidden" id="water" value="plenty">
 
-  <h2 style="margin-top:20px">2. Data hall</h2>
+  <h2 class="ih" style="margin-top:22px"><span class="n">2</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="7" rx="2"/><rect x="2" y="14" width="20" height="7" rx="2"/><path d="M6 6.5h.01M6 17.5h.01"/></svg>Data hall</h2>
   <div class="row">
     <div><label for="it">Cooling load (MW)</label><input type="number" id="it" value="20" min="0.1" step="0.5"></div>
     <div><label for="lcp">Liquid-cooled share (%)</label><input type="number" id="lcp" value="80" min="0" max="100" step="5"></div>
   </div>
-  <div class="note">The rest of the load is air-cooled (fan walls or CRAHs). Results update as you type.</div>
 
-  <h2 class="more-h">More settings</h2>
+  <h2 class="more-h"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg>More settings</h2>
   <details>
     <summary>Load and loop temperatures</summary>
     <label for="lf">Usual operating load (% of design)</label><input type="number" id="lf" value="80" min="10" max="100" step="5">
-    <div class="note">Annual energy, water and cost use this load; peak power always uses 100%.</div>
+    <div class="note">For annual results; peaks always use 100%.</div>
     <h3>Liquid cooling loop</h3>
     <div class="row">
       <div><label for="lcs">Supply (°C)</label><input type="number" id="lcs" value="30" min="5" max="50" step="1"></div>
@@ -465,7 +521,7 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
       <div><label for="dbD">Design dry-bulb (°C)</label><input type="number" id="dbD" step="0.1" placeholder="auto"></div>
       <div><label for="wbD">Design wet-bulb (°C)</label><input type="number" id="wbD" step="0.1" placeholder="auto"></div>
     </div>
-    <div class="note">Blank = the ASHRAE extreme annual values for the station. Every system is checked at the hottest hour (Case A) and the most humid hour (Case B). Enter a stricter value to replace the extreme.</div>
+    <div class="note">Blank = the ASHRAE extreme values for the station.</div>
   </details>
 
 
@@ -477,7 +533,7 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
       <div><label for="tW">Water incl. treatment ($/m³)</label><input type="number" id="tW" value="2.5" step="0.1" min="0"></div>
     </div>
     <div class="row"><div><label for="tD">Demand charge ($/kW per month)</label><input type="number" id="tD" value="0" step="1" min="0"></div><div></div></div>
-    <div class="note">Running cost of cooling only (not the IT load). The demand charge is applied to the cooling electrical peak every month. Indicative defaults; enter the local tariff.</div>
+    <div class="note">Indicative defaults; enter the local tariff.</div>
   </details>
   <details>
     <summary>Chillers (ASHRAE 90.1-2025 Path B / AHRI 551/591)</summary>
@@ -501,7 +557,7 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
       <div><label for="wcMax">Condenser water warning above (°C)</label><input type="number" id="wcMax" value="43" step="1"></div>
       <div></div>
     </div>
-    <div class="note">Rated COP: ASHRAE 90.1-2025 Table 6.8.1-3, Path B full load, at AHRI 551/591 (7 °C chilled water; 35 °C air or 30 °C condenser water). Part load: VSD curve calibrated to the Path B IPLV. The number of duty units follows the unit size; units are staged by load (the next starts above 90% PLR), plus 1 standby per loop in the cost. Air-cooled capacity loss from public Trane RTAC data; units sized at Case A. Above the condenser-water limit a system is flagged, not excluded.</div>
+    <div class="note">Rated COP: ASHRAE 90.1-2025 Path B at AHRI 551/591.</div>
   </details>
   <details>
     <summary>Heat rejection</summary>
@@ -529,7 +585,7 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
       <div><label for="eAD">Pad effectiveness (water use)</label><input type="number" id="eAD" value="0.85" step="0.05" min="0" max="1"></div>
       <div></div>
     </div>
-    <div class="note">Approaches: ASHRAE 90.1-2025 Table 6.8.1-7 rating points. Fan power at full speed: towers the ASHRAE 2025 minimum (3.56 L/s per kW); dry and adiabatic coolers 3% from public manufacturer data sheets. Fans on VFDs follow the affinity law (minimum speed 30%).</div>
+    <div class="note">Approaches: ASHRAE 90.1-2025 rating points.</div>
   </details>
   <details>
     <summary>Pumps and fan wall units</summary>
@@ -553,7 +609,7 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
       <div><label for="etaF">Fan × motor × VFD efficiency (%)</label><input type="number" id="etaF" value="65" step="1" min="20" max="100"></div>
       <div></div>
     </div>
-    <div class="note">P = Q × ΔP / (ρ × cp × ΔT × η). CDU pumps on a 10 K coolant ΔT; primary and secondary pumps on each loop's ΔT; condenser pumps on 5.56 K (211 kPa ≈ ASHRAE 90.1 Appendix G, 19 W/gpm). All pump and fan heat is added to the chiller load. VFD affinity law at part load (minimum speed 50% pumps, 30% fans).</div>
+    <div class="note">Pump and fan heat is added to the chiller load.</div>
   </details>
   <details>
     <summary>Environmental impact (carbon)</summary>
@@ -569,7 +625,7 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
       <div><label for="chW">Charge, water-cooled (kg/kW)</label><input type="number" id="chW" value="0.3" step="0.05" min="0"></div>
       <div><label for="chA">Charge, air-cooled (kg/kW)</label><input type="number" id="chA" value="0.4" step="0.05" min="0"></div>
     </div>
-    <div class="note" id="envNote">Leave blank for the city's values: grid factor from Our World in Data / Ember (latest year), US cities from EPA eGRID2023 subregions, Sydney from the Australian NGA factors (NSW 2025–26); water supply energy 3.5 kWh/m³ for Gulf desalination, 0.5 elsewhere (IEA WEO 2016), Phoenix given directly as 0.25–0.70 kg CO₂e/m³ (City of Phoenix 2022 GHG inventory, plus Central Arizona Project conveyance). GWP: R-134a and R-513A IPCC AR4 (as used by the U.S. EPA under the AIM Act), R-1234ze(E) EU F-gas Regulation 2024/573. Refrigerant charge and leak rate are assumptions; enter the selected chiller's data. Carbon counts in the recommendation (weight 3).</div>
+    <div class="note" id="envNote">Blank = the city's values. Refrigerant charge and leak rate are assumptions; enter the chiller's data.</div>
   </details>
   <details>
     <summary>Electrical losses</summary>
@@ -577,94 +633,59 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
       <div><label for="ups">UPS efficiency (%)</label><input type="number" id="ups" value="96" step="0.5" min="80" max="100"></div>
       <div><label for="dloss">Transformer + distribution losses (%)</label><input type="number" id="dloss" value="2" step="0.5" min="0" max="10"></div>
     </div>
-    <div class="note">UPS losses apply to the IT load; transformer and distribution losses apply to the whole facility (IT + cooling). Used for the annual PUE only; electrical peaks are the cooling plant only. Cooling for electrical rooms is not included.</div>
+    <div class="note">Used for the annual PUE only.</div>
   </details>
   <details>
     <summary>Initial cost rates ($ per kW of capacity)</summary>
     <div id="rates"></div>
     <div class="row"><div><label for="red">Redundancy (%)</label><input type="number" id="red" value="25" step="5" min="0"></div><div></div></div>
-    <div class="note">Indicative installed rates for screening only. Replace with local quotes.</div>
+    <div class="note">Indicative; replace with local quotes.</div>
   </details>
 </aside>
 </div>
 
 <section id="results">
-  <div class="colhead"><b>Results</b><span>Ranked systems, then details in the tabs below</span><span class="xports"><button type="button" class="link" id="xpdf" title="Open a print-ready report and save it as PDF">PDF report</button><button type="button" class="link" id="xport" title="Download every results table as an Excel workbook">Excel tables</button></span></div>
+  <div class="colhead"><b>Results</b><span class="xports"><button type="button" class="link" id="xpdf" title="Open a print-ready report and save it as PDF"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>PDF report</button><button type="button" class="link" id="xport" title="Download every results table as an Excel workbook"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>Excel tables</button></span></div>
   <div class="card reco" id="reco"></div>
 
   <nav class="rtabs" id="rtabs" role="tablist" aria-label="Results">
-    <button role="tab" data-p="ov" class="on" aria-selected="true">Overview</button>
-    <button role="tab" data-p="sys" aria-selected="false">Systems</button>
-    <button role="tab" data-p="en" aria-selected="false">Energy &amp; water</button>
+    <button role="tab" data-p="sys" class="on" aria-selected="true">Systems</button>
+    <button role="tab" data-p="en" aria-selected="false">Energy &amp; carbon</button>
     <button role="tab" data-p="cost" aria-selected="false">Cost</button>
     <button role="tab" data-p="clim" aria-selected="false">Climate</button>
-    <button role="tab" data-p="meth" aria-selected="false">Method</button>
   </nav>
 
-  <div class="pane" id="p-ov">
-    <div class="card"><h2>All options side by side</h2>
-      <div id="tOv"></div>
-      <div class="note">Highlighted cells are the best value among feasible options. Score weighs energy (4), water (3, doubled when water is limited), peak power (3) and initial cost (2). Click a row to see that system in full.</div></div>
-    <div class="card"><h2>Design-day check</h2><div id="tDes"></div><div class="note" id="desNote"></div></div>
-  </div>
-
-  <div class="pane" id="p-sys" hidden>
+  <div class="pane" id="p-sys">
     <div class="seg sysseg" id="sysSeg"></div>
     <div class="card">
       <div class="syshead" id="sysHead"></div>
-      <p class="how" id="sysHow"></p>
-      <div class="ctitle">How it is connected</div>
       <div id="sysSvg"></div>
-      <div class="kpis k6" id="sysKpi"></div>
-      <div class="note" id="sysDes"></div>
-    </div>
-    <div class="card"><h2>How it runs over the year</h2>
-      <div class="legend"><span><i style="background:var(--s3)"></i>Free cooling (chiller off)</span><span><i style="background:var(--s1)"></i>Partial (pre-cooling + chiller)</span><span><i style="background:var(--s2)"></i>Chiller only</span></div>
-      <div id="sysModes"></div>
-      <div class="ctitle" id="mTitle" style="margin-top:16px">Monthly operating hours</div>
-      <div class="seg" id="loopSeg"><button data-l="0" class="on">Liquid loop</button><button data-l="1">Air loop</button></div>
+      <div class="ctitle" id="mTitle" style="margin-top:16px">Operation by month</div>
+      <div class="climbar"><div class="seg" id="loopSeg"><button data-l="0" class="on">Liquid loop</button><button data-l="1">Air loop</button></div>
+      <div class="legend"><span><i style="background:var(--s3)"></i>Free cooling</span><span><i style="background:var(--s1)"></i>Partial</span><span><i style="background:var(--s2)"></i>Chiller only</span></div></div>
       <div class="chartbox"><canvas id="cM"></canvas></div>
+      <p class="artlink">How each system works: <a href="../../articles/cooling-towers-vs-adiabatic-vs-dry-coolers/index.html">Cooling towers vs adiabatic vs dry coolers</a></p>
     </div>
-    <div class="card"><div class="grid2">
-      <div><h2>Equipment and cost</h2><div id="sysComp"></div><div class="note" id="compNote"></div></div>
-      <div class="pros"><h2>Strengths and watch-outs</h2><div id="sysPros"></div></div>
-    </div></div>
   </div>
 
   <div class="pane" id="p-en" hidden>
-    <div class="card"><h2>Energy efficiency</h2><div class="split">
-      <div><div id="tEff"></div><div class="note">MLC = annual mechanical energy ÷ annual cooling load (ASHRAE 90.4 definition, cooling load taken as IT energy). Maximum: ASHRAE 90.4-2025 Table 6.5, for the county climate zone in U.S. cities (IECC 2021 / ASHRAE 169 county assignment, as for code compliance) and the station zone elsewhere and ITE above / at or below 300 kW. Screening check: a compliance calculation follows the 90.4 load points and TMY3 weather. Free-cooling hours: chiller fully off.</div></div>
-      <div><div class="ctitle" id="effTitle">Annual MLC</div><div class="chartbox"><canvas id="cEff"></canvas></div></div>
-    </div></div>
-    <div class="card"><h2>Carbon emissions</h2><div class="split">
-      <div><div id="tCO2"></div><div class="note" id="co2Note"></div></div>
-      <div><div class="ctitle" id="co2Title">Annual carbon by source</div>
-        <div class="legend"><span><i style="background:var(--s1)"></i>Electricity</span><span><i style="background:var(--s3)"></i>Water supply</span><span><i style="background:var(--s2)"></i>Refrigerant leakage</span></div>
-        <div class="chartbox" style="height:220px"><canvas id="cCO2"></canvas></div></div>
-    </div></div>
-    <div class="card"><h2>Electricity and water consumption</h2><div class="split">
-      <div><div id="tCons"></div><div class="note">Annual totals at the frequent load. Peaks are the design peak at 100% IT load: the highest of Case A, Case B and the typical-year maximum. Facility peak = (IT ÷ UPS efficiency + cooling peak) ÷ (1 − distribution losses), the grid connection. Water in brackets: tower evaporation band 0.15–0.27 %/K (central 0.20, EnergyPlus default). Electrical peak = cooling only: chillers + heat-rejection fans + pumps + CRAH / FWU fans + CDU pumps (no IT load, no electrical equipment or losses). Water peak = make-up water (evaporation, blowdown, pad water). PUE = (IT + cooling + losses) ÷ IT, annual. CRAH / fan-wall fans are not included.</div></div>
-      <div>
-        <div class="ctitle" id="elTitle">Annual electricity by component</div>
-        <div class="legend"><span><i style="background:var(--s1)"></i>Chiller compressors</span><span><i style="background:var(--s4)"></i>Heat-rejection fans</span><span><i style="background:var(--grey2)"></i>Pumps</span><span><i style="background:var(--s2)"></i>CRAH / FWU fans + CDU pumps</span></div>
-        <div class="chartbox" style="height:220px"><canvas id="cEl"></canvas></div>
-        <div class="ctitle" id="wTitle" style="margin-top:14px">Annual water</div>
-        <div class="chartbox" style="height:200px"><canvas id="cW"></canvas></div>
-      </div>
+    <div class="card"><h2>Efficiency</h2><div id="tEff"></div></div>
+    <div class="card"><div class="grid2">
+      <div><div class="ctitle">Electricity by component, MWh/yr</div>
+        <div class="legend"><span><i style="background:var(--s1)"></i>Chillers</span><span><i style="background:var(--s4)"></i>Heat-rejection fans</span><span><i style="background:var(--grey2)"></i>Pumps</span><span><i style="background:var(--s2)"></i>CRAH / FWU / CDU</span></div>
+        <div class="chartbox" style="height:220px"><canvas id="cEl"></canvas></div></div>
+      <div><div class="ctitle">CO₂ by source, t/yr</div>
+        <div class="legend"><span><i style="background:var(--s1)"></i>Electricity</span><span><i style="background:var(--s3)"></i>Water supply</span><span><i style="background:var(--s2)"></i>Refrigerant</span></div>
+        <div class="chartbox" style="height:220px"><canvas id="cCO2"></canvas></div><div class="note" id="co2Note"></div></div>
     </div></div>
   </div>
 
   <div class="pane" id="p-cost" hidden>
-    <div class="card"><h2>Running cost (cooling)</h2>
-      <div id="tRun"></div><div class="note" id="runNote"></div>
-      <div class="ctitle" id="runTitle" style="margin-top:18px">Annual running cost</div>
+    <div class="card"><h2>Cost</h2><div id="tRun"></div><div class="note" id="runNote"></div>
+      <div class="ctitle" style="margin-top:18px">Running cost by item, k$/yr</div>
       <div class="legend"><span><i style="background:var(--s1)"></i>Electricity</span><span><i style="background:var(--s3)"></i>Water</span><span><i style="background:var(--s4)"></i>Demand charge</span></div>
       <div class="chartbox" style="height:220px"><canvas id="cRun"></canvas></div>
     </div>
-    <div class="card"><h2>Initial cost (estimated range)</h2><div class="split">
-      <div><div id="tCap"></div><div class="note">Rate-based estimate, not a quotation: capacity × redundancy × low/high rate for each component. Excludes building works, electrical and controls.</div></div>
-      <div><div class="ctitle" id="capTitle">Estimated initial cost range</div><div class="chartbox"><canvas id="cCap"></canvas></div></div>
-    </div></div>
   </div>
 
   <div class="pane" id="p-clim" hidden>
@@ -672,56 +693,18 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
       <div class="kpis" id="clKpi" style="margin:0 0 14px"></div>
       <div class="climbar">
         <div class="seg" id="climSeg"><button data-dev="dc" class="on">Dry coolers (dry-bulb)</button><button data-dev="ct">Cooling towers (wet-bulb)</button></div>
-        <div class="legend"><span><i style="background:var(--s3)"></i>Free cooling (outdoor air alone)</span><span><i style="background:var(--s1)"></i>Partial (pre-cooling + chiller)</span><span><i style="background:var(--s2)"></i>Chiller only</span></div>
+        <div class="legend"><span><i style="background:var(--s3)"></i>Free cooling</span><span><i style="background:var(--s1)"></i>Partial</span><span><i style="background:var(--s2)"></i>Chiller only</span></div>
       </div>
       <div class="grid2">
-        <div><div class="ctitle" id="clTitle0">Liquid cooling loop (LC)</div><div class="note" id="clSub0" style="margin:0 0 6px"></div><div class="chartbox" style="height:260px"><canvas id="cCl0"></canvas></div></div>
-        <div><div class="ctitle" id="clTitle1">Air cooling loop (AC)</div><div class="note" id="clSub1" style="margin:0 0 6px"></div><div class="chartbox" style="height:260px"><canvas id="cCl1"></canvas></div></div>
+        <div><div class="ctitle" id="clTitle0">Liquid cooling loop</div><div class="chartbox" style="height:260px"><canvas id="cCl0"></canvas></div></div>
+        <div><div class="ctitle" id="clTitle1">Air cooling loop</div><div class="chartbox" style="height:260px"><canvas id="cCl1"></canvas></div></div>
       </div>
       <div class="note" id="clNote"></div></div>
-  </div>
-
-  <div class="pane" id="p-meth" hidden>
-  <div class="card">
-    <h2>Method and equations</h2>
-    <ul class="method">
-      <li><b>Weather</b>: built-in cities use a measured typical year (TMYx 2011–2025) from the main airport station and ASHRAE 2025 Handbook of Fundamentals design conditions, both from climate.onebuilding.org. Hourly wet-bulb is limited to the ASHRAE extreme annual wet-bulb + 1 K. Psychrometrics per ASHRAE Fundamentals, Ch. 1.</li>
-      <li><b>Design cases</b>: Case A = extreme dry-bulb + the wet-bulb of the hottest hour; Case B = extreme wet-bulb + the dry-bulb of the most humid hour that was not capped. Every system is checked at both at 100% load. The design peak is the highest of Case A, Case B and the typical-year maximum at 100% load, so no hour in the weather file exceeds it.</li>
-      <li><b>Loads</b>: chiller load = IT load + CDU pumps or FWU fans + primary and secondary pumps. Pumps and fans: <code>P = Q·ΔP / (ρ·c<sub>p</sub>·ΔT·η)</code>; VFD part load <code>P = P<sub>full</sub>·(Q/Q<sub>design</sub>)³</code>, minimum speed 50% pumps, 30% fans.</li>
-      <li><b>Free cooling</b> = (T<sub>return</sub> − T<sub>out</sub>) / (T<sub>return</sub> − T<sub>supply</sub>), 0–1. T<sub>out</sub>: towers wb + 5.56 + 1.5 (plate HX); dry coolers db + 5.56 (direct on the loop); adiabatic above 24 °C: min(db + 5.56, T<sub>pad</sub> + 9.4) + 1.5, with T<sub>pad</sub> = db − 0.85 (db − wb); the pads run only when they give the colder water; db + 5.56 + 1.5 below 24 °C; hybrid (capability rule): dry coolers in series ahead of the towers; the dry section runs when the water entering is above db + 5.56, the towers only when the dry section alone cannot reach the target (supply − 1.5 in free cooling, the 30 °C condenser-water setpoint with chillers only); with both on, in free-cooling hours dry share = (T<sub>in</sub> − T<sub>dry,out</sub>) / (T<sub>in</sub> − T<sub>req</sub>), T<sub>in</sub> = return − 1.5, T<sub>req</sub> = max(supply − 1.5, wb + 5.56), T<sub>dry,out</sub> = max(db + 5.56, T<sub>req</sub>); with chillers only (wb + 5.56 − db) / 5.56. Approaches: ASHRAE 90.1-2025 Table 6.8.1-7 rating points (minimum efficiency, not design selections).</li>
-      <li><b>Chillers</b>: <code>COP = COP<sub>rated</sub> × [(T<sub>e</sub> + 273.15)/(T<sub>c</sub> − T<sub>e</sub>)] ÷ [(T<sub>e,ref</sub> + 273.15)/(T<sub>c,ref</sub> − T<sub>e,ref</sub>)]</code>, limited to 14 and a lift of at least 3 K (assumption: a constant Carnot fraction over-predicts at very small lifts; public low-lift data are scarce, so the limit is tested by sensitivity). T<sub>e</sub> = supply − 2; T<sub>c</sub> = db + 15 (air-cooled) or condenser water + 7 (water-cooled). Rated COP: ASHRAE 90.1-2025 Path B (2.866 air-cooled, 6.018 water-cooled) at AHRI 551/591 (T<sub>e,ref</sub> 5 °C; T<sub>c,ref</sub> 50 / 37 °C). Part load: <code>PLF = a + b·PLR + c·PLR²</code> = k × EnergyPlus variable-speed shape + (1 − k), k solved so the AHRI points, each at its own condenser temperature, reproduce the Path B IPLV (k = 0.867 water-cooled, 0.890 air-cooled; coefficients 0.1969 / 0.1318 / 0.6713 and 0.1752 / 0.1354 / 0.6895). The temperature benefit sits only in the Carnot term. Units staged by load, the next above 90% PLR. Air-cooled capacity −1.35% per K above 35 °C.</li>
-      <li><b>Heat rejection</b>: Q<sub>r</sub> = chiller load + chiller power. Fans at full speed: towers 1.2%, dry and adiabatic coolers 3% of the heat (ASHRAE 2025 minimum / public data sheets); condenser pumps 211 kPa on 5.56 K. Condenser water above 43 °C gives a warning (a chiller rated above 43 °C is needed).</li>
-      <li><b>Water</b>: towers <code>0.0020 × flow × range</code> evaporation (EnergyPlus default 0.2 %/K; band 0.15–0.27 %/K) plus blowdown at CoC 4 = 2.3 L/h per kW rejected (1.7–3.1); hybrid on the towers' share; adiabatic <code>Q<sub>r</sub> × (db − T<sub>pad</sub>) / (12 × 2,430) × 1.15</code> in wet-mode hours only.</li>
-      <li><b>MLC</b> (ASHRAE 90.4): annual mechanical energy ÷ annual IT energy; checked against ASHRAE 90.4-2025 Table 6.5 for the climate zone.</li>
-      <li><b>Electrical losses and PUE</b>: <code>PUE = (IT / η<sub>UPS</sub> + cooling) / (1 − losses) / IT</code>, UPS 96%, distribution 2%. Simplified, not the 90.4 ELC method.</li>
-      <li><b>Running cost</b>: <code>electricity × tariff + water × tariff + cooling peak × demand charge × 12</code>. Simple payback against air-cooled chillers = extra initial cost (mid estimate) ÷ running cost saved.</li>
-      <li><b>Carbon</b> (t CO₂e/yr): electricity × grid factor + water × supply energy (kWh/m³) × grid factor + refrigerant charge (duty + 1 standby per loop, kg/kW × capacity) × leak rate × GWP. Grid factors: EPA eGRID2023 rev 2 (US), Australian NGA (Sydney), Our World in Data / Ember (others); water energy: IEA WEO 2016 (Phoenix: City of Phoenix 2022 GHG inventory + CAP, in kg CO₂e/m³); GWP: IPCC AR4 via the EPA AIM Act, R-1234ze(E) EU 2024/573.</li>
-      <li><b>Recommendation</b>: energy 4, water 3 (doubled when water is limited), peak 3, initial cost 2, carbon 3, normalised across feasible options. Energy and carbon are both scored on purpose: energy is the plant's efficiency, carbon its environmental impact, so electricity carries about half the weight. Full basis: the Cooling Plant Calculation Basis. Screening-level; confirm with vendor selections.</li>
-    </ul>
-  </div>
   </div>
 </section>
 </main>
 
-<section class="toolinfo" aria-labelledby="ti-h">
-  <div class="card">
-  <h2 id="ti-h">How the Cooling Plant Selector works</h2>
-  <p>The Cooling Plant Selector compares five data center cooling plants hour by hour over a full weather year (8,760 hours) and recommends the right one for the site: air-cooled chillers, air-cooled chillers with free-cooling dry coolers, and water-cooled chillers with cooling towers, adiabatic coolers or hybrid dry coolers and towers, each with plate heat exchanger free cooling. It reports cooling electricity, annual PUE and ASHRAE 90.4 MLC, the electrical peak, water use, carbon emissions, running and initial cost, and a ranked recommendation.</p>
-  <h3>Method</h3>
-  <ul><li>Weather: measured typical-year hourly data (TMYx 2011–2025) and ASHRAE 2025 design conditions for 33 built-in data center cities, or your own EPW / CSV file.</li><li>Two coincident design cases: the extreme dry-bulb with the wet-bulb of the hottest hour, and the extreme wet-bulb with the dry-bulb of the most humid hour. The design peak is the higher.</li><li>Chillers: ASHRAE 90.1-2025 Path B efficiency at AHRI 551/591 rating conditions, adjusted every hour for the actual lift, with VSD part-load curves calibrated to the ASHRAE IPLV and staging by load.</li><li>Free cooling = (return − water from the outdoor equipment) / (return − supply). Approaches from the ASHRAE 90.1-2025 heat-rejection rating points.</li><li>Pumps and fans from P = Q × ΔP / (ρ × cp × ΔT × η); carbon from local grid factors (EPA eGRID, Our World in Data), water supply energy and refrigerant leakage.</li></ul>
-  <h2 style="margin-top:20px">Frequently asked questions</h2>
-  <h3>Which cooling system is best for a data center in a hot climate such as Dubai or Riyadh?</h3>
-  <p>For a liquid-cooled hall at 30/40 °C, water-cooled chillers with cooling towers and plate heat exchanger free cooling usually rank first: the lowest electricity, MLC and peak power. They use the most water, so where water is limited a hybrid dry cooler and tower plant or adiabatic coolers trade some energy for much less water. Air-cooled chillers have the highest electrical peak.</p>
-  <h3>How is the ASHRAE 90.4 MLC checked?</h3>
-  <p>The annual mechanical load component (cooling energy ÷ IT energy) is compared with the maximum annualized MLC in ASHRAE 90.4-2025 Table 6.5 for the site climate zone and IT size.</p>
-  <h3>Why does a humid city use more cooling energy than a hotter dry one?</h3>
-  <p>Cooling towers and their free cooling depend on the wet-bulb temperature, not the dry-bulb. A humid city such as Mumbai keeps a high wet-bulb all year, so it gets fewer free-cooling hours than Dubai with its dry winters.</p>
-  <h3>How are the carbon emissions calculated?</h3>
-  <p>Annual cooling electricity × the local grid emission factor, plus water × the energy to supply it (3.5 kWh/m³ for Gulf desalination) × the grid factor, plus refrigerant leakage × its GWP.</p>
-  <p>Step-by-step guide: <a href="../../articles/how-to-use-cooling-plant-selector/index.html">How to use the Cooling Plant Selector</a>. Related: <a href="../../articles/cooling-towers-vs-adiabatic-vs-dry-coolers/index.html">Cooling towers vs adiabatic vs dry coolers</a> · <a href="../../articles/ashrae-90-4-mlc/index.html">ASHRAE 90.4 MLC explained</a>.</p>
-  <p style="margin-top:16px">By <a href="../../about/index.html#founder">Eng. Mutaz Othman</a>, Othman Energy Lab. Screening-level results; confirm with vendor selections and a detailed design.</p>
-  </div>
-</section>
+<p class="toolfoot">How it works and how to read the results: <a href="../../articles/how-to-use-cooling-plant-selector/index.html">How to use the Cooling Plant Selector</a>. Screening-level results; confirm with vendor selections and a detailed design.</p>
 
 <script>
 // ---------- shared UI helpers for all calculators (load after Chart.js, before the calculator scripts) ----------
@@ -1161,37 +1144,7 @@ function score(res,p,des){
   ok.sort((a,b)=>res[b].score-res[a].score);
   return ok;
 }
-// ---------- system descriptions: how each option works, strengths, watch-outs ----------
-const SYS={
- acc:{how:'Separate HT and LT air-cooled chillers cool each loop every hour of the year. Each chiller rejects its heat straight to outdoor air through its own condenser fans. There is no free cooling and no water.',
-  pre:null, ch:'Air-cooled chillers', rej:[null,'Outdoor air','via condenser fans'],
-  pros:['Simplest plant: one equipment type, no condenser water loop','No water use','Packaged, widely available equipment'],
-  cons:['Highest energy: compressors run all year','Chiller capacity and efficiency drop on the hottest days','Highest peak electrical demand']},
- accfc:{how:'Dry coolers pre-cool the return water whenever the outdoor air is cooler than the return. Air-cooled chillers then trim the water down to the supply setpoint. In cool weather the chillers switch off entirely.',
-  pre:'Free-cooling dry coolers', ch:'Air-cooled chillers', rej:['Outdoor air','Outdoor air','via condenser fans'],
-  pros:['No water use','Large free-cooling savings in cool and mild climates','Chillers stay available for the hot hours'],
-  cons:['Two sets of outdoor equipment: more yard or roof space','Free cooling is limited in hot climates','Air-cooled chillers still set the peak demand']},
- adia:{how:'Adiabatic coolers run dry most of the year. Above the switch temperature they wet their pads, cooling the air towards the wet-bulb. Their water pre-cools the return through a plate heat exchanger and is also the condenser water for water-cooled chillers, which trim the rest.',
-  pre:'Plate heat exchanger', ch:'Water-cooled chillers', shared:'Adiabatic coolers',
-  pros:['Far less water than cooling towers (wet only in hot hours)','Efficient water-cooled chillers','Closed circuit: little water treatment'],
-  cons:['Uses some water on hot days','Larger footprint than cooling towers','Pads or sprays need maintenance and legionella control']},
- hyb:{how:'Dry coolers and cooling towers serve the same condenser water, in series. In cool weather the dry coolers alone cool the water, with no water use. Above the switch temperature the towers start and cool the water close to the wet-bulb, while the dry coolers keep pre-cooling it ahead of them whenever the air is cooler than the water. The condenser water pre-cools the return through a plate heat exchanger and serves water-cooled chillers, which trim the rest.',
-  pre:'Plate heat exchanger', ch:'Water-cooled chillers', shared:'Dry coolers + cooling towers',
-  pros:['Tower-level energy and peak power on the hottest days','Water used only in hot hours, and less of it','Either set keeps running if the other is out of service'],
-  cons:['Highest initial cost: two sets of heat rejection','Most yard or roof space','Towers still need water treatment and legionella control']},
- wcc:{how:'Open cooling towers cool condenser water close to the outdoor wet-bulb by evaporation. That water pre-cools the return through a plate heat exchanger and serves the condensers of water-cooled chillers, which trim the rest.',
-  pre:'Plate heat exchanger', ch:'Water-cooled chillers', shared:'Cooling towers',
-  pros:['Lowest energy of the chiller options in most climates','Lowest condensing temperature, so the most efficient chillers','Compact heat rejection'],
-  cons:['Highest water use (evaporation plus blowdown)','Needs water treatment, legionella control and a reliable make-up supply','Visible plume and drift']},
-};
-const ROLE={
- acch:o=>o.id==='acc'?'HT and LT chillers cool each loop; reject heat through built-in condenser fans':'HT and LT chillers trim each loop to setpoint when free cooling is not enough',
- wcch:()=>'HT and LT chillers trim each loop to setpoint; reject heat to condenser water',
- dc:o=>o.id==='hyb'?'Runs alone when it reaches the target; otherwise pre-cools the water ahead of the towers':'Pre-cools the return water with outdoor air',
- adc:()=>'Cools the condenser water; pads wetted on hot hours',
- ct:o=>o.id==='hyb'?'Cools the condenser water by evaporation when the dry coolers alone cannot reach the target':'Cools the condenser water by evaporation',
- hx:()=>'Pre-cools the return water with condenser water (economiser)',
-};
+const SYS={acc:{},accfc:{},adia:{},hyb:{},wcc:{}};
 
 // ---------- schematic: one panel per loop (liquid / air cooling), piping as in the energy model ----------
 // water-cooled: outdoor heat rejection -> condenser water, in parallel to the plate HX and the chiller condensers, common return;
@@ -1208,8 +1161,8 @@ function schematic(id){
   const hx=P.aHX;
   const pmp=(x,y)=>`<circle class="pump" cx="${x}" cy="${y}" r="8"/><path class="pumpv" d="M${x-4} ${y-5}L${x+6} ${y}L${x-4} ${y+5}z"/>`;
   const heatRej={
-    wcc:['Cooling towers (shared by both loops)',`water out = wb + ${P.aCT} K · ${P.coc} cycles`],
-    adia:['Adiabatic coolers (shared by both loops)',`pads on above ${P.swAD} °C: wb + ${P.aAD} K · dry: db + ${P.aDC} K`],
+    wcc:['Cooling towers (shared by both loops)'],
+    adia:['Adiabatic coolers (shared by both loops)'],
   };
   const panel=({L,i},k)=>{
     const liquid=L.name==='LC', u=d.units.find(x=>x.loop===L.name)||{N:0,unit:0};
@@ -1217,44 +1170,44 @@ function schematic(id){
     const kPri=pumpK(P.dpPri,L.Tr-L.Ts,P.etaP)*L.Qd, kSec=pumpK(P.dpSec,L.Tr-L.Ts,P.etaP)*L.Qd, kTerm=termShare(L,P)*L.Qd;
     const kCW=pumpK(P.dpCW,P.rangeCW,P.etaP)*((P.des&&P.des[id]&&P.des[id][L.name])?P.des[id][L.name].Qr:0);
     let g=t(0,16,liquid?'Liquid cooling loop':'Air cooling loop','h','start')
-      +t(0,32,`${fmt(L.Qd/1000,1)} MW · supply ${L.Ts} °C / return ${L.Tr} °C`,'t2','start');
+      ;
     g+=`<rect class="zone" x="0" y="40" width="${W}" height="80" rx="8"/>`+t(10,115,'Outdoors','t2','start');
     // loop end: chiller evaporators -> tank -> pumps -> supply to IT; IT return
-    const chil=ac?box(240,150,170,82,['Air-cooled chillers',`${u.N} × ${fmt(u.unit/1000,1)} MW + 1 standby`,`rated COP ${P.copA.toFixed(2)} · on ${fmt(r.part[i]+r.mech[i])} h/yr`])
-      :box(240,140,170,36,['Chiller condensers','Tc = condenser water + 7 K'])+box(240,192,170,50,['Chiller evaporators',`${u.N} × ${fmt(u.unit/1000,1)} MW + 1 · COP ${P.copW.toFixed(2)}`]);
+    const chil=ac?box(240,150,170,82,['Air-cooled chillers'])
+      :box(240,140,170,36,['Chiller condensers'])+box(240,192,170,50,['Chiller evaporators']);
     g+=chil;
     if(!ac) g+=`<path class="refr" d="M325 176V192"/>`+t(332,188,'compressors','t2','start');
     const evapY=ac?191:217, evapB=ac?232:242;
-    g+=box(260,264,130,34,['Buffer / TES tank','not in energy calc'],'bx tes');
+    g+=box(260,264,130,34,['Buffer tank'],'bx tes');
     g+=pipe(`M325 ${evapB}V262`,'sup')+line('M325 298V318','sup');
-    g+=pmp(325,326)+t(338,324,'secondary pumps','t2','start')+t(338,338,`${fmt(kSec)} kW`,'t2','start');
-    g+=pipe('M325 334V376H312','sup')+t(333,360,`Supply ${L.Ts} °C`,'t2','start');
-    g+=box(120,352,190,50,[liquid?'Liquid-cooled IT (CDUs)':'Air-cooled IT (fan wall units)',`${fmt(L.Qd/1000,1)} MW at full load`],'bx it');
-    g+=liquid?pmp(130,424)+t(144,428,`CDU pumps ${fmt(kTerm)} kW (inside the CDUs)`,'t2','start'):t(120,428,`FWU fans ${fmt(kTerm)} kW (in the hall)`,'t2','start');
+    g+=pmp(325,326)+t(338,324,'secondary pumps','t2','start');
+    g+=pipe('M325 334V376H312','sup')+t(333,360,'Supply','t2','start');
+    g+=box(120,352,190,50,[liquid?'Liquid-cooled IT (CDUs)':'Air-cooled IT (fan wall units)'],'bx it');
+    g+=liquid?pmp(130,424)+t(144,428,'CDU pumps','t2','start'):t(120,428,'FWU fans','t2','start');
     if(ac){
-      g+=box(240,58,170,48,['Air-cooled condensers','Tc = db + 15 K'])+`<path class="heat" d="M325 150V108" marker-end="url(#ar-heat)"/>`+t(332,132,'heat to air','t2','start');
+      g+=box(240,58,170,48,['Air-cooled condensers'])+`<path class="heat" d="M325 150V108" marker-end="url(#ar-heat)"/>`+t(332,132,'heat to air','t2','start');
       if(id==='accfc'){
-        g+=box(20,58,170,48,['Dry coolers (on the loop)',`water out = db + ${P.aDC} K`]);
-        g+=pipe('M120 377H105V108','ret')+t(112,262,`Return ${L.Tr} °C`,'t2','start')+pmp(105,318)+t(117,322,`primary pumps ${fmt(kPri)} kW`,'t2','start');
-        g+=pipe(`M190 92H215V${evapY}H238`,'ret')+t(222,140,`free cooling ${fmt(r.free[i])} h/yr`,'t2','start');
+        g+=box(20,58,170,48,['Dry coolers (on the loop)']);
+        g+=pipe('M120 377H105V108','ret')+t(112,262,'Return','t2','start')+pmp(105,318)+t(117,322,'primary pumps','t2','start');
+        g+=pipe(`M190 92H215V${evapY}H238`,'ret')+t(222,140,'free cooling','t2','start');
       } else {
-        g+=pipe(`M120 377H105V${evapY}H238`,'ret')+t(112,262,`Return ${L.Tr} °C`,'t2','start')+pmp(105,318)+t(117,322,`primary pumps ${fmt(kPri)} kW`,'t2','start');
+        g+=pipe(`M120 377H105V${evapY}H238`,'ret')+t(112,262,'Return','t2','start')+pmp(105,318)+t(117,322,'primary pumps','t2','start');
       }
     } else {
       // outdoor heat rejection (hybrid: dry coolers then towers, in series)
       if(id==='hyb'){
-        g+=box(20,58,180,48,['Dry coolers','alone when they reach the target'])+box(230,58,180,48,['Cooling towers',`wb + ${P.aCT} K, when needed`]);
-        g+=pipe('M200 82H228','cw')+line('M8 50H422','cwr')+pipe('M110 50V56','cwr')+line('M320 106V128','cw')+pmp(320,117)+t(332,121,`CW pumps ${fmt(kCW)} kW`,'t2','start');
+        g+=box(20,58,180,48,['Dry coolers'])+box(230,58,180,48,['Cooling towers']);
+        g+=pipe('M200 82H228','cw')+line('M8 50H422','cwr')+pipe('M110 50V56','cwr')+line('M320 106V128','cw')+pmp(320,117)+t(332,121,'CW pumps','t2','start');
       } else {
         const hr=heatRej[id]; g+=box(20,58,390,48,hr);
-        g+=line('M8 50H422','cwr')+pipe('M215 50V56','cwr')+line('M215 106V128','cw')+pmp(215,117)+t(227,121,`condenser pumps ${fmt(kCW)} kW`,'t2','start');
+        g+=line('M8 50H422','cwr')+pipe('M215 50V56','cwr')+line('M215 106V128','cw')+pmp(215,117)+t(227,121,'condenser pumps','t2','start');
       }
       // condenser water supply in parallel to the plate HX and the condensers; returns to the common header
       g+=line('M105 128H325','cw')+pipe('M105 128V148','cw')+pipe('M325 128V138','cw');
       g+=line('M20 180H8V50','cwr')+line('M410 158H422V50','cwr');
-      g+=box(20,150,170,62,['Plate heat exchanger',`approach ${hx} K`,`free cooling ${fmt(r.free[i])} h/yr`]);
+      g+=box(20,150,170,62,['Plate heat exchanger','free cooling']);
       // loop: return -> plate HX -> evaporators
-      g+=pipe('M120 377H105V214','ret')+t(112,262,`Return ${L.Tr} °C`,'t2','start')+pmp(105,318)+t(117,322,`primary pumps ${fmt(kPri)} kW`,'t2','start');
+      g+=pipe('M120 377H105V214','ret')+t(112,262,'Return','t2','start')+pmp(105,318)+t(117,322,'primary pumps','t2','start');
       g+=pipe(`M190 196H215V${evapY}H238`,'ret')+t(196,246,'pre-cooled','t2','start');
     }
     return `<g transform="translate(${k*(W+G)},0)">${g}</g>`;
@@ -1263,8 +1216,7 @@ function schematic(id){
   const mk=(n,c)=>`<marker id="ar-${n}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:var(${c})"/></marker>`;
   return `<div class="legend"><span><i style="background:var(--s2)"></i>Loop return (warm)</span><span><i style="background:var(--s1)"></i>Loop supply (cooled)</span>${ac?'':'<span><i style="background:var(--s3)"></i>Condenser water (dashed: return to outdoors)</span>'}<span><i style="background:var(--grey2)"></i>Heat to outdoor air</span></div>
 <svg class="schem" viewBox="-2 0 ${vw+4} ${H}" style="--vw:${vw}" role="img" aria-label="Schematic of ${r.o.name}, one panel per cooling loop">
-<defs>${mk('sup','--s1')}${mk('ret','--s2')}${mk('cw','--s3')}${mk('cwr','--s3')}${mk('heat','--grey2')}</defs>${loops.map(panel).join('')}</svg>
-<div class="note">${ac?'Loop water goes straight to the chiller evaporators'+(id==='accfc'?' through the dry coolers when the air is cooler than the return':'')+'; each chiller rejects its heat through its own condenser fans.':`${id==='hyb'?'The dry coolers and the cooling towers are in series on one shared condenser-water circuit.':`The ${s.shared.toLowerCase()} are one shared plant.`} Condenser water feeds the plate heat exchangers and the chiller condensers in parallel and returns through one common header. The loop water is pre-cooled in the plate HX, then the chillers cool it to the supply temperature.`} Pumps shown at design power: primary (through the ${ac?'':'plate HX and '}chillers), secondary (to the IT), ${ac?'':'condenser water, '}and CDU pumps on the liquid loop. Duty chillers + 1 standby per loop. The buffer / TES tank is shown for ride-through and is not part of the energy calculation.</div>`;
+<defs>${mk('sup','--s1')}${mk('ret','--s2')}${mk('cw','--s3')}${mk('cwr','--s3')}${mk('heat','--grey2')}</defs>${loops.map(panel).join('')}</svg>`;
 }
 // ---------- Excel export: a minimal .xlsx writer (no library), one worksheet per table ----------
 // sheets: [{name, rows:[[cell,...],...], head:[row indexes in bold], widths:[chars per column]}]
@@ -1327,7 +1279,7 @@ function inputRows(root,names={}){
 }
 function downloadBlob(blob,name){ const url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000); }
 // ---------- Cooling Plant Selector: page logic ----------
-let WX=null,RES=null,DES=null,RANK=null,P=null,LOOP=0,PICK=null;
+let SCEN={},WX=null,RES=null,DES=null,RANK=null,P=null,LOOP=0,PICK=null;
 
 const groups=[...new Set(CITIES.map(c=>c.g))];
 groups.forEach(g=>{ const og=document.createElement('optgroup'); og.label=g; CITIES.filter(c=>c.g===g).forEach(c=>{const o=document.createElement('option'); o.value=c.id; o.textContent=c.name; og.appendChild(o);}); $('city').appendChild(og); });
@@ -1372,11 +1324,13 @@ function run(){
   const A=ashrae();
   P=params(); P.cases=designCases(WX,A,P.dbIn,P.wbIn); P.dbA=P.cases.A.db; P.dbD=P.cases.A.db; P.wbD=P.cases.B.wb;
   DES=designCheck(P); RES=simulate(WX,P,DES); RANK=score(RES,P,DES);
-  renderReco(); renderOverview(); renderDes(); renderSystem(); renderEff(); renderCarbon(); renderCons(); renderRun(); renderCap(); renderClimate();
+  // the pick for each water case: TSE available, water limited, no water
+  SCEN={}; ['plenty','limited','none'].forEach(w=>{ const c=Object.fromEntries(Object.entries(RES).map(([k,v])=>[k,{...v}])); SCEN[w]=score(c,{...P,water:w},DES)[0]||null; });
+  renderReco(); renderSystem(); renderEff(); renderCarbon(); renderCons(); renderRun(); renderClimate();
 }
 const order=()=>[...RANK,...OPTIONS.map(o=>o.id).filter(id=>!RANK.includes(id))];
 const sel=()=>PICK||RANK[0]||OPTIONS[0].id;   // system shown in the Systems tab: user's pick, else the recommendation
-const tag=(id,i)=>RES[id].excluded?`<span class="tag x">${RES[id].excluded}</span>`:(i===0?'<span class="tag ok">Recommended</span>':'');
+const tag=(id,i)=>RES[id].excluded?`<span class="tag x">${RES[id].excluded}</span>`:'';
 const loopTxt=(arr)=>P.loops.map((L,i)=>L.Q>0?fmt(arr[i]):'–').join(' / ');
 // basis label for peaks (annual figures are at the frequent load, stated in the notes)
 const atPk='design case';
@@ -1399,157 +1353,85 @@ function renderReco(){
     +(window.Chart?'':'<div class="banner">Charts could not load (no internet connection). Tables and results below are complete.</div>');
   const st=WX.station, C=P.cases, best=RANK.length?RES[RANK[0]]:null, acc=RES.acc;
   // the answer first, in one sentence; the context in one quiet line
-  const verdict=best?`<div class="verdict-line">Best fit for <b>${esc(WX.name)}</b>: <b class="pick">${best.o.name}</b>.${best.o.id==='acc'?'':` Against air-cooled chillers it saves <b>${fmt(Math.max(0,acc.E-best.E)/1000,1)} GWh</b> of electricity a year and <b>${fmt(Math.max(0,acc.peak-best.peak)/1000,1)} MW</b> of peak power.`}</div>`
+  const verdict=best?''
     :'<div class="verdict-line"><b>No system meets every constraint.</b> Try allowing water, raising the loop supply temperatures, or checking the design conditions and chiller limits.</div>';
-  const ctx=`<div class="ctxline">${fmt(P.Qd/1000,1)} MW hall · liquid ${P.loops[0].Ts}/${P.loops[0].Tr} °C · air ${P.loops[1].Ts}/${P.loops[1].Tr} °C · design ${fmt(C.A.db,1)} °C dry-bulb / ${fmt(C.B.wb,1)} °C wet-bulb${st?` · ${esc(st.station)}, TMYx ${esc(st.period)}`:''}</div>`;
   // one card per system: four numbers that matter, the rest behind "More"
-  const key=[['Electricity',r=>r.E,r=>`${fmt(r.E/1000,1)}`,'GWh/yr'],['Peak power',r=>r.peak,r=>`${fmt(r.peak/1000,1)}`,'MW'],['Water',r=>r.W,r=>r.W<1?'0':fmt(r.W/1000,0),'thousand m³/yr'],['CO₂',r=>r.co2,r=>fmt(r.co2/1000,1),'kt/yr']];
+  const IC={el:'<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',pk:'<path d="M12 14l4-4"/><path d="M3.3 19a10 10 0 1 1 17.4 0"/>',w:'<path d="M12 2.7s-6 6.4-6 11.3a6 6 0 0 0 12 0c0-4.9-6-11.3-6-11.3z"/>',co:'<path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 1 1 0 9Z"/>'};
+  const ic=k=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IC[k]}</svg>`;
+  const MK=['el','pk','w','co'];
+  const key=[['Electricity',r=>r.E,r=>`${fmt(r.E/1000,1)}`,'GWh/yr'],['Peak power',r=>r.peak,r=>`${fmt(r.peak/1000,1)}`,'MW'],['Water',r=>r.W,r=>r.W<1?'0':fmt(r.W/1000,0),'k m³/yr'],['CO₂',r=>r.co2,r=>fmt(r.co2/1000,1),'kt/yr']];
   const bestV=key.map(([,v])=>RANK.length?Math.min(...RANK.map(i=>v(RES[i]))):null);
-  const cards=order().map(id=>{ const r=RES[id], k=RANK.indexOf(id), d=DES[id];
-    const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="tag ok">Recommended</span>':`<span class="rank">#${k+1}</span>`;
-    const notes=[id==='acc'?'No free cooling':`Free cooling ${loopTxt(r.free)} h/yr (liquid / air)`];
-    if(d.warns.length) notes.push(`<b style="color:var(--warn)">Condenser water above ${P.wcMax} °C at design: needs a chiller rated above ${P.wcMax} °C</b>`); else if(r.hotCW>0) notes.push(`Condenser water above ${P.wcMax} °C for ${fmt(r.hotCW)} h/yr`);
-    if(mlcTxt(r)) notes.push(r.mlc<=mlcLim()?mlcTxt(r):`<b style="color:var(--bad)">${mlcTxt(r)}</b>`);
-    const more=[['Annual PUE',r.pue.toFixed(3)],['Water',wTxt(r)],[`Water peak (${atPk})`,`${fmt(r.Wpeak,1)} m³/h`],['Facility peak (grid)',`${fmt(r.facPeak/1000,1)} MW`],['Running cost',runTxt(r)],['Initial cost',costTxt(r)],['Score',r.excluded?'–':`${fmt(r.score)} / 100`]];
-    return `<div class="scard${k===0?' rec':''}${r.excluded?' off':''}">
+  const WL={plenty:'If TSE is available',limited:'If water is limited',none:'If there is no water'};
+  const D='<path d="M12 2.7s-6 6.4-6 11.3a6 6 0 0 0 12 0c0-4.9-6-11.3-6-11.3z"/>', sv=p=>`<svg viewBox="0 0 24 24" aria-hidden="true">${p}</svg>`;
+  const WI={plenty:sv(D+'<path d="M9 14.5h6"/><path d="M12 11.5v6"/>'),limited:sv(D+'<path d="M6.2 14h11.6"/>'),none:sv(D+'<path d="M3 3l18 18"/>')};
+  const recs=id=>Object.keys(WL).filter(w=>SCEN[w]===id);
+  const cOrder=[...new Set([...Object.keys(WL).map(w=>SCEN[w]).filter(Boolean),...order()])];
+  const cards=cOrder.map(id=>{ const r=RES[id], k=RANK.indexOf(id), d=DES[id], rw=recs(id);
+    const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:rw.map(w=>`<span class="wrec w-${w}"><i>${WI[w]}</i><span><small>Recommended</small>${WL[w]}</span></span>`).join('');
+    const warn=d.warns.length?`Condenser water above ${P.wcMax} °C at design`:(mlcLim()!=null&&r.mlc>mlcLim()?'Exceeds ASHRAE 90.4 MLC':'');
+    return `<div class="scard${rw.length?' rec':''}${r.excluded?' off':''}">
       <div class="stop">${status}</div>
       <div class="sname" title="${esc(r.o.name)}">${r.o.short}</div>
-      <div class="kn">${key.map(([l,v,t,u],j)=>`<div class="${!r.excluded&&v(r)<=bestV[j]*(1+1e-6)+1e-9?'hi':''}"><span class="kl">${l}</span><span class="kv">${t(r)}</span><span class="ku">${u}</span></div>`).join('')}</div>
-      <details class="cmore"><summary>More</summary>
-        <dl>${more.map(([l,v])=>`<div><dt>${l}</dt><dd>${v}</dd></div>`).join('')}</dl>
-        <ul>${notes.map(n=>`<li>${n}</li>`).join('')}</ul>
-      </details>
+      <div class="kn">${key.map(([l,v,t,u],j)=>{ const hi=!r.excluded&&v(r)<=bestV[j]*(1+1e-6)+1e-9; return `<div class="m-${MK[j]}${hi?' hi':''}"><span class="kl"><i>${ic(MK[j])}</i>${l}${hi?'<b class="best" title="Best value">Best</b>':''}</span><span class="kvr"><span class="kv">${t(r)}</span><span class="ku">${u}</span></span></div>`; }).join('')}</div>
+      ${warn?`<div class="cwarn">${warn}</div>`:''}
       <button class="link" data-sys="${id}">See system →</button></div>`; });
-  $('reco').innerHTML=`${banners}${verdict}${ctx}<div class="scards">${cards.join('')}</div><div class="cardnote">Best value in each row highlighted. Full tables, charts and the design-day check are in the tabs below.</div>`;
+  $('reco').innerHTML=`${banners}${verdict}<div class="scards">${cards.join('')}</div>`;
 }
 
-function renderOverview(){
-  const sumF=r=>r.free.reduce((a,b)=>a+b,0);
-  const cols=[
-    {h:'Electricity GWh/yr',v:r=>r.E/1000,d:1,lo:true},
-    {h:'Annual MLC',v:r=>r.mlc,d:3,lo:true},
-    {h:'Annual PUE',v:r=>r.pue,d:3,lo:true},
-    {h:`Electrical peak MW (cooling, ${atPk})`,v:r=>r.peak/1000,d:2,lo:true},
-    {h:'Water m³/yr',v:r=>r.W,d:0,lo:true},
-    {h:`Water peak m³/h (${atPk})`,v:r=>r.Wpeak,d:1,lo:true},
-    {h:'Carbon t CO₂/yr',v:r=>r.co2,d:0,lo:true},
-    {h:'Running cost M$/yr',v:r=>r.run/1e6,d:2,lo:true},
-    {h:'Initial cost M$',v:r=>r.capMid,lo:true,txt:r=>`${fmt(r.capLo/1e6,1)}–${fmt(r.capHi/1e6,1)}`},
-    {h:'Free-cooling h (LC / air)',v:sumF,lo:false,txt:r=>loopTxt(r.free)}];
-  const bestV=cols.map(c=>RANK.length?(c.lo?Math.min:Math.max)(...RANK.map(i=>c.v(RES[i]))):null);
-  const rows=order().map(id=>{ const r=RES[id], k=RANK.indexOf(id);
-    return `<tr class="click${k===0?' best':''}" data-sys="${id}"><td>${k>=0?k+1:'–'}</td><td>${r.o.name}${tag(id,k)}</td>
-      <td>${r.excluded?'–':`<span class="sbar" style="width:${Math.max(2,r.score*0.5)}px"></span>${fmt(r.score)}`}</td>
-      ${cols.map((c,j)=>{ const v=c.v(r), hi=!r.excluded&&Math.abs(v-bestV[j])<=Math.abs(bestV[j])*1e-6+1e-9;
-        return `<td class="${hi?'hi':''}">${c.txt?c.txt(r):fmt(v,c.d)}</td>`; }).join('')}</tr>`; });
-  $('tOv').innerHTML=table(['#','Option','Score (0–100)',...cols.map(c=>c.h)],rows);
-}
 
-function renderDes(){
-  const rows=order().map(id=>{ const r=RES[id], d=DES[id];
-    const res=!d.ok?'<span class="tag x">Fails</span>':d.warns.length?'<span class="tag">Warning</span>':'<span class="tag ok">Holds supply</span>';
-    return `<tr><td>${r.o.name}</td><td>${res}</td><td>${fmt(d.cases.A.P/1000,2)}</td><td>${fmt(d.cases.B.P/1000,2)}</td><td>${fmt(d.P/1000,2)} (${d.worst})</td><td>${d.ratio.toFixed(3)}</td><td>${fmt(d.W,1)}</td><td>${fmt(d.Qr/1000,1)}</td><td class="l">${d.units.map(u=>`${u.N} × ${fmt(u.unit/1000,1)} MW`).join(' / ')}</td><td class="l">${[...d.issues,...d.warns].join('; ')||'–'}</td></tr>`; });
-  $('tDes').innerHTML=table(['Option','Result','Case A MW','Case B MW','Design peak MW','kW/kW','Water m³/h','Heat rejection MW','Duty chillers (liquid / air loop)','Notes'],rows);
-  const auto=isNaN(P.dbIn)||isNaN(P.wbIn);
-  $('desNote').textContent=`Checked at 100% load at Case A (${fmt(P.cases.A.db,1)} °C db / ${fmt(P.cases.A.wb,1)} °C wb) and Case B (${fmt(P.cases.B.db,1)} °C db / ${fmt(P.cases.B.wb,1)} °C wb)${auto?(ashrae()?', from the ASHRAE extreme annual values with coincident values from the hourly weather':', from the hottest and most humid hours in the weather data'):''}. Design peak = the higher of the two. Heat rejection = loop load + compressor power. Air-cooled chillers above ${P.acMax} °C fail and are excluded; condenser water above ${P.wcMax} °C gives a warning.`;
-}
 
 function renderSystem(){
-  const id=sel(), r=RES[id], d=DES[id], s=SYS[id], k=RANK.indexOf(id);
-  $('sysSeg').innerHTML=OPTIONS.map(o=>{ const j=RANK.indexOf(o.id);
-    return `<button data-sys="${o.id}" class="${o.id===id?'on':''}"><span class="rk">${j>=0?j+1:'✕'}</span>${o.short}</button>`; }).join('');
-  const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="tag ok">Recommended</span>':`<span class="tag">Rank ${k+1} of ${RANK.length}</span>`;
-  $('sysHead').innerHTML=`<h2>${r.o.name}</h2>${status}${r.excluded?'':`<span class="note">score ${fmt(r.score)}</span>`}`;
-  $('sysHow').textContent=s.how;
+  const id=sel(), r=RES[id];
+  $('sysSeg').innerHTML=OPTIONS.map(o=>`<button data-sys="${o.id}" class="${o.id===id?'on':''}">${RES[o.id].excluded?'<span class="rk">✕</span>':''}${o.short}</button>`).join('');
+  const WLs={plenty:'if TSE is available',limited:'if water is limited',none:'if there is no water'};
+  const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:Object.keys(WLs).filter(w=>SCEN[w]===id).map(w=>`<span class="tag ok">Recommended ${WLs[w]}</span>`).join('');
+  $('sysHead').innerHTML=`<h2>${r.o.name}</h2>${status}`;
   $('sysSvg').innerHTML=schematic(id);
-  $('sysKpi').innerHTML=kpis([[`${fmt(r.E/1000,1)} GWh`,'Cooling electricity per year'],[r.mlc.toFixed(3),'Annual MLC (kW/kW)'],[r.pue.toFixed(3),'Annual PUE (incl. losses)'],
-    [`${fmt(r.peak/1000,2)} MW`,`Electrical peak, cooling plant (${atPk})`],[`${fmt(r.facPeak/1000,1)} MW`,`Facility peak, grid connection (cooling ${fmt(r.coolShare*100)}%)`],[`${fmt(r.Wpeak,1)} m³/h`,`Water peak, make-up (${atPk})`],
-    [wTxt(r),'Water per year (evaporation band)'],[runTxt(r),'Running cost, cooling'],[costTxt(r),'Initial cost (estimate)'],[payback(r).txt,'Payback vs air-cooled chillers'],[`${fmt(d.Qr/1000,1)} MW`,'Heat rejection at design']]);
-  $('sysDes').innerHTML=(d.ok?`Design cases: Case A ${fmt(d.cases.A.P/1000,2)} MW, Case B ${fmt(d.cases.B.P/1000,2)} MW; typical-year maximum ${fmt(r.yMax/1000,2)} MW${r.yAbove?` (${fmt(r.yAbove)} h above Cases A/B, up to +${fmt(r.yExcess/1000,2)} MW)`:''}; design peak ${fmt(r.peak/1000,2)} MW (${r.peakCase==='year'?'typical-year hour':'Case '+r.peakCase}). Duty chillers ${d.units.map(u=>`${u.N} × ${fmt(u.unit/1000,1)} MW`).join(' (liquid) / ')} (air), plus 1 standby each.`
-    :`<span class="tag x">Fails design day</span> ${d.issues.join('; ')}`)+(d.warns.length?` <span class="tag">Warning</span> ${d.warns[0]}.`:'');
-  // annual operating mode per loop
-  $('sysModes').innerHTML=P.loops.map((L,i)=>{ if(L.Q<=0) return '';
-    const seg=[['Free cooling',r.free[i],'--s3'],['Partial',r.part[i],'--s1'],['Chiller only',r.mech[i],'--s2']].filter(x=>x[1]>0);
-    return `<div class="mode"><div class="ml"><b>${i?'Air':'Liquid'} loop</b> ${L.Ts}/${L.Tr} °C</div>
-      <div class="mbar">${seg.map(([l,v,c])=>`<span style="flex:${v};background:var(${c})" title="${l}: ${fmt(v)} h/yr"></span>`).join('')}</div>
-      <div class="mv">${seg.map(([l,v])=>`${l} <b>${fmt(v)} h</b> (${fmt(v/87.6)}%)`).join(' · ')}</div></div>`; }).join('');
-  // equipment and cost
-  const cap=P.Qd*(1+P.red);
-  $('sysComp').innerHTML=table(['Component','Role','Sized MW','Cost M$'],r.o.comp.map(c=>{ const rt=P.rates[c];
-    return `<tr><td>${RATES.find(x=>x.id===c).l}</td><td class="l">${ROLE[c](r.o)}</td><td>${fmt(cap/1000,1)}</td><td>${fmt(cap*rt.lo/1e6,1)}–${fmt(cap*rt.hi/1e6,1)}</td></tr>`; }));
-  $('compNote').textContent=`Each component sized for ${fmt(P.Qd/1000,1)} MW load + ${fmt(P.red*100)}% redundancy. Pumps, CDUs, piping and controls are not included.`;
-  $('sysPros').innerHTML=`<h3>Strengths</h3><ul>${s.pros.map(x=>`<li>${x}</li>`).join('')}</ul><h3>Watch-outs</h3><ul>${s.cons.map(x=>`<li>${x}</li>`).join('')}</ul>`;
   renderMonthly();
 }
 
 function renderEff(){
-  const m=mlcLim(), zone=mlcZone();
-  const res=r=>m==null?'–':(r.mlc<=m?'<span class="tag ok">Meets</span>':'<span class="tag x">Exceeds</span>');
-  const rows=order().map((id,i)=>{ const r=RES[id]; return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td>${r.mlc.toFixed(3)}</td><td>${m==null?'–':m.toFixed(2)}</td><td>${res(r)}</td><td>${r.peakRatio.toFixed(3)}</td><td>${r.cop?r.cop.toFixed(1):'–'}</td><td>${loopTxt(r.free)}</td><td>${loopTxt(r.mech)}</td></tr>`; });
-  $('tEff').innerHTML=table(['Option','Annual MLC',`ASHRAE 90.4 max MLC${zone?' (zone '+esc(zone)+')':''}`,'90.4 result','Peak kW/kW','Avg chiller COP','Free-cooling h (LC / air)','Chiller-only h (LC / air)'],rows);
-  const ids=RANK;
-  $('effTitle').textContent=ids.length?`Annual MLC: ${RES[ids[0]].o.short} ${RES[ids[0]].mlc.toFixed(3)} kW/kW`:'Annual MLC';
-  hbar('cEff',ids.map(id=>RES[id].o.short),ids.map(id=>RES[id].mlc),'kW per kW of cooling',3);
+  const m=mlcLim();
+  const res=r=>m==null?'':(r.mlc<=m?' <span class="tag ok">Meets 90.4</span>':' <span class="tag x">Exceeds 90.4</span>');
+  const rows=order().map(id=>{ const r=RES[id]; return `<tr><td>${r.o.name}${tag(id)}</td><td>${r.pue.toFixed(3)}</td><td>${r.mlc.toFixed(3)}${res(r)}</td><td>${fmt(r.facPeak/1000,1)}</td></tr>`; });
+  $('tEff').innerHTML=table(['Option','Annual PUE',`Annual MLC${m!=null?' (90.4 max '+m.toFixed(2)+')':''}`,'Facility peak MW (grid)'],rows);
 }
 
 function renderCarbon(){
-  const b=RES.acc, rows=order().map((id,i)=>{ const r=RES[id]; return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td>${fmt(r.co2E)}</td><td>${fmt(r.co2W)}${band(r.co2W,r.co2Wlo,r.co2Whi)}</td><td>${fmt(r.co2R)}</td><td>${fmt(r.co2)}${band(r.co2,r.co2Lo,r.co2Hi)}</td><td>${fmt(r.co2IT,1)}</td><td>${id==='acc'?'–':fmt(b.co2-r.co2)}</td></tr>`; });
-  $('tCO2').innerHTML=table(['Option','Electricity t CO₂/yr','Water supply t CO₂/yr','Refrigerant t CO₂e/yr','Total t CO₂e/yr','kg CO₂e per MWh IT','Saving vs air-cooled t/yr'],rows);
   const rf=REFRIGERANTS[P.refr];
-  $('co2Note').textContent=`Grid factor ${P.ef.toFixed(3)} kg CO₂/kWh${isNaN(parseFloat($('envEF').value))?(cityId()?((CITIES.find(c=>c.id===cityId())||{}).g==='Americas'&&cityId()!=='saopaulo'?' (EPA eGRID2023 rev 2 subregion)':cityId()==='sydney'?' (Australian NGA factors, NSW 2025–26)':' (Our World in Data / Ember, latest year)'):' (world average; enter the local grid)'):''}; ${P.wco2?`water supply ${fmt(P.wco2[1],2)} kg CO₂e/m³ (band ${fmt(P.wco2[0],2)}–${fmt(P.wco2[2],2)}: City of Phoenix 2022 GHG inventory, plus Central Arizona Project conveyance at the top)`:`water supply ${fmt(P.wkwh,1)} kWh/m³`}; tower water band 0.15–0.27 %/K evaporation; ${rf.name} GWP ${fmt(rf.gwp,rf.gwp<10?2:0)}, charge ${P.chW} / ${P.chA} kg/kW (water / air-cooled), leak ${fmt(P.leak*100,1)}%/yr on duty + 1 standby chillers. Cooling plant only; IT electricity not included.`;
+  $('co2Note').textContent=`Grid ${P.ef.toFixed(3)} kg CO₂/kWh · water ${P.wco2?`${fmt(P.wco2[1],2)} kg CO₂e/m³`:`${fmt(P.wkwh,1)} kWh/m³`} · ${rf.name} GWP ${fmt(rf.gwp,rf.gwp<10?2:0)}, leak ${fmt(P.leak*100,1)}%/yr.`;
   const ids=RANK, labels=ids.map(id=>RES[id].o.short);
   const o=baseOpts(); o.indexAxis='y'; o.scales.x={stacked:true,grid:{color:css('--border')},border:{display:false},ticks:{color:css('--text2')},title:{display:true,text:'t CO₂e/yr',color:css('--text2')},beginAtZero:true};
   o.scales.y={stacked:true,grid:{display:false},ticks:{color:css('--text')}};
   o.plugins.tooltip={mode:'index',intersect:false,callbacks:{label:c=>`${c.dataset.label}: ${fmt(c.raw)} t`}};
   const ds=(lab,k,col,last)=>({label:lab,data:ids.map(id=>RES[id][k]),backgroundColor:col,borderColor:css('--surface'),borderWidth:{right:2},barThickness:18,borderRadius:last?{topRight:4,bottomRight:4}:0});
   mk('cCO2',{type:'bar',data:{labels,datasets:[ds('Electricity','co2E',css('--s1')),ds('Water supply','co2W',css('--s3')),ds('Refrigerant leakage','co2R',css('--s2'),true)]},options:o});
-  $('co2Title').textContent=ids.length?`Annual carbon: lowest ${fmt(Math.min(...ids.map(i=>RES[i].co2)))} t CO₂e/yr`:'Annual carbon by source';
 }
 
 function renderCons(){
-  const rows=order().map((id,i)=>{ const r=RES[id]; return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td>${fmt(r.E)}</td><td>${fmt(r.Ec)}</td><td>${fmt(r.Ef)}</td><td>${fmt(r.Ep)}</td><td>${fmt(r.Et)}</td><td>${fmt(r.Eloss)}</td><td>${r.pue.toFixed(3)}</td><td>${fmt(r.peak/1000,2)}</td><td>${fmt(r.facPeak/1000,1)}</td><td>${fmt(r.coolShare*100)}%</td><td>${fmt(r.W)}${band(r.W,r.Wlo,r.Whi)}</td><td>${fmt(r.Wpeak,1)}${band(r.Wpeak,r.WpeakLo,r.WpeakHi,1)}</td></tr>`; });
-  $('tCons').innerHTML=table(['Option','Cooling MWh/yr','Chillers','Heat-rejection fans','Pumps','CRAH / FWU / CDU','Electrical losses MWh/yr','Annual PUE',`Electrical peak MW (cooling, ${atPk})`,'Facility peak MW (grid)','Cooling share of facility peak','Water m³/yr',`Water peak m³/h (${atPk})`],rows);
   const ids=RANK, labels=ids.map(id=>RES[id].o.short);
   const o=baseOpts(); o.indexAxis='y'; o.scales.x={stacked:true,grid:{color:css('--border')},border:{display:false},ticks:{color:css('--text2')},title:{display:true,text:'MWh/yr',color:css('--text2')}};
   o.scales.y={stacked:true,grid:{display:false},ticks:{color:css('--text')}};
   o.plugins.tooltip={mode:'index',intersect:false,callbacks:{label:c=>`${c.dataset.label}: ${fmt(c.raw)} MWh`}};
   const ds=(lab,k,col,last)=>({label:lab,data:ids.map(id=>RES[id][k]),backgroundColor:col,borderColor:css('--surface'),borderWidth:{right:2},barThickness:18,borderRadius:last?{topRight:4,bottomRight:4}:0});
   mk('cEl',{type:'bar',data:{labels,datasets:[ds('Chiller compressors','Ec',css('--s1')),ds('Heat-rejection fans','Ef',css('--s4')),ds('Pumps','Ep',css('--grey2')),ds('CRAH / FWU fans + CDU pumps','Et',css('--s2'),true)]},options:o});
-  $('elTitle').textContent=ids.length?`Annual electricity: lowest ${fmt(Math.min(...ids.map(i=>RES[i].E))/1000,1)} GWh/yr`:'Annual electricity';
-  const zeroW=ids.filter(i=>RES[i].W<1).length;
-  $('wTitle').textContent=zeroW?`Annual water: ${zeroW} option${zeroW>1?'s':''} use none`:'Annual water';
-  hbar('cW',labels,ids.map(id=>RES[id].W),'m³/yr',0);
 }
 
 function renderRun(){
-  const rows=order().map((id,i)=>{ const r=RES[id], pb=payback(r);
-    return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td>${fmt(r.costE/1e3)}</td><td>${fmt(r.costW/1e3)}</td><td>${fmt(r.costD/1e3)}</td><td>${fmt(r.run/1e3)}</td><td>${id==='acc'?'–':fmt(pb.save/1e3)}</td><td>${pb.txt}</td></tr>`; });
-  $('tRun').innerHTML=table(['Option','Electricity k$/yr','Water k$/yr','Demand k$/yr','Total k$/yr','Saving vs air-cooled k$/yr','Simple payback'],rows);
-  $('runNote').textContent=`Cooling only (not IT electricity), at the frequent load. Tariffs: electricity ${P.tE} $/kWh, water ${P.tW} $/m³, demand ${P.tD} $/kW per month on the cooling peak. Simple payback = extra initial cost (mid estimate) over air-cooled chillers ÷ running cost saved; no discounting, maintenance or tariff escalation.`;
+  const rows=order().map(id=>{ const r=RES[id]; return `<tr><td>${r.o.name}${tag(id)}</td><td>${fmt(r.run/1e3)}</td><td>${costTxt(r)}</td><td>${payback(r).txt}</td></tr>`; });
+  $('tRun').innerHTML=table(['Option','Running cost k$/yr','Initial cost (estimate)','Payback vs air-cooled'],rows);
+  $('runNote').textContent=`Electricity ${P.tE} $/kWh · water ${P.tW} $/m³ · demand ${P.tD} $/kW-month. Initial cost excludes building works, electrical and controls.`;
   const ids=RANK, labels=ids.map(id=>RES[id].o.short);
   const o=baseOpts(); o.indexAxis='y'; o.scales.x={stacked:true,grid:{color:css('--border')},border:{display:false},ticks:{color:css('--text2')},title:{display:true,text:'k$/yr',color:css('--text2')},beginAtZero:true};
   o.scales.y={stacked:true,grid:{display:false},ticks:{color:css('--text')}};
   o.plugins.tooltip={mode:'index',intersect:false,callbacks:{label:c=>`${c.dataset.label}: ${fmt(c.raw)} k$/yr`}};
   const ds=(lab,k,col,last)=>({label:lab,data:ids.map(id=>RES[id][k]/1e3),backgroundColor:col,borderColor:css('--surface'),borderWidth:{right:2},barThickness:18,borderRadius:last?{topRight:4,bottomRight:4}:0});
   mk('cRun',{type:'bar',data:{labels,datasets:[ds('Electricity','costE',css('--s1')),ds('Water','costW',css('--s3')),ds('Demand charge','costD',css('--s4'),true)]},options:o});
-  $('runTitle').textContent=ids.length?`Annual running cost: lowest ${fmt(Math.min(...ids.map(i=>RES[i].run))/1e6,2)} M$/yr`:'Annual running cost';
 }
 
-function renderCap(){
-  const rows=order().map((id,i)=>{ const r=RES[id]; return `<tr class="${i===0&&!r.excluded?'best':''}"><td>${r.o.name}${tag(id,i)}</td><td class="l">${r.capParts.map(c=>RATES.find(x=>x.id===c).l).join(' + ')}</td><td>${fmt(r.capLo/1e6,1)}–${fmt(r.capHi/1e6,1)}</td><td>${fmt(r.capLo/P.Qd)}–${fmt(r.capHi/P.Qd)}</td></tr>`; });
-  $('tCap').innerHTML=table(['Option','Components','Estimate M$','$ per kW of load'],rows);
-  const ids=RANK, labels=ids.map(id=>RES[id].o.short);
-  const o=baseOpts(); o.indexAxis='y';
-  o.scales.x={grid:{color:css('--border')},border:{display:false},ticks:{color:css('--text2')},title:{display:true,text:'M$ (low – high)',color:css('--text2')},beginAtZero:true};
-  o.scales.y={grid:{display:false},ticks:{color:css('--text')}};
-  o.plugins.tooltip={callbacks:{label:c=>`${fmt(c.raw[0],1)} – ${fmt(c.raw[1],1)} M$`}};
-  mk('cCap',{type:'bar',data:{labels,datasets:[{data:ids.map(id=>[RES[id].capLo/1e6,RES[id].capHi/1e6]),backgroundColor:ids.map((id,i)=>i===0?css('--s1'):css('--grey')),borderRadius:4,borderSkipped:false,barThickness:16}]},options:o});
-  $('capTitle').textContent=ids.length?`Estimated initial cost: ${costTxt(RES[ids[0]])} for the recommended option`:'Estimated initial cost range';
-}
 
 function renderMonthly(){
   const id=sel(), r=RES[id], M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], sc=8760/WX.T.length, L=P.loops[LOOP];
-  $('mTitle').textContent=`Monthly operating hours, ${LOOP===0?'liquid':'air'} loop (${L.Ts}/${L.Tr} °C)`;
   const o=baseOpts(); o.scales.x.stacked=true; o.scales.y.stacked=true; o.scales.y.title={display:true,text:'hours',color:css('--text2')};
   o.plugins.tooltip={mode:'index',intersect:false,callbacks:{label:c=>`${c.dataset.label}: ${fmt(c.raw)} h`}};
   mk('cM',{type:'bar',data:{labels:M,datasets:[
@@ -1574,8 +1456,7 @@ function renderClimate(){
     const free=Array(12).fill(0), part=Array(12).fill(0), none=Array(12).fill(0);
     WX.T.forEach((t,h)=>{ const o=outT(h), m=WX.mon[h]; if(o<=L.Ts) free[m]+=sc; else if(o<L.Tr) part[m]+=sc; else none[m]+=sc; });
     const tot=a=>a.reduce((x,y)=>x+y,0);
-    $('clTitle'+i).textContent=`${i?'Air cooling loop (AC)':'Liquid cooling loop (LC)'}, ${L.Ts}/${L.Tr} °C`;
-    $('clSub'+i).textContent=`Free cooling ${fmt(tot(free))} h/yr · partial ${fmt(tot(part))} h · chiller only ${fmt(tot(none))} h. Free below ${fmt(L.Ts-appr,1)} °C ${dc?'dry-bulb':'wet-bulb'}, partial below ${fmt(L.Tr-appr,1)} °C.`;
+    $('clTitle'+i).textContent=`${i?'Air':'Liquid'} cooling loop, ${L.Ts}/${L.Tr} °C`;
     const o=baseOpts(); o.scales.x.stacked=true; o.scales.y.stacked=true; o.scales.y.max=750; o.scales.y.title={display:true,text:'hours',color:css('--text2')};
     o.plugins.tooltip={mode:'index',intersect:false,callbacks:{label:c=>`${c.dataset.label}: ${fmt(c.raw)} h`,footer:c=>tip(c[0].dataIndex)}};
     mk('cCl'+i,{type:'bar',data:{labels:M,datasets:[
@@ -1583,7 +1464,7 @@ function renderClimate(){
       {label:'Partial',data:part,backgroundColor:css('--s1'),borderColor:css('--surface'),borderWidth:{top:2}},
       {label:'Chiller only',data:none,backgroundColor:css('--s2'),borderColor:css('--surface'),borderWidth:{top:2},borderRadius:{topLeft:4,topRight:4}}]},options:o});
   });
-  $('clNote').textContent=`Climate only, before choosing a system: hours each month when the outdoor ${dc?'dry-bulb':'wet-bulb'} + ${fmt(appr,1)} K approach (${dc?'dry cooler':'tower + plate HX'}) is below the loop supply temperature (free cooling) or below its return temperature (partial). Hover over a month for its temperatures. The Systems tab shows how each complete system actually runs.`;
+  $('clNote').textContent='Hover over a month for its temperatures.';
 }
 document.querySelectorAll('#climSeg button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#climSeg button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); CLDEV=b.dataset.dev; renderClimate(); });
 
@@ -1624,7 +1505,7 @@ $('city').addEventListener('change',showSampleNote); showSampleNote();
 document.querySelectorAll('#inputs input:not([type=file]), #inputs select:not(#city)').forEach(el=>el.addEventListener('input',run));
 document.querySelectorAll('#loopSeg button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#loopSeg button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); LOOP=+b.dataset.l; renderMonthly(); });
 if(window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',run);
-showPane('ov');
+showPane('sys');
 loadCity();
 
 // input labels that repeat between the two loops
@@ -1636,7 +1517,7 @@ function exportReport(){
   const loopName=i=>i?'Air loop':'Liquid loop', B=v=>({v,b:true});
   const withNote=(rows,id)=>{ const n=id&&$(id)&&$(id).textContent.trim(); return n?[...rows,[],['Note: '+n]]:rows; };
   const sheet=(name,id,note,extra)=>({name,rows:withNote(tableRows($(id)),note),head:[0],...extra});
-  const rank=RANK.map((id,k)=>[k+1,RES[id].o.name,Math.round(RES[id].score)]);
+  const WLx={plenty:'If TSE is available',limited:'If water is limited',none:'If there is no water'}, rank=Object.keys(WLx).map(w=>[WLx[w],SCEN[w]?RES[SCEN[w]].o.name:'–']);
   const summary=[
     [B('Othman Energy Lab · Cooling Plant Selector report')],
     ['Exported',new Date().toLocaleString('en-GB')],
@@ -1651,36 +1532,26 @@ function exportReport(){
     ['Cooling load (MW)',P.Qd/1000],
     ...P.loops.map((L,i)=>[`${loopName(i)}: load MW, supply / return °C`,L.Qd/1000,`${L.Ts} / ${L.Tr}`]),
     [],
-    [B('Ranking')],[B('#'),B('Option'),B('Score (0–100)')],...rank,
+    [B('Recommended')],...rank,
     ...order().filter(id=>RES[id].excluded).map(id=>['–',RES[id].o.name,'Excluded: '+RES[id].excluded]),
     [],
     [B('Inputs')],[B('Input'),B('Value')],...inputRows(document.querySelector('aside.inputs')||document,INPUT_NAMES)];
-  // equipment of every option
-  const cap=P.Qd*(1+P.red), equip=[['Option','Component','Role','Sized MW','Cost low M$','Cost high M$']];
-  order().forEach(id=>{ const r=RES[id]; r.o.comp.forEach(c=>{ const rt=P.rates[c]; equip.push([r.o.name,RATES.find(x=>x.id===c).l,ROLE[c](r.o),+(cap/1000).toFixed(2),+(cap*rt.lo/1e6).toFixed(2),+(cap*rt.hi/1e6).toFixed(2)]); }); });
   // operating hours by month: free cooling / partial / chiller only, per option and loop
   const hrs=[['Option','Loop','Mode',...M,'Total h/yr']];
   order().forEach(id=>{ const r=RES[id]; P.loops.forEach((L,i)=>{ if(L.Q<=0) return;
     [['Free cooling',r.mFree],['Partial',r.mPart],['Chiller only',r.mMech]].forEach(([m,a])=>{ const v=a[i].map(x=>Math.round(x*sc)); hrs.push([r.o.name,`${loopName(i)} ${L.Ts}/${L.Tr} °C`,m,...v,v.reduce((s,x)=>s+x,0)]); }); }); });
   const sheets=[
     {name:'Summary',rows:summary,widths:[46,48,20]},
-    sheet('Overview','tOv'),
-    sheet('Design day','tDes','desNote'),
-    sheet('Efficiency','tEff'),
-    sheet('Carbon','tCO2','co2Note'),
-    sheet('Energy and water','tCons'),
-    sheet('Running cost','tRun','runNote'),
-    sheet('Initial cost','tCap'),
-    {name:'Equipment',rows:withNote(equip,'compNote'),head:[0]},
+    {name:'Results',rows:[['Option','Electricity MWh/yr','Peak power MW','Facility peak MW','Annual PUE','Annual MLC','Water m³/yr','CO₂ t/yr','Running cost k$/yr','Initial cost low M$','Initial cost high M$'],...order().map(id=>{ const r=RES[id]; return [r.o.name,Math.round(r.E),+(r.peak/1000).toFixed(2),+(r.facPeak/1000).toFixed(1),+r.pue.toFixed(3),+r.mlc.toFixed(3),Math.round(r.W),Math.round(r.co2),Math.round(r.run/1e3),+(r.capLo/1e6).toFixed(1),+(r.capHi/1e6).toFixed(1)]; })],head:[0]},
     {name:'Operating hours',rows:hrs,head:[0]}];
   const slug=String(WX.name).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'site';
   downloadBlob(xlsxBlob(sheets),`cooling-plant-report-${slug}-${new Date().toISOString().slice(0,10)}.xlsx`);
 }
 $('xport').onclick=exportReport;
 // ---------- PDF report: a print-ready A4 page built from the current results; saved with the browser's "Save as PDF" ----------
-const RPT_C={s1:'#2a78d6',s2:'#eb6834',s3:'#1baf7a',s4:'#eda100',grey:'#c9c8c3',grey2:'#9f9e99',brand:'#0e7c57',text:'#0b0b0b',text2:'#52514e',border:'#e3e2de'};
+const RPT_C={s1:'#2a78d6',s2:'#eb6834',s3:'#1baf7a',s4:'#eda100',grey:'#c9c8c3',grey2:'#9f9e99',brand:'#c2185b',text:'#0b0b0b',text2:'#52514e',border:'#e3e2de'};
 const RPT_CSS=`
-:root{--bg:#f6f6f4;--surface:#fff;--border:#e3e2de;--text:#0b0b0b;--text2:#52514e;--muted:#6f6e69;--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100;--grey:#c9c8c3;--grey2:#9f9e99;--good:#1a7f37;--warn:#b26b00;--bad:#c62828;--brand:#0e7c57;--brand-ink:#0b6b4a}
+:root{--bg:#f6f6f4;--surface:#fff;--border:#e3e2de;--text:#0b0b0b;--text2:#52514e;--muted:#6f6e69;--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100;--grey:#c9c8c3;--grey2:#9f9e99;--good:#1a7f37;--warn:#b26b00;--bad:#c62828;--brand:#c2185b;--brand-ink:#a3134d}
 @page{size:A4;margin:14mm 13mm 16mm}
 @page{@bottom-left{content:"Othman Energy Lab · Cooling Plant Selector";font:8pt system-ui,sans-serif;color:#6f6e69}@bottom-right{content:"Page " counter(page) " of " counter(pages);font:8pt system-ui,sans-serif;color:#6f6e69}}
 *{box-sizing:border-box}
@@ -1704,7 +1575,7 @@ h3{font-size:10pt;margin:12px 0 6px;break-after:avoid}
 .box{border:1px solid var(--border);border-radius:8px;padding:10px 12px;break-inside:avoid}
 .box h3{margin-top:0}
 dl.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:0}dl.kv dt{color:var(--text2)}dl.kv dd{margin:0;font-weight:600}
-.rec{border:1.5px solid var(--brand);background:#f1f8f4;border-radius:10px;padding:12px 14px;margin:12px 0;break-inside:avoid}
+.rec{border:1.5px solid var(--brand);background:#fcf0f5;border-radius:10px;padding:12px 14px;margin:12px 0;break-inside:avoid}
 .rec .tl{font-size:8pt;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-ink)}
 .rec .nm{font-size:14pt;font-weight:700;margin:2px 0 8px}
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
@@ -1716,7 +1587,7 @@ th{text-align:left;font-weight:700;background:#f2f2ef;border-bottom:1px solid va
 td{border-bottom:1px solid var(--border);padding:3.5px 5px;vertical-align:top}
 th:not(:first-child),td:not(:first-child){text-align:right}td.l,th.l{text-align:left!important}
 tr.best td{background:#eef7f2;font-weight:600}td.hi{color:var(--brand-ink);font-weight:700}
-.tag{display:inline-block;font-size:7pt;font-weight:700;border-radius:9px;padding:0 6px;margin-left:5px;background:#e7f3ec;color:var(--brand-ink);white-space:nowrap}.tag.x{background:#fbeaea;color:var(--bad)}.tag.ok{background:#e7f3ec;color:var(--good)}
+.tag{display:inline-block;font-size:7pt;font-weight:700;border-radius:9px;padding:0 6px;margin-left:5px;background:#fbe7f0;color:var(--brand-ink);white-space:nowrap}.tag.x{background:#fbeaea;color:var(--bad)}.tag.ok{background:#fbe7f0;color:var(--good)}
 .sbar{display:none}
 .note{font-size:7.8pt;color:var(--muted);margin:3px 0 0}
 .chart{break-inside:avoid;margin:6px 0 10px}.chart .ct{font-weight:700;font-size:9pt;margin-bottom:2px}
@@ -1733,7 +1604,7 @@ ul{margin:4px 0;padding-left:16px}li{margin:2px 0}
 .method{font-size:8pt}.method li{margin:3px 0}code{font-size:7.6pt}
 .disc{font-size:7.8pt;color:var(--muted);border-top:1px solid var(--border);margin-top:16px;padding-top:8px}
 `;
-const RPT_LOGO='<svg viewBox="0 0 26 26"><rect width="26" height="26" rx="6" fill="#0b0b0b"/><ellipse cx="12.4" cy="13.4" rx="6.6" ry="7" fill="none" stroke="#fcfcfb" stroke-width="2.6"/><path d="M19.4 3 L11.4 13.6 H15.4 L9.6 22.8 L22 10.6 H18.6 L22.6 3 Z" fill="#4cc99a" stroke="#0b0b0b" stroke-width="1.3" stroke-linejoin="round"/></svg>';
+const RPT_LOGO='<svg viewBox="0 0 26 26"><rect width="26" height="26" rx="6" fill="#0b0b0b"/><ellipse cx="12.4" cy="13.4" rx="6.6" ry="7" fill="none" stroke="#fcfcfb" stroke-width="2.6"/><path d="M19.4 3 L11.4 13.6 H15.4 L9.6 22.8 L22 10.6 H18.6 L22.6 3 Z" fill="#e0559a" stroke="#0b0b0b" stroke-width="1.3" stroke-linejoin="round"/></svg>';
 
 // round axis step: 1, 2, 2.5 or 5 × 10^n
 function rptStep(x){ const p=Math.pow(10,Math.floor(Math.log10(x))), m=x/p; return p*(m<=1?1:m<=2?2:m<=2.5?2.5:m<=5?5:10); }
@@ -1768,7 +1639,7 @@ function buildReport(){
   const date=now.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
   const loopTxt2=i=>`${i?'Air':'Liquid'} loop: ${fmt(P.loops[i].Qd/1000,1)} MW, supply ${P.loops[i].Ts} °C / return ${P.loops[i].Tr} °C`;
   const desSrc=isNaN(P.dbIn)||isNaN(P.wbIn)?(ashrae()?'ASHRAE 2025 extreme annual values':'hottest hours in the weather data'):'entered design values';
-  const waterTxt=$('water').selectedOptions[0].textContent;
+  const waterTxt='Compared for three cases: TSE available, water limited, no water';
   // ---- page 1: basis and recommendation
   let h=`<header class="top"><div class="logo">${RPT_LOGO}<span>Othman Energy <b>Lab</b></span></div><div class="meta">Cooling plant selection report<br>${date}</div></header>
   <h1>Cooling plant selection: ${esc(WX.name)}</h1>
@@ -1784,61 +1655,28 @@ function buildReport(){
       <dt>Air loop</dt><dd>${fmt(P.loops[1].Qd/1000,1)} MW · ${P.loops[1].Ts}/${P.loops[1].Tr} °C</dd>
       <dt>Water</dt><dd>${esc(waterTxt)}</dd><dt>Tariffs</dt><dd>${P.tE} $/kWh · ${P.tW} $/m³ · ${P.tD} $/kW-month</dd></dl></div>
   </div>`;
-  if(rec){
-    const pb=payback(rec), acc=RES.acc;
-    h+=`<div class="rec"><div class="tl">Recommended system · score ${fmt(rec.score)} of 100</div><div class="nm">${rec.o.name}</div>
-      <div class="kpis">
-        <div class="kpi"><div class="v">${fmt(rec.E/1000,1)} GWh/yr</div><div class="l">Cooling electricity</div></div>
-        <div class="kpi"><div class="v">${rec.pue.toFixed(3)}</div><div class="l">Annual PUE</div></div>
-        <div class="kpi"><div class="v">${fmt(rec.peak/1000,2)} MW</div><div class="l">Electrical peak, cooling (100% load)</div></div>
-        <div class="kpi"><div class="v">${fmt(rec.W)} m³/yr</div><div class="l">Water</div></div>
-        <div class="kpi"><div class="v">${fmt(rec.run/1e6,2)} M$/yr</div><div class="l">Running cost, cooling</div></div>
-        <div class="kpi"><div class="v">${fmt(rec.capLo/1e6,1)}–${fmt(rec.capHi/1e6,1)} M$</div><div class="l">Initial cost (estimate)</div></div>
-        <div class="kpi"><div class="v">${pb.txt}</div><div class="l">Payback vs air-cooled chillers</div></div>
-        <div class="kpi"><div class="v">${fmt(rec.mlc,3)}</div><div class="l">Annual MLC, kW/kW${mlcLim()!=null?` · ASHRAE 90.4 max ${mlcLim().toFixed(2)}: ${rec.mlc<=mlcLim()?'meets':'<b style="color:#c62828">exceeds</b>'}`:' (ASHRAE 90.4)'}</div></div>
-      </div>
-      <p class="why">${rec.o.id==='acc'?'':`Against air-cooled chillers it saves <b>${fmt(Math.max(0,acc.E-rec.E)/1000,1)} GWh/yr</b> of electricity and <b>${fmt(Math.max(0,acc.peak-rec.peak)/1000,2)} MW</b> of peak cooling power. `}Free cooling covers ${fmt(rec.free[0])} h/yr on the liquid loop and ${fmt(rec.free[1])} h/yr on the air loop. ${DES[rec.o.id].ok?`It holds the supply temperatures at the design condition (${fmt(P.dbD,1)} °C dry-bulb / ${fmt(P.wbD,1)} °C wet-bulb).`:''}</p></div>`;
-  } else h+=`<div class="rec"><div class="nm">No system meets every constraint</div><p class="why">Allow water, raise the loop supply temperatures, or check the design conditions and chiller limits.</p></div>`;
-  h+=`<h2>Ranking</h2><table><thead><tr><th>#</th><th class="l">System</th><th>Score</th><th>Electricity GWh/yr</th><th>Peak MW</th><th>Water m³/yr</th><th>Carbon t CO₂/yr</th><th>Running M$/yr</th><th>Initial M$</th></tr></thead><tbody>${ids.map(id=>{ const r=RES[id], k=RANK.indexOf(id);
-    return `<tr class="${k===0?'best':''}"><td>${k>=0?k+1:'–'}</td><td class="l">${r.o.name}${r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="tag ok">Recommended</span>':''}</td><td>${r.excluded?'–':fmt(r.score)}</td><td>${fmt(r.E/1000,1)}</td><td>${fmt(r.peak/1000,2)}</td><td>${fmt(r.W)}</td><td>${fmt(r.co2)}</td><td>${fmt(r.run/1e6,2)}</td><td>${fmt(r.capLo/1e6,1)}–${fmt(r.capHi/1e6,1)}</td></tr>`; }).join('')}</tbody></table>
-  <div class="note">Score: energy, water, peak power, initial cost and carbon normalised across the feasible options and weighted 4 / 3 / 3 / 2 / 3 (water doubled when limited). Annual figures at the frequent load; peaks at 100% load on the worst hour of the year.</div>`;
+  const WLr={plenty:'If TSE is available',limited:'If water is limited',none:'If there is no water'};
+  h+=`<div class="rec"><div class="tl">Recommended</div><dl class="kv">${Object.keys(WLr).map(w=>`<dt>${WLr[w]}</dt><dd><b>${SCEN[w]?RES[SCEN[w]].o.name:'No system meets the constraints'}</b></dd>`).join('')}</dl></div>`;
+  h+=`<h2>Results</h2><table><thead><tr><th class="l">System</th><th>Electricity GWh/yr</th><th>Peak MW</th><th>PUE</th><th>Water m³/yr</th><th>CO₂ t/yr</th><th>Running k$/yr</th><th>Initial M$</th></tr></thead><tbody>${ids.map(id=>{ const r=RES[id]; return `<tr><td class="l">${r.o.name}${r.excluded?`<span class="tag x">${r.excluded}</span>`:''}</td><td>${fmt(r.E/1000,1)}</td><td>${fmt(r.peak/1000,2)}</td><td>${r.pue.toFixed(3)}</td><td>${fmt(r.W)}</td><td>${fmt(r.co2)}</td><td>${fmt(r.run/1e3)}</td><td>${fmt(r.capLo/1e6,1)}–${fmt(r.capHi/1e6,1)}</td></tr>`; }).join('')}</tbody></table>`;
   // ---- page 2: comparison charts
-  const lab=id=>({label:RES[id].o.short,bold:id===RANK[0]});
+  const lab=id=>({label:RES[id].o.short});
   h+=`<section class="sec"><h2>Comparison</h2>
    <div class="chart"><div class="ct">Annual cooling electricity, MWh/yr</div>${rptLegend([['Chiller compressors',RPT_C.s1],['Heat-rejection fans',RPT_C.s4],['Pumps',RPT_C.grey2],['CRAH / FWU fans + CDU pumps',RPT_C.s2]])}
     ${rptBars(ids.map(id=>({...lab(id),segs:[[RES[id].Ec,RPT_C.s1],[RES[id].Ef,RPT_C.s4],[RES[id].Ep,RPT_C.grey2],[RES[id].Et,RPT_C.s2]]})),'MWh',0)}</div>
-   <div class="chart"><div class="ct">Electrical peak of the cooling plant, MW (100% load, worst hour)</div>${rptBars(ids.map(id=>({...lab(id),segs:[[RES[id].peak/1000,RPT_C.s2]]})),'MW',2)}</div>
-   <div class="chart"><div class="ct">Annual water, m³/yr</div>${rptBars(ids.map(id=>({...lab(id),segs:[[RES[id].W,RPT_C.s1]]})),'m³',0)}</div>
    <div class="chart"><div class="ct">Annual running cost of cooling, k$/yr</div>${rptLegend([['Electricity',RPT_C.s1],['Water',RPT_C.s3],['Demand charge',RPT_C.s4]])}
     ${rptBars(ids.map(id=>({...lab(id),segs:[[RES[id].costE/1e3,RPT_C.s1],[RES[id].costW/1e3,RPT_C.s3],[RES[id].costD/1e3,RPT_C.s4]]})),'k$',0)}</div>
-   <div class="chart"><div class="ct">Estimated initial cost, M$ (low – high)</div>${rptBars(ids.map(id=>({...lab(id),lo:RES[id].capLo/1e6,hi:RES[id].capHi/1e6})),'M$',1,true)}</div>
   </section>`;
   // ---- recommended system (and the one picked in the Systems tab, if different)
-  const shown=[...new Set([RANK[0],PICK].filter(Boolean))];
-  shown.forEach(id=>{ const r=RES[id], s=SYS[id], d=DES[id], k=RANK.indexOf(id), cap=P.Qd*(1+P.red);
-    h+=`<section class="sec"><h2>${k===0?'Recommended system':'Selected system'}: ${r.o.name}</h2><p>${s.how}</p>${schematic(id).replace(/<div class="note">/,'<div class="note">')}
-     <h3>Equipment and cost</h3><table><thead><tr><th class="l">Component</th><th class="l">Role</th><th>Sized MW</th><th>Cost M$</th></tr></thead><tbody>${r.o.comp.map(c=>{ const rt=P.rates[c];
-       return `<tr><td class="l">${RATES.find(x=>x.id===c).l}</td><td class="l">${ROLE[c](r.o)}</td><td>${fmt(cap/1000,1)}</td><td>${fmt(cap*rt.lo/1e6,1)}–${fmt(cap*rt.hi/1e6,1)}</td></tr>`; }).join('')}</tbody></table>
-     <div class="note">Each component sized for ${fmt(P.Qd/1000,1)} MW + ${fmt(P.red*100)}% redundancy. Pumps, CDUs, piping and controls not included.</div>
-     <div class="cols2"><div><h3>Strengths</h3><ul>${s.pros.map(x=>`<li>${x}</li>`).join('')}</ul></div><div><h3>Watch-outs</h3><ul>${s.cons.map(x=>`<li>${x}</li>`).join('')}</ul></div></div>
-     <h3>Design cases</h3><p>${d.ok?`At 100% load: Case A (db ${fmt(P.cases.A.db,1)} °C / wb ${fmt(P.cases.A.wb,1)} °C) ${fmt(d.cases.A.P/1000,2)} MW; Case B (wb ${fmt(P.cases.B.wb,1)} °C / db ${fmt(P.cases.B.db,1)} °C) ${fmt(d.cases.B.P/1000,2)} MW. Design peak ${fmt(d.P/1000,2)} MW (Case ${d.worst}), heat rejection ${fmt(d.Qr/1000,1)} MW. Duty chillers ${d.units.map(u=>u.N+" × "+fmt(u.unit/1000,1)+" MW").join(" / ")}, plus 1 standby per loop.${d.warns.length?" Warning: "+d.warns[0]+".":""}`:`<span class="tag x">Fails design day</span> ${d.issues.join("; ")}`}</p>
-     <h3>Operating modes over the year</h3>${rptLegend([['Free cooling (chillers off)',RPT_C.s3],['Partial free cooling',RPT_C.s1],['Chillers only',RPT_C.s2]])}
-     ${P.loops.map((L,i)=>L.Q>0?`<div class="chart"><div class="ct">${i?'Air':'Liquid'} loop ${L.Ts}/${L.Tr} °C: free ${fmt(r.free[i])} h · partial ${fmt(r.part[i])} h · chillers only ${fmt(r.mech[i])} h per year</div>${rptMonthly(r,i)}</div>`:'').join('')}
+  const shown=[...new Set([SCEN.plenty,SCEN.limited,SCEN.none,PICK].filter(Boolean))];
+  shown.forEach(id=>{ const r=RES[id];
+    h+=`<section class="sec"><h2>${r.o.name}</h2>${schematic(id)}
+     <h3>Operation by month</h3>${rptLegend([['Free cooling',RPT_C.s3],['Partial',RPT_C.s1],['Chiller only',RPT_C.s2]])}
+     ${P.loops.map((L,i)=>L.Q>0?`<div class="chart"><div class="ct">${i?'Air':'Liquid'} loop</div>${rptMonthly(r,i)}</div>`:'').join('')}
     </section>`; });
-  // ---- detailed tables
-  h+=`<section class="sec"><h2>Detailed results</h2>
-   <h3>Design-day check</h3>${rptTable('tDes')}<div class="note">${esc($('desNote').textContent)}</div>
-   <h3>Efficiency</h3>${rptTable('tEff')}
-   <h3>Energy and water</h3>${rptTable('tCons')}
-   <h3>Carbon emissions</h3>${rptTable('tCO2')}<div class="note">${esc($('co2Note').textContent)}</div>
-   <h3>Running cost</h3>${rptTable('tRun')}<div class="note">${esc($('runNote').textContent)}</div>
-   <h3>Initial cost</h3>${rptTable('tCap')}<div class="note">Rate-based estimate, not a quotation: capacity × redundancy × low/high rate for each component. Excludes building works, electrical and controls.</div></section>`;
   // ---- inputs and method
   const inp=inputRows(document.querySelector('aside.inputs')||document,INPUT_NAMES), half=Math.ceil(inp.length/2);
   const it=a=>`<table><thead><tr><th class="l">Input</th><th>Value</th></tr></thead><tbody>${a.map(([l,v])=>`<tr><td class="l">${esc(l)}</td><td>${esc(v)}</td></tr>`).join('')}</tbody></table>`;
-  const meth=$('p-meth')?$('p-meth').querySelector('ul.method'):null;
   h+=`<section class="sec"><h2>Inputs</h2><div class="cols2"><div>${it(inp.slice(0,half))}</div><div>${it(inp.slice(half))}</div></div>
-   ${meth?`<h2>Method and assumptions</h2><ul class="method">${meth.innerHTML}</ul>`:''}
    <div class="disc">Screening-level study made with the Othman Energy Lab Cooling Plant Selector (oenergylab.com). Results depend on the inputs listed and on typical equipment performance; confirm with vendor selections and a detailed design before procurement.</div></section>`;
   const title=`Cooling plant report – ${WX.name} – ${now.toISOString().slice(0,10)}`;
   return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${esc(title)}</title><style>${RPT_CSS}</style></head>

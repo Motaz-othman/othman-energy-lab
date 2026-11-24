@@ -1,7 +1,7 @@
 // ---------- PDF report: a print-ready A4 page built from the current results; saved with the browser's "Save as PDF" ----------
-const RPT_C={s1:'#2a78d6',s2:'#eb6834',s3:'#1baf7a',s4:'#eda100',grey:'#c9c8c3',grey2:'#9f9e99',brand:'#0e7c57',text:'#0b0b0b',text2:'#52514e',border:'#e3e2de'};
+const RPT_C={s1:'#2a78d6',s2:'#eb6834',s3:'#1baf7a',s4:'#eda100',grey:'#c9c8c3',grey2:'#9f9e99',brand:'#c2185b',text:'#0b0b0b',text2:'#52514e',border:'#e3e2de'};
 const RPT_CSS=`
-:root{--bg:#f6f6f4;--surface:#fff;--border:#e3e2de;--text:#0b0b0b;--text2:#52514e;--muted:#6f6e69;--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100;--grey:#c9c8c3;--grey2:#9f9e99;--good:#1a7f37;--warn:#b26b00;--bad:#c62828;--brand:#0e7c57;--brand-ink:#0b6b4a}
+:root{--bg:#f6f6f4;--surface:#fff;--border:#e3e2de;--text:#0b0b0b;--text2:#52514e;--muted:#6f6e69;--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100;--grey:#c9c8c3;--grey2:#9f9e99;--good:#1a7f37;--warn:#b26b00;--bad:#c62828;--brand:#c2185b;--brand-ink:#a3134d}
 @page{size:A4;margin:14mm 13mm 16mm}
 @page{@bottom-left{content:"Othman Energy Lab · Cooling Plant Selector";font:8pt system-ui,sans-serif;color:#6f6e69}@bottom-right{content:"Page " counter(page) " of " counter(pages);font:8pt system-ui,sans-serif;color:#6f6e69}}
 *{box-sizing:border-box}
@@ -25,7 +25,7 @@ h3{font-size:10pt;margin:12px 0 6px;break-after:avoid}
 .box{border:1px solid var(--border);border-radius:8px;padding:10px 12px;break-inside:avoid}
 .box h3{margin-top:0}
 dl.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:0}dl.kv dt{color:var(--text2)}dl.kv dd{margin:0;font-weight:600}
-.rec{border:1.5px solid var(--brand);background:#f1f8f4;border-radius:10px;padding:12px 14px;margin:12px 0;break-inside:avoid}
+.rec{border:1.5px solid var(--brand);background:#fcf0f5;border-radius:10px;padding:12px 14px;margin:12px 0;break-inside:avoid}
 .rec .tl{font-size:8pt;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-ink)}
 .rec .nm{font-size:14pt;font-weight:700;margin:2px 0 8px}
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
@@ -37,7 +37,7 @@ th{text-align:left;font-weight:700;background:#f2f2ef;border-bottom:1px solid va
 td{border-bottom:1px solid var(--border);padding:3.5px 5px;vertical-align:top}
 th:not(:first-child),td:not(:first-child){text-align:right}td.l,th.l{text-align:left!important}
 tr.best td{background:#eef7f2;font-weight:600}td.hi{color:var(--brand-ink);font-weight:700}
-.tag{display:inline-block;font-size:7pt;font-weight:700;border-radius:9px;padding:0 6px;margin-left:5px;background:#e7f3ec;color:var(--brand-ink);white-space:nowrap}.tag.x{background:#fbeaea;color:var(--bad)}.tag.ok{background:#e7f3ec;color:var(--good)}
+.tag{display:inline-block;font-size:7pt;font-weight:700;border-radius:9px;padding:0 6px;margin-left:5px;background:#fbe7f0;color:var(--brand-ink);white-space:nowrap}.tag.x{background:#fbeaea;color:var(--bad)}.tag.ok{background:#fbe7f0;color:var(--good)}
 .sbar{display:none}
 .note{font-size:7.8pt;color:var(--muted);margin:3px 0 0}
 .chart{break-inside:avoid;margin:6px 0 10px}.chart .ct{font-weight:700;font-size:9pt;margin-bottom:2px}
@@ -54,7 +54,7 @@ ul{margin:4px 0;padding-left:16px}li{margin:2px 0}
 .method{font-size:8pt}.method li{margin:3px 0}code{font-size:7.6pt}
 .disc{font-size:7.8pt;color:var(--muted);border-top:1px solid var(--border);margin-top:16px;padding-top:8px}
 `;
-const RPT_LOGO='<svg viewBox="0 0 26 26"><rect width="26" height="26" rx="6" fill="#0b0b0b"/><ellipse cx="12.4" cy="13.4" rx="6.6" ry="7" fill="none" stroke="#fcfcfb" stroke-width="2.6"/><path d="M19.4 3 L11.4 13.6 H15.4 L9.6 22.8 L22 10.6 H18.6 L22.6 3 Z" fill="#4cc99a" stroke="#0b0b0b" stroke-width="1.3" stroke-linejoin="round"/></svg>';
+const RPT_LOGO='<svg viewBox="0 0 26 26"><rect width="26" height="26" rx="6" fill="#0b0b0b"/><ellipse cx="12.4" cy="13.4" rx="6.6" ry="7" fill="none" stroke="#fcfcfb" stroke-width="2.6"/><path d="M19.4 3 L11.4 13.6 H15.4 L9.6 22.8 L22 10.6 H18.6 L22.6 3 Z" fill="#e0559a" stroke="#0b0b0b" stroke-width="1.3" stroke-linejoin="round"/></svg>';
 
 // round axis step: 1, 2, 2.5 or 5 × 10^n
 function rptStep(x){ const p=Math.pow(10,Math.floor(Math.log10(x))), m=x/p; return p*(m<=1?1:m<=2?2:m<=2.5?2.5:m<=5?5:10); }

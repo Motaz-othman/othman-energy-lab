@@ -13,7 +13,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Liquid Rack Cooling · Othman Energy Lab</title>
 <meta name="description" content="Choose a liquid-cooled GPU or CPU platform: maximum supply temperature, cooling and flow per rack, the safe minimum flow for variable-flow control, and how the CDU pump and control valve respond to a load jump or a pump trip. By Othman Energy Lab.">
-<meta name="theme-color" content="#0e7c57">
+<meta name="theme-color" content="#c2185b">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Othman Energy Lab">
 <meta property="og:title" content="Liquid Rack Cooling · Othman Energy Lab">
@@ -30,7 +30,7 @@
   --bg:#f6f6f4; --surface:#fcfcfb; --border:#e3e2de; --text:#0b0b0b; --text2:#52514e; --muted:#6f6e69;
   --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --grey:#c9c8c3; --grey2:#9f9e99;
   --good:#1a7f37; --warn:#b26b00; --bad:#c62828;
-  --brand:#0e7c57; --brand-ink:#0b6b4a;   /* Othman Energy Lab green: fills / text and links */
+  --brand:#c2185b; --brand-ink:#a3134d;   /* Othman Energy Lab magenta: fills / text and links */
 }
 @media (prefers-color-scheme: dark){
   :root:where(:not([data-theme="light"])){
@@ -38,7 +38,7 @@
     --bg:#121211; --surface:#1a1a19; --border:#2e2e2c; --text:#f0efec; --text2:#c3c2b7; --muted:#8f8e88;
     --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --grey:#4a4a47; --grey2:#6c6b67;
     --good:#4cc26a; --warn:#e0a03a; --bad:#ef6b6b;
-    --brand:#17855e; --brand-ink:#4cc99a;
+    --brand:#d63a7a; --brand-ink:#f48fb8;
   }
 }
 *{box-sizing:border-box}
@@ -348,12 +348,11 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
 <body class="wide" style="--navh:0px">
 <div class="pagehead">
   <h1>Liquid Rack Cooling</h1>
-  <p class="sub">Choose the GPU or CPU platform. See the maximum supply temperature, the cooling and flow each rack needs, the safe minimum flow for variable-flow control, and how the CDU pump and control valve respond to a load jump or a pump trip.</p>
 </div>
 
 <main class="layout">
 <div class="incol">
-<div class="colhead"><b>Inputs</b><span>Results update instantly</span></div>
+<div class="colhead"><b>Inputs</b></div>
 <aside class="card inputs" id="inRack">
   <h2>Platform</h2>
   <label for="rP">Liquid-cooled rack</label><select id="rP"></select>
@@ -396,7 +395,7 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
 </aside>
 </div>
 <section class="results">
-  <div class="colhead"><b>Results</b><span id="rStatus">Per rack</span></div>
+  <div class="colhead"><b>Results</b><span id="rStatus"></span></div>
   <div class="card hero" id="rRes"></div>
   <div class="card">
     <div class="seg" id="rScen"><button data-s="jump" class="on">Load jump</button><button data-s="pump">Pump trip</button></div>
@@ -611,7 +610,7 @@ function run(){
   const pair=(fn)=>withTank?fn(a,'no tank')+fn(b,`with ${tk}`):fn(a,'no tank');
   const over=r.Ts>p.TsMax+1e-9;
   $('rTsNote').innerHTML=over?`<span style="color:var(--bad)"><b>Above the ${fmt(p.TsMax)} °C maximum (ASHRAE ${p.cls}):</b> risky unless confirmed by the manufacturer.</span>`:`Default 40 °C. Maximum ${fmt(p.TsMax)} °C as per ASHRAE ${p.cls}; a higher supply saves more on the facility water. The flow follows the platform rule at the supply chosen.`;
-  $('rStatus').textContent=`Per rack · ${p.name}`;
+  $('rStatus').textContent='';
   $('rRes').innerHTML=`
     <div class="big4">
       <div class="bn"><div class="v">${fmt(r.Fop)} <small>L/min</small></div><div class="l">Operating flow · ${fmt(r.Ql,1)} kW to liquid, return ${fmt(r.TrOp,1)} °C (limit ${fmt(r.Tr)} °C) at ${fmt(r.Ts,r.Ts%1?1:0)} °C supply${r.Qa>0.05?` · ${fmt(r.Qa,1)} kW to air, ${fmt(r.air)} m³/h`:''}</div></div>
