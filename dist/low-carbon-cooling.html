@@ -289,6 +289,14 @@ a.tcard:hover .thumb .rk .best{transform:scaleX(1.04)}
 a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
 /* brand gradient (pink to purple), used on the main accents */
 :root{--grad:linear-gradient(120deg,#d9739f 0%,#a985d6 100%)}
+/* numbered input sections with an icon; one link line under each tool */
+.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+h2.ih{display:flex;align-items:center;gap:8px}
+h2.ih .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--brand);color:#fff;font-size:12px}
+h2.ih .ic{color:var(--brand-ink)}
+.toolfoot{max-width:var(--maxw);margin:24px auto 0;padding:0 28px;font-size:13px;color:var(--text2)}
+.toolfoot a{color:var(--brand-ink);font-weight:600}
+@media (max-width:900px){.toolfoot{padding:0 16px}}
 </style>
 <style>
 /* Result pages (Ride-Through Tank, Peak Shaving Tank, Liquid Rack Cooling): shared result styles (load after base.css) */
@@ -304,12 +312,12 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
 .hero{display:grid;gap:16px;border-left:4px solid var(--brand)}
 .hero .for{font-size:13.5px;color:var(--text2)}
 .big4{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
-.bn{padding:14px 16px;border-radius:12px;background:var(--bg);border:1px solid var(--border)}
-.bn .v{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
-.bn .v.good{color:var(--brand-ink)}
-.bn .v.bad{color:var(--bad)}
-.bn .v small{font-size:15px;font-weight:600;color:var(--text2);letter-spacing:0}
-.bn .l{font-size:13px;color:var(--text2);margin-top:4px}
+.big4 .bn{padding:14px 16px;border-radius:12px;background:var(--bg);border:1px solid var(--border)}
+.big4 .bn .v{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
+.big4 .bn .v.good{color:var(--brand-ink)}
+.big4 .bn .v.bad{color:var(--bad)}
+.big4 .bn .v small{font-size:15px;font-weight:600;color:var(--text2);letter-spacing:0}
+.big4 .bn .l{font-size:13px;color:var(--text2);margin-top:4px}
 .verdict{font-size:16px;line-height:1.5;padding:12px 16px;border-radius:10px;background:color-mix(in srgb,var(--brand) 9%,var(--surface))}
 .verdict.warn{background:color-mix(in srgb,var(--warn) 12%,var(--surface))}
 .uses{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
@@ -335,17 +343,17 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
 .no{color:var(--bad);font-weight:600}
 .method{font-size:12.5px;color:var(--text2);padding-left:18px}
 .method li{margin:4px 0}
-.bn .pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
-.bn .pair .v{display:block;font-size:24px}
-.bn .pair .v.bad{color:var(--bad)}
-.bn .pair .l{display:block;margin-top:2px}
+.big4 .bn .pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.big4 .bn .pair .v{display:block;font-size:24px}
+.big4 .bn .pair .v.bad{color:var(--bad)}
+.big4 .bn .pair .l{display:block;margin-top:2px}
 /* phones: two result cards per row; a card with two values takes the full row */
-@media (max-width:560px){.big4{grid-template-columns:1fr 1fr;gap:10px}.big4 .bn:has(.pair){grid-column:1/-1}.bn{padding:12px}.bn .v{font-size:24px}.bn .v small{font-size:13px}.verdict{font-size:15px}.tankrow{justify-items:center}}
+@media (max-width:560px){.big4{grid-template-columns:1fr 1fr;gap:10px}.big4 .bn:has(.pair){grid-column:1/-1}.big4 .bn{padding:12px}.big4 .bn .v{font-size:24px}.big4 .bn .v small{font-size:13px}.verdict{font-size:15px}.tankrow{justify-items:center}}
+.card.hero{border-left:1px solid var(--border)}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <meta name="author" content="Mutaz Othman">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Low-Carbon Cooling Selector","url":"https://www.oenergylab.com/data-centers/low-carbon-cooling/","description":"Find the data center cooling system with the lowest CO₂: five cooling plants compared hour by hour for 33 cities, counting electricity, water supply and refrigerant leakage with official grid factors. Or enter your own numbers. By Othman Energy Lab.","applicationCategory":"BusinessApplication","operatingSystem":"Any (web browser)","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"author":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"publisher":{"@id":"https://www.oenergylab.com/#org"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.oenergylab.com/"},{"@type":"ListItem","position":2,"name":"Data Centers","item":"https://www.oenergylab.com/data-centers/"},{"@type":"ListItem","position":3,"name":"Low-Carbon Cooling Selector","item":"https://www.oenergylab.com/data-centers/low-carbon-cooling/"}]}]}</script>
-<script type="application/ld+json" id="faq">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Which part of a cooling system's CO₂ is largest?","acceptedAnswer":{"@type":"Answer","text":"Electricity, in almost every case: usually 85–99% of the total. Refrigerant leakage can matter with high-GWP refrigerants such as R-134a, and water matters in the Gulf, where desalinated water takes about 3.5 kWh per m³."}},{"@type":"Question","name":"Where do the grid factors come from?","acceptedAnswer":{"@type":"Answer","text":"US cities use the EPA eGRID2023 subregion rates; Sydney uses the Australian National Greenhouse Accounts factors (NSW 2025–26); other countries use Our World in Data / Ember, latest year. You can type your own factor, for example a green-power contract."}},{"@type":"Question","name":"Does it include the IT equipment?","acceptedAnswer":{"@type":"Answer","text":"No. Only the cooling system: chillers, heat-rejection fans, pumps, CRAH, fan walls and CDUs. IT electricity and UPS losses are not included."}}]}</script>
 <style>
 .mode{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:4px}
 .eqs{display:grid;gap:8px}
@@ -381,7 +389,7 @@ tr.best td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpa
 <div class="incol">
 <div class="colhead"><b>Inputs</b></div>
 <aside class="card inputs" id="inGrid">
-  <h2>Location</h2>
+  <h2 class="ih"><span class="n">1</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>Location</h2>
   <label for="cCity">City</label><select id="cCity"></select>
   <div class="row">
     <div><label for="cEF">Grid factor (kg CO₂/kWh)</label><input type="number" id="cEF" step="0.01" min="0" placeholder="auto"></div>
@@ -389,7 +397,7 @@ tr.best td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpa
   </div>
   <div class="note" id="cEFNote">Leave blank for the city's official value.</div>
 
-  <h2 style="margin-top:18px">Cooling system</h2>
+  <h2 class="ih" style="margin-top:22px"><span class="n">2</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20M4.9 6.5l14.2 11M4.9 17.5l14.2-11"/></svg>Cooling system</h2>
   <div class="tabs mode"><button id="mEst" class="on" type="button">Compare systems</button><button id="mOwn" type="button">My own numbers</button></div>
   <div id="estPane">
     <div class="row">
@@ -415,10 +423,10 @@ tr.best td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpa
     <label for="oW">Water use (m³ per year)</label><input type="number" id="oW" value="150000" min="0" step="1000">
     <label for="oCh">Refrigerant charge, all chillers (kg)</label><input type="number" id="oCh" value="8000" min="0" step="100">
     <label for="oIT">IT energy (MWh per year, optional)</label><input type="number" id="oIT" min="0" step="1000" placeholder="for kg CO₂ per MWh IT">
-    <div class="note">From the design, a utility bill or the BMS. Cooling only: chillers, fans, pumps, CRAH / CDU.</div>
+    <div class="note">Cooling only: chillers, fans, pumps, CRAH / CDU.</div>
   </div>
 
-  <h2 style="margin-top:18px">Refrigerant</h2>
+  <h2 class="ih" style="margin-top:22px"><span class="n">3</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 1 1 0 9Z"/></svg>Refrigerant</h2>
   <div class="row">
     <div><label for="cRef">Refrigerant</label><select id="cRef"></select></div>
     <div><label for="cLeak">Leak (% of charge per year)</label><input type="number" id="cLeak" value="2" min="0" step="0.5"></div>
@@ -440,31 +448,10 @@ tr.best td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpa
     <div class="chartbox" id="cBox" style="height:260px"><canvas id="cChart"></canvas></div>
   </div>
   <div class="card" id="cAllCard"><div class="ctitle">Every system</div><div id="cAll"></div></div>
-  <details class="card more"><summary>Sources and assumptions</summary><div id="cDet"></div></details>
 </section>
 </main>
 
-<section class="toolinfo" aria-labelledby="ti-h">
-  <div class="card">
-  <h2 id="ti-h">How the Low-Carbon Cooling Selector works</h2>
-  <p>The Low-Carbon Cooling Selector finds the data center cooling system with the lowest carbon, and gives its yearly emissions of a data center cooling system in tonnes of CO₂ equivalent. It adds three sources: the electricity the cooling plant uses, the energy needed to supply its make-up water, and the refrigerant that leaks from the chillers each year.</p>
-  <h3>Method</h3>
-  <ul>
-    <li><b>Electricity:</b> annual cooling energy (MWh) × grid emission factor (t CO₂ per MWh).</li>
-    <li><b>Water:</b> annual water use (m³) × energy to supply 1 m³ (kWh) × grid emission factor.</li>
-    <li><b>Refrigerant:</b> chiller charge (kg) × leak rate per year × global warming potential (GWP) of the refrigerant.</li>
-    <li>In <b>Compare systems</b>, energy and water come from an 8,760-hour simulation with the city's measured weather, the same model as the Cooling Plant Selector. In <b>My own numbers</b>, you enter them.</li>
-  </ul>
-  <h2 style="margin-top:20px">Frequently asked questions</h2>
-  <h3>Which part of a cooling system's CO₂ is largest?</h3>
-  <p>Electricity, in almost every case: usually 85–99% of the total. Refrigerant leakage can matter with high-GWP refrigerants such as R-134a, and water matters in the Gulf, where desalinated water takes about 3.5 kWh per m³.</p>
-  <h3>Where do the grid factors come from?</h3>
-  <p>US cities use the EPA eGRID2023 subregion rates; Sydney uses the Australian National Greenhouse Accounts factors (NSW 2025–26); other countries use Our World in Data / Ember, latest year. You can type your own factor, for example a green-power contract.</p>
-  <h3>Does it include the IT equipment?</h3>
-  <p>No. Only the cooling system: chillers, heat-rejection fans, pumps, CRAH, fan walls and CDUs. IT electricity and UPS losses are not included.</p>
-  <p style="margin-top:16px">By <a href="../../about/index.html#founder">Eng. Mutaz Othman</a>, Othman Energy Lab. Screening-level results; confirm with a detailed design and the local grid data.</p>
-  </div>
-</section>
+<p class="toolfoot">How it works and how to read the results: <a href="../../articles/how-to-use-low-carbon-cooling-selector/index.html">How to use the Low-Carbon Cooling Selector</a>. Screening-level results; confirm with vendor selections and a detailed design.</p>
 <script>
 // ---------- shared UI helpers for all calculators (load after Chart.js, before the calculator scripts) ----------
 const $=id=>document.getElementById(id);
@@ -951,7 +938,7 @@ function params(){
 function schedule(ms){ clearTimeout(timer); timer=setTimeout(run,ms??300); }
 function run(){
   const f=factors();
-  $('cEFNote').innerHTML=`${f.efOwn?'Your grid factor':`Grid factor ${f.ef.toFixed(3)} kg CO₂/kWh: ${f.src}`}. ${f.wOwn?'Your water supply energy':(f.wco2?`Water supply ${fmt(f.wco2[1],2)} kg CO₂e/m³ (band ${fmt(f.wco2[0],2)}–${fmt(f.wco2[2],2)}): City of Phoenix 2022 GHG inventory + Central Arizona Project`:`Water supply ${fmt(f.wkwh,1)} kWh/m³: ${f.wkwh>=3?'Gulf seawater desalination':'conventional treated supply'} (IEA WEO 2016)`)}. Leave blank for the city's value.`;
+  $('cEFNote').innerHTML=`${f.efOwn?'Your grid factor':`Grid ${f.ef.toFixed(3)} kg CO₂/kWh`} · ${f.wOwn?'your water energy':(f.wco2?`water ${fmt(f.wco2[1],2)} kg CO₂e/m³`:`water ${fmt(f.wkwh,1)} kWh/m³`)}. Blank = the city's values.`;
   if(MODE==='own') return renderOwn(f);
   if(!WX){ $('cStatus').textContent='Loading weather…'; return; }
   P=params(); P.cases=designCases(WX,WX.station&&WX.station.ashrae,P.dbIn,P.wbIn); P.dbA=P.cases.A.db; P.dbD=P.cases.A.db; P.wbD=P.cases.B.wb;
@@ -984,13 +971,12 @@ function renderEst(f){
       <div class="sv">${t(r.co2)} <small>t CO₂e/yr</small></div>
       <div class="sbar"><i style="width:${w(r.co2E)};background:var(--s1)"></i><i style="width:${w(r.co2W)};background:var(--s3)"></i><i style="width:${w(r.co2R)};background:var(--s2)"></i></div>
     </div>`; });
-  $('cTabTitle').textContent='Each system, CO₂ only';
+  $('cTabCard').hidden=false; $('cTabTitle').textContent='Each system, CO₂ only';
   $('cTab').innerHTML=`<div class="sgrid">${cards.join('')}</div>`;
   const rows=ids.map((id,i)=>{ const r=RES[id], bad=!DES[id].ok;
     return `<tr class="${i===0&&!bad?'best':''}"><td class="sys">${r.o.short}${i===0&&!bad?'<span class="tag ok">Lowest</span>':''}${bad?'<span class="tag">Fails design day</span>':''}</td><td>${fmt(r.E)}</td><td>${fmt(r.W)}${r.Whi>r.W*1.001?` (${fmt(r.Wlo)}–${fmt(r.Whi)})`:''}</td><td>${fmt(r.charge)}</td><td>${t(r.co2E)}</td><td>${t(r.co2W)}</td><td>${t(r.co2R)}</td><td><b>${t(r.co2)}</b></td><td>${fmt(r.co2IT,1)}</td><td>${fmt(r.co2*Y)}</td></tr>`; });
   $('cAllCard').hidden=false;
   $('cAll').innerHTML=table(['System','Electricity MWh/yr','Water m³/yr','Charge kg','Electricity t/yr','Water t/yr','Refrigerant t/yr','Total t CO₂e/yr','kg per MWh IT',`Total over ${Y} yr (t)`],rows);
-  details(f,R,true);
 }
 
 // ---------- results: My own numbers ----------
@@ -1008,13 +994,7 @@ function renderOwn(f){
     </div>
     <div class="verdict">Electricity <b>${sh(cE)}%</b>, water supply <b>${sh(cW)}%</b>, refrigerant leakage <b>${sh(cR)}%</b> of the total.${cR>0.1*tot&&R.r.gwp>100?` Refrigerant is a large share: a low-GWP refrigerant such as R-1234ze(E) (GWP 1.37) would remove most of it.`:''}</div>`;
   chart([name],[{co2E:cE,co2W:cW,co2R:cR}]);
-  $('cAllCard').hidden=true; $('cTabTitle').textContent='How it is calculated';
-  $('cTab').innerHTML=`<div class="eqs">
-    <div><span>Electricity</span><span class="f">${fmt(E)} MWh × ${f.ef.toFixed(3)} t/MWh</span><b>${t(cE)} t</b></div>
-    <div><span>Water supply</span><span class="f">${f.wco2?`${fmt(W)} m³ × ${fmt(wkg,2)} kg CO₂e/m³ ÷ 1,000`:`${fmt(W)} m³ × ${fmt(f.wkwh,1)} kWh/m³ ÷ 1,000 × ${f.ef.toFixed(3)} t/MWh`}</span><b>${t(cW)} t</b></div>
-    <div><span>Refrigerant</span><span class="f">${fmt(ch)} kg × ${fmt(R.leak*100,1)}% × GWP ${fmt(R.r.gwp,R.r.gwp<10?2:0)} ÷ 1,000</span><b>${t(cR)} t</b></div>
-    <div class="tot"><span><b>Total per year</b></span><span class="f">CO₂ equivalent</span><b>${t(tot)} t</b></div></div>`;
-  details(f,R,false);
+  $('cAllCard').hidden=true; $('cTabCard').hidden=true;
 }
 
 // ---------- chart: stacked bars by source ----------
@@ -1029,16 +1009,6 @@ function chart(labels,rs){
   mk('cChart',{type:'bar',data:{labels,datasets:[ds('Electricity','co2E',css('--s1')),ds('Water supply','co2W',css('--s3')),ds('Refrigerant leakage','co2R',css('--s2'),true)]},options:o});
 }
 
-function details(f,R,est){
-  const st=WX&&WX.station;
-  $('cDet').innerHTML=`<ul class="method">
-    <li><b>Grid factor:</b> ${f.ef.toFixed(3)} kg CO₂ per kWh (= t per MWh), ${f.efOwn?'your value':f.src}. Location-based: the average of the local grid.</li>
-    <li><b>Water supply energy:</b> ${fmt(f.wkwh,1)} kWh per m³, ${f.wOwn?'your value':'IEA World Energy Outlook 2016 (Water-Energy Nexus): about 3.5 kWh/m³ for Gulf seawater desalination, 0.5 for conventional treated water'}${f.wco2?`; this city uses its utility's own figure instead: ${fmt(f.wco2[1],2)} kg CO₂e/m³ (band ${fmt(f.wco2[0],2)}–${fmt(f.wco2[2],2)}: City of Phoenix 2022 GHG inventory, Table 1, for treatment and distribution, plus Central Arizona Project conveyance at 1.4 kWh/m³ at the top)`:''}. Tower water in the table is the central value with the evaporation band 0.15–0.27 %/K (EnergyPlus default 0.20) in brackets.</li>
-    <li><b>Refrigerant:</b> ${R.r.name}, GWP ${fmt(R.r.gwp,R.r.gwp<10?2:0)} (100-year; R-134a and R-513A IPCC AR4 as used by the U.S. EPA under the AIM Act, R-1234ze(E) EU F-gas Regulation 2024/573); leak ${fmt(R.leak*100,1)}% of the charge per year.${est?` Charge ${fmt(num('cChW',0.3),2)} kg/kW for water-cooled and ${fmt(num('cChA',0.4),2)} kg/kW for air-cooled chillers, on the duty chillers + 1 standby per loop. Charge and leak rate are assumptions: use the chiller data where known.`:''}</li>
-    ${est?`<li><b>Energy and water:</b> 8,760-hour simulation, ${st?`${esc(st.station)}, measured typical year TMYx ${esc(st.period)}`:'generated typical year'}; ASHRAE 90.1-2025 chillers, heat-rejection approaches, pump and fan power, free cooling. Same model as the <a href="../cooling-plant/index.html">Cooling Plant Selector</a>, which also gives cost and peak power. A system that cannot meet the design day is listed last.</li>`:''}
-    <li><b>Cars:</b> ${CAR} t CO₂ per typical passenger car per year (US EPA).</li>
-    <li>Cooling system only: IT electricity and UPS losses are not included. Screening-level estimate.</li></ul>`;
-}
 
 // ---------- mode tabs and inputs ----------
 function setMode(m){ MODE=m; $('mEst').classList.toggle('on',m==='est'); $('mOwn').classList.toggle('on',m==='own');

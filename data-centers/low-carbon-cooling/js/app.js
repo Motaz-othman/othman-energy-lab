@@ -46,7 +46,7 @@ function params(){
 function schedule(ms){ clearTimeout(timer); timer=setTimeout(run,ms??300); }
 function run(){
   const f=factors();
-  $('cEFNote').innerHTML=`${f.efOwn?'Your grid factor':`Grid factor ${f.ef.toFixed(3)} kg CO₂/kWh: ${f.src}`}. ${f.wOwn?'Your water supply energy':(f.wco2?`Water supply ${fmt(f.wco2[1],2)} kg CO₂e/m³ (band ${fmt(f.wco2[0],2)}–${fmt(f.wco2[2],2)}): City of Phoenix 2022 GHG inventory + Central Arizona Project`:`Water supply ${fmt(f.wkwh,1)} kWh/m³: ${f.wkwh>=3?'Gulf seawater desalination':'conventional treated supply'} (IEA WEO 2016)`)}. Leave blank for the city's value.`;
+  $('cEFNote').innerHTML=`${f.efOwn?'Your grid factor':`Grid ${f.ef.toFixed(3)} kg CO₂/kWh`} · ${f.wOwn?'your water energy':(f.wco2?`water ${fmt(f.wco2[1],2)} kg CO₂e/m³`:`water ${fmt(f.wkwh,1)} kWh/m³`)}. Blank = the city's values.`;
   if(MODE==='own') return renderOwn(f);
   if(!WX){ $('cStatus').textContent='Loading weather…'; return; }
   P=params(); P.cases=designCases(WX,WX.station&&WX.station.ashrae,P.dbIn,P.wbIn); P.dbA=P.cases.A.db; P.dbD=P.cases.A.db; P.wbD=P.cases.B.wb;
@@ -79,13 +79,12 @@ function renderEst(f){
       <div class="sv">${t(r.co2)} <small>t CO₂e/yr</small></div>
       <div class="sbar"><i style="width:${w(r.co2E)};background:var(--s1)"></i><i style="width:${w(r.co2W)};background:var(--s3)"></i><i style="width:${w(r.co2R)};background:var(--s2)"></i></div>
     </div>`; });
-  $('cTabTitle').textContent='Each system, CO₂ only';
+  $('cTabCard').hidden=false; $('cTabTitle').textContent='Each system, CO₂ only';
   $('cTab').innerHTML=`<div class="sgrid">${cards.join('')}</div>`;
   const rows=ids.map((id,i)=>{ const r=RES[id], bad=!DES[id].ok;
     return `<tr class="${i===0&&!bad?'best':''}"><td class="sys">${r.o.short}${i===0&&!bad?'<span class="tag ok">Lowest</span>':''}${bad?'<span class="tag">Fails design day</span>':''}</td><td>${fmt(r.E)}</td><td>${fmt(r.W)}${r.Whi>r.W*1.001?` (${fmt(r.Wlo)}–${fmt(r.Whi)})`:''}</td><td>${fmt(r.charge)}</td><td>${t(r.co2E)}</td><td>${t(r.co2W)}</td><td>${t(r.co2R)}</td><td><b>${t(r.co2)}</b></td><td>${fmt(r.co2IT,1)}</td><td>${fmt(r.co2*Y)}</td></tr>`; });
   $('cAllCard').hidden=false;
   $('cAll').innerHTML=table(['System','Electricity MWh/yr','Water m³/yr','Charge kg','Electricity t/yr','Water t/yr','Refrigerant t/yr','Total t CO₂e/yr','kg per MWh IT',`Total over ${Y} yr (t)`],rows);
-  details(f,R,true);
 }
 
 // ---------- results: My own numbers ----------
@@ -103,13 +102,7 @@ function renderOwn(f){
     </div>
     <div class="verdict">Electricity <b>${sh(cE)}%</b>, water supply <b>${sh(cW)}%</b>, refrigerant leakage <b>${sh(cR)}%</b> of the total.${cR>0.1*tot&&R.r.gwp>100?` Refrigerant is a large share: a low-GWP refrigerant such as R-1234ze(E) (GWP 1.37) would remove most of it.`:''}</div>`;
   chart([name],[{co2E:cE,co2W:cW,co2R:cR}]);
-  $('cAllCard').hidden=true; $('cTabTitle').textContent='How it is calculated';
-  $('cTab').innerHTML=`<div class="eqs">
-    <div><span>Electricity</span><span class="f">${fmt(E)} MWh × ${f.ef.toFixed(3)} t/MWh</span><b>${t(cE)} t</b></div>
-    <div><span>Water supply</span><span class="f">${f.wco2?`${fmt(W)} m³ × ${fmt(wkg,2)} kg CO₂e/m³ ÷ 1,000`:`${fmt(W)} m³ × ${fmt(f.wkwh,1)} kWh/m³ ÷ 1,000 × ${f.ef.toFixed(3)} t/MWh`}</span><b>${t(cW)} t</b></div>
-    <div><span>Refrigerant</span><span class="f">${fmt(ch)} kg × ${fmt(R.leak*100,1)}% × GWP ${fmt(R.r.gwp,R.r.gwp<10?2:0)} ÷ 1,000</span><b>${t(cR)} t</b></div>
-    <div class="tot"><span><b>Total per year</b></span><span class="f">CO₂ equivalent</span><b>${t(tot)} t</b></div></div>`;
-  details(f,R,false);
+  $('cAllCard').hidden=true; $('cTabCard').hidden=true;
 }
 
 // ---------- chart: stacked bars by source ----------
@@ -124,16 +117,6 @@ function chart(labels,rs){
   mk('cChart',{type:'bar',data:{labels,datasets:[ds('Electricity','co2E',css('--s1')),ds('Water supply','co2W',css('--s3')),ds('Refrigerant leakage','co2R',css('--s2'),true)]},options:o});
 }
 
-function details(f,R,est){
-  const st=WX&&WX.station;
-  $('cDet').innerHTML=`<ul class="method">
-    <li><b>Grid factor:</b> ${f.ef.toFixed(3)} kg CO₂ per kWh (= t per MWh), ${f.efOwn?'your value':f.src}. Location-based: the average of the local grid.</li>
-    <li><b>Water supply energy:</b> ${fmt(f.wkwh,1)} kWh per m³, ${f.wOwn?'your value':'IEA World Energy Outlook 2016 (Water-Energy Nexus): about 3.5 kWh/m³ for Gulf seawater desalination, 0.5 for conventional treated water'}${f.wco2?`; this city uses its utility's own figure instead: ${fmt(f.wco2[1],2)} kg CO₂e/m³ (band ${fmt(f.wco2[0],2)}–${fmt(f.wco2[2],2)}: City of Phoenix 2022 GHG inventory, Table 1, for treatment and distribution, plus Central Arizona Project conveyance at 1.4 kWh/m³ at the top)`:''}. Tower water in the table is the central value with the evaporation band 0.15–0.27 %/K (EnergyPlus default 0.20) in brackets.</li>
-    <li><b>Refrigerant:</b> ${R.r.name}, GWP ${fmt(R.r.gwp,R.r.gwp<10?2:0)} (100-year; R-134a and R-513A IPCC AR4 as used by the U.S. EPA under the AIM Act, R-1234ze(E) EU F-gas Regulation 2024/573); leak ${fmt(R.leak*100,1)}% of the charge per year.${est?` Charge ${fmt(num('cChW',0.3),2)} kg/kW for water-cooled and ${fmt(num('cChA',0.4),2)} kg/kW for air-cooled chillers, on the duty chillers + 1 standby per loop. Charge and leak rate are assumptions: use the chiller data where known.`:''}</li>
-    ${est?`<li><b>Energy and water:</b> 8,760-hour simulation, ${st?`${esc(st.station)}, measured typical year TMYx ${esc(st.period)}`:'generated typical year'}; ASHRAE 90.1-2025 chillers, heat-rejection approaches, pump and fan power, free cooling. Same model as the <a href="../cooling-plant/index.html">Cooling Plant Selector</a>, which also gives cost and peak power. A system that cannot meet the design day is listed last.</li>`:''}
-    <li><b>Cars:</b> ${CAR} t CO₂ per typical passenger car per year (US EPA).</li>
-    <li>Cooling system only: IT electricity and UPS losses are not included. Screening-level estimate.</li></ul>`;
-}
 
 // ---------- mode tabs and inputs ----------
 function setMode(m){ MODE=m; $('mEst').classList.toggle('on',m==='est'); $('mOwn').classList.toggle('on',m==='own');

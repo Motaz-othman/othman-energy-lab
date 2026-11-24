@@ -33,7 +33,6 @@
 <script>window.Chart||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"><\/script>')</script>
 <meta name="author" content="Mutaz Othman">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Liquid Rack Cooling","url":"https://www.oenergylab.com/data-centers/rack-cooling/","description":"Choose a liquid-cooled GPU or CPU platform: maximum supply temperature, cooling and flow per rack, the safe minimum flow for variable-flow control, and how the CDU pump and control valve respond to a load jump or a pump trip. By Othman Energy Lab.","applicationCategory":"BusinessApplication","operatingSystem":"Any (web browser)","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"author":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"publisher":{"@id":"https://www.oenergylab.com/#org"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.oenergylab.com/"},{"@type":"ListItem","position":2,"name":"Data Centers","item":"https://www.oenergylab.com/data-centers/"},{"@type":"ListItem","position":3,"name":"Liquid Rack Cooling","item":"https://www.oenergylab.com/data-centers/rack-cooling/"}]}]}</script>
-<script type="application/ld+json" id="faq">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What coolant flow does an NVIDIA GB300 NVL72 rack need?","acceptedAnswer":{"@type":"Answer","text":"About 59 L/min at 25 °C supply up to 177 L/min at 45 °C supply, holding the return at about 55 °C (Lenovo GB300 NVL72 data), plus the operating margin."}},{"@type":"Question","name":"What is the safe minimum flow at idle?","acceptedAnswer":{"@type":"Answer","text":"The lowest idle flow from which a jump to rated power does not push the coolant return past its limit before the VFD pump ramps up; never below the vendor minimum flow."}},{"@type":"Question","name":"Do I need a buffer tank on the CDU loop?","acceptedAnswer":{"@type":"Answer","text":"Only if the water in the CDU and its pipes cannot cover the time the control valve and pump take to respond. Beyond that minimum, a bigger tank only lowers the supply temperature rise."}},{"@type":"Question","name":"What happens if the CDU pump trips?","acceptedAnswer":{"@type":"Answer","text":"The racks hold very little heat: the coolant reaches its limit within seconds, so the standby CDU pump should run in parallel with automatic changeover."}}]}</script>
 </head>
 <body class="wide">
 <header class="sitebar" data-root="../../" data-page="data-centers"></header>
@@ -46,19 +45,19 @@
 <div class="incol">
 <div class="colhead"><b>Inputs</b></div>
 <aside class="card inputs" id="inRack">
-  <h2>Platform</h2>
+  <h2 class="ih"><span class="n">1</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 1v4M15 1v4M9 19v4M15 19v4M1 9h4M1 15h4M19 9h4M19 15h4"/></svg>Platform</h2>
   <label for="rP">Liquid-cooled rack</label><select id="rP"></select>
   <div class="note" id="rPnote"></div>
   <label for="rTs" style="margin-top:12px">Coolant supply to the rack (°C)</label><input type="number" id="rTs" step="1">
-  <div class="note" id="rTsNote">Default 40 °C. Maximum 45 °C as per ASHRAE W45. The flow follows the platform rule at the supply chosen.</div>
+  <div class="note" id="rTsNote">Maximum 45 °C (ASHRAE W45).</div>
   <label for="rVbuf" style="margin-top:12px">Buffer tank on the TCS loop (L per rack)</label><input type="number" id="rVbuf" min="0" step="10">
   <div class="note" id="rVbufNote"></div>
-  <h2 style="margin-top:18px">CDU response</h2>
+  <h2 class="ih" style="margin-top:22px"><span class="n">2</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14l4-4"/><path d="M3.3 19a10 10 0 1 1 17.4 0"/></svg>CDU response</h2>
   <div class="row">
     <div><label for="rRamp">VFD pump ramp (s)</label><input type="number" id="rRamp" value="15" min="0" step="1"></div>
     <div><label for="rMCV">MCV stroke (s)</label><input type="number" id="rMCV" value="60" min="0" step="5"></div>
   </div>
-  <div class="note">The MCV is the CDU control valve on the facility water side of its heat exchanger. Defaults are on the safe side (standard actuator and pump ramp); enter the vendor values when known.</div>
+  <div class="note">MCV: the CDU control valve. Enter the vendor values when known.</div>
   <details>
     <summary>Customize</summary>
     <div class="row">
@@ -82,7 +81,7 @@
       <div><label for="rVcdu">Coolant in CDU per rack (L)</label><input type="number" id="rVcdu" value="40" min="0" step="5"></div>
     </div>
     <label for="rAir">Air temperature rise, for the airflow (K)</label><input type="number" id="rAir" value="12" min="5" max="25" step="1">
-    <div class="note">Flow margin: operating flow above the minimum the platform needs; the CDU heat exchanger is taken with the same margin. Air temperature rise only sets the airflow for the air share of the heat. Buffer at the chips: coolant in the cold plates plus the cold-plate metal, as litres of water (the manifolds do not count). Volumes are estimates; use the rack and CDU data when known.</div>
+    <div class="note">Volumes are estimates; use the rack and CDU data when known.</div>
   </details>
 </aside>
 </div>
@@ -96,29 +95,10 @@
     <div class="chartbox" style="height:300px"><canvas id="rChart"></canvas></div>
     <div class="note" id="rChartNote" style="margin-top:8px"></div>
   </div>
-  <details class="card more"><summary>Show details</summary><div id="rDet"></div></details>
 </section>
 </main>
 
-<section class="toolinfo" aria-labelledby="ti-h">
-  <div class="card">
-  <h2 id="ti-h">How the Liquid Rack Cooling works</h2>
-  <p>Liquid Rack Cooling shows what a liquid-cooled GPU or CPU rack needs: the maximum coolant supply temperature, the cooling and flow per rack, the safe minimum flow for variable-flow control, the minimum buffer tank on the CDU loop, and how the CDU pump and control valve respond to a load jump or a pump trip. Platforms include NVIDIA GB300 and GB200 NVL72, Vera Rubin, HGX B200, AMD Instinct MI355X, Helios and MI300A, and Lenovo Neptune CPU racks.</p>
-  <h3>Method</h3>
-  <ul><li>Required flow = heat to liquid ÷ (ρ × cp × (maximum return − supply)), which reproduces published OEM flow tables; the operating flow adds a margin (20% by default).</li><li>A load jump from idle to rated power is modelled with two water masses: the coolant at the chips and the CDU loop, with the CDU sensing delay, VFD pump ramp and control valve stroke.</li><li>The minimum tank is the smallest volume that keeps the return within its limit through the response gap at full flow.</li></ul>
-  <h2 style="margin-top:20px">Frequently asked questions</h2>
-  <h3>What coolant flow does an NVIDIA GB300 NVL72 rack need?</h3>
-  <p>About 59 L/min at 25 °C supply up to 177 L/min at 45 °C supply, holding the return at about 55 °C (Lenovo GB300 NVL72 data), plus the operating margin.</p>
-  <h3>What is the safe minimum flow at idle?</h3>
-  <p>The lowest idle flow from which a jump to rated power does not push the coolant return past its limit before the VFD pump ramps up; never below the vendor minimum flow.</p>
-  <h3>Do I need a buffer tank on the CDU loop?</h3>
-  <p>Only if the water in the CDU and its pipes cannot cover the time the control valve and pump take to respond. Beyond that minimum, a bigger tank only lowers the supply temperature rise.</p>
-  <h3>What happens if the CDU pump trips?</h3>
-  <p>The racks hold very little heat: the coolant reaches its limit within seconds, so the standby CDU pump should run in parallel with automatic changeover.</p>
-  <p>Read more: <a href="../../articles/gb300-nvl72-liquid-cooling/index.html">NVIDIA GB300 NVL72 liquid cooling: flow, supply temperature and minimum flow</a>.</p>
-  <p style="margin-top:16px">By <a href="../../about/index.html#founder">Eng. Mutaz Othman</a>, Othman Energy Lab. Screening-level results; confirm with vendor selections and a detailed design.</p>
-  </div>
-</section>
+<p class="toolfoot">How it works and how to read the results: <a href="../../articles/gb300-nvl72-liquid-cooling/index.html">NVIDIA GB300 NVL72 liquid cooling</a>. Screening-level results; confirm with vendor selections and a detailed design.</p>
 
 <footer class="sitefoot" data-root="../../"></footer>
 <script src="../../shared/js/site.js"></script>

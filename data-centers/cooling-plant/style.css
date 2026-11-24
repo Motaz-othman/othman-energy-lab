@@ -162,7 +162,7 @@
 .scard .cwarn{font-size:12.5px;font-weight:600;color:var(--warn)}
 .artlink{margin:14px 0 0;font-size:13.5px;color:var(--text2)}
 .artlink a{color:var(--brand-ink);font-weight:600}
-.toolfoot{margin:24px 28px 0;font-size:13px;color:var(--text2)}.toolfoot a{color:var(--brand-ink);font-weight:600}@media (max-width:900px){.toolfoot{margin:20px 16px 0}}
+
 /* calm look: white cards, one soft accent */
 .wrec,.wrec.w-plenty,.wrec.w-limited,.wrec.w-none{background:var(--bg);border-color:var(--border)}
 .wrec i{background:var(--grad)}

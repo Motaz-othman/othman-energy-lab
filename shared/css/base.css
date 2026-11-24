@@ -263,3 +263,11 @@ a.tcard:hover .thumb .rk .best{transform:scaleX(1.04)}
 a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
 /* brand gradient (pink to purple), used on the main accents */
 :root{--grad:linear-gradient(120deg,#d9739f 0%,#a985d6 100%)}
+/* numbered input sections with an icon; one link line under each tool */
+.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+h2.ih{display:flex;align-items:center;gap:8px}
+h2.ih .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--brand);color:#fff;font-size:12px}
+h2.ih .ic{color:var(--brand-ink)}
+.toolfoot{max-width:var(--maxw);margin:24px auto 0;padding:0 28px;font-size:13px;color:var(--text2)}
+.toolfoot a{color:var(--brand-ink);font-weight:600}
+@media (max-width:900px){.toolfoot{padding:0 16px}}

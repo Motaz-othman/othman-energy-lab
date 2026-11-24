@@ -33,7 +33,6 @@
 <script>window.Chart||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"><\/script>')</script>
 <meta name="author" content="Mutaz Othman">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Peak Shaving Tank","url":"https://www.oenergylab.com/data-centers/peak-shaving-tank/","description":"Size a chilled-water tank that shaves the rare extreme-hour peak of a data center cooling plant, so the plant and its electrical supply need less rated power. By Othman Energy Lab.","applicationCategory":"BusinessApplication","operatingSystem":"Any (web browser)","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"author":{"@id":"https://www.oenergylab.com/about/#mutaz-othman"},"publisher":{"@id":"https://www.oenergylab.com/#org"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.oenergylab.com/"},{"@type":"ListItem","position":2,"name":"Data Centers","item":"https://www.oenergylab.com/data-centers/"},{"@type":"ListItem","position":3,"name":"Peak Shaving Tank","item":"https://www.oenergylab.com/data-centers/peak-shaving-tank/"}]}]}</script>
-<script type="application/ld+json" id="faq">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How much can a chilled-water tank cut the cooling plant rated power?","acceptedAnswer":{"@type":"Answer","text":"Across the 33 built-in cities, typically 10–17% of the cooling plant rated power for air-cooled chillers, depending on how short and sharp the hottest hours are."}},{"@type":"Question","name":"Why does recharge time matter?","acceptedAnswer":{"@type":"Answer","text":"After the hottest afternoon the tank must be full again before the next hot day. If it needs more than about 4 hours at the night load, recharging may not be safe during a heatwave: raise the design temperature or add a standby chiller."}},{"@type":"Question","name":"Is this the same as a ride-through tank?","acceptedAnswer":{"@type":"Answer","text":"No. A ride-through tank covers a few minutes of full cooling during a power changeover. A peak shaving tank covers the extreme-weather hours and lets the plant be rated lower. A reserve can be kept full for ride-through."}}]}</script>
 </head>
 <body class="wide">
 <header class="sitebar" data-root="../../" data-page="data-centers"></header>
@@ -46,24 +45,24 @@
 <div class="incol">
 <div class="colhead"><b>Inputs</b></div>
 <aside class="card inputs" id="inGrid">
-  <h2>Weather</h2>
+  <h2 class="ih"><span class="n">1</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>Weather</h2>
   <div class="tabs"><button id="gTabCity" class="on">City</button><button id="gTabFile">Weather file</button></div>
   <div id="gCityPane"><label for="gCity">City</label><select id="gCity"></select></div>
   <div id="gFilePane" hidden>
     <label for="gFile">EPW or CSV weather file (8,760 hours)</label><input type="file" id="gFile" accept=".epw,.csv,.txt">
-    <div class="note" id="gFileInfo">Same formats as the Cooling Plant Selector.</div>
+    <div class="note" id="gFileInfo"></div>
   </div>
-  <h2 style="margin-top:18px">Load and plant</h2>
+  <h2 class="ih" style="margin-top:22px"><span class="n">2</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="7" rx="2"/><rect x="2" y="14" width="20" height="7" rx="2"/><path d="M6 6.5h.01M6 17.5h.01"/></svg>Load and plant</h2>
   <label for="gQ">Cooling load / chiller capacity at full IT (MW)</label><input type="number" id="gQ" value="20" min="0.1" step="1">
   <label for="gNight">Average IT load over the 12-hour night (%)</label><input type="number" id="gNight" value="80" min="10" max="100" step="5">
-  <div class="note">The tank recharges at night, 19:00 to 07:00, with the chiller capacity the IT load leaves free. The lower the night load, the faster it recharges. By day the IT load is taken at 100%.</div>
+  <div class="note">The tank recharges 19:00–07:00.</div>
   <label for="gSys">Cooling system</label><select id="gSys"></select>
-  <div class="note">Air-cooled systems, whose power peaks hardest in the hottest hours. The heatwave here is built from dry-bulb; water-cooled plants peak in humid hours instead, so the method does not apply to them. Every result is checked against the whole measured year.</div>
+  <div class="note">Air-cooled systems only.</div>
   <div class="row">
     <div><label for="gTs">Supply (°C)</label><input type="number" id="gTs" value="30" step="1"></div>
     <div><label for="gTr">Return (°C)</label><input type="number" id="gTr" value="40" step="1"></div>
   </div>
-  <h2 style="margin-top:18px">Design temperature</h2>
+  <h2 class="ih" style="margin-top:22px"><span class="n">3</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 14.8V4a2 2 0 0 0-4 0v10.8a4 4 0 1 0 4 0Z"/></svg>Design temperature</h2>
   <label for="gTd">Size the plant for (°C)</label><input type="number" id="gTd" step="0.5">
   <div class="note" id="gTdNote">The recommended temperature is filled in. Type your own to test it.</div>
   <details>
@@ -72,7 +71,7 @@
       <div><label for="gSafe">Extra temperature margin (K)</label><input type="number" id="gSafe" value="0" min="0" step="0.5"></div>
       <div><label for="gRechMax">Safe recharge time (h)</label><input type="number" id="gRechMax" value="4" min="1" max="12" step="0.5"></div>
     </div>
-    <div class="note">The recommendation is the lowest design temperature whose tank recharges within the safe time. Add an extra margin to raise it.</div>
+    <div class="note">Adds a margin to the recommended temperature.</div>
     <div class="row">
       <div><label for="gReserve">Reserve kept full (%)</label><input type="number" id="gReserve" value="20" min="0" max="80" step="5"></div>
       <div><label for="gMar">Tank sizing margin (%)</label><input type="number" id="gMar" value="20" min="0" step="5"></div>
@@ -99,26 +98,10 @@
     <div class="ctitle" style="margin-top:14px">Tank level</div>
     <div class="chartbox" style="height:140px"><canvas id="gSoc"></canvas></div>
   </div>
-  <details class="card more"><summary>Show details</summary><div id="gDet"></div></details>
 </section>
 </main>
 
-<section class="toolinfo" aria-labelledby="ti-h">
-  <div class="card">
-  <h2 id="ti-h">How the Peak Shaving Tank works</h2>
-  <p>The Peak Shaving Tank sizes a chilled-water thermal storage tank that covers the rare extreme hottest hours of a data center cooling plant, so the chillers and their electrical supply can be rated for a lower design temperature. It finds the lowest design temperature whose tank still recharges safely during the 12-hour night, and shows the cut in rated power, the tank volume and the recharge time.</p>
-  <h3>Method</h3>
-  <ul><li>A heatwave of the hottest days is built from the ASHRAE extreme values and the site daily range, with full IT load by day and the night IT load from 19:00 to 07:00.</li><li>For each design temperature the plant is rated lower and the tank covers the shortfall; it must be full again before morning, using only the capacity the night load leaves free.</li><li>The recommendation is the lowest design temperature whose tank recharges within the safe time (4 hours by default), checked against the ASHRAE 0.4% level.</li><li>The plant model is the same as the Cooling Plant Selector: ASHRAE 90.1-2025 chillers, approaches and pumps.</li></ul>
-  <h2 style="margin-top:20px">Frequently asked questions</h2>
-  <h3>How much can a chilled-water tank cut the cooling plant rated power?</h3>
-  <p>Across the 33 built-in cities, typically 10–17% of the cooling plant rated power for air-cooled chillers, depending on how short and sharp the hottest hours are.</p>
-  <h3>Why does recharge time matter?</h3>
-  <p>After the hottest afternoon the tank must be full again before the next hot day. If it needs more than about 4 hours at the night load, recharging may not be safe during a heatwave: raise the design temperature or add a standby chiller.</p>
-  <h3>Is this the same as a ride-through tank?</h3>
-  <p>No. A ride-through tank covers a few minutes of full cooling during a power changeover. A peak shaving tank covers the extreme-weather hours and lets the plant be rated lower. A reserve can be kept full for ride-through.</p>
-  <p style="margin-top:16px">By <a href="../../about/index.html#founder">Eng. Mutaz Othman</a>, Othman Energy Lab. Screening-level results; confirm with vendor selections and a detailed design.</p>
-  </div>
-</section>
+<p class="toolfoot">How it works and how to read the results: <a href="../../articles/how-to-use-peak-shaving-tank/index.html">How to use the Peak Shaving Tank</a>. Screening-level results; confirm with vendor selections and a detailed design.</p>
 
 <footer class="sitefoot" data-root="../../"></footer>
 <script src="../../shared/js/site.js"></script>

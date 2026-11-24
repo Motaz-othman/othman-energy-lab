@@ -18,7 +18,7 @@ const ARTICLES=[
 {slug:'how-to-use-cooling-plant-selector', date:'2026-11-22', tool:['Cooling Plant Selector','data-centers/cooling-plant/'],
  title:'How to use the Cooling Plant Selector',
  desc:'Step-by-step guide to the free Cooling Plant Selector: choose the city, enter the IT load and loop temperatures, read the ranked cooling plants, the design cases, energy, water, carbon and cost, and export a PDF or Excel report.',
- body:`<p>The <a href="../../data-centers/cooling-plant/index.html">Cooling Plant Selector</a> compares five cooling plants for a data hall with a liquid cooling loop and an air cooling loop, hour by hour over a full weather year, and recommends the right one for the site. This guide walks through the inputs and how to read the results.</p>
+ body:`<p>The <a href="../../data-centers/cooling-plant/index.html">Cooling Plant Selector</a> compares five cooling plants for a data hall with a liquid cooling loop and an air cooling loop, hour by hour over a full weather year (8,760 hours): air-cooled chillers, air-cooled chillers with free-cooling dry coolers, and water-cooled chillers with cooling towers, adiabatic coolers or hybrid dry coolers and towers, each with plate heat exchanger free cooling. It reports cooling electricity, annual PUE and ASHRAE 90.4 MLC, the electrical peak, water use, carbon emissions, and running and initial cost, and recommends one system for each water case: TSE available, water limited and no water. This guide walks through the inputs and how to read the results.</p>
 <h2>1. Choose the weather</h2>
 <p>Pick one of the 33 built-in data center cities in the <b>City</b> tab: Gulf cities (Dubai, Abu Dhabi, Riyadh, Jeddah, Dammam, Manama), major US markets (Northern Virginia, Dallas, Phoenix, Atlanta, Columbus, Silicon Valley, Hillsboro, Reno and others), Europe and Asia-Pacific. Each city loads its airport station's measured typical year (TMYx 2011–2025, 8,760 hours) and its ASHRAE 2025 design conditions. For another site, use the <b>Weather file</b> tab to upload an EPW file or a CSV with hourly dry-bulb and humidity; a sample CSV shows the format.</p>
 <h2>2. Enter the data hall load</h2>
@@ -26,28 +26,67 @@ const ARTICLES=[
 <li><b>Frequent load (%)</b>: the load the hall runs at most of the time; annual energy, water and cost use it. Peaks always use 100%.</li>
 <li><b>Liquid cooling loop</b>: its share of the load and its supply / return temperatures (default 30 / 40 °C for direct-to-chip cooling).</li>
 <li><b>Air cooling loop</b>: supply / return for the fan wall units (default 20 / 30 °C).</li></ul>
-<h2>3. Set the site conditions</h2>
-<p><b>Water availability</b> can be Available, Limited (water counts double in the ranking) or None (systems that need water are excluded). The <b>design dry-bulb and wet-bulb</b> are blank by default: the tool then checks two coincident design cases from the ASHRAE extremes, Case A with the extreme dry-bulb and Case B with the extreme wet-bulb. Enter a stricter value, such as an ASHRAE 20-year return period, to replace the extreme.</p>
+<h2>3. Set the design condition (optional)</h2>
+<p>The <b>design dry-bulb and wet-bulb</b> are blank by default: the tool then checks two coincident design cases from the ASHRAE extremes, Case A with the extreme dry-bulb and Case B with the extreme wet-bulb. Enter a stricter value, such as an ASHRAE 20-year return period, to replace the extreme.</p>
 <h2>4. Adjust the engineering inputs (optional)</h2>
 <p>The collapsed sections hold the full basis, all with standard defaults you can override: utility tariffs; chillers (ASHRAE 90.1-2025 Path B COP, unit sizes, the condenser-water warning limit); heat rejection (ASHRAE approaches, fan power); pump heads and fan wall units; environmental impact (grid emission factor, refrigerant); electrical losses; and initial cost rates.</p>
 <h2>5. Read the results</h2>
-<p>The top of the results shows the two design cases and one card per system, the recommended one first: electricity, annual PUE, electrical peak, water, carbon, running and initial cost, with notes on free-cooling hours, savings against air-cooled chillers and the ASHRAE 90.4 MLC check. The tabs go deeper:</p>
-<ul><li><b>Overview</b>: all options side by side and the design-day check at both cases, with the number of chillers.</li>
-<li><b>Systems</b>: the schematic of each plant with every pump, its equipment, operating modes and monthly free-cooling hours.</li>
-<li><b>Energy &amp; water</b>: MLC against ASHRAE 90.4-2025, carbon by source, and electricity and water by component.</li>
-<li><b>Cost</b>: running cost, payback against air-cooled chillers, and the initial cost range.</li>
-<li><b>Climate</b> and <b>Method</b>: free-cooling potential by month, and every equation and source.</li></ul>
+<p>One card per system shows annual electricity, peak power, water and CO₂, with the best value in each row marked. Three cards carry a recommendation, one for each water case: <b>If TSE is available</b> (energy, water, peak power, initial cost and carbon weighed together), <b>If water is limited</b> (water counts double) and <b>If there is no water</b> (only dry systems). The tabs below the cards:</p>
+<ul><li><b>Systems</b>: the schematic of each plant and its operation by month (free cooling, partial, chiller only) on each loop.</li>
+<li><b>Energy &amp; carbon</b>: annual PUE, the ASHRAE 90.4 MLC check and the facility peak, with electricity by component and CO₂ by source.</li>
+<li><b>Cost</b>: running cost, initial cost range and payback against air-cooled chillers.</li>
+<li><b>Climate</b>: free-cooling potential of the site by month, for dry coolers and for cooling towers.</li></ul>
 <h2>6. Export the report</h2>
-<p><b>PDF report</b> opens a print-ready A4 report (save it with the browser's Save as PDF). <b>Excel tables</b> downloads every results table as a workbook.</p>
+<p><b>PDF report</b> opens a print-ready A4 report (save it with the browser's Save as PDF). <b>Excel tables</b> downloads the results, the recommendations, your inputs and the monthly operating hours as a workbook.</p>
 <h2>Example: a 100 MW data center in Dubai</h2>
 <p>At 100% load all year, with 80 MW on the liquid loop and 20 MW on the air loop:</p>
-${table(['System','Design peak (MW)','Electricity (GWh/yr)','Water (m³/yr)','Carbon (t CO₂e/yr)'],[
- ['Water-cooled chillers + cooling towers + free cooling','14.2','72.7','1,629,980','37,142'],
- ['Hybrid dry coolers and towers + free cooling','14.2','77.9','1,138,317','38,784'],
- ['Adiabatic coolers + free cooling','20.3','113.4','747,562','54,724'],
- ['Air-cooled chillers + dry coolers','29.8','127.9','0','60,492'],
- ['Air-cooled chillers','29.8','150.2','0','70,920']])}
-<p>Cooling towers rank first: half the electrical peak of air-cooled chillers and about half the carbon, at the cost of the most water. Where water is limited, the hybrid plant saves about 30% of the water for 7% more electricity.</p>`},
+<div class="tw"><table><thead><tr><th>System</th><th>Design peak (MW)</th><th>Electricity (GWh/yr)</th><th>Water (m³/yr)</th><th>Carbon (t CO₂e/yr)</th></tr></thead><tbody><tr><td>Water-cooled chillers + cooling towers + free cooling</td><td>14.2</td><td>72.7</td><td>1,629,980</td><td>37,142</td></tr><tr><td>Hybrid dry coolers and towers + free cooling</td><td>14.2</td><td>77.9</td><td>1,138,317</td><td>38,784</td></tr><tr><td>Adiabatic coolers + free cooling</td><td>20.3</td><td>113.4</td><td>747,562</td><td>54,724</td></tr><tr><td>Air-cooled chillers + dry coolers</td><td>29.8</td><td>127.9</td><td>0</td><td>60,492</td></tr><tr><td>Air-cooled chillers</td><td>29.8</td><td>150.2</td><td>0</td><td>70,920</td></tr></tbody></table></div>
+<p>Cooling towers rank first: half the electrical peak of air-cooled chillers and about half the carbon, at the cost of the most water. Where water is limited, the hybrid plant saves about 30% of the water for 7% more electricity.</p>`,
+ faq:[[`Which cooling system is best for a data center in a hot climate such as Dubai or Riyadh?`,`For a liquid-cooled hall at 30/40 °C, water-cooled chillers with cooling towers and plate heat exchanger free cooling usually rank first: the lowest electricity, MLC and peak power. They use the most water, so where water is limited a hybrid dry cooler and tower plant or adiabatic coolers trade some energy for much less water. Air-cooled chillers have the highest electrical peak.`],
+  [`How is the ASHRAE 90.4 MLC checked?`,`The annual mechanical load component (cooling energy ÷ IT energy) is compared with the maximum annualized MLC in ASHRAE 90.4-2025 Table 6.5 for the site climate zone and IT size.`],
+  [`Why does a humid city use more cooling energy than a hotter dry one?`,`Cooling towers and their free cooling depend on the wet-bulb temperature, not the dry-bulb. A humid city such as Mumbai keeps a high wet-bulb all year, so it gets fewer free-cooling hours than Dubai with its dry winters.`],
+  [`How are the carbon emissions calculated?`,`Annual cooling electricity × the local grid emission factor, plus water × the energy to supply it (3.5 kWh/m³ for Gulf desalination) × the grid factor, plus refrigerant leakage × its GWP.`]]},
+
+{slug:'how-to-use-low-carbon-cooling-selector', date:'2026-11-24', tool:['Low-Carbon Cooling Selector','data-centers/low-carbon-cooling/'],
+ title:'How to use the Low-Carbon Cooling Selector',
+ desc:'Step-by-step guide to the free Low-Carbon Cooling Selector: pick the city, compare five data center cooling plants or enter your own numbers, and read the yearly CO2 from electricity, water supply and refrigerant leakage.',
+ body:`<p>The <a href="../../data-centers/low-carbon-cooling/index.html">Low-Carbon Cooling Selector</a> finds the data center cooling system with the lowest carbon and gives its yearly emissions in tonnes of CO₂ equivalent. It adds three sources: the electricity the cooling plant uses, the energy needed to supply its water, and the refrigerant that leaks from the chillers.</p>
+<h2>1. Choose the location</h2>
+<p>Pick the city. Its grid emission factor and water supply energy fill in automatically: US cities use the EPA eGRID subregion rates, Sydney the Australian National Greenhouse Accounts factors, other countries Our World in Data / Ember. Type your own values to replace them, for example a green-power contract.</p>
+<h2>2. Compare systems or enter your own numbers</h2>
+<ul><li><b>Compare systems</b>: enter the cooling load, average load and liquid-cooled share. The tool runs five cooling plants over the city's measured weather year, the same model as the <a href="../../data-centers/cooling-plant/index.html">Cooling Plant Selector</a>.</li>
+<li><b>My own numbers</b>: enter the yearly cooling electricity, water use and refrigerant charge of your system, from the design, a utility bill or the BMS.</li></ul>
+<h2>3. Set the refrigerant</h2>
+<p>Choose the refrigerant and its yearly leak rate, and the charge per kW for water-cooled and air-cooled chillers. Low-GWP refrigerants such as R-1234ze(E) remove almost all of the leakage share.</p>
+<h2>4. Read the results</h2>
+<p>One card per system shows its yearly CO₂, lowest first, with a bar split by source. The chart compares the sources side by side, and the table at the bottom lists electricity, water, charge and CO₂ for every system, with the total over the chosen period.</p>`,
+ faq:[[`Which part of a cooling system's CO₂ is largest?`,`Electricity, in almost every case: usually 85–99% of the total. Refrigerant leakage can matter with high-GWP refrigerants such as R-134a, and water matters in the Gulf, where desalinated water takes about 3.5 kWh per m³.`],
+  [`Where do the grid factors come from?`,`US cities use the EPA eGRID2023 subregion rates; Sydney uses the Australian National Greenhouse Accounts factors (NSW 2025–26); other countries use Our World in Data / Ember, latest year. You can type your own factor, for example a green-power contract.`],
+  [`Does it include the IT equipment?`,`No. Only the cooling system: chillers, heat-rejection fans, pumps, CRAH, fan walls and CDUs. IT electricity and UPS losses are not included.`]]},
+
+{slug:'how-to-use-peak-shaving-tank', date:'2026-11-24', tool:['Peak Shaving Tank','data-centers/peak-shaving-tank/'],
+ title:'How to use the Peak Shaving Tank',
+ desc:'Step-by-step guide to the free Peak Shaving Tank: size a chilled-water tank that covers the rare hottest hours, so the cooling plant and its electrical supply can be rated for a lower design temperature.',
+ body:`<p>A cooling plant is rated for the extreme hottest hour at full IT load, a condition that rarely happens. The <a href="../../data-centers/peak-shaving-tank/index.html">Peak Shaving Tank</a> sizes a chilled-water tank that covers those few hours, so the chillers and their electrical supply can be rated lower. The tank recharges during the night.</p>
+<h2>1. Choose the weather</h2>
+<p>Pick one of the built-in cities, which load the measured hourly year and the ASHRAE design conditions of the main airport, or upload an EPW or CSV weather file.</p>
+<h2>2. Enter the load and plant</h2>
+<ul><li><b>Cooling load</b>: the chiller capacity at full IT load.</li>
+<li><b>Night IT load</b>: the average IT load over the 12-hour night, 19:00 to 07:00. The lower it is, the faster the tank recharges.</li>
+<li><b>Cooling system</b>: air-cooled systems, whose power peaks hardest in the hottest hours.</li>
+<li><b>Supply and return</b>: the chilled-water temperatures, which set how much cooling each cubic metre stores.</li></ul>
+<h2>3. Set the design temperature</h2>
+<p>The tool fills in the recommended design temperature: the lowest one whose tank still recharges safely after the hottest afternoon. Type your own value to test it, or add a margin under the safety settings.</p>
+<h2>4. Read the results</h2>
+<ul><li><b>Rated power cut</b>: the reduction in the cooling plant's electrical rating, against the plant rated for the extreme.</li>
+<li><b>Tank</b>: the volume and the tank size.</li>
+<li><b>Recharge time</b> at the night load, and the <b>hours per year</b> the tank works.</li>
+<li>The <b>hottest-day chart</b> shows the plant power with and without the tank, and the tank level through the day and night.</li>
+<li>A <b>reserve</b> is kept full: it is never used for peak shaving and covers a power changeover or weather hotter than the design.</li>
+<li>The <b>typical-year check</b> confirms the tank covers every hour of the measured year.</li></ul>`,
+ faq:[[`How much can a chilled-water tank cut the cooling plant rated power?`,`Across the 33 built-in cities, typically 10–17% of the cooling plant rated power for air-cooled chillers, depending on how short and sharp the hottest hours are.`],
+  [`Why does recharge time matter?`,`After the hottest afternoon the tank must be full again before the next hot day. If it needs more than about 4 hours at the night load, recharging may not be safe during a heatwave: raise the design temperature or add a standby chiller.`],
+  [`Is this the same as a ride-through tank?`,`No. A ride-through tank covers a few minutes of full cooling during a power changeover. A peak shaving tank covers the extreme-weather hours and lets the plant be rated lower. A reserve can be kept full for ride-through.`]]},
 
 {slug:'ride-through-tank-sizing', date:'2026-11-22', tool:['Ride-Through Tank','data-centers/ride-through-tank/'],
  title:'How to size a chilled-water ride-through tank for a data center',
@@ -68,7 +107,10 @@ ${table(['Step','Typical time'],[['Generator start and transfer (NFPA 110 Level 
 <h2>Tank shape</h2>
 <p>Stratification works best when the tank is tall: a height of 1 to 4 times the diameter, up to the site height limit (often about 15 m). Larger volumes are split into equal tanks.</p>
 <h2>What must be on UPS</h2>
-<p>The chilled-water pumps and the CDUs or air handlers must run on UPS, or the tank cannot deliver its cooling. With liquid cooling the racks hold very little heat: even 30–60 seconds without flow can trip the IT, so continuous circulation matters as much as the tank volume.</p>`},
+<p>The chilled-water pumps and the CDUs or air handlers must run on UPS, or the tank cannot deliver its cooling. With liquid cooling the racks hold very little heat: even 30–60 seconds without flow can trip the IT, so continuous circulation matters as much as the tank volume.</p>`,
+ faq:[[`How big a tank do I need to ride through a chiller restart?`,`For a 20 MW load, 10 minutes, a 10 K supply/return difference and 85% tank efficiency: 3,333 kWh of cooling, 338 m³ net, about 405 m³ with a 20% margin.`],
+  [`How many minutes of ride-through should a data center tank give?`,`About 10 minutes with quick-restart chillers (typical data center specification), 15–20 minutes with standard chillers, and 15 minutes for Tier IV or liquid cooling with little thermal mass.`],
+  [`What else must be on UPS?`,`The chilled-water pumps and the CDUs or air handlers, or the tank cannot deliver its cooling during the gap.`]]},
 
 {slug:'ashrae-90-4-mlc', date:'2026-11-22', tool:['Cooling Plant Selector','data-centers/cooling-plant/'],
  title:'ASHRAE 90.4 MLC explained, with the limits by climate zone',
@@ -119,7 +161,11 @@ ${table(['Item','Value'],[['Thermal design power','135 kW, up to about 155 kW pe
 <p>Variable-flow control saves pump energy at idle, but the racks hold very little coolant. If the load jumps from idle to full power, the coolant heats up until the CDU pump ramps up and its control valve opens. The safe minimum flow is the lowest idle flow from which that jump does not push the return past its limit, and never below the vendor minimum. A small buffer tank on the CDU loop can cover the response gap; beyond that, a bigger tank only lowers the supply temperature rise.</p>
 <h2>Pump trip</h2>
 <p>If the CDU pump stops, the coolant reaches its limit within seconds. Run the standby CDU pump in parallel with automatic changeover, and keep the CDUs and facility pumps on UPS.</p>
-<p>The <a href="../../data-centers/rack-cooling/index.html">Liquid Rack Cooling</a> tool calculates the flow, safe minimum flow, minimum buffer tank and pump-trip time for the GB300 NVL72 and other GPU and CPU platforms.</p>`},
+<p>The <a href="../../data-centers/rack-cooling/index.html">Liquid Rack Cooling</a> tool calculates the flow, safe minimum flow, minimum buffer tank and pump-trip time for the GB300 NVL72 and other GPU and CPU platforms.</p>`,
+ faq:[[`What coolant flow does an NVIDIA GB300 NVL72 rack need?`,`About 59 L/min at 25 °C supply up to 177 L/min at 45 °C supply, holding the return at about 55 °C (Lenovo GB300 NVL72 data), plus the operating margin.`],
+  [`What is the safe minimum flow at idle?`,`The lowest idle flow from which a jump to rated power does not push the coolant return past its limit before the VFD pump ramps up; never below the vendor minimum flow.`],
+  [`Do I need a buffer tank on the CDU loop?`,`Only if the water in the CDU and its pipes cannot cover the time the control valve and pump take to respond. Beyond that minimum, a bigger tank only lowers the supply temperature rise.`],
+  [`What happens if the CDU pump trips?`,`The racks hold very little heat: the coolant reaches its limit within seconds, so the standby CDU pump should run in parallel with automatic changeover.`]]},
 ];
 
 const head=(title,desc,url,ld,root)=>`<!DOCTYPE html>
@@ -132,7 +178,7 @@ ${GA}
 <meta name="description" content="${esc(desc)}">
 <link rel="icon" href="${root}shared/img/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="${root}shared/img/apple-touch-icon.png">
-<meta name="theme-color" content="#c2185b">
+<meta name="theme-color" content="#a8326e">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Othman Energy Lab">
 <meta property="og:title" content="${esc(title)}">
@@ -174,6 +220,8 @@ for(const a of ARTICLES){
   const ld=[{'@type':'TechArticle',headline:a.title,description:a.desc,url,mainEntityOfPage:url,datePublished:a.date,dateModified:a.date,inLanguage:'en',
     author:PERSON,publisher:ORG,image:B+'shared/img/og-image.png',about:{'@type':'WebApplication',name:a.tool[0],url:B+a.tool[1]}},
     crumbs([['Home',''],['Articles','articles/'],[a.title,`articles/${a.slug}/`]])];
+  if(a.faq) ld.push({'@type':'FAQPage',mainEntity:a.faq.map(([q,ans])=>({'@type':'Question',name:q,acceptedAnswer:{'@type':'Answer',text:ans.replace(/<[^>]+>/g,'')}}))});
+  const faqHtml=a.faq?`<h2>Frequently asked questions</h2>\n${a.faq.map(([q,ans])=>`<h3>${q}</h3>\n<p>${ans}</p>`).join('\n')}\n`:'';
   const html=`${head(a.title,a.desc,url,ld,root)}
 <body>
 <header class="sitebar" data-root="${root}" data-page="articles"></header>
@@ -183,7 +231,7 @@ for(const a of ARTICLES){
   <h1>${a.title}</h1>
   <p class="meta">By <a href="${root}about/index.html#founder">Eng. Mutaz Othman</a> · ${new Date(a.date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</p>
 ${a.body}
-  <p class="cta"><a class="btn primary" href="${root}${a.tool[1]}index.html">Open the ${a.tool[0]} →</a></p>
+${faqHtml}  <p class="cta"><a class="btn primary" href="${root}${a.tool[1]}index.html">Open the ${a.tool[0]} →</a></p>
 </article>
 </main>
 <footer class="sitefoot" data-root="${root}"></footer>

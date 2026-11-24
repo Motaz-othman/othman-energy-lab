@@ -11,12 +11,12 @@
 .hero{display:grid;gap:16px;border-left:4px solid var(--brand)}
 .hero .for{font-size:13.5px;color:var(--text2)}
 .big4{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
-.bn{padding:14px 16px;border-radius:12px;background:var(--bg);border:1px solid var(--border)}
-.bn .v{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
-.bn .v.good{color:var(--brand-ink)}
-.bn .v.bad{color:var(--bad)}
-.bn .v small{font-size:15px;font-weight:600;color:var(--text2);letter-spacing:0}
-.bn .l{font-size:13px;color:var(--text2);margin-top:4px}
+.big4 .bn{padding:14px 16px;border-radius:12px;background:var(--bg);border:1px solid var(--border)}
+.big4 .bn .v{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
+.big4 .bn .v.good{color:var(--brand-ink)}
+.big4 .bn .v.bad{color:var(--bad)}
+.big4 .bn .v small{font-size:15px;font-weight:600;color:var(--text2);letter-spacing:0}
+.big4 .bn .l{font-size:13px;color:var(--text2);margin-top:4px}
 .verdict{font-size:16px;line-height:1.5;padding:12px 16px;border-radius:10px;background:color-mix(in srgb,var(--brand) 9%,var(--surface))}
 .verdict.warn{background:color-mix(in srgb,var(--warn) 12%,var(--surface))}
 .uses{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
@@ -42,9 +42,10 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
 .no{color:var(--bad);font-weight:600}
 .method{font-size:12.5px;color:var(--text2);padding-left:18px}
 .method li{margin:4px 0}
-.bn .pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
-.bn .pair .v{display:block;font-size:24px}
-.bn .pair .v.bad{color:var(--bad)}
-.bn .pair .l{display:block;margin-top:2px}
+.big4 .bn .pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.big4 .bn .pair .v{display:block;font-size:24px}
+.big4 .bn .pair .v.bad{color:var(--bad)}
+.big4 .bn .pair .l{display:block;margin-top:2px}
 /* phones: two result cards per row; a card with two values takes the full row */
-@media (max-width:560px){.big4{grid-template-columns:1fr 1fr;gap:10px}.big4 .bn:has(.pair){grid-column:1/-1}.bn{padding:12px}.bn .v{font-size:24px}.bn .v small{font-size:13px}.verdict{font-size:15px}.tankrow{justify-items:center}}
+@media (max-width:560px){.big4{grid-template-columns:1fr 1fr;gap:10px}.big4 .bn:has(.pair){grid-column:1/-1}.big4 .bn{padding:12px}.big4 .bn .v{font-size:24px}.big4 .bn .v small{font-size:13px}.verdict{font-size:15px}.tankrow{justify-items:center}}
+.card.hero{border-left:1px solid var(--border)}
