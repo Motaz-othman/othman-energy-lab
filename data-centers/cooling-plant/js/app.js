@@ -77,7 +77,7 @@ function renderReco(){
   const IC={el:'<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',pk:'<path d="M12 14l4-4"/><path d="M3.3 19a10 10 0 1 1 17.4 0"/>',w:'<path d="M12 2.7s-6 6.4-6 11.3a6 6 0 0 0 12 0c0-4.9-6-11.3-6-11.3z"/>',co:'<path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 1 1 0 9Z"/>'};
   const ic=k=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IC[k]}</svg>`;
   const MK=['el','pk','w','co'];
-  const key=[['Electricity',r=>r.E,r=>`${fmt(r.E/1000,1)}`,'GWh/yr'],['Peak power',r=>r.peak,r=>`${fmt(r.peak/1000,1)}`,'MW'],['Water',r=>r.W,r=>r.W<1?'0':fmt(r.W/1000,0),'thousand m³/yr'],['CO₂',r=>r.co2,r=>fmt(r.co2/1000,1),'kt/yr']];
+  const key=[['Electricity',r=>r.E,r=>`${fmt(r.E/1000,1)}`,'GWh/yr'],['Peak',r=>r.peak,r=>`${fmt(r.peak/1000,1)}`,'MW'],['Water',r=>r.W,r=>r.W<1?'0':fmt(r.W/1000,0),'thousand m³/yr'],['CO₂',r=>r.co2,r=>fmt(r.co2/1000,1),'kt/yr']];
   const bestV=key.map(([,v])=>RANK.length?Math.min(...RANK.map(i=>v(RES[i]))):null);
   const cards=order().map(id=>{ const r=RES[id], k=RANK.indexOf(id), d=DES[id];
     const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="recb"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>Recommended</span>':`<span class="rank">${k+1}</span>`;
@@ -88,7 +88,7 @@ function renderReco(){
     return `<div class="scard${k===0?' rec':''}${r.excluded?' off':''}">
       <div class="stop">${status}</div>
       <div class="sname" title="${esc(r.o.name)}">${r.o.short}</div>
-      <div class="kn">${key.map(([l,v,t,u],j)=>{ const hi=!r.excluded&&v(r)<=bestV[j]*(1+1e-6)+1e-9; return `<div class="m-${MK[j]}${hi?' hi':''}"><span class="kl"><i>${ic(MK[j])}</i>${l}${hi?'<b class="best">Best</b>':''}</span><span class="kv">${t(r)}</span><span class="ku">${u}</span></div>`; }).join('')}</div>
+      <div class="kn">${key.map(([l,v,t,u],j)=>{ const hi=!r.excluded&&v(r)<=bestV[j]*(1+1e-6)+1e-9; return `<div class="m-${MK[j]}${hi?' hi':''}"><span class="kl"><i>${ic(MK[j])}</i>${l}${hi?'<b class="best" title="Best value">✓</b>':''}</span><span class="kv">${t(r)}</span><span class="ku">${u}</span></div>`; }).join('')}</div>
       <details class="cmore"><summary>More</summary>
         <dl>${more.map(([l,v])=>`<div><dt>${l}</dt><dd>${v}</dd></div>`).join('')}</dl>
         <ul>${notes.map(n=>`<li>${n}</li>`).join('')}</ul>

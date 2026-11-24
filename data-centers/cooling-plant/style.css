@@ -125,4 +125,8 @@
 #inputs h2.ih .ic{color:var(--brand-ink)}
 #inputs .more-h{display:flex;align-items:center;gap:8px}
 .colhead .xports button{display:inline-flex;align-items:center;gap:6px}
-.scard .kl{white-space:nowrap;gap:5px}.scard .kl .best{padding:1px 5px}
+.scard .kn{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.scard .kn>div{min-width:0}
+.scard .kl{white-space:nowrap;overflow:hidden;gap:5px;padding-right:20px}
+.scard .kl i{flex:none}
+.scard .kl .best{position:absolute;top:7px;right:7px;margin:0;padding:0;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:11px;line-height:1}
