@@ -45,7 +45,7 @@
 <div class="incol">
 <div class="colhead"><b>Inputs</b></div>
 <aside class="card" id="inputs">
-  <h2>1. Site</h2>
+  <h2 class="ih"><span class="n">1</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>Site</h2>
   <div class="tabs"><button id="tabCity" class="on">City</button><button id="tabFile">Weather file</button></div>
   <div id="cityPane">
     <label for="city">City</label>
@@ -76,13 +76,13 @@
     <option value="none">None (zero-water design)</option>
   </select>
 
-  <h2 style="margin-top:20px">2. Data hall</h2>
+  <h2 class="ih" style="margin-top:22px"><span class="n">2</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="7" rx="2"/><rect x="2" y="14" width="20" height="7" rx="2"/><path d="M6 6.5h.01M6 17.5h.01"/></svg>Data hall</h2>
   <div class="row">
     <div><label for="it">Cooling load (MW)</label><input type="number" id="it" value="20" min="0.1" step="0.5"></div>
     <div><label for="lcp">Liquid-cooled share (%)</label><input type="number" id="lcp" value="80" min="0" max="100" step="5"></div>
   </div>
 
-  <h2 class="more-h">More settings</h2>
+  <h2 class="more-h"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg>More settings</h2>
   <details>
     <summary>Load and loop temperatures</summary>
     <label for="lf">Usual operating load (% of design)</label><input type="number" id="lf" value="80" min="10" max="100" step="5">
@@ -228,7 +228,7 @@
 </div>
 
 <section id="results">
-  <div class="colhead"><b>Results</b><span class="xports"><button type="button" class="link" id="xpdf" title="Open a print-ready report and save it as PDF">PDF report</button><button type="button" class="link" id="xport" title="Download every results table as an Excel workbook">Excel tables</button></span></div>
+  <div class="colhead"><b>Results</b><span class="xports"><button type="button" class="link" id="xpdf" title="Open a print-ready report and save it as PDF"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>PDF report</button><button type="button" class="link" id="xport" title="Download every results table as an Excel workbook"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>Excel tables</button></span></div>
   <div class="card reco" id="reco"></div>
 
   <nav class="rtabs" id="rtabs" role="tablist" aria-label="Results">
