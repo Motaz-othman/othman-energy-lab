@@ -81,11 +81,13 @@ function renderReco(){
   const MK=['el','pk','w','co'];
   const key=[['Electricity',r=>r.E,r=>`${fmt(r.E/1000,1)}`,'GWh/yr'],['Peak',r=>r.peak,r=>`${fmt(r.peak/1000,1)}`,'MW'],['Water',r=>r.W,r=>r.W<1?'0':fmt(r.W/1000,0),'thousand m³/yr'],['CO₂',r=>r.co2,r=>fmt(r.co2/1000,1),'kt/yr']];
   const bestV=key.map(([,v])=>RANK.length?Math.min(...RANK.map(i=>v(RES[i]))):null);
-  const WL={plenty:'if TSE is available',limited:'if water is limited',none:'if there is no water'};
+  const WL={plenty:'If TSE is available',limited:'If water is limited',none:'If there is no water'};
+  const D='<path d="M12 2.7s-6 6.4-6 11.3a6 6 0 0 0 12 0c0-4.9-6-11.3-6-11.3z"/>', sv=p=>`<svg viewBox="0 0 24 24" aria-hidden="true">${p}</svg>`;
+  const WI={plenty:sv(D+'<path d="M9 14.5h6"/><path d="M12 11.5v6"/>'),limited:sv(D+'<path d="M6.2 14h11.6"/>'),none:sv(D+'<path d="M3 3l18 18"/>')};
   const recs=id=>Object.keys(WL).filter(w=>SCEN[w]===id);
   const cOrder=[...new Set([...Object.keys(WL).map(w=>SCEN[w]).filter(Boolean),...order()])];
   const cards=cOrder.map(id=>{ const r=RES[id], k=RANK.indexOf(id), d=DES[id], rw=recs(id);
-    const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:rw.length?rw.map(w=>`<span class="recb"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>Recommended ${WL[w]}</span>`).join(''):'<span class="notrec">Not recommended</span>';
+    const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:rw.map(w=>`<span class="wrec w-${w}"><i>${WI[w]}</i><span><small>Recommended</small>${WL[w]}</span></span>`).join('');
     const notes=[id==='acc'?'No free cooling':`Free cooling ${loopTxt(r.free)} h/yr (liquid / air)`];
     if(d.warns.length) notes.push(`<b style="color:var(--warn)">Condenser water above ${P.wcMax} °C at design: needs a chiller rated above ${P.wcMax} °C</b>`); else if(r.hotCW>0) notes.push(`Condenser water above ${P.wcMax} °C for ${fmt(r.hotCW)} h/yr`);
     if(mlcTxt(r)) notes.push(r.mlc<=mlcLim()?mlcTxt(r):`<b style="color:var(--bad)">${mlcTxt(r)}</b>`);
