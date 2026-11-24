@@ -90,7 +90,7 @@ button.link:hover{background:color-mix(in srgb,var(--brand) 10%,transparent)}
 tr.click{cursor:pointer}
 tr.click:hover td{background:color-mix(in srgb,var(--text) 4%,transparent)}
 td.hi{background:color-mix(in srgb,var(--brand) 13%,transparent);font-weight:650}
-.tag:not(.ok):not(.x){background:var(--bg);color:var(--text2);border:1px solid var(--border)}
+.tag:not(.ok):not(.x):not(.top){background:var(--bg);color:var(--text2);border:1px solid var(--border)}
 /* site bar, footer, buttons (shared/js/site.js fills the bar and footer) */
 .sitebar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding-top:env(safe-area-inset-top,0px)}
 .sitebar-in{max-width:var(--maxw);margin:0 auto;height:var(--navh);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 28px}
@@ -281,3 +281,4 @@ h2.ih .ic{color:var(--brand-ink)}
 .sitebar .topnav a[aria-current]{background:color-mix(in srgb,var(--brand) 12%,transparent);color:var(--brand-ink);font-weight:650}
 @media (max-width:560px){.sitebar .topnav{font-size:13.5px;gap:0}.sitebar .topnav a{padding:6px 8px}}
 @media (max-width:430px){.sitebar .topnav{font-size:12.5px}.sitebar .topnav a{padding:6px 5px}}
+.tag.top{background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand-ink);border:0}
