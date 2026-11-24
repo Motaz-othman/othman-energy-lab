@@ -4,7 +4,7 @@
 // formEndpoint: where the contact form posts. FormSubmit (formsubmit.co) needs no account: the first message sends a
 // one-time confirmation email to SITE.email; click its link once and later messages are delivered. Empty = open the
 // visitor's email app instead.
-const SITE={name:'Othman Energy Lab', tagline:'Code-based. Beyond the minimum.', email:'Mutaz.othman@outlook.com', formEndpoint:'https://formsubmit.co/ajax/Mutaz.othman@outlook.com',
+const SITE={name:'Othman Energy Lab', tagline:'Choose the right system.', email:'Mutaz.othman@outlook.com', formEndpoint:'https://formsubmit.co/ajax/Mutaz.othman@outlook.com',
   slogan:['Less energy.','Lower cost.','A cleaner planet.']};
 const NAV=[
   {id:'about',l:'About',href:'about/index.html'},
