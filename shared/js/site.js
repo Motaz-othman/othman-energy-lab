@@ -13,7 +13,7 @@ const NAV=[
   {id:'contact',l:'Contact',href:'contact/index.html'},
 ];
 // mark: the Othman Energy Lab logo (shared/img/logo.png, transparent)
-const MARK=r=>`<img class="mark" src="${r}shared/img/logo.png" alt="" width="40" height="40">`;
+const MARK=r=>`<img class="mark" src="${r}shared/img/logo.png?v=2" alt="" width="40" height="40">`;
 (function(){
   const bar=document.querySelector('header.sitebar');
   if(bar){ const r=bar.dataset.root||'';
