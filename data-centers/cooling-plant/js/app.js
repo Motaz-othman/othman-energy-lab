@@ -95,7 +95,7 @@ function renderReco(){
     return `<div class="scard${rw.length?' rec':''}${r.excluded?' off':''}">
       <div class="stop">${status}</div>
       <div class="sname" title="${esc(r.o.name)}">${r.o.short}</div>
-      <div class="kn">${key.map(([l,v,t,u],j)=>{ const hi=!r.excluded&&v(r)<=bestV[j]*(1+1e-6)+1e-9; return `<div class="m-${MK[j]}${hi?' hi':''}"><span class="kl"><i>${ic(MK[j])}</i>${l}${hi?'<b class="best" title="Best value">✓</b>':''}</span><span class="kvr"><span class="kv">${t(r)}</span><span class="ku">${u}</span></span></div>`; }).join('')}</div>
+      <div class="kn">${key.map(([l,v,t,u],j)=>{ const hi=!r.excluded&&v(r)<=bestV[j]*(1+1e-6)+1e-9; return `<div class="m-${MK[j]}${hi?' hi':''}"><span class="kl"><i>${ic(MK[j])}</i>${l}${hi?'<b class="best" title="Best value">Best</b>':''}</span><span class="kvr"><span class="kv">${t(r)}</span><span class="ku">${u}</span></span></div>`; }).join('')}</div>
       <details class="cmore"><summary>More</summary>
         <dl>${more.map(([l,v])=>`<div><dt>${l}</dt><dd>${v}</dd></div>`).join('')}</dl>
         <ul>${notes.map(n=>`<li>${n}</li>`).join('')}</ul>

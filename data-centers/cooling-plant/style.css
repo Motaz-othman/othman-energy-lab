@@ -158,3 +158,4 @@
 .scard .kl{font-size:13.5px;overflow:visible}
 .scard .kvr{flex-wrap:nowrap;justify-content:flex-end}
 .scard .kv,.scard.rec .kv{font-size:21px}
+.scard .kl .best{width:auto;height:auto;border-radius:6px;padding:1px 5px;font-size:9.5px;font-weight:700;letter-spacing:.03em;line-height:1.4;text-transform:uppercase;margin-left:3px}
