@@ -47,12 +47,12 @@
 <div class="incol">
 <div class="colhead"><b>Inputs</b><span>Change any value; results update instantly</span></div>
 <aside class="card" id="inputs">
-  <h2>1. Weather</h2>
+  <h2>1. Site</h2>
   <div class="tabs"><button id="tabCity" class="on">City</button><button id="tabFile">Weather file</button></div>
   <div id="cityPane">
     <label for="city">City</label>
     <select id="city"></select>
-    <div class="note">Built-in cities use measured hourly weather (TMYx 2011–2025, main airport station) and ASHRAE 2025 design conditions, from climate.onebuilding.org. Upload your own EPW or CSV for a specific site.</div>
+    <div class="note">Measured hourly weather and ASHRAE 2025 design conditions for the main airport. Or upload your own weather file.</div>
   </div>
   <div id="filePane" hidden>
     <div class="drop" id="drop">Drop an <b>.epw</b> file (ASHRAE IWEC / TMY) or a CSV here, or click to choose<input type="file" id="file" accept=".epw,.csv,.txt" hidden></div>
@@ -72,37 +72,45 @@
     <div class="note">EPW files for most locations are free at climate.onebuilding.org.</div>
   </div>
 
-  <h2 style="margin-top:18px">2. Data hall cooling load</h2>
-  <div class="row">
-    <div><label for="it">Cooling load (MW)</label><input type="number" id="it" value="20" min="0.1" step="0.5"></div>
-    <div><label for="lf">Frequent load (%)</label><input type="number" id="lf" value="80" min="10" max="100" step="5"></div>
-  </div>
-  <h3>Liquid cooling loop</h3>
-  <div class="row3">
-    <div><label for="lcp">Share (%)</label><input type="number" id="lcp" value="80" min="0" max="100" step="5"></div>
-    <div><label for="lcs">Supply (°C)</label><input type="number" id="lcs" value="30" min="5" max="50" step="1"></div>
-    <div><label for="lcr">Return (°C)</label><input type="number" id="lcr" value="40" min="6" max="65" step="1"></div>
-  </div>
-  <h3>Air cooling loop <span id="airShare" style="text-transform:none;letter-spacing:0;font-weight:400"></span></h3>
-  <div class="row">
-    <div><label for="acs">Supply (°C)</label><input type="number" id="acs" value="20" min="5" max="40" step="1"></div>
-    <div><label for="acr">Return (°C)</label><input type="number" id="acr" value="30" min="6" max="50" step="1"></div>
-  </div>
-
-  <h2 style="margin-top:18px">3. Site</h2>
-  <label for="water">Water availability</label>
+  <label for="water">Water for cooling</label>
   <select id="water">
     <option value="plenty">Available (potable or TSE)</option>
     <option value="limited">Limited</option>
     <option value="none">None (zero-water design)</option>
   </select>
 
-  <h3>Design condition (extreme)</h3>
+  <h2 style="margin-top:20px">2. Data hall</h2>
   <div class="row">
-    <div><label for="dbD">Design dry-bulb (°C)</label><input type="number" id="dbD" step="0.1" placeholder="auto"></div>
-    <div><label for="wbD">Design wet-bulb (°C)</label><input type="number" id="wbD" step="0.1" placeholder="auto"></div>
+    <div><label for="it">Cooling load (MW)</label><input type="number" id="it" value="20" min="0.1" step="0.5"></div>
+    <div><label for="lcp">Liquid-cooled share (%)</label><input type="number" id="lcp" value="80" min="0" max="100" step="5"></div>
   </div>
-  <div class="note">Two coincident design cases. Case A: the extreme dry-bulb with the wet-bulb of the hottest hour. Case B: the extreme wet-bulb with the dry-bulb of the most humid hour. Leave blank to use the ASHRAE extreme annual values (for an uploaded file: its hottest and most humid hours). Enter a stricter value, e.g. the ASHRAE 20-year return period, to replace the extreme.</div>
+  <div class="note">The rest of the load is air-cooled (fan walls or CRAHs). Results update as you type.</div>
+
+  <h2 class="more-h">More settings</h2>
+  <details>
+    <summary>Load and loop temperatures</summary>
+    <label for="lf">Usual operating load (% of design)</label><input type="number" id="lf" value="80" min="10" max="100" step="5">
+    <div class="note">Annual energy, water and cost use this load; peak power always uses 100%.</div>
+    <h3>Liquid cooling loop</h3>
+    <div class="row">
+      <div><label for="lcs">Supply (°C)</label><input type="number" id="lcs" value="30" min="5" max="50" step="1"></div>
+      <div><label for="lcr">Return (°C)</label><input type="number" id="lcr" value="40" min="6" max="65" step="1"></div>
+    </div>
+    <h3>Air cooling loop <span id="airShare" style="text-transform:none;letter-spacing:0;font-weight:400"></span></h3>
+    <div class="row">
+      <div><label for="acs">Supply (°C)</label><input type="number" id="acs" value="20" min="5" max="40" step="1"></div>
+      <div><label for="acr">Return (°C)</label><input type="number" id="acr" value="30" min="6" max="50" step="1"></div>
+    </div>
+  </details>
+  <details>
+    <summary>Design condition (extreme weather)</summary>
+    <div class="row">
+      <div><label for="dbD">Design dry-bulb (°C)</label><input type="number" id="dbD" step="0.1" placeholder="auto"></div>
+      <div><label for="wbD">Design wet-bulb (°C)</label><input type="number" id="wbD" step="0.1" placeholder="auto"></div>
+    </div>
+    <div class="note">Blank = the ASHRAE extreme annual values for the station. Every system is checked at the hottest hour (Case A) and the most humid hour (Case B). Enter a stricter value to replace the extreme.</div>
+  </details>
+
 
 
   <details>

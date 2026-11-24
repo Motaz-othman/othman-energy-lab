@@ -69,32 +69,30 @@ function payback(r){
 function renderReco(){
   const banners=(WX.synthetic?'<div class="banner">Approximate weather generated from monthly normals (station data could not load). Upload an EPW file for design-grade results.</div>':'')
     +(window.Chart?'':'<div class="banner">Charts could not load (no internet connection). Tables and results below are complete.</div>');
-  const st=WX.station;
-  const head=`<div class="sub">For <b>${esc(WX.name)}</b>: ${fmt(P.Qd/1000,1)} MW hall, liquid loop ${P.loops[0].Ts}/${P.loops[0].Tr} °C, air loop ${P.loops[1].Ts}/${P.loops[1].Tr} °C</div>`
-    +(st?`<div class="wxsrc">Weather: ${esc(st.station)} (WMO ${esc(st.wmo)}), measured hourly year TMYx ${esc(st.period)} · ${esc((cityId()&&countyZone(cityId())?`county zone ${countyZone(cityId())[0]} (${countyZone(cityId())[1]}, IECC 2021 / ASHRAE 169) for the 90.4 check; station zone ${st.zone}`:`ASHRAE climate zone ${st.zone}`))} · climate.onebuilding.org</div>`:'');
-  // extreme ambient: the design condition every system is checked against
-  const src=isNaN(P.dbIn)||isNaN(P.wbIn)?(ashrae()?'ASHRAE extreme annual values (2025 Fundamentals)':'hottest hours in the weather data'):'entered design values';
-  const C=P.cases, amb=`<div class="amb"><span class="al">Design cases</span>
-    <span class="av"><i style="background:var(--s1)"></i>Case A: dry-bulb <b>${fmt(C.A.db,1)} °C</b> · wb ${fmt(C.A.wb,1)} °C</span>
-    <span class="av"><i style="background:var(--s2)"></i>Case B: wet-bulb <b>${fmt(C.B.wb,1)} °C</b> · db ${fmt(C.B.db,1)} °C</span>
-    <span class="an">Extremes from ${src}; coincident values from the hourly weather</span></div>`;
-  const top=RANK.length?'':'<div class="sub" style="margin-top:4px"><b>No system meets every constraint.</b> Try allowing water, raising the loop supply temperatures, or checking the design conditions and chiller limits.</div>';
-  // one summary card per system, recommended first
-  const lines=[['Electricity',r=>r.E,r=>`${fmt(r.E/1000,1)} GWh/yr`],['Annual PUE',r=>r.pue,r=>r.pue.toFixed(3)],[`Electrical peak <small>cooling, ${atPk}</small>`,r=>r.peak,r=>`${fmt(r.peak/1000,2)} MW`],['Water',r=>r.W,wTxt],[`Water peak <small>${atPk}</small>`,r=>r.Wpeak,r=>`${fmt(r.Wpeak,1)} m³/h`],['Carbon',r=>r.co2,r=>`${fmt(r.co2)} t CO₂/yr`],['Running cost',r=>r.run,runTxt],['Initial cost',r=>r.capMid,costTxt]];
-  const bestV=lines.map(([,v])=>RANK.length?Math.min(...RANK.map(i=>v(RES[i]))):null);
-  const cards=order().map(id=>{ const r=RES[id], k=RANK.indexOf(id);
-    const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="tag ok">Recommended</span>':`<span class="tag">#${k+1}</span>`;
+  const st=WX.station, C=P.cases, best=RANK.length?RES[RANK[0]]:null, acc=RES.acc;
+  // the answer first, in one sentence; the context in one quiet line
+  const verdict=best?`<div class="verdict-line">Best fit for <b>${esc(WX.name)}</b>: <b class="pick">${best.o.name}</b>.${best.o.id==='acc'?'':` Against air-cooled chillers it saves <b>${fmt(Math.max(0,acc.E-best.E)/1000,1)} GWh</b> of electricity a year and <b>${fmt(Math.max(0,acc.peak-best.peak)/1000,1)} MW</b> of peak power.`}</div>`
+    :'<div class="verdict-line"><b>No system meets every constraint.</b> Try allowing water, raising the loop supply temperatures, or checking the design conditions and chiller limits.</div>';
+  const ctx=`<div class="ctxline">${fmt(P.Qd/1000,1)} MW hall · liquid ${P.loops[0].Ts}/${P.loops[0].Tr} °C · air ${P.loops[1].Ts}/${P.loops[1].Tr} °C · design ${fmt(C.A.db,1)} °C dry-bulb / ${fmt(C.B.wb,1)} °C wet-bulb${st?` · ${esc(st.station)}, TMYx ${esc(st.period)}`:''}</div>`;
+  // one card per system: four numbers that matter, the rest behind "More"
+  const key=[['Electricity',r=>r.E,r=>`${fmt(r.E/1000,1)}`,'GWh/yr'],['Peak power',r=>r.peak,r=>`${fmt(r.peak/1000,1)}`,'MW'],['Water',r=>r.W,r=>r.W<1?'0':fmt(r.W/1000,0),'thousand m³/yr'],['CO₂',r=>r.co2,r=>fmt(r.co2/1000,1),'kt/yr']];
+  const bestV=key.map(([,v])=>RANK.length?Math.min(...RANK.map(i=>v(RES[i]))):null);
+  const cards=order().map(id=>{ const r=RES[id], k=RANK.indexOf(id), d=DES[id];
+    const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="tag ok">Recommended</span>':`<span class="rank">#${k+1}</span>`;
     const notes=[id==='acc'?'No free cooling':`Free cooling ${loopTxt(r.free)} h/yr (liquid / air)`];
-    if(id!=='acc') notes.push(`Saves ${fmt(Math.max(0,RES.acc.E-r.E)/1000,1)} GWh/yr vs air-cooled chillers`);
-    const dw=DES[id]; if(dw.warns.length) notes.push(`<b style="color:var(--warn)">Condenser water above ${P.wcMax} °C at design: needs a chiller rated above ${P.wcMax} °C</b>`); else if(r.hotCW>0) notes.push(`Condenser water above ${P.wcMax} °C for ${fmt(r.hotCW)} h/yr`);
+    if(d.warns.length) notes.push(`<b style="color:var(--warn)">Condenser water above ${P.wcMax} °C at design: needs a chiller rated above ${P.wcMax} °C</b>`); else if(r.hotCW>0) notes.push(`Condenser water above ${P.wcMax} °C for ${fmt(r.hotCW)} h/yr`);
     if(mlcTxt(r)) notes.push(r.mlc<=mlcLim()?mlcTxt(r):`<b style="color:var(--bad)">${mlcTxt(r)}</b>`);
+    const more=[['Annual PUE',r.pue.toFixed(3)],['Water',wTxt(r)],[`Water peak (${atPk})`,`${fmt(r.Wpeak,1)} m³/h`],['Facility peak (grid)',`${fmt(r.facPeak/1000,1)} MW`],['Running cost',runTxt(r)],['Initial cost',costTxt(r)],['Score',r.excluded?'–':`${fmt(r.score)} / 100`]];
     return `<div class="scard${k===0?' rec':''}${r.excluded?' off':''}">
-      <div class="stop">${status}${r.excluded?'':`<span class="note">score ${fmt(r.score)}</span>`}</div>
-      <div class="sname">${r.o.name}</div>
-      <dl>${lines.map(([l,v,t],j)=>`<div class="${!r.excluded&&v(r)<=bestV[j]*(1+1e-6)+1e-9?'hi':''}"><dt>${l}</dt><dd>${t(r)}</dd></div>`).join('')}</dl>
-      <ul>${notes.map(n=>`<li>${n}</li>`).join('')}</ul>
+      <div class="stop">${status}</div>
+      <div class="sname" title="${esc(r.o.name)}">${r.o.short}</div>
+      <div class="kn">${key.map(([l,v,t,u],j)=>`<div class="${!r.excluded&&v(r)<=bestV[j]*(1+1e-6)+1e-9?'hi':''}"><span class="kl">${l}</span><span class="kv">${t(r)}</span><span class="ku">${u}</span></div>`).join('')}</div>
+      <details class="cmore"><summary>More</summary>
+        <dl>${more.map(([l,v])=>`<div><dt>${l}</dt><dd>${v}</dd></div>`).join('')}</dl>
+        <ul>${notes.map(n=>`<li>${n}</li>`).join('')}</ul>
+      </details>
       <button class="link" data-sys="${id}">See system →</button></div>`; });
-  $('reco').innerHTML=`${banners}${head}${amb}${top}<div class="scards">${cards.join('')}</div>`;
+  $('reco').innerHTML=`${banners}${verdict}${ctx}<div class="scards">${cards.join('')}</div><div class="cardnote">Best value in each row highlighted. Full tables, charts and the design-day check are in the tabs below.</div>`;
 }
 
 function renderOverview(){

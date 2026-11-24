@@ -329,21 +329,37 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
 #tOv th:nth-child(2),#tOv td:nth-child(2){text-align:left;white-space:normal;min-width:220px}
 #tOv td:first-child{color:var(--text2)}
 /* system summary cards (top) */
-.scards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:12px}
-.scard{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px}
-.scard.rec{border:2px solid var(--brand);padding:11px}
-.scard.off{opacity:.7}
-.scard .stop{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:20px}
+.scards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:14px}
+@media (max-width:1100px){.scards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.scards{grid-template-columns:1fr}}
+.scard{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;transition:box-shadow .15s,border-color .15s}
+.scard:hover{box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.scard.rec{border:2px solid var(--brand);padding:15px;background:color-mix(in srgb,var(--brand) 5%,var(--surface));grid-row:span 1}
+.scard.off{opacity:.6}
+.scard .stop{display:flex;align-items:center;gap:6px;min-height:22px}
 .scard .stop .tag{margin-left:0}
-.scard .stop .note{margin:0}
-.scard .sname{font-weight:650;font-size:15px;line-height:1.3;min-height:2.6em}
-.scard dl{margin:0;display:grid;gap:2px}
-.scard dl div{display:flex;justify-content:space-between;gap:8px;padding:4px 6px;border-radius:4px}
+.scard .rank{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.04em}
+.scard .sname{font-weight:700;font-size:16px;line-height:1.3;color:var(--text)}
+.scard.rec .sname{font-size:18px}
+.scard .kn{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.scard .kn>div{padding:10px 10px 8px;border-radius:10px;background:var(--bg);display:flex;flex-direction:column;gap:1px}
+.scard .kn>div.hi{background:color-mix(in srgb,var(--brand) 12%,var(--surface))}
+.scard .kl{font-size:12px;color:var(--text2)}
+.scard .kv{font-size:22px;font-weight:750;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--text);line-height:1.15}
+.scard.rec .kv{font-size:26px;color:var(--brand-ink)}
+.scard .ku{font-size:11.5px;color:var(--muted)}
+.scard .cmore summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--brand-ink);margin:0}
+.scard .cmore dl{margin:8px 0 0;display:grid;gap:2px}
+.scard .cmore dl div{display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);align-items:baseline}
 .scard dt{color:var(--text2);font-size:12.5px}
-.scard dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
-.scard dl div.hi{background:color-mix(in srgb,var(--brand) 13%,transparent)}
-.scard ul{margin:0 0 0 16px;padding:0;font-size:12.5px;color:var(--text2)}
-.scard .link{margin-top:auto;align-self:flex-start;padding:5px 10px;font-size:13px}
+.scard dd{margin:0;font-weight:600;font-size:13px;font-variant-numeric:tabular-nums;text-align:right}
+.scard ul{margin:8px 0 0 16px;padding:0;font-size:12.5px;color:var(--text2)}
+.scard .link{margin-top:auto;align-self:flex-start;padding:6px 12px;font-size:13px}
+.verdict-line{font-size:17px;line-height:1.5;color:var(--text)}
+.verdict-line .pick{color:var(--brand-ink)}
+.ctxline{font-size:12.5px;color:var(--muted);margin-top:4px}
+.cardnote{font-size:12px;color:var(--muted);margin-top:10px}
+#inputs .more-h{margin-top:22px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--text2)}
 /* extreme ambient (design condition) strip under the project line */
 .amb{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin-top:10px;padding:10px 14px;border-radius:8px;background:color-mix(in srgb,var(--warn) 10%,var(--bg));border:1px solid color-mix(in srgb,var(--warn) 35%,var(--border))}
 .amb .al{font-size:12px;font-weight:650;letter-spacing:.05em;text-transform:uppercase;color:var(--text2)}
@@ -388,12 +404,12 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
 <div class="incol">
 <div class="colhead"><b>Inputs</b><span>Change any value; results update instantly</span></div>
 <aside class="card" id="inputs">
-  <h2>1. Weather</h2>
+  <h2>1. Site</h2>
   <div class="tabs"><button id="tabCity" class="on">City</button><button id="tabFile">Weather file</button></div>
   <div id="cityPane">
     <label for="city">City</label>
     <select id="city"></select>
-    <div class="note">Built-in cities use measured hourly weather (TMYx 2011–2025, main airport station) and ASHRAE 2025 design conditions, from climate.onebuilding.org. Upload your own EPW or CSV for a specific site.</div>
+    <div class="note">Measured hourly weather and ASHRAE 2025 design conditions for the main airport. Or upload your own weather file.</div>
   </div>
   <div id="filePane" hidden>
     <div class="drop" id="drop">Drop an <b>.epw</b> file (ASHRAE IWEC / TMY) or a CSV here, or click to choose<input type="file" id="file" accept=".epw,.csv,.txt" hidden></div>
@@ -413,37 +429,45 @@ a.tcard:hover .thumb .tk .lvl{transform:scaleY(1.6)}
     <div class="note">EPW files for most locations are free at climate.onebuilding.org.</div>
   </div>
 
-  <h2 style="margin-top:18px">2. Data hall cooling load</h2>
-  <div class="row">
-    <div><label for="it">Cooling load (MW)</label><input type="number" id="it" value="20" min="0.1" step="0.5"></div>
-    <div><label for="lf">Frequent load (%)</label><input type="number" id="lf" value="80" min="10" max="100" step="5"></div>
-  </div>
-  <h3>Liquid cooling loop</h3>
-  <div class="row3">
-    <div><label for="lcp">Share (%)</label><input type="number" id="lcp" value="80" min="0" max="100" step="5"></div>
-    <div><label for="lcs">Supply (°C)</label><input type="number" id="lcs" value="30" min="5" max="50" step="1"></div>
-    <div><label for="lcr">Return (°C)</label><input type="number" id="lcr" value="40" min="6" max="65" step="1"></div>
-  </div>
-  <h3>Air cooling loop <span id="airShare" style="text-transform:none;letter-spacing:0;font-weight:400"></span></h3>
-  <div class="row">
-    <div><label for="acs">Supply (°C)</label><input type="number" id="acs" value="20" min="5" max="40" step="1"></div>
-    <div><label for="acr">Return (°C)</label><input type="number" id="acr" value="30" min="6" max="50" step="1"></div>
-  </div>
-
-  <h2 style="margin-top:18px">3. Site</h2>
-  <label for="water">Water availability</label>
+  <label for="water">Water for cooling</label>
   <select id="water">
     <option value="plenty">Available (potable or TSE)</option>
     <option value="limited">Limited</option>
     <option value="none">None (zero-water design)</option>
   </select>
 
-  <h3>Design condition (extreme)</h3>
+  <h2 style="margin-top:20px">2. Data hall</h2>
   <div class="row">
-    <div><label for="dbD">Design dry-bulb (°C)</label><input type="number" id="dbD" step="0.1" placeholder="auto"></div>
-    <div><label for="wbD">Design wet-bulb (°C)</label><input type="number" id="wbD" step="0.1" placeholder="auto"></div>
+    <div><label for="it">Cooling load (MW)</label><input type="number" id="it" value="20" min="0.1" step="0.5"></div>
+    <div><label for="lcp">Liquid-cooled share (%)</label><input type="number" id="lcp" value="80" min="0" max="100" step="5"></div>
   </div>
-  <div class="note">Two coincident design cases. Case A: the extreme dry-bulb with the wet-bulb of the hottest hour. Case B: the extreme wet-bulb with the dry-bulb of the most humid hour. Leave blank to use the ASHRAE extreme annual values (for an uploaded file: its hottest and most humid hours). Enter a stricter value, e.g. the ASHRAE 20-year return period, to replace the extreme.</div>
+  <div class="note">The rest of the load is air-cooled (fan walls or CRAHs). Results update as you type.</div>
+
+  <h2 class="more-h">More settings</h2>
+  <details>
+    <summary>Load and loop temperatures</summary>
+    <label for="lf">Usual operating load (% of design)</label><input type="number" id="lf" value="80" min="10" max="100" step="5">
+    <div class="note">Annual energy, water and cost use this load; peak power always uses 100%.</div>
+    <h3>Liquid cooling loop</h3>
+    <div class="row">
+      <div><label for="lcs">Supply (°C)</label><input type="number" id="lcs" value="30" min="5" max="50" step="1"></div>
+      <div><label for="lcr">Return (°C)</label><input type="number" id="lcr" value="40" min="6" max="65" step="1"></div>
+    </div>
+    <h3>Air cooling loop <span id="airShare" style="text-transform:none;letter-spacing:0;font-weight:400"></span></h3>
+    <div class="row">
+      <div><label for="acs">Supply (°C)</label><input type="number" id="acs" value="20" min="5" max="40" step="1"></div>
+      <div><label for="acr">Return (°C)</label><input type="number" id="acr" value="30" min="6" max="50" step="1"></div>
+    </div>
+  </details>
+  <details>
+    <summary>Design condition (extreme weather)</summary>
+    <div class="row">
+      <div><label for="dbD">Design dry-bulb (°C)</label><input type="number" id="dbD" step="0.1" placeholder="auto"></div>
+      <div><label for="wbD">Design wet-bulb (°C)</label><input type="number" id="wbD" step="0.1" placeholder="auto"></div>
+    </div>
+    <div class="note">Blank = the ASHRAE extreme annual values for the station. Every system is checked at the hottest hour (Case A) and the most humid hour (Case B). Enter a stricter value to replace the extreme.</div>
+  </details>
+
 
 
   <details>
@@ -1373,32 +1397,30 @@ function payback(r){
 function renderReco(){
   const banners=(WX.synthetic?'<div class="banner">Approximate weather generated from monthly normals (station data could not load). Upload an EPW file for design-grade results.</div>':'')
     +(window.Chart?'':'<div class="banner">Charts could not load (no internet connection). Tables and results below are complete.</div>');
-  const st=WX.station;
-  const head=`<div class="sub">For <b>${esc(WX.name)}</b>: ${fmt(P.Qd/1000,1)} MW hall, liquid loop ${P.loops[0].Ts}/${P.loops[0].Tr} °C, air loop ${P.loops[1].Ts}/${P.loops[1].Tr} °C</div>`
-    +(st?`<div class="wxsrc">Weather: ${esc(st.station)} (WMO ${esc(st.wmo)}), measured hourly year TMYx ${esc(st.period)} · ${esc((cityId()&&countyZone(cityId())?`county zone ${countyZone(cityId())[0]} (${countyZone(cityId())[1]}, IECC 2021 / ASHRAE 169) for the 90.4 check; station zone ${st.zone}`:`ASHRAE climate zone ${st.zone}`))} · climate.onebuilding.org</div>`:'');
-  // extreme ambient: the design condition every system is checked against
-  const src=isNaN(P.dbIn)||isNaN(P.wbIn)?(ashrae()?'ASHRAE extreme annual values (2025 Fundamentals)':'hottest hours in the weather data'):'entered design values';
-  const C=P.cases, amb=`<div class="amb"><span class="al">Design cases</span>
-    <span class="av"><i style="background:var(--s1)"></i>Case A: dry-bulb <b>${fmt(C.A.db,1)} °C</b> · wb ${fmt(C.A.wb,1)} °C</span>
-    <span class="av"><i style="background:var(--s2)"></i>Case B: wet-bulb <b>${fmt(C.B.wb,1)} °C</b> · db ${fmt(C.B.db,1)} °C</span>
-    <span class="an">Extremes from ${src}; coincident values from the hourly weather</span></div>`;
-  const top=RANK.length?'':'<div class="sub" style="margin-top:4px"><b>No system meets every constraint.</b> Try allowing water, raising the loop supply temperatures, or checking the design conditions and chiller limits.</div>';
-  // one summary card per system, recommended first
-  const lines=[['Electricity',r=>r.E,r=>`${fmt(r.E/1000,1)} GWh/yr`],['Annual PUE',r=>r.pue,r=>r.pue.toFixed(3)],[`Electrical peak <small>cooling, ${atPk}</small>`,r=>r.peak,r=>`${fmt(r.peak/1000,2)} MW`],['Water',r=>r.W,wTxt],[`Water peak <small>${atPk}</small>`,r=>r.Wpeak,r=>`${fmt(r.Wpeak,1)} m³/h`],['Carbon',r=>r.co2,r=>`${fmt(r.co2)} t CO₂/yr`],['Running cost',r=>r.run,runTxt],['Initial cost',r=>r.capMid,costTxt]];
-  const bestV=lines.map(([,v])=>RANK.length?Math.min(...RANK.map(i=>v(RES[i]))):null);
-  const cards=order().map(id=>{ const r=RES[id], k=RANK.indexOf(id);
-    const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="tag ok">Recommended</span>':`<span class="tag">#${k+1}</span>`;
+  const st=WX.station, C=P.cases, best=RANK.length?RES[RANK[0]]:null, acc=RES.acc;
+  // the answer first, in one sentence; the context in one quiet line
+  const verdict=best?`<div class="verdict-line">Best fit for <b>${esc(WX.name)}</b>: <b class="pick">${best.o.name}</b>.${best.o.id==='acc'?'':` Against air-cooled chillers it saves <b>${fmt(Math.max(0,acc.E-best.E)/1000,1)} GWh</b> of electricity a year and <b>${fmt(Math.max(0,acc.peak-best.peak)/1000,1)} MW</b> of peak power.`}</div>`
+    :'<div class="verdict-line"><b>No system meets every constraint.</b> Try allowing water, raising the loop supply temperatures, or checking the design conditions and chiller limits.</div>';
+  const ctx=`<div class="ctxline">${fmt(P.Qd/1000,1)} MW hall · liquid ${P.loops[0].Ts}/${P.loops[0].Tr} °C · air ${P.loops[1].Ts}/${P.loops[1].Tr} °C · design ${fmt(C.A.db,1)} °C dry-bulb / ${fmt(C.B.wb,1)} °C wet-bulb${st?` · ${esc(st.station)}, TMYx ${esc(st.period)}`:''}</div>`;
+  // one card per system: four numbers that matter, the rest behind "More"
+  const key=[['Electricity',r=>r.E,r=>`${fmt(r.E/1000,1)}`,'GWh/yr'],['Peak power',r=>r.peak,r=>`${fmt(r.peak/1000,1)}`,'MW'],['Water',r=>r.W,r=>r.W<1?'0':fmt(r.W/1000,0),'thousand m³/yr'],['CO₂',r=>r.co2,r=>fmt(r.co2/1000,1),'kt/yr']];
+  const bestV=key.map(([,v])=>RANK.length?Math.min(...RANK.map(i=>v(RES[i]))):null);
+  const cards=order().map(id=>{ const r=RES[id], k=RANK.indexOf(id), d=DES[id];
+    const status=r.excluded?`<span class="tag x">${r.excluded}</span>`:k===0?'<span class="tag ok">Recommended</span>':`<span class="rank">#${k+1}</span>`;
     const notes=[id==='acc'?'No free cooling':`Free cooling ${loopTxt(r.free)} h/yr (liquid / air)`];
-    if(id!=='acc') notes.push(`Saves ${fmt(Math.max(0,RES.acc.E-r.E)/1000,1)} GWh/yr vs air-cooled chillers`);
-    const dw=DES[id]; if(dw.warns.length) notes.push(`<b style="color:var(--warn)">Condenser water above ${P.wcMax} °C at design: needs a chiller rated above ${P.wcMax} °C</b>`); else if(r.hotCW>0) notes.push(`Condenser water above ${P.wcMax} °C for ${fmt(r.hotCW)} h/yr`);
+    if(d.warns.length) notes.push(`<b style="color:var(--warn)">Condenser water above ${P.wcMax} °C at design: needs a chiller rated above ${P.wcMax} °C</b>`); else if(r.hotCW>0) notes.push(`Condenser water above ${P.wcMax} °C for ${fmt(r.hotCW)} h/yr`);
     if(mlcTxt(r)) notes.push(r.mlc<=mlcLim()?mlcTxt(r):`<b style="color:var(--bad)">${mlcTxt(r)}</b>`);
+    const more=[['Annual PUE',r.pue.toFixed(3)],['Water',wTxt(r)],[`Water peak (${atPk})`,`${fmt(r.Wpeak,1)} m³/h`],['Facility peak (grid)',`${fmt(r.facPeak/1000,1)} MW`],['Running cost',runTxt(r)],['Initial cost',costTxt(r)],['Score',r.excluded?'–':`${fmt(r.score)} / 100`]];
     return `<div class="scard${k===0?' rec':''}${r.excluded?' off':''}">
-      <div class="stop">${status}${r.excluded?'':`<span class="note">score ${fmt(r.score)}</span>`}</div>
-      <div class="sname">${r.o.name}</div>
-      <dl>${lines.map(([l,v,t],j)=>`<div class="${!r.excluded&&v(r)<=bestV[j]*(1+1e-6)+1e-9?'hi':''}"><dt>${l}</dt><dd>${t(r)}</dd></div>`).join('')}</dl>
-      <ul>${notes.map(n=>`<li>${n}</li>`).join('')}</ul>
+      <div class="stop">${status}</div>
+      <div class="sname" title="${esc(r.o.name)}">${r.o.short}</div>
+      <div class="kn">${key.map(([l,v,t,u],j)=>`<div class="${!r.excluded&&v(r)<=bestV[j]*(1+1e-6)+1e-9?'hi':''}"><span class="kl">${l}</span><span class="kv">${t(r)}</span><span class="ku">${u}</span></div>`).join('')}</div>
+      <details class="cmore"><summary>More</summary>
+        <dl>${more.map(([l,v])=>`<div><dt>${l}</dt><dd>${v}</dd></div>`).join('')}</dl>
+        <ul>${notes.map(n=>`<li>${n}</li>`).join('')}</ul>
+      </details>
       <button class="link" data-sys="${id}">See system →</button></div>`; });
-  $('reco').innerHTML=`${banners}${head}${amb}${top}<div class="scards">${cards.join('')}</div>`;
+  $('reco').innerHTML=`${banners}${verdict}${ctx}<div class="scards">${cards.join('')}</div><div class="cardnote">Best value in each row highlighted. Full tables, charts and the design-day check are in the tabs below.</div>`;
 }
 
 function renderOverview(){
