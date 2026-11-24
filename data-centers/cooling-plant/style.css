@@ -142,3 +142,12 @@
 .wrec>span{display:flex;flex-direction:column;line-height:1.2;font-size:13.5px;font-weight:700;color:var(--text)}
 .wrec small{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--wc) 80%,var(--text))}
 .scard .stop{gap:6px;min-height:0}
+/* metric rows: label line, then value + unit on one line; no boxes */
+.scard .kn{gap:14px 16px;padding:12px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.scard .kn>div,.scard .kn>div.hi{background:none;border:0;padding:0;gap:4px}
+.scard .kl{padding:0;font-size:12.5px}
+.scard .kvr{display:flex;align-items:baseline;gap:5px;flex-wrap:wrap}
+.scard .kv,.scard.rec .kv{font-size:24px}
+.scard .ku{font-size:12px}
+.scard .kn>div.hi .kv{color:var(--m)}
+.scard .kl .best{position:static;width:16px;height:16px;font-size:10px;margin-left:2px}
