@@ -297,6 +297,13 @@ h2.ih .ic{color:var(--brand-ink)}
 .toolfoot{max-width:var(--maxw);margin:24px auto 0;padding:0 28px;font-size:13px;color:var(--text2)}
 .toolfoot a{color:var(--brand-ink);font-weight:600}
 @media (max-width:900px){.toolfoot{padding:0 16px}}
+/* top menu in the brand style: same weight and spacing as the name, berry for the current page */
+.sitebar .topnav{font-size:15px;gap:4px}
+.sitebar .topnav a{color:var(--text);font-weight:600;letter-spacing:-.01em;padding:8px 12px;border-radius:999px;position:relative}
+.sitebar .topnav a:hover{background:color-mix(in srgb,var(--brand) 8%,transparent);color:var(--brand-ink)}
+.sitebar .topnav a[aria-current]{background:color-mix(in srgb,var(--brand) 12%,transparent);color:var(--brand-ink);font-weight:650}
+@media (max-width:560px){.sitebar .topnav{font-size:13.5px;gap:0}.sitebar .topnav a{padding:6px 8px}}
+@media (max-width:430px){.sitebar .topnav{font-size:12.5px}.sitebar .topnav a{padding:6px 5px}}
 </style>
 <style>
 /* Result pages (Ride-Through Tank, Peak Shaving Tank, Liquid Rack Cooling): shared result styles (load after base.css) */
