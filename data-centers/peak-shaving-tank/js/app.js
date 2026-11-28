@@ -24,7 +24,7 @@ $('gFile').onchange=e=>{ const f=e.target.files[0]; if(!f) return; const rd=new 
 // ---------- study ----------
 function inputs(){
   const lim=(v,a,b)=>Math.min(b,Math.max(a,v));   // typed values are not held to the min / max of the fields
-  return {Q:Math.max(0.1,num('gQ',20))*1000,night:lim(num('gNight',80),10,100)/100,sys:$('gSys').value,Ts:num('gTs',30),Tr:Math.max(num('gTr',40),num('gTs',30)+1),
+  return {Q:Math.max(0.1,num('gQ',20))*1000,night:lim(num('gNight',80),10,100)/100,day0:lim(Math.round(num('gDay0',7)),0,23),night0:lim(Math.round(num('gNight0',19)),0,23),sys:$('gSys').value,Ts:num('gTs',30),Tr:Math.max(num('gTr',40),num('gTs',30)+1),
     reserve:lim(num('gReserve',20),0,80)/100,margin:Math.max(0,num('gMar',20))/100,days:lim(Math.round(num('gDays',3)),1,7),rechMax:lim(num('gRechMax',4),1,12),
     eff:lim(num('gEff',85),50,100)/100,Hmax:Math.max(3,num('gH',15)),safety:Math.max(0,num('gSafe',0))};
 }
@@ -49,8 +49,9 @@ function render(){
     : `Recommended: <b>${fmt(rec,1)} °C</b> · <a href="#" id="gTdReset">use it</a>`;
   if($('gTdReset')) $('gTdReset').onclick=e=>{ e.preventDefault(); userTd=null; render(); };
   $('gStatus').textContent='';
+  const hh=h=>String(h).padStart(2,'0')+':00', nh=nightHours(I), win=`${hh(I.night0)}–${hh(I.day0)}`;
   const chCut=Math.max(0,c.cap0-c.capT), night=`${fmt(I.night*100)}% IT load`, lim=`${fmt(I.rechMax,1)} h`;
-  const rech=isFinite(c.rechH)?{v:`${fmt(c.rechH)} <small>h</small>`,l:`to recharge at ${night} over the 12-hour night`}:{v:'No',l:`full recharge before morning at ${night}`};
+  const rech=isFinite(c.rechH)?{v:`${fmt(c.rechH)} <small>h</small>`,l:`to recharge at ${night} over the ${nh}-hour night (${win})`}:{v:'No',l:`full recharge before morning at ${night}`};
   const save=`Chiller capacity −${MW(chCut)} MW.`;
   // the reserve kept full (net of the sizing margin) also covers a power changeover at full load
   const rideMin=c.V*I.reserve*RHO_CP*(I.Tr-I.Ts)*I.eff/3600/I.Q*60;

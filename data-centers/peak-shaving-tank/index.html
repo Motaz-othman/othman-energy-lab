@@ -54,8 +54,12 @@
   </div>
   <h2 class="ih" style="margin-top:22px"><span class="n">2</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="7" rx="2"/><rect x="2" y="14" width="20" height="7" rx="2"/><path d="M6 6.5h.01M6 17.5h.01"/></svg>Load and plant</h2>
   <label for="gQ">Cooling load / chiller capacity at full IT (MW)</label><input type="number" id="gQ" value="20" min="0.1" step="1">
-  <label for="gNight">Average IT load over the 12-hour night (%)</label><input type="number" id="gNight" value="80" min="10" max="100" step="5">
-  <div class="note">The tank recharges 19:00–07:00.</div>
+  <label for="gNight">Average IT load at night (%)</label><input type="number" id="gNight" value="80" min="10" max="100" step="5">
+  <div class="row">
+    <div><label for="gNight0">Night starts (hour)</label><input type="number" id="gNight0" value="19" min="0" max="23" step="1"></div>
+    <div><label for="gDay0">Day starts (hour)</label><input type="number" id="gDay0" value="7" min="0" max="23" step="1"></div>
+  </div>
+  <div class="note">Full IT load by day; the tank recharges at night.</div>
   <label for="gSys">Cooling system</label><select id="gSys"></select>
   <div class="note">Air-cooled systems only.</div>
   <div class="row">

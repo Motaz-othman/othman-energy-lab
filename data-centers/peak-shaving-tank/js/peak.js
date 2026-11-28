@@ -1,8 +1,13 @@
 // ---------- Peak Shaving Tank: sizing model ----------
 // Uses the shared hourly plant model (shared/js/cooling-model.js: OPTIONS, hourModel), shared/js/tank.js and the station weather.
-// same basis as the Cooling Plant Selector (shared BASIS); capacity is continuous here (4 equal duty chillers), derated by capFactor; limits relaxed
+// same basis as the Cooling Plant Selector (shared BASIS): chillers sized as whole units of the same unit sizes, derated by capFactor; limits relaxed
 const TES_P={...BASIS,unitWL:null,unitWA:null,unitA:null,nCh:4,acMax:60,wcMax:50};
-const DAY0=7, NIGHT0=19;   // full IT load 07:00–19:00; the 12-hour night 19:00–07:00 runs at the night IT load
+// loop: 25 °C supply and above is the liquid loop (CDU pumps counted), below it the air loop (fan walls counted), as in the Cooling Plant Selector
+// day and night hours are inputs (i.day0, i.night0; default 07:00 and 19:00): full IT load by day, the night IT load at night
+const isDay=(i,t)=>i.day0<i.night0?(t>=i.day0&&t<i.night0):(t>=i.day0||t<i.night0);
+const nightHours=i=>(24-i.night0+i.day0+24)%24||24;
+// chiller unit size (rated kW), as in the Cooling Plant Selector: air-cooled unitA; water-cooled unitWL (liquid loop) or unitWA (air loop, supply below 25 °C)
+const unitFor=(hm,L)=>hm.kind==='ac'?BASIS.unitA:(L.Ts>=25?BASIS.unitWL:BASIS.unitWA);
 
 // chiller capacity factor vs its rating point: air-cooled falls with ambient dry-bulb (rated at 35 °C),
 // water-cooled with entering condenser water (rated at 30 °C, AHRI 551/591); k = fraction lost per K
@@ -10,12 +15,12 @@ function capFactor(hm,db,k){ return Math.max(0.3, hm.kind==='wc' ? 1-k.w*(hm.ecw
 
 // one hour of the plant: chiller capacity available, and the electrical power for a cooling load
 function plantAt(o,L,db,wb,capRated,k){
-  const hm0=hourModel(o,{...L,Qd:1},db,wb,TES_P), cap=capRated*capFactor(hm0,db,k);
-  const hm=hourModel(o,{...L,Qd:cap},db,wb,TES_P);
+  const hm0=hourModel(o,{...L,Qd:1},db,wb,TES_P), cap=capRated*capFactor(hm0,db,k), n=Math.max(1,Math.round(capRated/unitFor(hm0,L)));
+  const hm=hourModel(o,{...L,Qd:cap},db,wb,{...TES_P,nCh:n});
   return {hm,cap,ff:hm.ff,power:q=>hm.calc(Math.max(0,q)).P};
 }
 // rated chiller capacity needed to carry the full load q at design condition (db, wb)
-function capRatedFor(o,L,q,db,wb,k){ const hm=hourModel(o,{...L,Qd:1},db,wb,TES_P); return q*(1-hm.ff)/capFactor(hm,db,k); }
+function capRatedFor(o,L,q,db,wb,k){ const hm=hourModel(o,{...L,Qd:1},db,wb,TES_P), u=unitFor(hm,L); return Math.max(1,Math.ceil(q*(1-hm.ff)/capFactor(hm,db,k)/u-1e-9))*u; }
 
 // hottest-day profile from the ASHRAE extremes and the site's typical hot-day range; 15:00 peak, 05:00 low
 function hotDay(A,DR){
@@ -57,22 +62,22 @@ function runPlant(o,L,hours,capRated,k,Etank,loadAt,pCap){
 }
 
 // size the tank for one design temperature Td: a heatwave of N hottest days, full IT load by day,
-// the night IT load for the 12-hour night; the tank must be full again before the next morning
+// the night IT load over the night hours; the tank must be full again before the next morning
 function studyCase(o,L,i,base,DR,Td,k,yr){
   const TdWb=base.extDB>base.db04 ? base.extWB-(base.extDB-Td)*(base.extWB-base.wb04)/(base.extDB-base.db04) : base.extWB;
   const cap0=capRatedFor(o,L,i.Q,base.extDB,base.extWB,k);           // plant sized for the extreme (no tank)
   const capT=capRatedFor(o,L,i.Q,Td,Math.min(TdWb,Td),k);              // plant sized for the design temperature
   const pCap=plantAt(o,L,Td,Math.min(TdWb,Td),capT,k).power(i.Q);       // electrical limit = full load at the design temperature
-  const day=hotDay(base,DR), hw=[]; for(let d=0;d<i.days;d++) hw.push(...day); hw.push(...day.slice(0,DAY0));   // + the last night
-  const load=h=>{ const t=h%24; return t>=DAY0&&t<NIGHT0?i.Q:i.Q*i.night; };
+  const day=hotDay(base,DR), hw=[]; for(let d=0;d<i.days;d++) hw.push(...day); hw.push(...day.slice(0,i.day0));   // + the last night
+  const load=h=>isDay(i,h%24)?i.Q:i.Q*i.night;
   const E=runPlant(o,L,hw,capT,k,1e12,load,pCap).drawMax;              // energy the tank must hold
   const r=runPlant(o,L,hw,capT,k,E,load,pCap);
-  // recharge: hours from the end of each afternoon's discharge until the tank is full again (must be before 07:00)
+  // recharge: hours from the end of each afternoon's discharge until the tank is full again (must be before the morning)
   let rechH=0, ok=true;
   for(let d=0;d<i.days;d++){
     const lastDis=r.prof.slice(d*24,(d+1)*24).reduce((m,x,j)=>x.dis>1e-6?d*24+j:m,-1); if(lastDis<0) continue;
     let full=-1; for(let h=lastDis+1;h<r.prof.length;h++){ if(r.prof[h].soc>=E-1e-3){full=h;break;} }
-    if(full<0||full>d*24+24+DAY0){ ok=false; rechH=Infinity; } else rechH=Math.max(rechH,full-lastDis);
+    if(full<0||full>d*24+24+i.day0){ ok=false; rechH=Infinity; } else rechH=Math.max(rechH,full-lastDis);
   }
   const safe=ok&&rechH<=i.rechMax;                                     // recharges within the safe time
   const V=E>0?tankVolume(E,i.Tr-i.Ts,i.eff)*(1+i.margin)/(1-i.reserve):0;
@@ -87,8 +92,8 @@ function studyCase(o,L,i,base,DR,Td,k,yr){
 // typical-year check: the whole measured year at the same day / night load, with the usable tank and the new power limit.
 // The tank covers the year when its deepest draw stays within the usable storage (the reserve is never used).
 function yearCheck(st,i,wx,k,c){
-  const o=st.sys, L={name:'CHW',Ts:i.Ts,Tr:i.Tr}, yr=wx.T.map((t,h)=>({db:t,wb:wx.Twb[h]}));
-  const load=h=>{ const t=h%24; return t>=DAY0&&t<NIGHT0?i.Q:i.Q*i.night; };
+  const o=st.sys, L={name:i.Ts>=25?'LC':'Air',Ts:i.Ts,Tr:i.Tr}, yr=wx.T.map((t,h)=>({db:t,wb:wx.Twb[h]}));
+  const load=h=>isDay(i,h%24)?i.Q:i.Q*i.night;
   const r=runPlant(o,L,yr,c.capT,k,c.E,load,c.Prated);
   const hours=r.prof.filter(x=>x.dis>1e-6).length, draw=c.E-Math.min(...r.prof.map(x=>x.soc));
   return {hours,draw,share:c.E>0?draw/c.E:0,ok:draw<=c.E*1.001};
@@ -98,7 +103,7 @@ function yearCheck(st,i,wx,k,c){
 // the lowest design temperature whose tank recharges within the safe time (default 4 h),
 // plus an optional extra margin (default 0 K)
 function peakStudy(i,wx,k){
-  const o=OPTIONS.find(x=>x.id===i.sys), L={name:'CHW',Ts:i.Ts,Tr:i.Tr}, base=designBasis(wx), DR=hotDayRange(wx);
+  const o=OPTIONS.find(x=>x.id===i.sys), L={name:i.Ts>=25?'LC':'Air',Ts:i.Ts,Tr:i.Tr}, base=designBasis(wx), DR=hotDayRange(wx);
   const lo=Math.max(base.db04-3,base.extDB-8), cases=[], yr=wx.T.map((t,h)=>({db:t,wb:wx.Twb[h]}));
   for(let Td=Math.round((base.extDB-0.5)*2)/2; Td>=lo-1e-9; Td-=0.5) cases.push(studyCase(o,L,i,base,DR,Td,k,yr));
   let low=null; for(const c of cases){ if(c.safe&&c.E>0) low=c; else if(low) break; }   // cases run from hot to cool

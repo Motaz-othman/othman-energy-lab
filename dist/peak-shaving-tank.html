@@ -384,8 +384,12 @@ tr.rec td{font-weight:700;background:color-mix(in srgb,var(--brand) 10%,transpar
   </div>
   <h2 class="ih" style="margin-top:22px"><span class="n">2</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="7" rx="2"/><rect x="2" y="14" width="20" height="7" rx="2"/><path d="M6 6.5h.01M6 17.5h.01"/></svg>Load and plant</h2>
   <label for="gQ">Cooling load / chiller capacity at full IT (MW)</label><input type="number" id="gQ" value="20" min="0.1" step="1">
-  <label for="gNight">Average IT load over the 12-hour night (%)</label><input type="number" id="gNight" value="80" min="10" max="100" step="5">
-  <div class="note">The tank recharges 19:00–07:00.</div>
+  <label for="gNight">Average IT load at night (%)</label><input type="number" id="gNight" value="80" min="10" max="100" step="5">
+  <div class="row">
+    <div><label for="gNight0">Night starts (hour)</label><input type="number" id="gNight0" value="19" min="0" max="23" step="1"></div>
+    <div><label for="gDay0">Day starts (hour)</label><input type="number" id="gDay0" value="7" min="0" max="23" step="1"></div>
+  </div>
+  <div class="note">Full IT load by day; the tank recharges at night.</div>
   <label for="gSys">Cooling system</label><select id="gSys"></select>
   <div class="note">Air-cooled systems only.</div>
   <div class="row">
@@ -658,7 +662,7 @@ const REFRIGERANTS={r513a:{name:'R-513A',gwp:631},r134a:{name:'R-134a',gwp:1430}
 const BASIS={
   copA:2.866, copW:6.018, copMax:14,          // ASHRAE 90.1-2025 Table 6.8.1-3, Path B full load; COPmax = assumption (low-lift limit; public manufacturer data are scarce; tested by sensitivity 10 / 14 / 20 / none)
   unitWL:7000, unitWA:5500, unitA:1500, derA:0.0135,   // chiller unit sizes (kW): water-cooled liquid / air loop, air-cooled; air-cooled capacity loss per K above 35 °C (Trane RTAC public data)
-  stage:0.90, acMax:52, wcMax:43,             // next chiller above 90% PLR; air-cooled max ambient; condenser-water warning limit
+  acMax:52, wcMax:43,                         // air-cooled max ambient; condenser-water warning limit (chillers staged for least power each hour)
   acApp:15, wcApp:7,                          // condensing: ambient + 15 K; condenser water + 5 K range (AHRI) + 2 K
   aCT:5.56, aDC:5.56, aAD:9.4, aHX:1.5, rangeCW:5.56,   // ASHRAE 90.1-2025 Table 6.8.1-7 rating approaches; adiabatic: coil approach above the air after the pads
                                               // (rating 95 °F leaving water, 95 / 75 °F air: pad air 78 °F, so 17 °F = 9.4 K); plate HX
@@ -682,6 +686,10 @@ const pumpK=(dpKPa,dT,eta)=>dpKPa/(1000*4.18*Math.max(dT,0.5)*eta);
 const airFanK=(dpKPa,dT,eta)=>dpKPa/(1.2*1.006*Math.max(dT,0.5)*eta);
 // VFD affinity law: power ∝ speed³, speed ∝ flow, held at the minimum speed
 const affinity=(x,minSpeed)=>Math.pow(Math.max(minSpeed,Math.min(x,1.2)),3);
+// pumps: pump + motor + VFD efficiency falls at low speed (assumption from typical motor and drive part-load curves:
+// about 92% of the full-speed efficiency at 50% speed, 80% at 30%); power = affinity ÷ relative efficiency
+const pumpEta=s=>1-0.53*Math.pow(Math.max(0,1-Math.min(s,1)),2.7);
+const pumpAff=(x,minSpeed)=>affinity(x,minSpeed)/pumpEta(Math.max(minSpeed,Math.min(x,1.2)));
 // chiller COP at the hour's lift (constant Carnot fraction) from the rated point; AHRI 551/591: 7 °C chilled water,
 // 35 °C air + 15 K = 50 °C condensing, 30 °C condenser water + 7 K = 37 °C condensing; evaporating = supply − 2 K
 const CH_REF={ac:{Te:5,Tc:50}, wc:{Te:5,Tc:37}};
@@ -735,17 +743,19 @@ function hourModel(o,L,db,wb,p){
   const minT=L.name==='Air'?p.minFan:p.minPump;
   const calc=q=>{
     const x=L.Qd>0?q/L.Qd:0;
-    const Pt=term*L.Qd*affinity(x,minT), Pl=pk*L.Qd*affinity(x,p.minPump);
+    const Pt=term*L.Qd*(L.name==='Air'?affinity(x,minT):pumpAff(x,minT)), Pl=pk*L.Qd*pumpAff(x,p.minPump);
     const qL=q+Pt+Pl, Qch=qL*(1-ff);
     let Pc=0,nOn=0,plr=0;
-    if(Qch>0){ nOn=Math.min(N,Math.max(1,Math.ceil(Qch/(p.stage*capH)-1e-9))); plr=Qch/(nOn*capH); Pc=nOn*capH/cop*partLoad(kind,Math.min(plr,1.2)); }
+    if(Qch>0){ // staging: run the number of chillers that draws the least power this hour (at least enough to carry the load)
+      const nMin=Math.min(N,Math.max(1,Math.ceil(Qch/capH-1e-9)));
+      for(let n=nMin;n<=N;n++){ const x=Qch/(n*capH), P=n*capH/cop*partLoad(kind,Math.min(x,1.2)); if(!nOn||P<Pc){ nOn=n; plr=x; Pc=P; } } }
     const Qr=qL+Pc, QrRef=des?des.Qr:Qr, f=(share,k)=>share>0?k*QrRef*affinity(Math.min(1,Qr*share/QrRef),p.minFan):0;   // fans: full speed at most
     let Pf=0;
     if(o.id==='accfc') Pf=ff>0?p.kDC*qLdes*affinity(Math.min(1,qL*ff/qLdes),p.minFan):0;
     else if(o.id==='adia') Pf=f(1,p.kAD);
     else if(o.id==='wcc') Pf=f(1,p.kCT);
     else if(o.id==='hyb') Pf=f(wet,p.kCT)+f(dShare,p.kDC);
-    const Pcw=kind==='wc'?pumpK(p.dpCW,p.rangeCW,p.etaP)*QrRef*affinity(Math.min(1,Qr/QrRef),p.minPump):0;
+    const Pcw=kind==='wc'?pumpK(p.dpCW,p.rangeCW,p.etaP)*QrRef*pumpAff(Math.min(1,Qr/QrRef),p.minPump):0;
     return {Pc,Pf,Pp:Pl+Pcw,Pt,Qr,qL,Qch,nOn,plr,cop:Qch>0?Qch/Pc:null,P:Pc+Pf+Pl+Pcw+Pt};
   };
   // limits: air-cooled max ambient fails the design; condenser water above the standard range only warns
@@ -901,9 +911,14 @@ function tankSvg(D,H){
 }
 // ---------- Peak Shaving Tank: sizing model ----------
 // Uses the shared hourly plant model (shared/js/cooling-model.js: OPTIONS, hourModel), shared/js/tank.js and the station weather.
-// same basis as the Cooling Plant Selector (shared BASIS); capacity is continuous here (4 equal duty chillers), derated by capFactor; limits relaxed
+// same basis as the Cooling Plant Selector (shared BASIS): chillers sized as whole units of the same unit sizes, derated by capFactor; limits relaxed
 const TES_P={...BASIS,unitWL:null,unitWA:null,unitA:null,nCh:4,acMax:60,wcMax:50};
-const DAY0=7, NIGHT0=19;   // full IT load 07:00–19:00; the 12-hour night 19:00–07:00 runs at the night IT load
+// loop: 25 °C supply and above is the liquid loop (CDU pumps counted), below it the air loop (fan walls counted), as in the Cooling Plant Selector
+// day and night hours are inputs (i.day0, i.night0; default 07:00 and 19:00): full IT load by day, the night IT load at night
+const isDay=(i,t)=>i.day0<i.night0?(t>=i.day0&&t<i.night0):(t>=i.day0||t<i.night0);
+const nightHours=i=>(24-i.night0+i.day0+24)%24||24;
+// chiller unit size (rated kW), as in the Cooling Plant Selector: air-cooled unitA; water-cooled unitWL (liquid loop) or unitWA (air loop, supply below 25 °C)
+const unitFor=(hm,L)=>hm.kind==='ac'?BASIS.unitA:(L.Ts>=25?BASIS.unitWL:BASIS.unitWA);
 
 // chiller capacity factor vs its rating point: air-cooled falls with ambient dry-bulb (rated at 35 °C),
 // water-cooled with entering condenser water (rated at 30 °C, AHRI 551/591); k = fraction lost per K
@@ -911,12 +926,12 @@ function capFactor(hm,db,k){ return Math.max(0.3, hm.kind==='wc' ? 1-k.w*(hm.ecw
 
 // one hour of the plant: chiller capacity available, and the electrical power for a cooling load
 function plantAt(o,L,db,wb,capRated,k){
-  const hm0=hourModel(o,{...L,Qd:1},db,wb,TES_P), cap=capRated*capFactor(hm0,db,k);
-  const hm=hourModel(o,{...L,Qd:cap},db,wb,TES_P);
+  const hm0=hourModel(o,{...L,Qd:1},db,wb,TES_P), cap=capRated*capFactor(hm0,db,k), n=Math.max(1,Math.round(capRated/unitFor(hm0,L)));
+  const hm=hourModel(o,{...L,Qd:cap},db,wb,{...TES_P,nCh:n});
   return {hm,cap,ff:hm.ff,power:q=>hm.calc(Math.max(0,q)).P};
 }
 // rated chiller capacity needed to carry the full load q at design condition (db, wb)
-function capRatedFor(o,L,q,db,wb,k){ const hm=hourModel(o,{...L,Qd:1},db,wb,TES_P); return q*(1-hm.ff)/capFactor(hm,db,k); }
+function capRatedFor(o,L,q,db,wb,k){ const hm=hourModel(o,{...L,Qd:1},db,wb,TES_P), u=unitFor(hm,L); return Math.max(1,Math.ceil(q*(1-hm.ff)/capFactor(hm,db,k)/u-1e-9))*u; }
 
 // hottest-day profile from the ASHRAE extremes and the site's typical hot-day range; 15:00 peak, 05:00 low
 function hotDay(A,DR){
@@ -958,22 +973,22 @@ function runPlant(o,L,hours,capRated,k,Etank,loadAt,pCap){
 }
 
 // size the tank for one design temperature Td: a heatwave of N hottest days, full IT load by day,
-// the night IT load for the 12-hour night; the tank must be full again before the next morning
+// the night IT load over the night hours; the tank must be full again before the next morning
 function studyCase(o,L,i,base,DR,Td,k,yr){
   const TdWb=base.extDB>base.db04 ? base.extWB-(base.extDB-Td)*(base.extWB-base.wb04)/(base.extDB-base.db04) : base.extWB;
   const cap0=capRatedFor(o,L,i.Q,base.extDB,base.extWB,k);           // plant sized for the extreme (no tank)
   const capT=capRatedFor(o,L,i.Q,Td,Math.min(TdWb,Td),k);              // plant sized for the design temperature
   const pCap=plantAt(o,L,Td,Math.min(TdWb,Td),capT,k).power(i.Q);       // electrical limit = full load at the design temperature
-  const day=hotDay(base,DR), hw=[]; for(let d=0;d<i.days;d++) hw.push(...day); hw.push(...day.slice(0,DAY0));   // + the last night
-  const load=h=>{ const t=h%24; return t>=DAY0&&t<NIGHT0?i.Q:i.Q*i.night; };
+  const day=hotDay(base,DR), hw=[]; for(let d=0;d<i.days;d++) hw.push(...day); hw.push(...day.slice(0,i.day0));   // + the last night
+  const load=h=>isDay(i,h%24)?i.Q:i.Q*i.night;
   const E=runPlant(o,L,hw,capT,k,1e12,load,pCap).drawMax;              // energy the tank must hold
   const r=runPlant(o,L,hw,capT,k,E,load,pCap);
-  // recharge: hours from the end of each afternoon's discharge until the tank is full again (must be before 07:00)
+  // recharge: hours from the end of each afternoon's discharge until the tank is full again (must be before the morning)
   let rechH=0, ok=true;
   for(let d=0;d<i.days;d++){
     const lastDis=r.prof.slice(d*24,(d+1)*24).reduce((m,x,j)=>x.dis>1e-6?d*24+j:m,-1); if(lastDis<0) continue;
     let full=-1; for(let h=lastDis+1;h<r.prof.length;h++){ if(r.prof[h].soc>=E-1e-3){full=h;break;} }
-    if(full<0||full>d*24+24+DAY0){ ok=false; rechH=Infinity; } else rechH=Math.max(rechH,full-lastDis);
+    if(full<0||full>d*24+24+i.day0){ ok=false; rechH=Infinity; } else rechH=Math.max(rechH,full-lastDis);
   }
   const safe=ok&&rechH<=i.rechMax;                                     // recharges within the safe time
   const V=E>0?tankVolume(E,i.Tr-i.Ts,i.eff)*(1+i.margin)/(1-i.reserve):0;
@@ -988,8 +1003,8 @@ function studyCase(o,L,i,base,DR,Td,k,yr){
 // typical-year check: the whole measured year at the same day / night load, with the usable tank and the new power limit.
 // The tank covers the year when its deepest draw stays within the usable storage (the reserve is never used).
 function yearCheck(st,i,wx,k,c){
-  const o=st.sys, L={name:'CHW',Ts:i.Ts,Tr:i.Tr}, yr=wx.T.map((t,h)=>({db:t,wb:wx.Twb[h]}));
-  const load=h=>{ const t=h%24; return t>=DAY0&&t<NIGHT0?i.Q:i.Q*i.night; };
+  const o=st.sys, L={name:i.Ts>=25?'LC':'Air',Ts:i.Ts,Tr:i.Tr}, yr=wx.T.map((t,h)=>({db:t,wb:wx.Twb[h]}));
+  const load=h=>isDay(i,h%24)?i.Q:i.Q*i.night;
   const r=runPlant(o,L,yr,c.capT,k,c.E,load,c.Prated);
   const hours=r.prof.filter(x=>x.dis>1e-6).length, draw=c.E-Math.min(...r.prof.map(x=>x.soc));
   return {hours,draw,share:c.E>0?draw/c.E:0,ok:draw<=c.E*1.001};
@@ -999,7 +1014,7 @@ function yearCheck(st,i,wx,k,c){
 // the lowest design temperature whose tank recharges within the safe time (default 4 h),
 // plus an optional extra margin (default 0 K)
 function peakStudy(i,wx,k){
-  const o=OPTIONS.find(x=>x.id===i.sys), L={name:'CHW',Ts:i.Ts,Tr:i.Tr}, base=designBasis(wx), DR=hotDayRange(wx);
+  const o=OPTIONS.find(x=>x.id===i.sys), L={name:i.Ts>=25?'LC':'Air',Ts:i.Ts,Tr:i.Tr}, base=designBasis(wx), DR=hotDayRange(wx);
   const lo=Math.max(base.db04-3,base.extDB-8), cases=[], yr=wx.T.map((t,h)=>({db:t,wb:wx.Twb[h]}));
   for(let Td=Math.round((base.extDB-0.5)*2)/2; Td>=lo-1e-9; Td-=0.5) cases.push(studyCase(o,L,i,base,DR,Td,k,yr));
   let low=null; for(const c of cases){ if(c.safe&&c.E>0) low=c; else if(low) break; }   // cases run from hot to cool
@@ -1034,7 +1049,7 @@ $('gFile').onchange=e=>{ const f=e.target.files[0]; if(!f) return; const rd=new 
 // ---------- study ----------
 function inputs(){
   const lim=(v,a,b)=>Math.min(b,Math.max(a,v));   // typed values are not held to the min / max of the fields
-  return {Q:Math.max(0.1,num('gQ',20))*1000,night:lim(num('gNight',80),10,100)/100,sys:$('gSys').value,Ts:num('gTs',30),Tr:Math.max(num('gTr',40),num('gTs',30)+1),
+  return {Q:Math.max(0.1,num('gQ',20))*1000,night:lim(num('gNight',80),10,100)/100,day0:lim(Math.round(num('gDay0',7)),0,23),night0:lim(Math.round(num('gNight0',19)),0,23),sys:$('gSys').value,Ts:num('gTs',30),Tr:Math.max(num('gTr',40),num('gTs',30)+1),
     reserve:lim(num('gReserve',20),0,80)/100,margin:Math.max(0,num('gMar',20))/100,days:lim(Math.round(num('gDays',3)),1,7),rechMax:lim(num('gRechMax',4),1,12),
     eff:lim(num('gEff',85),50,100)/100,Hmax:Math.max(3,num('gH',15)),safety:Math.max(0,num('gSafe',0))};
 }
@@ -1059,8 +1074,9 @@ function render(){
     : `Recommended: <b>${fmt(rec,1)} °C</b> · <a href="#" id="gTdReset">use it</a>`;
   if($('gTdReset')) $('gTdReset').onclick=e=>{ e.preventDefault(); userTd=null; render(); };
   $('gStatus').textContent='';
+  const hh=h=>String(h).padStart(2,'0')+':00', nh=nightHours(I), win=`${hh(I.night0)}–${hh(I.day0)}`;
   const chCut=Math.max(0,c.cap0-c.capT), night=`${fmt(I.night*100)}% IT load`, lim=`${fmt(I.rechMax,1)} h`;
-  const rech=isFinite(c.rechH)?{v:`${fmt(c.rechH)} <small>h</small>`,l:`to recharge at ${night} over the 12-hour night`}:{v:'No',l:`full recharge before morning at ${night}`};
+  const rech=isFinite(c.rechH)?{v:`${fmt(c.rechH)} <small>h</small>`,l:`to recharge at ${night} over the ${nh}-hour night (${win})`}:{v:'No',l:`full recharge before morning at ${night}`};
   const save=`Chiller capacity −${MW(chCut)} MW.`;
   // the reserve kept full (net of the sizing margin) also covers a power changeover at full load
   const rideMin=c.V*I.reserve*RHO_CP*(I.Tr-I.Ts)*I.eff/3600/I.Q*60;
